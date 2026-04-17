@@ -1,0 +1,281 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Project Scaffold & Config",
+        "description": "Initialize Next.js 14 App Router project with Tailwind CSS, shadcn/ui, TypeScript strict mode, and the central config object.",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "high",
+        "details": "1. Run `npx create-next-app@latest` with TypeScript, Tailwind, App Router, src/ directory.\n2. Install shadcn/ui: `npx shadcn@latest init`.\n3. Create `src/lib/config.ts` exporting:\n   - apiBase = process.env.NEXT_PUBLIC_WP_URL + '/wp-json'\n   - productsNs = 'wpadhlwrapi/v1'\n   - apiNs = 'api'\n   - features: { registration: boolean, guestCheckout: boolean }\n4. Create `.env.local.example` with NEXT_PUBLIC_WP_URL and NEXT_PUBLIC_STRIPE_PK placeholders.\n5. Set up src/ directory structure as defined in PRD section 4.1.\n6. Add tsconfig.json path aliases: @/* -> ./src/*.\n\nConstraints:\n- Zero hardcoded URLs or store names outside config.ts.\n- NEXT_PUBLIC_WP_URL is the only variable needed to switch stores.\n\nFiles (max 5): src/lib/config.ts, .env.local.example, tsconfig.json, package.json, tailwind.config.ts",
+        "testStrategy": "1. Run `npm run build` -- must compile with zero TypeScript errors.\n2. Change NEXT_PUBLIC_WP_URL in .env.local -- verify config.apiBase reflects the new value at runtime.\n3. Import a shadcn/ui Button in a test page -- verify it renders correctly.",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Central API Client",
+        "description": "Build lib/api/client.ts -- the single fetch wrapper that attaches JWT, handles 401 auto-refresh with in-flight deduplication, retries on network failure, and normalises errors.",
+        "status": "pending",
+        "dependencies": [
+          1
+        ],
+        "priority": "high",
+        "details": "1. Create src/lib/api/client.ts exporting apiClient(path, options).\n2. Token attachment: read access_token from the Authorization cookie (server components) or from authStore (client components).\n3. On 401 response:\n   a. If a refresh is already in-flight, await the same promise (singleton -- use a module-level `let refreshPromise: Promise | null`).\n   b. Otherwise, call POST /api/auth/refresh with the refresh_token cookie.\n   c. On refresh success: update access_token cookie, retry original request once.\n   d. On refresh failure: call authStore.logout() and router.push('/login').\n4. On { success: false }: throw ApiError with { code, message } fields.\n5. Network failure: retry once after 500 ms delay.\n6. Never expose raw WP/WooCommerce internal fields.\n\nAPI deps: API Documentation.md section 3 (token types), section 7.2 (refresh endpoint).\n\nFiles (max 5): src/lib/api/client.ts, src/lib/errors.ts",
+        "testStrategy": "1. Mock a 401 response followed by a successful refresh -- verify original request is retried with the new token.\n2. Mock two simultaneous 401 requests -- verify only ONE refresh call fires.\n3. Mock refresh returning 401 -- verify authStore.logout() is called and redirect to /login occurs.\n4. Mock { success: false, code: 'out_of_stock', message: '...' } -- verify an ApiError is thrown with matching code.\n5. Mock network failure -- verify one retry happens after ~500 ms.",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Zustand Auth Store + Next.js Auth API Routes",
+        "description": "Create stores/authStore.ts (Zustand) and the Next.js server-side route handlers that set/clear httpOnly JWT cookies.",
+        "status": "pending",
+        "dependencies": [
+          1,
+          2
+        ],
+        "priority": "high",
+        "details": "1. Create src/stores/authStore.ts with Zustand:\n   - State: user: { id, email, display_name } | null, isAuthenticated: boolean, loading: boolean.\n   - Actions: login(username, password, guestToken?), register(email, password, first_name, last_name), logout(), refreshToken().\n   - login and register call the Next.js API routes (not the WP API directly).\n\n2. Create Next.js Route Handlers:\n   - src/app/api/auth/login/route.ts: forwards to POST /wp-json/api/auth/login, sets access_token and refresh_token as httpOnly Secure SameSite=Lax cookies, returns { user }.\n   - src/app/api/auth/register/route.ts: forwards to POST /wp-json/api/auth/register, sets cookies, returns { user }.\n   - src/app/api/auth/logout/route.ts: clears both cookies, returns 200.\n   - src/app/api/auth/refresh/route.ts: reads refresh_token cookie, forwards to POST /wp-json/api/auth/refresh, updates access_token cookie.\n\n3. On successful login: call cartStore.clearGuestToken() to remove guest_token from localStorage (cart was merged).\n\nConstraints:\n- access_token and refresh_token are NEVER accessible from JavaScript (httpOnly).\n- guest_token stays in localStorage; this store does not manage it.\n\nAPI deps: API Documentation.md sections 7.1, 7.2, Flow E.\n\nFiles (max 5): src/stores/authStore.ts, src/app/api/auth/login/route.ts, src/app/api/auth/register/route.ts, src/app/api/auth/logout/route.ts, src/app/api/auth/refresh/route.ts",
+        "testStrategy": "1. Call authStore.login() with valid credentials -- verify isAuthenticated = true, user is populated, httpOnly cookie is set (visible in DevTools Cookies, not in JS document.cookie).\n2. Call authStore.logout() -- verify cookies are cleared and user = null.\n3. After login with a guest token -- verify localStorage cart_token is removed.",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Zustand Cart Store + Cart API Layer",
+        "description": "Create stores/cartStore.ts and lib/api/cart.ts -- full cart state management with guest token lifecycle and cart-merge on login.",
+        "status": "pending",
+        "dependencies": [
+          1,
+          2,
+          3
+        ],
+        "priority": "high",
+        "details": "1. Create src/lib/api/cart.ts with functions:\n   - apiAddToCart(productId, variationId, quantity) -- calls POST /wpadhlwrapi/v1/cart/add\n   - apiGetCart(token) -- calls GET /wpadhlwrapi/v1/cart\n   - apiUpdateCartItem(itemId, quantity) -- calls PUT /wpadhlwrapi/v1/cart/update\n   - apiRemoveCartItem(itemId) -- calls DELETE /wpadhlwrapi/v1/cart/remove\n\n2. Create src/stores/cartStore.ts with Zustand:\n   - State: items: CartItem[], cartToken: string | null, guestToken: string | null, loading: boolean, error: string | null, cartDrawerOpen: boolean.\n   - fetchCart(): fetches cart with current token (guest or user).\n   - addItem(productId, variationId, quantity): on first add -- saves returned guest_token to localStorage['cart_token'] and to guestToken state.\n   - updateItem(itemId, quantity): calls update API, refreshes cart state.\n   - removeItem(itemId): calls remove API, refreshes cart state.\n   - clearGuestToken(): removes localStorage['cart_token'], sets guestToken = null.\n   - clearCart(): resets items to [] (called after order confirmation).\n   - error is always set for API failures -- never swallowed silently.\n\nEdge cases:\n- out_of_stock (400) -- set error = 'This item is out of stock'.\n- guest_token only appears in the FIRST cart/add response; do not overwrite on subsequent adds.\n\nAPI deps: API Documentation.md section 6 (all cart endpoints), Flow A steps 3-5.\n\nFiles (max 4): src/stores/cartStore.ts, src/lib/api/cart.ts",
+        "testStrategy": "1. Call addItem() with no existing token -- verify localStorage['cart_token'] is set and guestToken populated.\n2. Call addItem() a second time -- verify localStorage['cart_token'] is NOT overwritten.\n3. Call updateItem() -- verify cart state reflects new quantity.\n4. Call removeItem() -- verify item absent from items array.\n5. Trigger out_of_stock error -- verify cartStore.error = 'This item is out of stock'.\n6. After clearGuestToken() -- verify localStorage['cart_token'] is null.",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Login Page",
+        "description": "Build /login page with LoginForm component -- credential form, guest cart merge on login, error display.",
+        "status": "pending",
+        "dependencies": [
+          3
+        ],
+        "priority": "high",
+        "details": "1. Create src/app/login/page.tsx (SSG static page).\n2. Create src/components/auth/LoginForm.tsx:\n   - Fields: username (email or WP username), password.\n   - On submit: reads localStorage['cart_token'] (guest_token); calls authStore.login(username, password, guestToken).\n   - On success: redirect to /account (or ?redirect= param if set).\n   - Shows inline error for invalid_credentials: 'Invalid username or password.'\n   - Submit button: loading spinner while request is in-flight, disabled during loading.\n3. Link to /register ('Create an account') and /forgot-password ('Forgot password?').\n\nAPI deps: API Documentation.md section 7.1.\n\nFiles (max 4): src/app/login/page.tsx, src/components/auth/LoginForm.tsx",
+        "testStrategy": "Manual test scenario 2 (step 1) + scenario 1 (steps 8-9):\n1. Submit with wrong credentials -- inline error shown.\n2. Submit with valid credentials + existing guest cart -- redirect to /account, cart merged, localStorage cleared.\n3. Submit with valid credentials (no guest cart) -- redirect to /account.",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Register Page",
+        "description": "Build /register page with RegisterForm -- new account creation with immediate login on success.",
+        "status": "pending",
+        "dependencies": [
+          3
+        ],
+        "priority": "high",
+        "details": "1. Create src/app/register/page.tsx (SSG static page).\n2. Create src/components/auth/RegisterForm.tsx:\n   - Fields: first_name, last_name, email, password, confirm_password.\n   - Client-side validation: email format, password min 8 chars, passwords match.\n   - On submit: calls authStore.register(email, password, first_name, last_name).\n   - On success (201): redirect to /account; user is immediately authenticated (cookies set by route handler).\n   - Error email_exists -- 'This email is already registered.'\n   - Error registration_failed -- 'Registration failed. Please try again.'\n3. Link to /login ('Already have an account?').\n\nAPI deps: API Documentation.md Flow E.\n\nFiles (max 3): src/app/register/page.tsx, src/components/auth/RegisterForm.tsx",
+        "testStrategy": "Manual test scenario 6:\n1. Submit with already-registered email -- 'This email is already registered' error shown.\n2. Submit with password < 8 chars -- inline validation error before API call.\n3. Submit valid new user -- redirect to /account, user logged in, access_token cookie set (httpOnly -- not in JS).",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Forgot Password & Reset Password Pages",
+        "description": "Build /forgot-password and /reset-password pages -- two-step password recovery with anti-enumeration security.",
+        "status": "pending",
+        "dependencies": [
+          3
+        ],
+        "priority": "medium",
+        "details": "1. Forgot Password:\n   - src/app/forgot-password/page.tsx (SSG static).\n   - src/components/auth/ForgotPasswordForm.tsx: single email field.\n   - Calls POST /wp-json/api/auth/forgot-password via apiClient.\n   - ALWAYS shows: 'If an account exists for this email, a reset link has been sent.' -- regardless of API outcome (anti-enumeration).\n   - Submit button disabled after first submit to prevent spam.\n\n2. Reset Password:\n   - src/app/reset-password/page.tsx (CSR -- reads URL query params).\n   - src/components/auth/ResetPasswordForm.tsx: new_password + confirm_password fields.\n   - On mount: reads ?key= and ?login= from URL. If either missing -- show 'Invalid reset link.' immediately.\n   - On submit: calls POST /wp-json/api/auth/reset-password with { key, login, new_password }.\n   - On success: redirect to /login?reset=success.\n   - Error invalid_reset_key -- 'This link is invalid or has expired.'\n\nAPI deps: API Documentation.md Flow F.\n\nFiles (max 4): src/app/forgot-password/page.tsx, src/components/auth/ForgotPasswordForm.tsx, src/app/reset-password/page.tsx, src/components/auth/ResetPasswordForm.tsx",
+        "testStrategy": "Manual test scenario 7:\n1. Submit forgot-password with non-existent email -- same success message shown (no enumeration).\n2. Submit forgot-password with real email -- same message shown; email received.\n3. Click reset link -- form shown; fill new password -- redirect to /login with success message.\n4. Log in with new password -- succeeds.\n5. Use expired reset link -- 'This link is invalid or has expired.' shown.",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Product Archive Page",
+        "description": "Build /products SSG+ISR page with ProductGrid, ProductCard, pagination, category filter, and search.",
+        "status": "pending",
+        "dependencies": [
+          1,
+          2
+        ],
+        "priority": "high",
+        "details": "1. Create src/lib/api/products.ts:\n   - getProducts({ page, per_page, category, search }) -- GET /wpadhlwrapi/v1/products with next: { revalidate: 60 }.\n   - getProduct(slug) -- GET /wpadhlwrapi/v1/products/{slug} with ISR.\n   - getAllProductSlugs() -- fetches all pages to build generateStaticParams.\n\n2. Create src/app/(shop)/products/page.tsx:\n   - Server Component (SSG+ISR revalidate: 60).\n   - Reads searchParams: page, category, search.\n   - Clamps per_page to 12 (never > 100).\n   - Renders ProductGrid and pagination controls.\n   - Empty state: 'No products found.'\n\n3. Create src/components/product/ProductCard.tsx:\n   - Displays: next/image thumbnail, name, price (sale vs regular with strikethrough), On Sale badge.\n   - Links to /products/{slug}.\n\n4. Create src/components/product/ProductGrid.tsx:\n   - Responsive grid layout; maps products array to ProductCard components.\n\nAPI deps: API Documentation.md section 5.1.\n\nFiles (max 5): src/app/(shop)/products/page.tsx, src/lib/api/products.ts, src/components/product/ProductCard.tsx, src/components/product/ProductGrid.tsx",
+        "testStrategy": "Manual test scenario 3 (steps 1-2):\n1. Visit /products -- verify product grid renders (Network tab: no auth headers).\n2. Add ?category=t-shirts -- verify filtered results.\n3. Add ?search=tee -- verify search results.\n4. Paginate via ?page=2 -- verify new products load.\n5. Visit with no matching filter -- verify 'No products found.' message.\n6. `npm run build` -- verify ISR pages are statically generated.",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Product Detail Page",
+        "description": "Build /products/[slug] SSG+ISR page with image gallery, VariationSelector, and Add to Cart with variation enforcement.",
+        "status": "pending",
+        "dependencies": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "priority": "high",
+        "details": "1. Create src/app/(shop)/products/[slug]/page.tsx:\n   - Server Component with generateStaticParams (uses getAllProductSlugs()).\n   - ISR: export const revalidate = 60.\n   - Calls getProduct(slug) -- uses fat payload (no extra variation requests).\n   - On product_not_found (null) -- notFound().\n   - Renders: image gallery (next/image), name, price (sale vs regular), short_description, description, VariationSelector, Add to Cart button.\n\n2. Create src/components/product/VariationSelector.tsx:\n   - Client Component (needs state for selected attributes).\n   - For variable products: renders selector for each attribute group in variations[].attributes.\n   - Add to Cart DISABLED until all attribute groups have a selection.\n   - Selected variation with stock_status === 'outofstock' -- button shows 'Out of Stock', disabled.\n   - For simple products (empty variations[]): renders Add to Cart directly.\n   - On Add to Cart click: calls cartStore.addItem(product.id, selectedVariation.id, 1).\n   - Shows loading state during cart API call.\n\nEdge cases:\n- Product image url missing -- render a placeholder image.\n- Simple product -- no variation UI rendered.\n\nAPI deps: API Documentation.md sections 5.2 and 6.1.\n\nFiles (max 4): src/app/(shop)/products/[slug]/page.tsx, src/components/product/VariationSelector.tsx, src/lib/api/products.ts (already created in task 8)",
+        "testStrategy": "Manual test scenarios 1 (steps 3-5), 3 (steps 2-3), 5 (steps 1-3):\n1. Navigate to a variable product -- verify variation selectors render.\n2. Click Add to Cart WITHOUT selecting all attributes -- verify button stays disabled.\n3. Select all attributes -- verify button activates.\n4. Select an out-of-stock variation -- verify button shows 'Out of Stock', disabled.\n5. Navigate to /products/nonexistent-slug -- verify 404 page.\n6. Navigate to a simple product -- verify no variation selectors, Add to Cart immediately active.",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Cart Page + Cart Drawer",
+        "description": "Build /cart CSR page with CartItem, CartSummary, and a slide-out CartDrawer accessible from the Header.",
+        "status": "pending",
+        "dependencies": [
+          4,
+          17
+        ],
+        "priority": "high",
+        "details": "1. Create src/app/cart/page.tsx:\n   - Client Component ('use client'). Calls cartStore.fetchCart() on mount.\n   - Renders list of CartItem components.\n   - Empty state: 'Your cart is empty.' with 'Continue Shopping' link -> /products.\n   - 'Proceed to Checkout' button -> /checkout.\n\n2. Create src/components/cart/CartItem.tsx:\n   - Displays: product name, variation attributes (from item meta), quantity stepper (+/- buttons), remove button.\n   - Quantity stepper: calls cartStore.updateItem(item.id, newQty). Min quantity = 1.\n   - Remove button: calls cartStore.removeItem(item.id).\n   - NOTE (OQ-1): Cart API does not return item prices. Display quantity only; subtotal omitted pending resolution of OQ-1.\n\n3. Create src/components/cart/CartSummary.tsx:\n   - Displays item count. Subtotal field shows 'Calculated at checkout' (OQ-1 pending).\n   - 'Go to Checkout' button.\n\n4. Create src/components/cart/CartDrawer.tsx:\n   - shadcn/ui Sheet (slide-over panel) opened via cartStore.cartDrawerOpen boolean.\n   - Renders CartItem list in compact form.\n   - 'View Cart' -> /cart; 'Checkout' -> /checkout.\n\n5. Update src/components/layout/Header.tsx:\n   - Cart icon button shows badge with cartStore.items.length.\n   - Click opens CartDrawer.\n\nAPI deps: API Documentation.md sections 6.2, 6.3, 6.4.\n\nFiles (max 5): src/app/cart/page.tsx, src/components/cart/CartItem.tsx, src/components/cart/CartSummary.tsx, src/components/cart/CartDrawer.tsx",
+        "testStrategy": "Manual test scenario 1 (steps 6-7) and scenario 2 (step 2):\n1. Add item to cart -- CartDrawer opens, badge shows count = 1.\n2. Navigate to /cart -- item renders with correct name and quantity.\n3. Change quantity via stepper -- update reflected without page reload.\n4. Remove item -- item disappears from list.\n5. Remove all items -- empty state message shown.",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Checkout Page - Address Form & Gateway Selector",
+        "description": "Build protected /checkout CSR page with billing/shipping address form pre-filled from user profile and payment gateway selector.",
+        "status": "pending",
+        "dependencies": [
+          3,
+          4,
+          17
+        ],
+        "priority": "high",
+        "details": "1. Create src/app/checkout/page.tsx:\n   - Client Component ('use client'). Protected: if not authenticated -- redirect to /login?redirect=/checkout.\n   - If cartStore.items.length === 0 on mount -- redirect to /cart with message 'Your cart is empty.'\n   - On mount: fetch GET /api/user to pre-fill billing form fields.\n\n2. Create src/components/checkout/CheckoutForm.tsx:\n   - Fields (matching API Documentation.md section 7.3 address object): first_name, last_name, company, address_1, address_2, city, state, postcode, country, email, phone.\n   - Shipping address: checkbox 'Same as billing' (default checked). If unchecked -- shows separate shipping fields (no email/phone).\n   - Gateway selector: radio buttons -- 'Credit Card (Stripe)' | 'Bank Transfer (BACS)'.\n   - Renders StripeForm (task 12) or BacsInfo (task 13) based on selection.\n   - Submit button: shows loading spinner, disabled during API call.\n   - All error codes from API Documentation.md section 7.3 mapped to visible messages.\n\n3. Create src/lib/api/checkout.ts:\n   - placeOrder({ gateway, payment_data?, billing, shipping? }) -- POST /wp-json/api/checkout with access_token from cookie.\n   - Returns { order_id, status, transaction_id }.\n\nAPI deps: API Documentation.md sections 7.3 and 9.1 (user pre-fill).\n\nFiles (max 5): src/app/checkout/page.tsx, src/components/checkout/CheckoutForm.tsx, src/lib/api/checkout.ts",
+        "testStrategy": "Manual test scenario 1 (step 10) and scenario 2 (steps 3-4):\n1. Navigate to /checkout without login -- redirected to /login.\n2. Log in, navigate to /checkout -- form pre-filled with saved billing address.\n3. Verify 'Same as billing' checkbox pre-checked; uncheck -- shipping fields appear.\n4. Select BACS -- verify BacsInfo renders (no card field).\n5. Select Stripe -- verify StripeForm (CardElement) renders.",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Checkout - Stripe Integration",
+        "description": "Build StripeForm with @stripe/react-stripe-js CardElement, client-side PaymentMethod creation, and POST /api/checkout stripe flow.",
+        "status": "pending",
+        "dependencies": [
+          11
+        ],
+        "priority": "high",
+        "details": "1. Install: npm install @stripe/stripe-js @stripe/react-stripe-js.\n2. Create src/components/checkout/StripeForm.tsx:\n   - Wrapped in Elements stripe={stripePromise} (lazy-loaded via dynamic() to avoid SSR issues).\n   - stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PK!).\n   - Renders shadcn/ui-styled CardElement container.\n   - On parent form submit:\n     a. stripe.createPaymentMethod({ type: 'card', card: cardElement }) -- get paymentMethod.id.\n     b. If Stripe returns an error -- display error.message inline; STOP (do not call backend).\n     c. Calls CheckoutForm.handlePlaceOrder({ gateway: 'stripe', payment_data: { payment_method_id } }).\n3. Add NEXT_PUBLIC_STRIPE_PK to .env.local.example.\n4. Import StripeForm in CheckoutForm via dynamic(() => import('./StripeForm'), { ssr: false }) (code-split, no SSR).\n\nEdge cases:\n- payment_failed (402 from backend) -- 'Payment was declined. Please check your card details.'\n- Card validation error before submit -- show Stripe error message in a visible red label.\n\nAPI deps: API Documentation.md section 7.3 (stripe gateway), Flow A steps 8-9.\n\nFiles (max 4): src/components/checkout/StripeForm.tsx, src/components/checkout/CheckoutForm.tsx (add dynamic import), .env.local.example",
+        "testStrategy": "Manual test scenario 1 (steps 11-12):\n1. Select Stripe, enter test card 4242 4242 4242 4242 exp 12/34 CVC 123.\n2. Submit -- verify redirect to /order-confirmation/{id} with status 'completed'.\n3. Enter declined card 4000 0000 0000 0002 -- verify 'Payment was declined.' error shown; no redirect.\n4. Submit with empty card field -- verify Stripe inline validation error before API call.",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "Checkout - BACS Integration",
+        "description": "Build BacsInfo component for Bank Transfer checkout -- displays bank details notice and submits BACS order.",
+        "status": "pending",
+        "dependencies": [
+          11
+        ],
+        "priority": "medium",
+        "details": "1. Create src/components/checkout/BacsInfo.tsx:\n   - Renders a notice box: 'You will receive bank transfer instructions by email after placing your order.'\n   - No additional form fields required for BACS.\n2. In CheckoutForm.tsx when gateway = 'bacs':\n   - Submit calls placeOrder({ gateway: 'bacs', billing, shipping }) (no payment_data).\n   - On success { order_id, status: 'pending' } -- redirect to /order-confirmation/{order_id}.\n\nAPI deps: API Documentation.md section 7.3 (bacs gateway), Flow B.\n\nFiles (max 2): src/components/checkout/BacsInfo.tsx, src/components/checkout/CheckoutForm.tsx",
+        "testStrategy": "Manual test scenario 2 (steps 3-4):\n1. Select BACS, fill billing form, submit.\n2. Verify redirect to /order-confirmation/{id} with status 'pending'.\n3. Verify no card element rendered when BACS is selected.",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "Order Confirmation Page",
+        "description": "Build /order-confirmation/[id] CSR page -- shows order status, transaction ID (Stripe) or bank transfer instructions (BACS).",
+        "status": "pending",
+        "dependencies": [
+          12,
+          13
+        ],
+        "priority": "medium",
+        "details": "1. Create src/app/order-confirmation/[id]/page.tsx:\n   - Client Component ('use client').\n   - Reads order data from router state or sessionStorage (passed by checkout on redirect).\n   - Displays:\n     - 'Order #42 confirmed!' heading.\n     - Status badge (Completed / Pending Payment).\n     - If transaction_id present (Stripe): 'Payment ID: pi_xxx'.\n     - If status === 'pending' (BACS): bank transfer instructions block with order number reference.\n   - 'Continue Shopping' button -- /products.\n   - 'View My Orders' button -- /account.\n2. After rendering: call cartStore.clearCart() to reset cart state.\n\nFiles (max 2): src/app/order-confirmation/[id]/page.tsx",
+        "testStrategy": "1. After Stripe checkout success -- order confirmation shows order_id and 'Completed' status.\n2. After BACS checkout success -- order confirmation shows 'Pending Payment' and bank transfer instructions.\n3. Navigate to /account after confirmation -- order appears in order list.",
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "Account Page",
+        "description": "Build protected /account CSR page -- user profile display, saved addresses, paginated order history, logout.",
+        "status": "pending",
+        "dependencies": [
+          3,
+          17
+        ],
+        "priority": "medium",
+        "details": "1. Create src/app/account/page.tsx:\n   - Client Component ('use client'). Protected: if not authenticated -- redirect to /login.\n   - On mount: call getUserProfile() and getOrders(1, 10) in parallel.\n\n2. Create src/lib/api/user.ts:\n   - getUserProfile() -- GET /wp-json/api/user with access_token cookie.\n\n3. Create src/lib/api/orders.ts:\n   - getOrders(page, perPage) -- GET /wp-json/api/orders?page=&per_page= with access_token cookie.\n\n4. Profile section (read-only in v1): display_name, email, billing address block, shipping address block.\n\n5. Create src/components/account/OrdersList.tsx:\n   - Paginated list (previous/next buttons).\n   - Each row: Order #, date (formatted), status badge (color-coded), total with currency.\n   - Empty state: 'You have no orders yet.'\n\n6. Logout button: calls authStore.logout(), redirects to /.\n\nEdge cases:\n- user_not_found (404 from /api/user) -- call authStore.logout(), redirect to /login.\n- invalid_token (401) -- auto-refresh via apiClient; if refresh fails -- redirect to /login.\n\nAPI deps: API Documentation.md sections 9.1 (orders), 10.1 (user profile), Flow D.\n\nFiles (max 5): src/app/account/page.tsx, src/lib/api/user.ts, src/lib/api/orders.ts, src/components/account/OrdersList.tsx",
+        "testStrategy": "Manual test scenario 2 (step 5) and scenario 4 (token expiry):\n1. Log in, navigate to /account -- profile data shown, order list loads.\n2. Verify pagination: navigate to page 2 if orders > 10.\n3. Click Logout -- redirected to /, cookies cleared.\n4. Navigate to /account without login -- redirected to /login.\n5. With expired access token + valid refresh token -- page still loads (auto-refresh).\n6. With both tokens expired -- redirected to /login with session expired message.",
+        "subtasks": []
+      },
+      {
+        "id": 16,
+        "title": "Home Page",
+        "description": "Build / SSG+ISR home page with a config-driven hero section and featured products grid.",
+        "status": "pending",
+        "dependencies": [
+          1,
+          2,
+          8
+        ],
+        "priority": "medium",
+        "details": "1. Create src/app/(shop)/page.tsx:\n   - Server Component with export const revalidate = 60.\n   - Calls getProducts({ per_page: 8 }) for featured products.\n   - Renders hero section and ProductGrid.\n\n2. Hero section driven by lib/config.ts hero object:\n   - config.hero = { title, subtitle, ctaText, ctaLink } -- all values from env vars or config.\n   - No hardcoded marketing copy.\n\n3. 'Shop All' CTA button -> /products.\n\nConstraints:\n- No direct WooCommerce dependency.\n- Changing NEXT_PUBLIC_WP_URL changes the product source; no other code changes needed.\n\nFiles (max 3): src/app/(shop)/page.tsx, src/lib/config.ts (add hero config)",
+        "testStrategy": "1. `npm run build` -- verify home page is statically generated.\n2. Visit / -- hero section renders with config values, 8 products shown.\n3. Click a product card -- navigates to /products/[slug].\n4. Click 'Shop All' -- navigates to /products.",
+        "subtasks": []
+      },
+      {
+        "id": 17,
+        "title": "Layout - Header & Footer",
+        "description": "Build site-wide Header and Footer -- navigation, auth-aware links, cart icon with badge, mobile responsive.",
+        "status": "pending",
+        "dependencies": [
+          1,
+          3,
+          4
+        ],
+        "priority": "high",
+        "details": "1. Create src/components/layout/Header.tsx:\n   - Client Component (reads Zustand state).\n   - Logo/site name from config.ts.\n   - Navigation links: Home (/), Products (/products).\n   - Auth-aware right section:\n     - Unauthenticated: 'Login' -> /login, 'Register' -> /register.\n     - Authenticated: 'Account' -> /account, 'Logout' button.\n   - Cart icon: shows cartStore.items.length badge (0 hidden).\n   - Cart icon click: sets cartStore.cartDrawerOpen = true.\n   - Mobile: hamburger menu (shadcn/ui Sheet).\n\n2. Create src/components/layout/Footer.tsx:\n   - Static links: Privacy Policy, Terms, Contact.\n   - Copyright text from config.ts.\n\n3. Add Header + Footer to src/app/layout.tsx.\n\nConstraints:\n- No WooCommerce dependency.\n- Must render correctly when cart is empty and user is not logged in.\n\nFiles (max 4): src/components/layout/Header.tsx, src/components/layout/Footer.tsx, src/app/layout.tsx",
+        "testStrategy": "1. Visit any page unauthenticated -- Header shows Login + Register links; cart badge hidden.\n2. Log in -- Header shows Account + Logout; Login/Register hidden.\n3. Add item to cart -- cart badge shows count.\n4. Click cart icon -- CartDrawer opens.\n5. Resize to mobile (375px) -- hamburger menu appears, nav collapses.",
+        "subtasks": []
+      },
+      {
+        "id": 18,
+        "title": "Error Handling & 404 Pages",
+        "description": "Add global error boundary, 404 not-found page, and API error toast notifications.",
+        "status": "pending",
+        "dependencies": [
+          1,
+          2
+        ],
+        "priority": "medium",
+        "details": "1. Create src/app/error.tsx (Next.js global error boundary):\n   - Client Component. Shows 'Something went wrong. Please try again.' with a Reset button.\n   - Logs error to console.error in dev.\n\n2. Create src/app/not-found.tsx:\n   - Shows '404 - Page not found' with link back to /products.\n\n3. Add a toast notification system:\n   - Use sonner (or shadcn/ui Toaster) for non-blocking API error messages.\n   - apiClient.ts calls toast.error(error.message) on API errors where appropriate.\n   - Cart errors (out_of_stock) surface via cartStore.error AND a toast.\n\n4. Product 404: notFound() is already called in task 9. Verify not-found.tsx is reached.\n\nConstraints: Fail loudly -- every error visible to user; no silent catch.\n\nFiles (max 4): src/app/error.tsx, src/app/not-found.tsx, src/components/ui/toaster.tsx (shadcn), src/app/layout.tsx (add Toaster)",
+        "testStrategy": "1. Navigate to /nonexistent-page -- 404 not-found page shown.\n2. Navigate to /products/nonexistent-slug -- 404 shown.\n3. Trigger an API error (e.g., network disconnect) -- error toast appears in UI.\n4. Out-of-stock add to cart -- toast shows 'This item is out of stock.'",
+        "subtasks": []
+      },
+      {
+        "id": 19,
+        "title": "Manual QA & Integration Testing",
+        "description": "Execute all 7 manual test scenarios from PRD section 8 against a live staging backend. Document pass/fail.",
+        "status": "pending",
+        "dependencies": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ],
+        "priority": "high",
+        "details": "Execute all 7 manual test scenarios from PRD section 8 (source: .taskmaster/docs/headless_ecommerce_frontend_prd_bak.txt):\n\n1. Scenario 1 - Guest Purchase (Stripe): Full flow from product browse -> add to cart -> login with cart merge -> Stripe checkout -> order confirmation.\n2. Scenario 2 - Registered User Purchase (BACS): Login -> browse -> add simple product -> BACS checkout -> order in account.\n3. Scenario 3 - Browse Without Buying: Product listing + PDP load without auth; 404 on bad slug.\n4. Scenario 4 - Token Expiry / Auto-Refresh: Simulate expired access token; verify silent refresh; simulate expired refresh token; verify redirect to /login.\n5. Scenario 5 - Out-of-Stock Error: Mark product out of stock; verify Add to Cart disabled; verify error on cart add; verify checkout error.\n6. Scenario 6 - New User Registration: Duplicate email error; password validation; successful registration -> auto-login.\n7. Scenario 7 - Forgot/Reset Password: Anti-enumeration message; full reset flow; expired link error.\n\nTest environments: Chrome desktop + Safari mobile (375px viewport).\nRecord results as PASS / FAIL / BLOCKED in a QA report.",
+        "testStrategy": "Each scenario IS the test. All 7 scenarios must show PASS before v1 is considered shippable. Document any FAIL or BLOCKED with screenshots and reproduction steps.",
+        "subtasks": []
+      }
+    ]
+  }
+}
