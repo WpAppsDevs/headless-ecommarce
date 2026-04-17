@@ -58,7 +58,7 @@
         "id": 5,
         "title": "Login Page",
         "description": "Build /login page with LoginForm component -- credential form, guest cart merge on login, error display.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           3
         ],
@@ -71,7 +71,7 @@
         "id": 6,
         "title": "Register Page",
         "description": "Build /register page with RegisterForm -- new account creation with immediate login on success.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           3
         ],
