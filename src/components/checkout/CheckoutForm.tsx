@@ -1,6 +1,8 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
+import type React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -12,9 +14,22 @@ import { Button } from '@/components/ui/button';
 import { ApiError } from '@/lib/errors';
 import { placeOrder } from '@/lib/api/checkout';
 import { useCartStore } from '@/stores/cartStore';
-import { StripeForm, type StripeFormHandle } from './StripeForm';
 import { BacsInfo } from './BacsInfo';
+import type { StripeFormHandle } from './StripeForm';
 import type { BillingAddress, AddressFields, UserProfile } from '@/lib/api/checkout';
+
+// Code-split + no SSR — Stripe SDK must only run in the browser
+const StripeForm = dynamic(
+  () => import('./StripeForm').then((m) => m.StripeForm),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="rounded-md border px-3 py-2.5 text-sm text-muted-foreground">
+        Loading card form…
+      </div>
+    ),
+  },
+) as React.ForwardRefExoticComponent<React.RefAttributes<StripeFormHandle>>;
 
 // ---------------------------------------------------------------------------
 // Schema

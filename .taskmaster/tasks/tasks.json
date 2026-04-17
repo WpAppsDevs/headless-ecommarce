@@ -141,7 +141,7 @@
         "id": 11,
         "title": "Checkout Page - Address Form & Gateway Selector",
         "description": "Build protected /checkout CSR page with billing/shipping address form pre-filled from user profile and payment gateway selector.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           3,
           4,
