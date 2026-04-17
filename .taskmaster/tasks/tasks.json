@@ -210,7 +210,7 @@
         "id": 16,
         "title": "Home Page",
         "description": "Build / SSG+ISR home page with a config-driven hero section and featured products grid.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           1,
           2,
