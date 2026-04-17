@@ -240,7 +240,7 @@
         "id": 18,
         "title": "Error Handling & 404 Pages",
         "description": "Add global error boundary, 404 not-found page, and API error toast notifications.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           1,
           2
