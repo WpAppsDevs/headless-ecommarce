@@ -1,9 +1,12 @@
 import Link from 'next/link';
 import { getProducts } from '@/lib/api/products';
-import { ProductGrid } from '@/components/product/ProductGrid';
-import { config } from '@/lib/config';
-import { buttonVariants } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { ProductCard } from '@/components/product/ProductCard';
+import { AnnouncementBar } from '@/components/home/AnnouncementBar';
+import { HeroSlider } from '@/components/home/HeroSlider';
+import { FeaturesStrip } from '@/components/home/FeaturesStrip';
+import { CategoryGrid } from '@/components/home/CategoryGrid';
+import { TestimonialsSection } from '@/components/home/TestimonialsSection';
+import { InstagramSection } from '@/components/home/InstagramSection';
 
 export const revalidate = 60;
 
@@ -12,43 +15,54 @@ export default async function HomePage() {
     () => ({ items: [] }),
   );
 
-  const { hero } = config;
-
   return (
     <div className="flex flex-col">
-      {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <section className="bg-muted">
-        <div className="mx-auto max-w-7xl px-4 py-20 text-center sm:px-6 lg:px-8 lg:py-28">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            {hero.title}
-          </h1>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
-            {hero.subtitle}
+      {/* Announcement bar */}
+      <AnnouncementBar />
+
+      {/* Hero slider */}
+      <HeroSlider />
+
+      {/* Features strip */}
+      <FeaturesStrip />
+
+      {/* Featured products — "Today's Best Choices" */}
+      <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="mb-8 text-center">
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Handpicked for You
           </p>
-          <div className="mt-8 flex justify-center gap-4">
-            <Link
-              href={hero.ctaLink}
-              className={cn(buttonVariants({ size: 'lg' }))}
-            >
-              {hero.ctaText}
-            </Link>
-          </div>
+          <h2 className="mt-1 text-3xl font-bold tracking-tight">Today&apos;s Best Choices</h2>
+          <p className="mt-2 text-muted-foreground">
+            Discover today&apos;s standout picks.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {featured.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+
+        <div className="mt-10 text-center">
+          <Link
+            href="/products"
+            className="inline-flex items-center gap-2 rounded-full border border-zinc-300 px-8 py-3 text-sm font-semibold transition hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
+          >
+            View All Products →
+          </Link>
         </div>
       </section>
 
-      {/* ── Featured Products ─────────────────────────────────────────────── */}
-      <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Featured Products</h2>
-          <Link
-            href="/products"
-            className="text-sm font-medium text-primary hover:underline"
-          >
-            Shop All →
-          </Link>
-        </div>
-        <ProductGrid products={featured} />
-      </section>
+      {/* Shop by categories */}
+      <CategoryGrid />
+
+      {/* Testimonials */}
+      <TestimonialsSection />
+
+      {/* Instagram */}
+      <InstagramSection />
     </div>
   );
 }
+
