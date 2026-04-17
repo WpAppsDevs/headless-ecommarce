@@ -5,7 +5,7 @@
         "id": 1,
         "title": "Project Scaffold & Config",
         "description": "Initialize Next.js 14 App Router project with Tailwind CSS, shadcn/ui, TypeScript strict mode, and the central config object.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [],
         "priority": "high",
         "details": "1. Run `npx create-next-app@latest` with TypeScript, Tailwind, App Router, src/ directory.\n2. Install shadcn/ui: `npx shadcn@latest init`.\n3. Create `src/lib/config.ts` exporting:\n   - apiBase = process.env.NEXT_PUBLIC_WP_URL + '/wp-json'\n   - productsNs = 'wpadhlwrapi/v1'\n   - apiNs = 'api'\n   - features: { registration: boolean, guestCheckout: boolean }\n4. Create `.env.local.example` with NEXT_PUBLIC_WP_URL and NEXT_PUBLIC_STRIPE_PK placeholders.\n5. Set up src/ directory structure as defined in PRD section 4.1.\n6. Add tsconfig.json path aliases: @/* -> ./src/*.\n\nConstraints:\n- Zero hardcoded URLs or store names outside config.ts.\n- NEXT_PUBLIC_WP_URL is the only variable needed to switch stores.\n\nFiles (max 5): src/lib/config.ts, .env.local.example, tsconfig.json, package.json, tailwind.config.ts",
@@ -16,7 +16,7 @@
         "id": 2,
         "title": "Central API Client",
         "description": "Build lib/api/client.ts -- the single fetch wrapper that attaches JWT, handles 401 auto-refresh with in-flight deduplication, retries on network failure, and normalises errors.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           1
         ],
