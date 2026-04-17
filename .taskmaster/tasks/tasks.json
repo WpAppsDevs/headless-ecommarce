@@ -127,7 +127,7 @@
         "id": 10,
         "title": "Cart Page + Cart Drawer",
         "description": "Build /cart CSR page with CartItem, CartSummary, and a slide-out CartDrawer accessible from the Header.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           4,
           17
