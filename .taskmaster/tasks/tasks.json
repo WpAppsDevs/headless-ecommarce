@@ -97,7 +97,7 @@
         "id": 8,
         "title": "Product Archive Page",
         "description": "Build /products SSG+ISR page with ProductGrid, ProductCard, pagination, category filter, and search.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           1,
           2
