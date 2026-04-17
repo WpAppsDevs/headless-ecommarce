@@ -29,7 +29,7 @@
         "id": 3,
         "title": "Zustand Auth Store + Next.js Auth API Routes",
         "description": "Create stores/authStore.ts (Zustand) and the Next.js server-side route handlers that set/clear httpOnly JWT cookies.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           1,
           2
@@ -43,7 +43,7 @@
         "id": 4,
         "title": "Zustand Cart Store + Cart API Layer",
         "description": "Create stores/cartStore.ts and lib/api/cart.ts -- full cart state management with guest token lifecycle and cart-merge on login.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           1,
           2,
