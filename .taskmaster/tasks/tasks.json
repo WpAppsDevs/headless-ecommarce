@@ -225,7 +225,7 @@
         "id": 17,
         "title": "Layout - Header & Footer",
         "description": "Build site-wide Header and Footer -- navigation, auth-aware links, cart icon with badge, mobile responsive.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           1,
           3,
