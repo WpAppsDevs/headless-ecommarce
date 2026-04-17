@@ -84,7 +84,7 @@
         "id": 7,
         "title": "Forgot Password & Reset Password Pages",
         "description": "Build /forgot-password and /reset-password pages -- two-step password recovery with anti-enumeration security.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           3
         ],

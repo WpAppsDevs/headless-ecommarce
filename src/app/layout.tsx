@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AuthHydrator } from "@/components/layout/AuthHydrator";
+import { CartDrawer } from "@/components/cart/CartDrawer";
 import { config } from "@/lib/config";
 
 const geistSans = Geist({
@@ -34,6 +35,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <AuthHydrator />
         <Header />
+        <CartDrawer />
         <main className="flex-1">{children}</main>
         <Footer />
       </body>
