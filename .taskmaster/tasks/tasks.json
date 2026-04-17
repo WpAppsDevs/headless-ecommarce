@@ -156,7 +156,7 @@
         "id": 12,
         "title": "Checkout - Stripe Integration",
         "description": "Build StripeForm with @stripe/react-stripe-js CardElement, client-side PaymentMethod creation, and POST /api/checkout stripe flow.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           11
         ],
@@ -169,7 +169,7 @@
         "id": 13,
         "title": "Checkout - BACS Integration",
         "description": "Build BacsInfo component for Bank Transfer checkout -- displays bank details notice and submits BACS order.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           11
         ],

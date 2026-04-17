@@ -245,6 +245,11 @@ export function CheckoutForm({ profile }: Props) {
       });
 
       clearCart();
+      // Persist order result for confirmation page before navigating
+      sessionStorage.setItem(
+        `order_${result.order_id}`,
+        JSON.stringify(result),
+      );
       router.push(`/order-confirmation/${result.order_id}`);
     } catch (e) {
       if (e instanceof ApiError) {
