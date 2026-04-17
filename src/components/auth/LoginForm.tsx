@@ -59,8 +59,17 @@ export function LoginForm() {
     }
   };
 
+  const resetSuccess = searchParams.get('reset') === 'success';
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+      {/* Password reset success banner */}
+      {resetSuccess && (
+        <div className="rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-300">
+          Password updated! Sign in with your new password.
+        </div>
+      )}
+
       {/* Root / API error */}
       {errors.root && (
         <p role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
