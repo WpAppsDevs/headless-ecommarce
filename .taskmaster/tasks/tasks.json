@@ -182,7 +182,7 @@
         "id": 14,
         "title": "Order Confirmation Page",
         "description": "Build /order-confirmation/[id] CSR page -- shows order status, transaction ID (Stripe) or bank transfer instructions (BACS).",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           12,
           13
@@ -196,7 +196,7 @@
         "id": 15,
         "title": "Account Page",
         "description": "Build protected /account CSR page -- user profile display, saved addresses, paginated order history, logout.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           3,
           17
