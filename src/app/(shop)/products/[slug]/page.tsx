@@ -1,12 +1,17 @@
+import { Suspense } from 'react';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { ChevronRight, Star, Tag, Package } from 'lucide-react';
 import { getProduct, getAllProductSlugs } from '@/lib/api/products';
 import { ProductImages } from '@/components/product/ProductImages';
 import { VariationSelector } from '@/components/product/VariationSelector';
-import { Badge } from '@/components/ui/badge';
+import { ProductTabs } from '@/components/product/ProductTabs';
+import { RelatedProducts } from '@/components/product/RelatedProducts';
+import { ProductCardSkeleton } from '@/components/product/ProductCardSkeleton';
 import { ApiError } from '@/lib/errors';
 
 export const revalidate = 60;
-export const dynamicParams = true; // on-demand ISR for slugs not pre-built at deploy
+export const dynamicParams = true;
 
 // ---------------------------------------------------------------------------
 // Static params
@@ -57,74 +62,132 @@ export default async function ProductPage({ params }: PageProps) {
     throw e;
   }
 
-  const isVariableProduct = product.type === 'variable' && product.variations.length > 0;
   const isOnSale =
     product.on_sale && product.sale_price && product.sale_price !== product.regular_price;
+  const primaryCategory = product.categories[0];
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+      {/* Breadcrumbs */}
+      <nav aria-label="Breadcrumb">
+        <ol className="flex items-center gap-1 text-xs text-zinc-400">
+          <li>
+            <Link href="/" className="transition-colors hover:text-zinc-600">
+              Home
+            </Link>
+          </li>
+          {primaryCategory && (
+            <>
+              <li>
+                <ChevronRight className="h-3 w-3" />
+              </li>
+              <li>
+                <Link
+                  href={`/products?category=${primaryCategory.slug}`}
+                  className="transition-colors hover:text-zinc-600"
+                >
+                  {primaryCategory.name}
+                </Link>
+              </li>
+            </>
+          )}
+          <li>
+            <ChevronRight className="h-3 w-3" />
+          </li>
+          <li className="max-w-[200px] truncate font-medium text-zinc-600">{product.name}</li>
+        </ol>
+      </nav>
 
-        {/* ── Image gallery ─────────────────────────────────────────────── */}
-        <ProductImages images={product.images} name={product.name} />
+      {/* 2-col product section */}
+      <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
+        {/* Left: image gallery */}
+        <ProductImages images={product.images} name={product.name} isOnSale={!!isOnSale} />
 
-        {/* ── Product info ──────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-4">
-
-          {/* Category badges */}
+        {/* Right: product info */}
+        <div className="flex flex-col gap-5 lg:sticky lg:top-24 lg:self-start">
+          {/* Category pill links */}
           {product.categories.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {product.categories.map((cat) => (
-                <Badge key={cat.id} variant="secondary">
+                <Link
+                  key={cat.id}
+                  href={`/products?category=${cat.slug}`}
+                  className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-200"
+                >
                   {cat.name}
-                </Badge>
+                </Link>
               ))}
             </div>
           )}
 
           {/* Name */}
-          <h1 className="text-3xl font-bold leading-tight">{product.name}</h1>
+          <h1 className="text-3xl font-bold leading-tight text-zinc-900">{product.name}</h1>
 
-          {/* Base price — only shown for simple products (variables show price per variation) */}
-          {!isVariableProduct && (
-            <div className="flex items-baseline gap-3">
-              {isOnSale ? (
-                <>
-                  <span className="text-2xl font-semibold">${product.sale_price}</span>
-                  <span className="text-lg text-muted-foreground line-through">
-                    ${product.regular_price}
-                  </span>
-                  <Badge variant="destructive">Sale</Badge>
-                </>
-              ) : (
-                <span className="text-2xl font-semibold">${product.price}</span>
-              )}
+          {/* Static star rating */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-0.5">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Star
+                  key={i}
+                  className="h-4 w-4"
+                  fill={i <= 4 ? '#f59e0b' : 'none'}
+                  stroke={i <= 4 ? '#f59e0b' : '#d1d5db'}
+                />
+              ))}
             </div>
-          )}
+            <span className="text-sm text-zinc-400">(128 Reviews)</span>
+          </div>
 
           {/* Short description */}
           {product.short_description && (
             <div
-              className="text-muted-foreground [&_p]:leading-relaxed"
+              className="text-sm leading-relaxed text-zinc-500 [&_p]:leading-relaxed"
               dangerouslySetInnerHTML={{ __html: product.short_description }}
             />
           )}
 
-          {/* Variation selector + Add to Cart */}
+          {/* Variation selector (price, swatches, qty, cart, wishlist, delivery) */}
           <VariationSelector product={product} />
 
-          {/* Full description */}
-          {product.description && (
-            <>
-              <hr className="border-border" />
-              <div
-                className="prose prose-sm max-w-none text-foreground"
-                dangerouslySetInnerHTML={{ __html: product.description }}
-              />
-            </>
-          )}
+          {/* Product meta */}
+          <div className="flex flex-col gap-2 border-t border-zinc-100 pt-4 text-xs text-zinc-400">
+            {product.sku && (
+              <div className="flex items-center gap-1.5">
+                <Tag className="h-3.5 w-3.5" />
+                <span>SKU: {product.sku}</span>
+              </div>
+            )}
+            {product.categories.length > 0 && (
+              <div className="flex items-center gap-1.5">
+                <Package className="h-3.5 w-3.5" />
+                <span>{product.categories.map((c) => c.name).join(', ')}</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Below the fold: tabs */}
+      <div className="mt-16">
+        <ProductTabs
+          description={product.description}
+          sku={product.sku}
+          categories={product.categories}
+        />
+      </div>
+
+      {/* Related products */}
+      <Suspense
+        fallback={
+          <div className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
+          </div>
+        }
+      >
+        <RelatedProducts />
+      </Suspense>
     </div>
   );
 }
