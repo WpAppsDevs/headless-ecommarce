@@ -110,6 +110,8 @@ export async function getProduct(slug: string): Promise<Product> {
 
 /** Fetches all product slugs across all pages — used for generateStaticParams. */
 export async function getAllProductSlugs(): Promise<string[]> {
+  // Skip static pre-generation if the API URL is not configured (e.g. fresh Vercel deploy)
+  if (!process.env.NEXT_PUBLIC_WP_URL) return [];
   const slugs: string[] = [];
   let page = 1;
   while (true) {
