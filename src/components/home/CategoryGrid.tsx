@@ -35,40 +35,51 @@ const CATEGORIES = [
 
 export function CategoryGrid() {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-      {/* Heading */}
-      <div className="mb-8 text-center">
-        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Collections
-        </p>
-        <h2 className="mt-1 text-3xl font-bold tracking-tight">Shop By Categories</h2>
-        <p className="mt-2 text-muted-foreground">
-          Explore essential activewear collections for every workout style.
-        </p>
-      </div>
-
-      {/* Category cards */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-        {CATEGORIES.map((cat) => (
+    <section aria-labelledby="categories-heading" className="bg-zinc-50 dark:bg-zinc-900/30 py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Heading */}
+        <div className="mb-10 flex items-end justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
+              Collections
+            </p>
+            <h2 id="categories-heading" className="mt-1 text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
+              Shop By Category
+            </h2>
+          </div>
           <Link
-            key={cat.slug}
-            href={`/products?category=${cat.slug}`}
-            className="group relative overflow-hidden rounded-2xl bg-zinc-100"
+            href="/products"
+            className="hidden text-sm font-medium text-zinc-500 underline-offset-4 hover:underline sm:block"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={cat.image}
-              alt={cat.name}
-              className="aspect-[3/4] w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-              <p className="font-semibold leading-tight">{cat.name}</p>
-              <p className="mt-0.5 text-xs text-white/70">{cat.count}</p>
-            </div>
+            View all →
           </Link>
-        ))}
+        </div>
+
+        {/* Scroll container on mobile, grid on desktop */}
+        <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 lg:grid-cols-5">
+          {CATEGORIES.map((cat) => (
+            <Link
+              key={cat.slug}
+              href={`/products?category=${cat.slug}`}
+              className="group relative shrink-0 w-44 overflow-hidden rounded-2xl bg-zinc-100 sm:w-auto"
+              aria-label={`Browse ${cat.name}`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={cat.image}
+                alt={cat.name}
+                className="aspect-[3/4] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <p className="font-bold text-white">{cat.name}</p>
+                <p className="mt-0.5 text-xs text-white/60">{cat.count}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
+
