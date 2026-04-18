@@ -22,16 +22,16 @@ export function NewsletterSection() {
   return (
     <section
       aria-labelledby="newsletter-heading"
-      className="relative overflow-hidden bg-zinc-900 py-20"
+      className="relative overflow-hidden bg-rose-950 py-20"
     >
       {/* Decorative blobs */}
       <div
         aria-hidden="true"
-        className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-zinc-700/30 blur-3xl"
+        className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-rose-800/30 blur-3xl"
       />
       <div
         aria-hidden="true"
-        className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-zinc-600/20 blur-3xl"
+        className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-rose-700/20 blur-3xl"
       />
 
       <div className="relative mx-auto max-w-2xl px-4 text-center sm:px-6">
@@ -49,7 +49,7 @@ export function NewsletterSection() {
         </p>
 
         {submitted ? (
-          <div className="mt-8 flex items-center justify-center gap-3 rounded-2xl bg-zinc-800 px-6 py-5 text-white">
+          <div className="mt-8 flex items-center justify-center gap-3 rounded-2xl bg-rose-900 px-6 py-5 text-white">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500">
               <Check className="h-4 w-4 text-white" />
             </div>
@@ -70,7 +70,7 @@ export function NewsletterSection() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email address"
-                className="flex-1 rounded-2xl bg-zinc-800 px-5 py-3.5 text-sm text-white placeholder:text-zinc-500 outline-none ring-1 ring-zinc-700 transition focus:ring-2 focus:ring-white sm:rounded-r-none sm:rounded-l-2xl"
+                className="flex-1 rounded-2xl bg-rose-900 px-5 py-3.5 text-sm text-white placeholder:text-rose-300/60 outline-none ring-1 ring-rose-800 transition focus:ring-2 focus:ring-white sm:rounded-r-none sm:rounded-l-2xl"
               />
               <button
                 type="submit"
