@@ -15,6 +15,7 @@ interface AuthState {
   user: AuthUser | null;
   isAuthenticated: boolean;
   loading: boolean;
+  hydrated: boolean;
   login: (username: string, password: string, guestToken?: string) => Promise<void>;
   register: (
     email: string,
@@ -65,6 +66,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
     user: null,
     isAuthenticated: false,
     loading: false,
+    hydrated: false,
 
     // ── login ───────────────────────────────────────────────────────────────
     login: async (username, password, guestToken) => {
@@ -162,6 +164,9 @@ export const useAuthStore = create<AuthState>((set, get) => {
         }
       } catch {
         // Not authenticated — keep default state
+      } finally {
+        // Always mark hydration complete so dependent pages can proceed
+        set({ hydrated: true });
       }
     },
   };

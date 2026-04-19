@@ -46,7 +46,7 @@ function AddressDisplay({ addr }: { addr: BillingAddress | AddressFields | null 
 
 export default function AccountPage() {
   const router = useRouter();
-  const { logout } = useAuthStore();
+  const { logout, hydrated, isAuthenticated } = useAuthStore();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [ordersResult, setOrdersResult] = useState<OrdersResult | null>(null);
@@ -54,6 +54,15 @@ export default function AccountPage() {
   const [initError, setInitError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Wait until AuthHydrator has finished restoring the token
+    if (!hydrated) return;
+
+    // If definitely not authenticated after hydration, redirect immediately
+    if (!isAuthenticated) {
+      router.replace('/login');
+      return;
+    }
+
     async function init() {
       try {
         // Fetch profile + first page of orders in parallel
@@ -67,7 +76,10 @@ export default function AccountPage() {
       } catch (e) {
         if (
           e instanceof ApiError &&
-          (e.code === 'session_expired' || e.code === 'invalid_token' || e.code === 'user_not_found')
+          (e.code === 'session_expired' ||
+            e.code === 'invalid_token' ||
+            e.code === 'user_not_found' ||
+            e.code === 'no_token')
         ) {
           await logout();
           router.replace('/login');
@@ -79,7 +91,7 @@ export default function AccountPage() {
 
     init();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [hydrated, isAuthenticated]);
 
   const handleLogout = async () => {
     await logout();
