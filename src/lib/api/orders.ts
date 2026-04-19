@@ -45,7 +45,12 @@ export interface OrdersResult {
  */
 export async function getOrders(page = 1, perPage = 10): Promise<OrdersResult> {
   const token = tokenCache.get();
-  const url = `${config.apiBase}/api/orders?page=${page}&per_page=${perPage}`;
+  const isClient = typeof window !== 'undefined';
+
+  // Browser: proxy through /api/account/orders to avoid CORS with external API
+  const url = isClient
+    ? `/api/account/orders?page=${page}&per_page=${perPage}`
+    : `${config.apiBase}/${config.apiNs}/orders?page=${page}&per_page=${perPage}`;
 
   const res = await fetch(url, {
     headers: {

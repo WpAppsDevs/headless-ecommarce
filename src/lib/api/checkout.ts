@@ -1,5 +1,6 @@
-import { apiClient } from './client';
+import { apiClient, tokenCache } from './client';
 import { config } from '@/lib/config';
+import { ApiError } from '@/lib/errors';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -51,6 +52,25 @@ export interface OrderResult {
 
 /** GET /wp-json/api/user — requires user access token */
 export async function getUser(): Promise<UserProfile> {
+  if (typeof window !== 'undefined') {
+    // Browser: proxy through /api/auth/me to avoid CORS with external API
+    const token = tokenCache.get();
+    if (!token) throw new ApiError('no_token', 'Not authenticated');
+    const res = await fetch('/api/auth/me', {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+    });
+    const json = (await res.json()) as {
+      success: boolean;
+      data?: UserProfile;
+      code?: string;
+      message?: string;
+    };
+    if (!json.success) {
+      throw new ApiError(json.code ?? 'api_error', json.message ?? 'Failed to load user');
+    }
+    return json.data as UserProfile;
+  }
   return apiClient<UserProfile>(`${config.apiNs}/user`);
 }
 

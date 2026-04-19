@@ -1,7 +1,6 @@
-const WP_URL = process.env.NEXT_PUBLIC_WP_URL;
+const WP_URL = (process.env.NEXT_PUBLIC_WP_URL ?? '').replace(/\/$/, '');
 
 if (!WP_URL && typeof window === 'undefined') {
-  // During build/SSR — warn clearly instead of producing a broken relative URL
   console.warn(
     '[config] NEXT_PUBLIC_WP_URL is not set. ' +
     'Add it to your .env.local (local) or Vercel Environment Variables (production).',
@@ -9,7 +8,7 @@ if (!WP_URL && typeof window === 'undefined') {
 }
 
 export const config = {
-  apiBase: (WP_URL ?? '') + '/wp-json',
+  apiBase: WP_URL + '/wp-json',
   productsNs: 'wpadhlwrapi/v1',
   apiNs: 'api',
   siteName: process.env.NEXT_PUBLIC_SITE_NAME ?? 'HeadlessECF',
