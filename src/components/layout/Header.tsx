@@ -20,8 +20,6 @@ import { cn } from '@/lib/utils';
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/products', label: 'Shop' },
-  { href: '/products?category=new-arrivals', label: 'New Arrivals' },
-  { href: '/products?on_sale=true', label: 'Sale', highlight: true },
 ];
 
 // ── Search overlay ───────────────────────────────────────────────────────────
@@ -67,7 +65,7 @@ function NavLinks({ onClick }: { onClick?: () => void }) {
   const pathname = usePathname();
   return (
     <>
-      {NAV_LINKS.map(({ href, label, highlight }) => {
+      {NAV_LINKS.map(({ href, label }) => {
         const active = pathname === href || (href !== '/' && pathname.startsWith(href.split('?')[0]));
         return (
           <Link
@@ -76,15 +74,12 @@ function NavLinks({ onClick }: { onClick?: () => void }) {
             onClick={onClick}
             className={cn(
               'relative text-sm font-medium transition-colors',
-              highlight
-                ? 'text-rose-500 hover:text-rose-600'
-                : active
+              active
                 ? 'text-zinc-900'
                 : 'text-zinc-500 hover:text-zinc-900',
               // animated underline
               'after:absolute after:-bottom-0.5 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-zinc-900 after:transition-transform hover:after:scale-x-100',
               active && 'after:scale-x-100',
-              highlight && 'after:bg-rose-500',
             )}
           >
             {label}

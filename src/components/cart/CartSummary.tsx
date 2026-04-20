@@ -10,6 +10,7 @@ import { useCartStore } from '@/stores/cartStore';
 export function CartSummary() {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
+  console.log('CartSummary items:', items);
   const totalQty = items.reduce((sum, i) => sum + Number(i.quantity), 0);
 
   return (
