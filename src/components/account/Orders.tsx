@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X } from 'lucide-react';
-import { Order, OrdersMeta } from '@/lib/api/orders';
+import type { Order, OrdersMeta } from '@/lib/api/orders';
 import { OrderCard } from './OrderCard';
 import { OrderDetailsModal } from './OrderDetailsModal';
 
@@ -11,36 +10,40 @@ interface OrdersProps {
   meta: OrdersMeta;
 }
 
-type OrderStatus = 'all' | 'pending' | 'delivery' | 'completed' | 'cancelled';
+type OrderFilter = 'all' | 'pending' | 'delivery' | 'completed' | 'cancelled';
+
+const FILTERS: Array<{ id: OrderFilter; label: string }> = [
+  { id: 'all',       label: 'All Order'  },
+  { id: 'pending',   label: 'Pending'    },
+  { id: 'delivery',  label: 'Delivery'   },
+  { id: 'completed', label: 'Completed'  },
+  { id: 'cancelled', label: 'Canceled'   },
+];
 
 export function Orders({ orders, meta }: OrdersProps) {
-  const [activeFilter, setActiveFilter] = useState<OrderStatus>('all');
+  const [activeFilter, setActiveFilter] = useState<OrderFilter>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  const filters: Array<{ id: OrderStatus; label: string }> = [
-    { id: 'all', label: 'All Orders' },
-    { id: 'pending', label: 'Pending' },
-    { id: 'delivery', label: 'Delivery' },
-    { id: 'completed', label: 'Completed' },
-    { id: 'cancelled', label: 'Cancelled' },
-  ];
-
-  const filteredOrders =
-    activeFilter === 'all' ? orders : orders.filter((o) => o.status === activeFilter);
+  const filtered =
+    activeFilter === 'all'
+      ? orders
+      : orders.filter(o => o.status === activeFilter);
 
   return (
     <>
       <div className="space-y-6">
+        <h2 className="text-2xl font-bold text-zinc-900">Your Orders</h2>
+
         {/* Filter tabs */}
-        <div className="flex gap-2 overflow-x-auto border-b border-zinc-200">
-          {filters.map(({ id, label }) => (
+        <div className="flex gap-6 border-b border-zinc-200">
+          {FILTERS.map(({ id, label }) => (
             <button
               key={id}
               onClick={() => setActiveFilter(id)}
-              className={`whitespace-nowrap px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
+              className={`whitespace-nowrap pb-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
                 activeFilter === id
                   ? 'border-zinc-900 text-zinc-900'
-                  : 'border-transparent text-zinc-500 hover:text-zinc-700'
+                  : 'border-transparent text-zinc-400 hover:text-zinc-700'
               }`}
             >
               {label}
@@ -50,12 +53,12 @@ export function Orders({ orders, meta }: OrdersProps) {
 
         {/* Orders list */}
         <div className="space-y-4">
-          {filteredOrders.length === 0 ? (
-            <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center">
-              <p className="text-sm text-zinc-500">No orders found</p>
+          {filtered.length === 0 ? (
+            <div className="rounded-xl border border-zinc-200 p-10 text-center">
+              <p className="text-sm text-zinc-400">No orders found</p>
             </div>
           ) : (
-            filteredOrders.map((order) => (
+            filtered.map(order => (
               <OrderCard
                 key={order.id}
                 order={order}
@@ -65,15 +68,13 @@ export function Orders({ orders, meta }: OrdersProps) {
           )}
         </div>
 
-        {/* Pagination info */}
-        {meta && (
-          <div className="text-center text-xs text-zinc-500">
-            Showing {filteredOrders.length} of {meta.total} orders
-          </div>
+        {meta && filtered.length > 0 && (
+          <p className="text-center text-xs text-zinc-400">
+            Showing {filtered.length} of {meta.total} orders
+          </p>
         )}
       </div>
 
-      {/* Order Details Modal */}
       {selectedOrder && (
         <OrderDetailsModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
       )}

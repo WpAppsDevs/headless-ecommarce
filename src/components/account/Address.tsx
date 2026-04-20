@@ -58,6 +58,7 @@ function AddressBlock({ title, address }: { title: string; address: any }) {
 export function Address({ profile }: AddressProps) {
   return (
     <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-zinc-900">My Address</h2>
       <div className="grid gap-6 sm:grid-cols-2">
         <AddressBlock title="Billing Address" address={profile?.billing} />
         <AddressBlock title="Shipping Address" address={profile?.shipping} />

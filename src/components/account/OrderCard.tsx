@@ -1,75 +1,60 @@
 'use client';
 
-import { Order } from '@/lib/api/orders';
+import type { Order } from '@/lib/api/orders';
 
 interface OrderCardProps {
   order: Order;
   onViewDetails: () => void;
 }
 
-const statusColors: Record<string, { badge: string; text: string }> = {
-  pending: { badge: 'bg-blue-100', text: 'text-blue-700' },
-  delivery: { badge: 'bg-amber-100', text: 'text-amber-700' },
-  completed: { badge: 'bg-emerald-100', text: 'text-emerald-700' },
-  cancelled: { badge: 'bg-red-100', text: 'text-red-700' },
+const STATUS_STYLES: Record<string, string> = {
+  pending:    'bg-orange-50 text-orange-500 border border-orange-200',
+  processing: 'bg-blue-50 text-blue-600 border border-blue-200',
+  'on-hold':  'bg-amber-50 text-amber-600 border border-amber-200',
+  delivery:   'bg-purple-50 text-purple-600 border border-purple-200',
+  completed:  'bg-green-50 text-green-600 border border-green-200',
+  cancelled:  'bg-red-50 text-red-500 border border-red-200',
+  refunded:   'bg-zinc-100 text-zinc-600 border border-zinc-200',
 };
 
+const STATUS_LABELS: Record<string, string> = {
+  pending: 'Pending', processing: 'Processing', 'on-hold': 'On Hold',
+  delivery: 'Delivery', completed: 'Completed', cancelled: 'Canceled', refunded: 'Refunded',
+};
+
+const CANCELLABLE = ['pending', 'processing', 'on-hold', 'delivery'];
+
 export function OrderCard({ order, onViewDetails }: OrderCardProps) {
-  const colors = statusColors[order.status] || statusColors.pending;
-  const orderDate = order.date_created
-    ? new Date(order.date_created).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      })
-    : 'N/A';
+  const badgeClass = STATUS_STYLES[order.status] ?? STATUS_STYLES['pending'];
+  const statusText = STATUS_LABELS[order.status] ?? order.status;
+  const canCancel  = CANCELLABLE.includes(order.status);
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-6">
-      <div className="flex items-start justify-between gap-4 mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-zinc-900">Order #{order.id}</h3>
-          <p className="mt-1 text-sm text-zinc-500">Placed on {orderDate}</p>
+    <div className="rounded-xl border border-zinc-200 bg-white p-6">
+      {/* Header row */}
+      <div className="mb-5 flex items-center justify-between">
+        <p className="text-sm text-zinc-700">
+          <span className="font-medium">Order Number: </span>
+          <span className="font-semibold">#{order.id}</span>
+        </p>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-zinc-400">Order Status:</span>
+          <span className={`rounded-full px-3 py-0.5 text-xs font-medium ${badgeClass}`}>
+            {statusText}
+          </span>
         </div>
-        <span
-          className={`inline-block rounded-full px-3 py-1 text-xs font-semibold capitalize ${colors.badge} ${colors.text}`}
-        >
-          {order.status}
-        </span>
-      </div>
-
-      {/* Order items */}
-      <div className="mb-6 space-y-3 border-t border-b border-zinc-100 py-4">
-        {order.line_items.length === 0 ? (
-          <p className="text-sm text-zinc-500">No items in order</p>
-        ) : (
-          order.line_items.map((item, idx) => (
-            <div key={idx} className="flex justify-between text-sm">
-              <span className="text-zinc-700">
-                {item.name} x {item.quantity}
-              </span>
-              <span className="font-medium text-zinc-900">${item.line_total}</span>
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* Order total */}
-      <div className="mb-6 flex justify-between">
-        <span className="font-semibold text-zinc-900">Total</span>
-        <span className="text-xl font-bold text-zinc-900">${Number(order.total).toFixed(2)}</span>
       </div>
 
       {/* Action buttons */}
-      <div className="flex gap-3">
+      <div className="flex items-center gap-3">
         <button
           onClick={onViewDetails}
-          className="flex-1 rounded-lg border border-zinc-300 px-4 py-2.5 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-50"
+          className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700"
         >
           Order Details
         </button>
-        {order.status === 'pending' && (
-          <button className="flex-1 rounded-lg border border-red-300 px-4 py-2.5 text-sm font-medium text-red-700 transition-colors hover:bg-red-50">
+        {canCancel && (
+          <button className="rounded-full border border-zinc-300 px-5 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50">
             Cancel Order
           </button>
         )}

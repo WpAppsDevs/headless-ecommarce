@@ -13,6 +13,31 @@ export interface OrderLineItem {
   line_total: string;
 }
 
+export interface OrderBilling {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  address_1: string;
+  address_2: string;
+  city: string;
+  state: string;
+  postcode: string;
+  country: string;
+  company: string;
+}
+
+export interface OrderShipping {
+  first_name: string;
+  last_name: string;
+  address_1: string;
+  address_2: string;
+  city: string;
+  state: string;
+  postcode: string;
+  country: string;
+}
+
 export interface Order {
   id: number;
   status: string;
@@ -20,6 +45,11 @@ export interface Order {
   total: string;
   date_created: string | null;
   line_items: OrderLineItem[];
+  billing?: OrderBilling;
+  shipping?: OrderShipping;
+  payment_method_title?: string;
+  discount_total?: string;
+  shipping_total?: string;
 }
 
 export interface OrdersMeta {
