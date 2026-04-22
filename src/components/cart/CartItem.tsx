@@ -1,6 +1,7 @@
 'use client';
 
 import { Minus, Plus, Trash2 } from 'lucide-react';
+import Image from 'next/image';
 import { useCartStore } from '@/stores/cartStore';
 import type { CartItem as CartItemType } from '@/lib/api/cart';
 
@@ -24,8 +25,8 @@ export function CartItem({ item }: Props) {
   const { updateItem, removeItem, loading } = useCartStore();
   const qty = Number(item.quantity);
   const { attributes } = parseMeta(item.meta);
-  const productName = String(item.product_name) || `Product #${item.product_id}`;
-  const imageUrl = String(item.product_image) || productName.charAt(0);
+  const productName = item.product_name ? String(item.product_name) : `Product #${item.product_id}`;
+  const imageUrl = item.product_image ? String(item.product_image) : null;
 
   const attrEntries = Object.entries(attributes).map(([k, v]) => ({
     label: k.replace(/^pa_/, '').replace(/_/g, ' '),
@@ -37,11 +38,20 @@ export function CartItem({ item }: Props) {
       {/* Image placeholder */}
       <div
         className="h-[72px] w-[72px] shrink-0 rounded-xl bg-zinc-100 flex items-center justify-center overflow-hidden"
-        aria-hidden="true"
       >
-        <span className="text-2xl font-bold text-zinc-300 uppercase select-none">
-          {imageUrl}
-        </span>
+        {imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt={productName}
+            width={72}
+            height={72}
+            className="object-cover"
+          />
+        ) : (
+          <span className="text-2xl font-bold text-zinc-300 uppercase select-none">
+            {productName.charAt(0)}
+          </span>
+        )}
       </div>
 
       {/* Info + controls */}

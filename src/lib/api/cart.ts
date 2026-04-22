@@ -6,6 +6,8 @@ import { config } from '@/lib/config';
 // ---------------------------------------------------------------------------
 
 export interface CartItem {
+  product_name: string;
+  product_image: string;
   id: string;
   cart_token: string;
   user_id: string | null;
@@ -15,10 +17,6 @@ export interface CartItem {
   meta: string | null;
   created_at: string;
   updated_at: string;
-  /** Product display name — included by the WP API cart endpoints. */
-  product_name?: string;
-  /** Product thumbnail URL — included by the WP API cart endpoints. */
-  product_image?: string;
 }
 
 export interface CartData {
