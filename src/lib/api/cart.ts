@@ -15,6 +15,10 @@ export interface CartItem {
   meta: string | null;
   created_at: string;
   updated_at: string;
+  /** Product display name — included by the WP API cart endpoints. */
+  product_name?: string;
+  /** Product thumbnail URL — included by the WP API cart endpoints. */
+  product_image?: string;
 }
 
 export interface CartData {

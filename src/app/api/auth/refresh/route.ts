@@ -2,6 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { config } from '@/lib/config';
 
+const IS_PROD = process.env.NODE_ENV === 'production';
+
+const COOKIE_BASE = {
+  httpOnly: true,
+  secure: IS_PROD,
+  sameSite: 'lax' as const,
+  path: '/',
+};
+
+/** Expire both auth cookies — called when refresh token is invalid/expired. */
+function expireAuthCookies(response: NextResponse): void {
+  response.cookies.set('access_token', '', { ...COOKIE_BASE, maxAge: 0 });
+  response.cookies.set('refresh_token', '', { ...COOKIE_BASE, maxAge: 0 });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const cookieStore = await cookies();
@@ -26,23 +41,42 @@ export async function POST(req: NextRequest) {
     const json = await wpRes.json();
 
     if (!wpRes.ok || json?.success === false) {
-      return NextResponse.json(json, { status: wpRes.status });
+      // Expired / revoked refresh token — clear stale cookies so the client
+      // stops retrying with a doomed token on every subsequent page load.
+      const errResponse = NextResponse.json(json, { status: wpRes.status });
+      expireAuthCookies(errResponse);
+      return errResponse;
     }
 
-    const newToken: string = json.data.token;
+    // The WP plugin may return 'access_token' (same shape as login) or 'token'.
+    // Accept both field names so a plugin update doesn't silently break auth.
+    const newToken: string | undefined =
+      json.data?.access_token ?? json.data?.token;
+
+    if (!newToken) {
+      const errResponse = NextResponse.json(
+        { success: false, code: 'invalid_response', message: 'No token in refresh response' },
+        { status: 502 },
+      );
+      expireAuthCookies(errResponse);
+      return errResponse;
+    }
 
     const response = NextResponse.json(
       { success: true, data: { token: newToken } },
       { status: 200 },
     );
 
-    response.cookies.set('access_token', newToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 3600,
-    });
+    response.cookies.set('access_token', newToken, { ...COOKIE_BASE, maxAge: 3600 });
+
+    // Persist a new refresh_token when the WP plugin uses rotating tokens.
+    const newRefreshToken: string | undefined = json.data?.refresh_token;
+    if (newRefreshToken) {
+      response.cookies.set('refresh_token', newRefreshToken, {
+        ...COOKIE_BASE,
+        maxAge: 14 * 24 * 60 * 60,
+      });
+    }
 
     return response;
   } catch {

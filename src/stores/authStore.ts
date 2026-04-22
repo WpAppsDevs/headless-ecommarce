@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { tokenCache, setOnUnauthorized } from '@/lib/api/client';
+import { useCartStore } from '@/stores/cartStore';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -58,6 +59,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
     setOnUnauthorized(() => {
       tokenCache.set(undefined);
       set({ user: null, isAuthenticated: false });
+      useCartStore.getState().clearCart();
       window.location.href = '/login';
     });
   }
@@ -85,6 +87,8 @@ export const useAuthStore = create<AuthState>((set, get) => {
         // Guest cart was merged into the user cart on login
         clearGuestToken();
         set({ user: json.data.user, isAuthenticated: true, loading: false });
+        // Refresh cart to reflect the server-side merged state
+        void useCartStore.getState().fetchCart();
       } catch (e) {
         set({ loading: false });
         throw e;
@@ -108,6 +112,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
         tokenCache.set(json.data.access_token);
         clearGuestToken();
         set({ user: json.data.user, isAuthenticated: true, loading: false });
+        void useCartStore.getState().fetchCart();
       } catch (e) {
         set({ loading: false });
         throw e;
@@ -120,6 +125,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
       // Fire-and-forget — clear httpOnly cookies server-side
       await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
       set({ user: null, isAuthenticated: false });
+      useCartStore.getState().clearCart();
     },
 
     // ── refreshToken ────────────────────────────────────────────────────────

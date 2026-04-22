@@ -3,7 +3,6 @@
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { useCartStore } from '@/stores/cartStore';
 import type { CartItem as CartItemType } from '@/lib/api/cart';
-import { string } from 'zod';
 
 interface Props {
   item: CartItemType;
