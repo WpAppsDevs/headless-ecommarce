@@ -3,6 +3,7 @@
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { useCartStore } from '@/stores/cartStore';
 import type { CartItem as CartItemType } from '@/lib/api/cart';
+import { string } from 'zod';
 
 interface Props {
   item: CartItemType;
@@ -23,8 +24,9 @@ function parseMeta(meta: string | null): { name: string; attributes: Record<stri
 export function CartItem({ item }: Props) {
   const { updateItem, removeItem, loading } = useCartStore();
   const qty = Number(item.quantity);
-  const { name, attributes } = parseMeta(item.meta);
-  const productName = name || `Product #${item.product_id}`;
+  const { attributes } = parseMeta(item.meta);
+  const productName = String(item.product_name) || `Product #${item.product_id}`;
+  const imageUrl = String(item.product_image) || productName.charAt(0);
 
   const attrEntries = Object.entries(attributes).map(([k, v]) => ({
     label: k.replace(/^pa_/, '').replace(/_/g, ' '),
@@ -39,7 +41,7 @@ export function CartItem({ item }: Props) {
         aria-hidden="true"
       >
         <span className="text-2xl font-bold text-zinc-300 uppercase select-none">
-          {productName.charAt(0)}
+          {imageUrl}
         </span>
       </div>
 
