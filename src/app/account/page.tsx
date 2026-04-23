@@ -8,6 +8,12 @@ import { getUser, type UserProfile } from '@/lib/api/checkout';
 import { getOrders, type OrdersResult } from '@/lib/api/orders';
 import { useAuthStore } from '@/stores/authStore';
 import { AccountLayout } from '@/components/account/AccountLayout';
+import { PageHeader } from '@/components/ui/PageHeader';
+
+const BREADCRUMBS = [
+  { label: 'Home', href: '/' },
+  { label: 'My Account' },
+];
 
 export default function AccountPage() {
   const router = useRouter();
@@ -58,27 +64,25 @@ export default function AccountPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, isAuthenticated]);
 
-  if (initError) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-sm text-red-600">{initError}</p>
-      </div>
-    );
-  }
-
-  if (!ready) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
-      </div>
-    );
-  }
-
   return (
-    <AccountLayout
-      profile={profile}
-      orders={ordersResult?.orders || []}
-      ordersMeta={ordersResult?.meta || { page: 1, per_page: 100, total: 0, total_pages: 0 }}
-    />
+    <>
+      <PageHeader title="My Account" breadcrumbs={BREADCRUMBS} />
+
+      {initError ? (
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <p className="text-sm text-red-600">{initError}</p>
+        </div>
+      ) : !ready ? (
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
+        </div>
+      ) : (
+        <AccountLayout
+          profile={profile}
+          orders={ordersResult?.orders || []}
+          ordersMeta={ordersResult?.meta || { page: 1, per_page: 100, total: 0, total_pages: 0 }}
+        />
+      )}
+    </>
   );
 }
