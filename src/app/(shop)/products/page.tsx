@@ -1,5 +1,7 @@
 import { getProducts } from '@/lib/api/products';
 import { ShopClient } from '@/components/shop/ShopClient';
+import { PageHeader } from '@/components/ui/PageHeader';
+import type { BreadcrumbItem } from '@/components/ui/PageHeader';
 
 export const revalidate = 60;
 
@@ -17,13 +19,27 @@ export default async function ProductsPage({ searchParams }: PageProps) {
     () => ({ items: [], meta: { page: 1, per_page: 12, total: 0, total_pages: 1 } }),
   );
 
+  const categoryLabel = category
+    ? category.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+    : null;
+
+  const breadcrumbs: BreadcrumbItem[] = [
+    { label: 'Home', href: '/' },
+    ...(categoryLabel
+      ? [{ label: 'Shop', href: '/products' }, { label: categoryLabel }]
+      : [{ label: 'Shop' }]),
+  ];
+
   return (
-    <ShopClient
-      initialProducts={items}
-      meta={meta}
-      initialCategory={category}
-      initialSearch={search}
-      serverPage={page}
-    />
+    <>
+      <PageHeader title={categoryLabel ?? 'Shop'} breadcrumbs={breadcrumbs} />
+      <ShopClient
+        initialProducts={items}
+        meta={meta}
+        initialCategory={category}
+        initialSearch={search}
+        serverPage={page}
+      />
+    </>
   );
 }

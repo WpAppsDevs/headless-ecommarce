@@ -136,10 +136,6 @@ export function ShopClient({
     return pages;
   }
 
-  const categoryLabel = initialCategory
-    ? initialCategory.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-    : null;
-
   const sidebarProps = {
     categories,
     selectedCategory: initialCategory ?? '',
@@ -157,27 +153,6 @@ export function ShopClient({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Page header */}
-      <div className="mb-6">
-        {/* Breadcrumbs */}
-        <nav className="mb-2 flex items-center gap-1.5 text-xs text-zinc-400" aria-label="Breadcrumb">
-          <Link href="/" className="hover:text-zinc-700 transition-all duration-150">Home</Link>
-          <span>/</span>
-          <Link href="/products" className="hover:text-zinc-700 transition-all duration-150">Shop</Link>
-          {categoryLabel && (
-            <>
-              <span>/</span>
-              <span className="text-zinc-600">{categoryLabel}</span>
-            </>
-          )}
-        </nav>
-
-        <h1 className="text-3xl font-bold text-zinc-900">{categoryLabel ?? 'Shop'}</h1>
-        <p className="mt-1 text-sm text-zinc-400">
-          {meta.total} product{meta.total !== 1 ? 's' : ''}
-        </p>
-      </div>
-
       {/* Mobile filter drawer */}
       {mobileFiltersOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">

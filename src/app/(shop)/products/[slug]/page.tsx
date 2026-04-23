@@ -1,7 +1,8 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ChevronRight, Star, Tag, Package } from 'lucide-react';
+import { Star, Tag, Package } from 'lucide-react';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { getProduct, getAllProductSlugs } from '@/lib/api/products';
 import { ProductImages } from '@/components/product/ProductImages';
 import { VariationSelector } from '@/components/product/VariationSelector';
@@ -67,39 +68,22 @@ export default async function ProductPage({ params }: PageProps) {
   const primaryCategory = product.categories[0];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Breadcrumbs */}
-      <nav aria-label="Breadcrumb">
-        <ol className="flex items-center gap-1 text-xs text-zinc-400">
-          <li>
-            <Link href="/" className="transition-colors hover:text-zinc-600">
-              Home
-            </Link>
-          </li>
-          {primaryCategory && (
-            <>
-              <li>
-                <ChevronRight className="h-3 w-3" />
-              </li>
-              <li>
-                <Link
-                  href={`/products?category=${primaryCategory.slug}`}
-                  className="transition-colors hover:text-zinc-600"
-                >
-                  {primaryCategory.name}
-                </Link>
-              </li>
-            </>
-          )}
-          <li>
-            <ChevronRight className="h-3 w-3" />
-          </li>
-          <li className="max-w-[200px] truncate font-medium text-zinc-600">{product.name}</li>
-        </ol>
-      </nav>
+    <>
+      <PageHeader
+        title={product.name}
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          { label: 'Shop', href: '/products' },
+          ...(primaryCategory
+            ? [{ label: primaryCategory.name, href: `/products?category=${primaryCategory.slug}` }]
+            : []),
+          { label: product.name },
+        ]}
+      />
 
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* 2-col product section */}
-      <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
         {/* Left: image gallery */}
         <ProductImages images={product.images} name={product.name} isOnSale={!!isOnSale} />
 
@@ -189,5 +173,6 @@ export default async function ProductPage({ params }: PageProps) {
         <RelatedProducts />
       </Suspense>
     </div>
+    </>
   );
 }

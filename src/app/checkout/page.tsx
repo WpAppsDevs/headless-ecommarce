@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { CheckoutForm } from '@/components/checkout/CheckoutForm';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { getUser, type UserProfile } from '@/lib/api/checkout';
 import { useCartStore } from '@/stores/cartStore';
 import { ApiError } from '@/lib/errors';
@@ -64,15 +65,24 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
-      <h1 className="mb-8 text-3xl font-bold">Checkout</h1>
+    <>
+      <PageHeader
+        title="Checkout"
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          { label: 'Shop', href: '/products' },
+          { label: 'Checkout' },
+        ]}
+      />
 
-      <div className="mb-6 rounded-md border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
-        {items.reduce((s, i) => s + Number(i.quantity), 0)} item
-        {items.reduce((s, i) => s + Number(i.quantity), 0) !== 1 ? 's' : ''} in your cart
+      <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mb-6 rounded-md border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+          {items.reduce((s, i) => s + Number(i.quantity), 0)} item
+          {items.reduce((s, i) => s + Number(i.quantity), 0) !== 1 ? 's' : ''} in your cart
+        </div>
+
+        <CheckoutForm profile={profile} />
       </div>
-
-      <CheckoutForm profile={profile} />
-    </div>
+    </>
   );
 }
