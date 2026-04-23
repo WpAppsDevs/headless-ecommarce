@@ -53,6 +53,10 @@ function CartExpiryBanner({ minutes }: { minutes: number }) {
 
 export function CartPageContent() {
   const { items, loading, error, fetchCart } = useCartStore();
+  const subtotal = items.reduce(
+    (sum, item) => sum + parseFloat(item.price || '0') * Number(item.quantity),
+    0,
+  );
 
   useEffect(() => {
     fetchCart();
@@ -70,7 +74,7 @@ export function CartPageContent() {
       {/* Free shipping progress */}
       {SETTINGS.showFreeShippingBar && items.length > 0 && (
         <div className="mb-6 rounded-xl border border-zinc-100 bg-white px-5 py-4">
-          <FreeShippingBar total={0} threshold={SETTINGS.freeShippingThreshold} />
+          <FreeShippingBar total={subtotal} threshold={SETTINGS.freeShippingThreshold} />
         </div>
       )}
 

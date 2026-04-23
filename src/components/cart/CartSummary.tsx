@@ -16,6 +16,10 @@ const SHIPPING_OPTIONS: { id: ShippingOption; label: string; sublabel?: string; 
 export function CartSummary() {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
+  const subtotal = items.reduce(
+    (sum, item) => sum + parseFloat(item.price || '0') * Number(item.quantity),
+    0,
+  );
   const [shipping, setShipping] = useState<ShippingOption>('free');
   const [agreed, setAgreed] = useState(false);
 
@@ -28,8 +32,7 @@ export function CartSummary() {
       {/* Subtotal */}
       <div className="flex items-center justify-between text-sm">
         <span className="font-medium text-zinc-600">Subtotal</span>
-        {/* Cart API does not return item prices — calculated at checkout */}
-        <span className="font-semibold text-zinc-400 italic text-xs">Calculated at checkout</span>
+        <span className="font-semibold text-zinc-900">${subtotal.toFixed(2)}</span>
       </div>
 
       {/* Discounts */}
@@ -74,7 +77,7 @@ export function CartSummary() {
       <div className="flex items-center justify-between">
         <span className="text-base font-bold text-zinc-900">Total</span>
         <span className="text-base font-bold text-zinc-900">
-          {shippingCost > 0 ? `+$${shippingCost.toFixed(2)} shipping` : 'Free shipping'}
+          ${(subtotal + shippingCost).toFixed(2)}
         </span>
       </div>
 

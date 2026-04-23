@@ -75,9 +75,9 @@ export function CartItemRow({ item }: Props) {
         </div>
       </td>
 
-      {/* Price — not available from cart API */}
+      {/* Price — unit price */}
       <td className="py-5 pr-4 text-sm font-medium text-zinc-900 whitespace-nowrap">
-        <span className="text-zinc-400 italic text-xs">—</span>
+        ${parseFloat(item.price || '0').toFixed(2)}
       </td>
 
       {/* Quantity stepper */}
@@ -105,9 +105,9 @@ export function CartItemRow({ item }: Props) {
         </div>
       </td>
 
-      {/* Total — not available from cart API */}
-      <td className="py-5 pr-4 text-sm font-medium text-zinc-900 whitespace-nowrap">
-        <span className="text-zinc-400 italic text-xs">—</span>
+      {/* Total — qty × unit price */}
+      <td className="py-5 pr-4 text-sm font-semibold text-zinc-900 whitespace-nowrap">
+        ${(parseFloat(item.price || '0') * qty).toFixed(2)}
       </td>
 
       {/* Remove */}

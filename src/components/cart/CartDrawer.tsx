@@ -15,6 +15,10 @@ export function CartDrawer() {
   const [activePanel, setActivePanel] = useState<ActionPanel>(null);
   const [termsAgreed, setTermsAgreed] = useState(false);
 
+  const subtotal = items.reduce(
+    (sum, item) => sum + parseFloat(item.price || '0') * Number(item.quantity),
+    0,
+  );
   const totalQty = items.reduce((s, i) => s + Number(i.quantity), 0);
 
   const togglePanel = (panel: Exclude<ActionPanel, null>) =>
@@ -69,8 +73,7 @@ export function CartDrawer() {
           <>
             {/* ── Free shipping bar ──────────────────────────────────────── */}
             <div className="shrink-0 border-b bg-zinc-50 px-5 py-3">
-              {/* total=0 because cart API does not return item prices */}
-              <FreeShippingBar total={0} threshold={100} />
+              <FreeShippingBar total={subtotal} threshold={100} />
             </div>
 
             {/* ── Items list ─────────────────────────────────────────────── */}
@@ -142,7 +145,7 @@ export function CartDrawer() {
             <div className="shrink-0 border-t px-5 py-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-zinc-900">Subtotal</span>
-                <span className="text-xs italic text-zinc-400">Calculated at checkout</span>
+                <span className="text-sm font-bold text-zinc-900">${subtotal.toFixed(2)}</span>
               </div>
             </div>
 

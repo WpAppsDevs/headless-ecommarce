@@ -85,7 +85,7 @@ export function CartItem({ item }: Props) {
           </div>
         )}
 
-        {/* Qty stepper */}
+        {/* Qty stepper + line total */}
         <div className="flex items-center gap-2">
           <div className="flex items-center rounded-lg border border-zinc-200 overflow-hidden">
             <button
@@ -108,8 +108,10 @@ export function CartItem({ item }: Props) {
               <Plus className="h-3 w-3" />
             </button>
           </div>
-          {/* Price not available from cart API */}
-          <span className="ml-auto text-xs text-zinc-400 italic">—</span>
+          {/* Line total = unit price × qty */}
+          <span className="ml-auto text-sm font-semibold text-zinc-900">
+            ${(parseFloat(item.price || '0') * qty).toFixed(2)}
+          </span>
         </div>
       </div>
     </div>

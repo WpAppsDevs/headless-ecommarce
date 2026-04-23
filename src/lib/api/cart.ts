@@ -6,8 +6,6 @@ import { config } from '@/lib/config';
 // ---------------------------------------------------------------------------
 
 export interface CartItem {
-  product_name: string;
-  product_image: string;
   id: string;
   cart_token: string;
   user_id: string | null;
@@ -17,6 +15,10 @@ export interface CartItem {
   meta: string | null;
   created_at: string;
   updated_at: string;
+  product_name: string;
+  product_image: string | null;
+  /** Unit price returned by the API (e.g. "99.99"; "0" if unavailable). */
+  price: string;
 }
 
 export interface CartData {
