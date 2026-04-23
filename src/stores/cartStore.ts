@@ -27,7 +27,7 @@ interface CartActions {
   /** Fetch the current cart (guest or user). */
   fetchCart: () => Promise<void>;
   /** Add a product to the cart. Saves guest_token on the very first add. */
-  addItem: (productId: number, variationId: number, quantity: number) => Promise<void>;
+  addItem: (productId: number, variationId: number, quantity: number, attributes?: Record<string, string>) => Promise<void>;
   /** Set a new absolute quantity for an existing line item. */
   updateItem: (itemId: number, quantity: number) => Promise<void>;
   /** Remove a line item from the cart. */
@@ -78,10 +78,10 @@ export const useCartStore = create<CartState & CartActions>((set) => ({
     }
   },
 
-  addItem: async (productId, variationId, quantity) => {
+  addItem: async (productId, variationId, quantity, attributes) => {
     set({ loading: true, error: null });
     try {
-      const data = await apiAddToCart(productId, variationId, quantity);
+      const data = await apiAddToCart(productId, variationId, quantity, attributes);
 
       // guest_token only appears in the FIRST add response for a new session.
       // Never overwrite an existing token (subsequent adds omit guest_token).

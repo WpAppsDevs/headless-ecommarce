@@ -54,11 +54,21 @@ export async function apiAddToCart(
   productId: number,
   variationId = 0,
   quantity = 1,
+  /** Variation attribute map, e.g. `{ pa_color: "blue", pa_size: "xl" }` */
+  attributes?: Record<string, string>,
 ): Promise<CartData> {
+  const meta = attributes && Object.keys(attributes).length > 0
+    ? JSON.stringify({ attributes })
+    : undefined;
   return apiClient<CartData>(`${ns}/cart/add`, {
     method: 'POST',
     token: getGuestToken(),
-    body: JSON.stringify({ product_id: productId, variation_id: variationId, quantity }),
+    body: JSON.stringify({
+      product_id: productId,
+      variation_id: variationId,
+      quantity,
+      ...(meta ? { meta } : {}),
+    }),
   });
 }
 

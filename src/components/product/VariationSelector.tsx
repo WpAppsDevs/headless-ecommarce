@@ -113,7 +113,7 @@ export function VariationSelector({ product }: { product: Product }) {
       : 0;
 
   async function handleAddToCart() {
-    await addItem(product.id, selectedVariation?.id ?? 0, quantity);
+    await addItem(product.id, selectedVariation?.id ?? 0, quantity, selected);
     if (!useCartStore.getState().error) {
       setAdded(true);
       setTimeout(() => setAdded(false), 2000);
