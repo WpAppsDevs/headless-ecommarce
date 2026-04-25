@@ -16,7 +16,7 @@ const PURCHASE_TYPES = [
     icon: Clock,
     label: 'Pre-Order',
     badge: 'From Pakistan',
-    badgeColor: 'bg-[#C4867A]',
+    badgeColor: 'bg-brand-preorder',
     description: 'Exclusive designs imported fresh from Pakistan. Place your order and we\'ll bring it for you in 10–15 days.',
     deliveryNote: '10–15 Days Delivery',
     href: '/products',
@@ -36,14 +36,14 @@ const PURCHASE_TYPES = [
 
 export function CategoryGrid() {
   return (
-    <section aria-labelledby="purchase-types-heading" className="bg-[#F7ECEA] py-16">
+    <section aria-labelledby="purchase-types-heading" className="bg-brand-bg py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="mb-10 text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-[#C4867A]">
+          <p className="text-xs font-semibold uppercase tracking-widest text-brand-accent">
             How to Shop With Us
           </p>
-          <h2 id="purchase-types-heading" className="mt-2 font-serif text-3xl font-bold text-[#7C3D52] sm:text-4xl">
+          <h2 id="purchase-types-heading" className="mt-2 font-serif text-3xl font-bold text-brand-text sm:text-4xl">
             Choose Your Shopping Style
           </h2>
           <p className="mt-2 text-sm text-zinc-500">
@@ -77,15 +77,15 @@ export function CategoryGrid() {
               {/* Content */}
               <div className="flex flex-1 flex-col gap-3 p-5">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#7C3D52]/10">
-                    <Icon className="h-4 w-4 text-[#7C3D52]" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-accent/10">
+                    <Icon className="h-4 w-4 text-brand-accent" />
                   </div>
-                  <h3 className="font-serif text-lg font-bold text-[#7C3D52]">{label}</h3>
+                  <h3 className="font-serif text-lg font-bold text-brand-text">{label}</h3>
                 </div>
                 <p className="flex-1 text-sm leading-relaxed text-zinc-500">{description}</p>
                 <div className="flex items-center justify-between border-t border-zinc-100 pt-3">
-                  <span className="text-xs font-medium text-[#C4867A]">{deliveryNote}</span>
-                  <span className="text-xs font-semibold text-[#7C3D52] group-hover:underline">
+                  <span className="text-xs font-medium text-brand-accent">{deliveryNote}</span>
+                  <span className="text-xs font-semibold text-brand-text group-hover:underline">
                     Shop Now →
                   </span>
                 </div>

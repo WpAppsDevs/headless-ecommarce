@@ -46,27 +46,64 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* ── Brand design tokens → Tailwind color utilities ──────────────────────
+     Update :root brand vars below to change colors site-wide.
+     Usage: bg-brand-accent, text-brand-text, border-brand-border, etc.     */
+  --color-brand-text: var(--brand-text);
+  --color-brand-text-muted: var(--brand-text-muted);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-accent-hover: var(--brand-accent-hover);
+  --color-brand-accent-light: var(--brand-accent-light);
+  --color-brand-bg: var(--brand-bg);
+  --color-brand-section: var(--brand-section);
+  --color-brand-card: var(--brand-card);
+  --color-brand-border: var(--brand-border);
+  --color-brand-stock: var(--brand-stock);
+  --color-brand-preorder: var(--brand-preorder);
+  --color-brand-dark: var(--brand-dark);
 }
 
 :root {
-  --background: oklch(0.985 0.007 50);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  /* ── Brand design tokens ─────────────────────────────────────────────────
+     Single source of truth for site colors. Update here to change globally.
+     -------------------------------------------------------------------------
+     Usage in components: bg-brand-accent, text-brand-text, etc.
+     See @theme inline above for the full Tailwind utility mapping.          */
+  --brand-text: #2B2B2B;
+  --brand-text-muted: #6F6F6F;
+  --brand-accent: #C97C7C;
+  --brand-accent-hover: #B46666;
+  --brand-accent-light: #F3E4E4;
+  --brand-bg: #F8F5F2;
+  --brand-section: #FFFFFF;
+  --brand-card: #FBF7F5;
+  --brand-border: #E8E2DD;
+  --brand-stock: #7BAE7F;
+  --brand-preorder: #D89A6A;
+  --brand-dark: #2B2B2B;
+
+  /* ── Shadcn/base-ui system vars — wired to brand tokens ─────────────────
+     Default shadcn components (Button, Input, Card, Badge, etc.) auto-adopt
+     the brand palette via these vars.                                        */
+  --background: var(--brand-bg);
+  --foreground: var(--brand-text);
+  --card: var(--brand-card);
+  --card-foreground: var(--brand-text);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.38 0.11 355);
-  --primary-foreground: oklch(0.985 0 0);
+  --popover-foreground: var(--brand-text);
+  --primary: var(--brand-accent);
+  --primary-foreground: var(--brand-dark);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  --muted-foreground: var(--brand-text-muted);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: var(--brand-border);
+  --input: var(--brand-border);
+  --ring: var(--brand-accent);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);

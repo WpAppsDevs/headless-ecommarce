@@ -33,10 +33,10 @@ export function CategoryBanners() {
     <section aria-labelledby="categories-heading" className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
       {/* Heading */}
       <div className="mb-8 text-center">
-        <p className="text-xs font-semibold uppercase tracking-widest text-[#C4867A]">
+        <p className="text-xs font-semibold uppercase tracking-widest text-brand-accent">
           Shop by Category
         </p>
-        <h2 id="categories-heading" className="mt-2 font-serif text-3xl font-bold text-[#7C3D52] sm:text-4xl">
+        <h2 id="categories-heading" className="mt-2 font-serif text-3xl font-bold text-brand-text sm:text-4xl">
           For the Whole Family
         </h2>
       </div>
@@ -51,7 +51,7 @@ export function CategoryBanners() {
                 alt={b.label}
                 className={`h-72 w-full object-cover transition-transform duration-700 ${b.available ? 'group-hover:scale-105' : ''}`}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#7C3D52]/80 via-[#7C3D52]/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/80 via-brand-dark/20 to-transparent" />
 
               {/* Coming soon overlay */}
               {!b.available && (
@@ -67,7 +67,7 @@ export function CategoryBanners() {
                 <h3 className="font-serif text-2xl font-bold text-white">{b.label}</h3>
                 <p className="mt-1 text-sm text-white/70">{b.tagline}</p>
                 {b.available && (
-                  <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#C4867A] group-hover:underline underline-offset-2">
+                  <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-brand-accent group-hover:underline underline-offset-2">
                     {b.cta} →
                   </span>
                 )}

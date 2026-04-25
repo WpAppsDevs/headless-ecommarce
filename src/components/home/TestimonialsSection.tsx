@@ -41,14 +41,14 @@ const TESTIMONIALS = [
 
 export function TestimonialsSection() {
   return (
-    <section aria-labelledby="testimonials-heading" className="bg-[#F7ECEA] py-16">
+    <section aria-labelledby="testimonials-heading" className="bg-brand-bg py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="mb-10 text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-[#C4867A]">
+          <p className="text-xs font-semibold uppercase tracking-widest text-brand-accent">
             Customer Reviews
           </p>
-          <h2 id="testimonials-heading" className="mt-2 font-serif text-3xl font-bold text-[#7C3D52] sm:text-4xl">
+          <h2 id="testimonials-heading" className="mt-2 font-serif text-3xl font-bold text-brand-text sm:text-4xl">
             What Our Customers Say
           </h2>
           <p className="mt-2 text-sm text-zinc-500">
@@ -66,7 +66,7 @@ export function TestimonialsSection() {
               {/* Stars */}
               <div className="flex gap-0.5">
                 {Array.from({ length: t.rating }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-[#C4867A] text-[#C4867A]" />
+                  <Star key={i} className="h-4 w-4 fill-brand-accent text-brand-accent" />
                 ))}
               </div>
 

@@ -21,14 +21,14 @@ export function NewsletterSection() {
   return (
     <section
       aria-labelledby="newsletter-heading"
-      className="relative overflow-hidden bg-[#7C3D52] py-20"
+      className="relative overflow-hidden bg-brand-dark py-20"
     >
       {/* Decorative blobs */}
       <div aria-hidden="true" className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
-      <div aria-hidden="true" className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-[#C4867A]/10 blur-3xl" />
+      <div aria-hidden="true" className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-brand-accent/10 blur-3xl" />
 
       <div className="relative mx-auto max-w-2xl px-4 text-center sm:px-6">
-        <p className="text-xs font-semibold uppercase tracking-widest text-[#C4867A]">
+        <p className="text-xs font-semibold uppercase tracking-widest text-brand-accent">
           Stay in the Loop
         </p>
         <h2
@@ -42,7 +42,7 @@ export function NewsletterSection() {
         </p>
 
         {submitted ? (
-          <div className="mt-8 flex items-center justify-center gap-3 rounded-2xl bg-[#5C2A3C] px-6 py-5 text-white">
+          <div className="mt-8 flex items-center justify-center gap-3 rounded-2xl bg-white/10 px-6 py-5 text-white">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-400">
               <Check className="h-4 w-4 text-white" />
             </div>
@@ -61,18 +61,18 @@ export function NewsletterSection() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email address"
-                className="flex-1 rounded-2xl bg-[#5C2A3C] px-5 py-3.5 text-sm text-white placeholder:text-white/40 outline-none ring-1 ring-white/20 transition focus:ring-2 focus:ring-[#C4867A] sm:rounded-r-none sm:rounded-l-2xl"
+                className="flex-1 rounded-2xl bg-white/10 px-5 py-3.5 text-sm text-white placeholder:text-white/40 outline-none ring-1 ring-white/20 transition focus:ring-2 focus:ring-brand-accent sm:rounded-r-none sm:rounded-l-2xl"
               />
               <button
                 type="submit"
                 disabled={loading}
                 className={cn(
-                  'flex items-center justify-center gap-2 rounded-2xl bg-[#C4867A] px-7 py-3.5 text-sm font-semibold text-[#7C3D52] transition hover:bg-[#A8685E] disabled:opacity-60 sm:rounded-l-none sm:rounded-r-2xl',
+                  'flex items-center justify-center gap-2 rounded-2xl bg-brand-accent px-7 py-3.5 text-sm font-semibold text-brand-dark transition hover:bg-brand-accent-hover disabled:opacity-60 sm:rounded-l-none sm:rounded-r-2xl',
                 )}
                 aria-label="Subscribe to newsletter"
               >
                 {loading ? (
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#7C3D52]/40 border-t-[#7C3D52]" />
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand-dark/40 border-t-brand-dark" />
                 ) : (
                   <Send className="h-4 w-4" />
                 )}

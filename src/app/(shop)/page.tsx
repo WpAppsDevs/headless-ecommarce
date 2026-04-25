@@ -51,16 +51,16 @@ export default function HomePage() {
       <section aria-labelledby="featured-heading" className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-end justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#C4867A]">
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-accent">
               New Arrivals
             </p>
-            <h2 id="featured-heading" className="mt-1 font-serif text-3xl font-bold text-[#7C3D52]">
+            <h2 id="featured-heading" className="mt-1 font-serif text-3xl font-bold text-brand-text">
               Latest Collection
             </h2>
           </div>
           <Link
             href="/products"
-            className="hidden text-sm font-medium text-[#7C3D52] underline-offset-4 hover:underline sm:block"
+            className="hidden text-sm font-medium text-brand-text underline-offset-4 hover:underline sm:block"
           >
             View all →
           </Link>

@@ -78,7 +78,7 @@ function NavLinks({ onClick }: { onClick?: () => void }) {
                 ? 'text-zinc-900'
                 : 'text-zinc-500 hover:text-zinc-900',
               // animated underline
-              'after:absolute after:-bottom-0.5 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-[#7C3D52] after:transition-transform hover:after:scale-x-100',
+              'after:absolute after:-bottom-0.5 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-brand-accent after:transition-transform hover:after:scale-x-100',
               active && 'after:scale-x-100',
             )}
           >
@@ -143,7 +143,7 @@ export function Header() {
 
         {/* ── Logo ── */}
         <Link href="/" className="flex shrink-0 items-center gap-2 text-xl font-black tracking-tight text-zinc-900">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#7C3D52] text-sm font-black text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-accent text-sm font-black text-white">
             {config.siteName.charAt(0)}
           </span>
           {config.siteName}
@@ -181,7 +181,7 @@ export function Header() {
           >
             <ShoppingCart className="h-[18px] w-[18px]" />
             {itemCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#7C3D52] text-[10px] font-bold text-white">
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-brand-accent text-[10px] font-bold text-white">
                 {itemCount > 99 ? '99+' : itemCount}
               </span>
             )}
@@ -219,7 +219,7 @@ export function Header() {
           >
             <ShoppingCart className="h-5 w-5" />
             {itemCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#7C3D52] text-[10px] font-bold text-white">
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-brand-accent text-[10px] font-bold text-white">
                 {itemCount > 99 ? '99+' : itemCount}
               </span>
             )}

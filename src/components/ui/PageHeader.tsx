@@ -18,7 +18,7 @@ interface PageHeaderProps {
  */
 export function PageHeader({ title, breadcrumbs }: PageHeaderProps) {
   return (
-    <div className="bg-gradient-to-r from-[#F7ECEA] via-[#FDF8F6] to-[#F7ECEA] py-14 text-center">
+    <div className="bg-gradient-to-r from-brand-accent-light via-brand-section to-brand-accent-light py-14 text-center">
       <h1 className="text-4xl font-bold tracking-tight text-zinc-900">{title}</h1>
 
       <nav aria-label="Breadcrumb" className="mt-3">

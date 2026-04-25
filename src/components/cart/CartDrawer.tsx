@@ -38,7 +38,7 @@ export function CartDrawer() {
               Shopping Cart
             </h2>
             {totalQty > 0 && (
-              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#7C3D52] px-1.5 text-[11px] font-semibold text-white">
+              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-accent px-1.5 text-[11px] font-semibold text-white">
                 {totalQty}
               </span>
             )}

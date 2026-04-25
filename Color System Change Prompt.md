@@ -1,34 +1,93 @@
-Redesign the entire website UI color system for a Pakistani fashion eCommerce brand.
+Redesign the entire website UI color system for a Pakistani fashion eCommerce brand using a soft dusty rose premium palette inspired by the provided reference design.
 
-Current issue:
-The existing colors feel outdated and not premium enough. I want a modern, elegant, and high-converting color palette.
+IMPORTANT:
+- Do NOT change layout or structure
+- Only update the color system
+- Implement a centralized global color system (design tokens / variables)
+
+--------------------------------------------------
+🎨 COLOR PALETTE (USE EXACT VALUES)
+
+Primary text: #2B2B2B
+Secondary text: #6F6F6F
+
+Primary accent (buttons, highlights): #C97C7C
+Accent hover state: #B46666
+Light accent background: #F3E4E4
+
+Main background: #F8F5F2
+Section background: #FFFFFF
+Card background: #FBF7F5
+
+Borders and dividers: #E8E2DD
+
+Optional status colors:
+- Ready Stock: #7BAE7F
+- Pre-Order: #D89A6A
+
+--------------------------------------------------
+🧩 GLOBAL COLOR SYSTEM (VERY IMPORTANT)
+
+Define all colors as reusable global variables / design tokens.
+
+Example structure:
+
+- --color-primary-text
+- --color-secondary-text
+- --color-accent
+- --color-accent-hover
+- --color-bg-main
+- --color-bg-section
+- --color-bg-card
+- --color-border
+- --color-success (stock)
+- --color-warning (pre-order)
 
 Requirements:
-- Replace all existing colors (background, buttons, text, cards, badges)
-- Maintain strong contrast and accessibility
-- Keep the design clean, minimal, and premium
+- All UI elements must use these variables (no hardcoded colors)
+- Ensure consistency across all components
+- Make the system easily maintainable and scalable
 
-New color direction:
-- Use a soft, feminine, premium palette
-- Primary text: deep neutral (not pure black)
-- Accent color: soft dusty pink or muted luxury tone
-- Background: warm off-white or very light pastel
-- Secondary background: subtle contrast (cards/sections)
+--------------------------------------------------
+📍 APPLY COLORS TO
 
-Apply consistently to:
 - Hero section
+- Navigation bar
 - Buttons (primary, secondary, outline)
 - Product cards
 - Badges (Ready Stock, Pre-Order, Catalog)
-- Navigation bar
+- Sections and backgrounds
 - Footer
 
-UX rules:
-- CTA buttons must stand out clearly
-- Use accent color sparingly (10–20%)
-- Maintain visual hierarchy using color contrast
+--------------------------------------------------
+🎯 UX RULES
 
-Output:
-- A complete updated color system
-- Show before/after style if possible
-- Ensure mobile-friendly contrast and readability
+- CTA buttons must stand out using accent color
+- Use accent color sparingly (10–20%)
+- Maintain strong contrast and readability
+- Ensure mobile accessibility
+
+--------------------------------------------------
+💻 IMPLEMENTATION OUTPUT
+
+Provide:
+1. Updated UI with new colors applied
+2. Global color variable system (CSS variables or design tokens)
+3. Example usage in components (buttons, cards, etc.)
+
+Example (CSS variables):
+
+:root {
+  --color-primary-text: #2B2B2B;
+  --color-accent: #C97C7C;
+  --color-bg-main: #F8F5F2;
+}
+
+--------------------------------------------------
+🚀 GOAL
+
+- Premium, elegant, feminine UI
+- Fully scalable color system
+- Easy future updates (change in one place reflects everywhere)
+
+Also generate Tailwind config or CSS variable integration so colors can be updated globally from a single file.

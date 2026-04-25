@@ -12,21 +12,21 @@ export function HeroSlider() {
         className="absolute inset-0 h-full w-full object-cover object-top"
       />
       {/* Deep green gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#7C3D52]/90 via-[#7C3D52]/65 to-[#7C3D52]/20" />
+      <div className="absolute inset-0 bg-gradient-to-r from-brand-dark/90 via-brand-dark/65 to-brand-dark/20" />
 
       {/* Content */}
       <div className="relative z-10 flex h-full items-center">
         <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-16">
           <div className="max-w-2xl">
             {/* Eyebrow */}
-            <span className="mb-5 inline-block rounded-full border border-[#C4867A]/60 bg-[#C4867A]/10 px-5 py-1.5 text-xs font-semibold uppercase tracking-widest text-[#C4867A] backdrop-blur-sm">
+            <span className="mb-5 inline-block rounded-full border border-brand-accent/60 bg-brand-accent/10 px-5 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-accent backdrop-blur-sm">
               Premium Pakistani Dresses
             </span>
 
             {/* Headline */}
             <h1 className="font-serif text-5xl font-bold leading-tight text-white sm:text-6xl lg:text-7xl">
               Elegance from<br />
-              <span className="text-[#C4867A]">Pakistan</span> to<br />
+              <span className="text-brand-accent">Pakistan</span> to<br />
               Bangladesh
             </h1>
 
@@ -38,13 +38,13 @@ export function HeroSlider() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/products"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-[#7C3D52] transition hover:bg-[#F7ECEA] hover:shadow-lg"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-brand-dark transition hover:bg-brand-bg hover:shadow-lg"
               >
                 Shop Ready Stock
               </Link>
               <Link
                 href="/products"
-                className="inline-flex items-center gap-2 rounded-full border-2 border-[#C4867A] bg-transparent px-7 py-3.5 text-sm font-semibold text-[#C4867A] backdrop-blur-sm transition hover:bg-[#C4867A]/10"
+                className="inline-flex items-center gap-2 rounded-full border-2 border-brand-accent bg-transparent px-7 py-3.5 text-sm font-semibold text-brand-accent backdrop-blur-sm transition hover:bg-brand-accent/10"
               >
                 Pre-Order Collection
               </Link>
@@ -63,7 +63,7 @@ export function HeroSlider() {
                 Ready Stock in 2–5 Days
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#C4867A]" />
+                <span className="h-1.5 w-1.5 rounded-full bg-brand-accent" />
                 Pre-Order in 10–15 Days
               </span>
               <span className="flex items-center gap-1.5">

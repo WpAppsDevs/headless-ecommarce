@@ -28,7 +28,7 @@ const COMPANY_LINKS = [
 function SocialLink({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
-      className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-700 text-zinc-400 transition-colors hover:border-[#C4867A] hover:text-[#C4867A]">
+      className="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-700 text-zinc-400 transition-colors hover:border-brand-accent hover:text-brand-accent">
       {children}
     </a>
   );
@@ -46,7 +46,7 @@ export function Footer() {
           {/* Brand column */}
           <div className="space-y-5">
             <Link href="/" className="inline-flex items-center gap-2 text-xl font-black text-white">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#7C3D52] text-sm font-black text-white">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-accent text-sm font-black text-white">
                 {config.siteName.charAt(0)}
               </span>
               {config.siteName}
@@ -100,7 +100,7 @@ export function Footer() {
             <ul className="space-y-3">
               {SHOP_LINKS.map(({ href, label }) => (
                 <li key={label}>
-                  <Link href={href} className="text-sm text-zinc-400 transition-colors hover:text-[#C4867A]">
+                  <Link href={href} className="text-sm text-zinc-400 transition-colors hover:text-brand-accent">
                     {label}
                   </Link>
                 </li>
@@ -114,7 +114,7 @@ export function Footer() {
             <ul className="space-y-3">
               {HELP_LINKS.map(({ href, label }) => (
                 <li key={label}>
-                  <Link href={href} className="text-sm text-zinc-400 transition-colors hover:text-[#C4867A]">
+                  <Link href={href} className="text-sm text-zinc-400 transition-colors hover:text-brand-accent">
                     {label}
                   </Link>
                 </li>
@@ -128,7 +128,7 @@ export function Footer() {
             <ul className="space-y-3">
               {COMPANY_LINKS.map(({ href, label }) => (
                 <li key={label}>
-                  <Link href={href} className="text-sm text-zinc-400 transition-colors hover:text-[#C4867A]">
+                  <Link href={href} className="text-sm text-zinc-400 transition-colors hover:text-brand-accent">
                     {label}
                   </Link>
                 </li>
