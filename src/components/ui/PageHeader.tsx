@@ -51,6 +51,12 @@ export function PageHeader({ title, breadcrumbs }: PageHeaderProps) {
           ))}
         </ol>
       </nav>
+      {title === 'My Account' && (
+        <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-zinc-500">
+          Manage your profile, track orders, and easily update your personal details anytime,{' '}
+          all in one convenient place.
+        </p>
+      )}
     </div>
   );
 }

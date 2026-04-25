@@ -704,7 +704,10 @@ Content-Type: application/json
         "quantity": "1",
         "meta": null,
         "created_at": "2024-01-15 10:30:00",
-        "updated_at": "2024-01-15 10:30:00"
+        "updated_at": "2024-01-15 10:30:00",
+        "product_name": "Nike Air Max 90",
+        "product_image": "https://example.com/wp-content/uploads/2024/01/nike-air-max.jpg",
+        "price": "99.99"
       }
     ],
     "cart_token": "550e8400-e29b-41d4-a716-446655440000",
@@ -760,13 +763,35 @@ Authorization: Bearer eyJhbGci...
         "quantity": "2",
         "meta": null,
         "created_at": "2024-01-15 10:30:00",
-        "updated_at": "2024-01-15 10:31:00"
+        "updated_at": "2024-01-15 10:31:00",
+        "product_name": "Nike Air Max 90",
+        "product_image": "https://example.com/wp-content/uploads/2024/01/nike-air-max.jpg",
+        "price": "99.99"
       }
     ],
     "cart_token": "550e8400-e29b-41d4-a716-446655440000"
   }
 }
 ```
+
+#### Cart Item Fields
+
+Each item in the `items` array contains the following fields:
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Unique row ID of the cart item |
+| `cart_token` | string | Cart session token (empty for authenticated users) |
+| `user_id` | integer \| null | WP user ID (null for guests) |
+| `product_id` | string | WooCommerce product ID |
+| `variation_id` | string | Product variation ID (0 for simple products) |
+| `quantity` | string | Number of units in the cart |
+| `meta` | string \| null | JSON-encoded custom metadata |
+| `created_at` | string | ISO 8601 timestamp when item was added |
+| `updated_at` | string | ISO 8601 timestamp of last modification |
+| `product_name` | string | Human-readable product name (e.g., "Nike Air Max 90") |
+| `product_image` | string \| null | Primary image URL from the product (null if no image exists) |
+| `price` | string | Current product price (e.g., `"99.99"`; `"0"` if unavailable) |
 
 ---
 

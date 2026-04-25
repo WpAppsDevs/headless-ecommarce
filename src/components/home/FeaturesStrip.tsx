@@ -1,41 +1,65 @@
-import { Truck, RotateCcw, ShieldCheck, HeadphonesIcon } from 'lucide-react';
+import { ShieldCheck, Truck, Star, RotateCcw, HeadphonesIcon, Package } from 'lucide-react';
 
 const FEATURES = [
   {
+    icon: ShieldCheck,
+    title: '100% Authentic',
+    desc: 'Direct from trusted Pakistani manufacturers',
+  },
+  {
     icon: Truck,
-    title: 'Free Shipping',
-    desc: 'On all orders over $50',
+    title: 'Fast Delivery',
+    desc: 'Ready stock in 2–5 days across Bangladesh',
+  },
+  {
+    icon: Star,
+    title: 'Premium Quality',
+    desc: 'Carefully curated fabrics and craftsmanship',
+  },
+  {
+    icon: Package,
+    title: 'Secure Packaging',
+    desc: 'Garments arrive fresh and wrinkle-free',
   },
   {
     icon: RotateCcw,
-    title: 'Easy Returns',
-    desc: '30-day return policy',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Secure Payment',
-    desc: '100% protected transactions',
+    title: 'Easy Exchange',
+    desc: '7-day exchange policy on ready stock',
   },
   {
     icon: HeadphonesIcon,
-    title: '24/7 Support',
-    desc: 'Always here to help you',
+    title: 'Dedicated Support',
+    desc: 'WhatsApp & call support 7 days a week',
   },
 ];
 
 export function FeaturesStrip() {
   return (
-    <section className="border-b border-t bg-background">
+    <section aria-labelledby="why-us-heading" className="bg-white py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 divide-x divide-y lg:grid-cols-4 lg:divide-y-0">
+        {/* Heading */}
+        <div className="mb-10 text-center">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#C9A961]">
+            Our Promise
+          </p>
+          <h2 id="why-us-heading" className="mt-2 font-serif text-3xl font-bold text-[#0F5132] sm:text-4xl">
+            Why Choose Us
+          </h2>
+        </div>
+
+        {/* Grid */}
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           {FEATURES.map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="flex items-center gap-4 px-6 py-5">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-                <Icon className="h-5 w-5 text-zinc-700 dark:text-zinc-300" />
+            <div
+              key={title}
+              className="flex flex-col items-center gap-3 rounded-2xl bg-[#F9F7F3] p-5 text-center"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0F5132]/10">
+                <Icon className="h-5 w-5 text-[#0F5132]" />
               </div>
               <div>
-                <p className="text-sm font-semibold">{title}</p>
-                <p className="text-xs text-muted-foreground">{desc}</p>
+                <p className="text-sm font-semibold text-zinc-900">{title}</p>
+                <p className="mt-0.5 text-xs leading-relaxed text-zinc-500">{desc}</p>
               </div>
             </div>
           ))}

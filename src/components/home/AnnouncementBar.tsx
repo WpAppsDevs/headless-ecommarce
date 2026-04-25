@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 import { Tag } from 'lucide-react';
 
 const MESSAGES = [
-  '🎉 Midseason Sale: 20% Off — Auto Applied at Checkout — Limited Time Only',
-  '🚚 Free Shipping on Orders Over $50 — Shop Now',
-  '🔥 New Arrivals Just Dropped — Discover the Latest Collection',
+  '🎉 Eid Collection Now Live — Premium Pakistani Dresses at Special Prices',
+  '🚚 Free Delivery on Orders Over ৳2,500 — Ready Stock Ships in 2–5 Days',
+  '📦 Pre-Order Now Open — Imported Direct from Pakistan in 10–15 Days',
+  '🛍️ Wholesale & Catalog Orders Available — Contact Us for Bulk Pricing',
 ];
 
 export function AnnouncementBar() {
@@ -20,17 +21,17 @@ export function AnnouncementBar() {
         setIndex((i) => (i + 1) % MESSAGES.length);
         setVisible(true);
       }, 400);
-    }, 4000);
+    }, 4500);
     return () => clearInterval(timer);
   }, []);
 
   return (
-    <div className="bg-zinc-900 text-white text-sm py-2.5 px-4 text-center overflow-hidden">
+    <div className="bg-[#0F5132] text-white text-sm py-2.5 px-4 text-center overflow-hidden">
       <span
         className="inline-flex items-center gap-2 transition-opacity duration-400"
         style={{ opacity: visible ? 1 : 0 }}
       >
-        <Tag className="h-3.5 w-3.5 text-yellow-400 shrink-0" />
+        <Tag className="h-3.5 w-3.5 text-[#C9A961] shrink-0" />
         {MESSAGES[index]}
       </span>
     </div>

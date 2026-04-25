@@ -7,14 +7,18 @@ import { AnnouncementBar } from '@/components/home/AnnouncementBar';
 import { HeroSlider } from '@/components/home/HeroSlider';
 import { CategoryGrid } from '@/components/home/CategoryGrid';
 import { PromoBanners } from '@/components/home/PromoBanners';
+import { PreOrderSteps } from '@/components/home/PreOrderSteps';
+import { WholesaleBanner } from '@/components/home/WholesaleBanner';
+import { CategoryBanners } from '@/components/home/CategoryBanners';
+import { TestimonialsSection } from '@/components/home/TestimonialsSection';
+import { FeaturesStrip } from '@/components/home/FeaturesStrip';
+import { ComingSoonSection } from '@/components/home/ComingSoonSection';
+import { WhatsAppCTA } from '@/components/home/WhatsAppCTA';
 import { NewsletterSection } from '@/components/home/NewsletterSection';
-import { Flame, Zap } from 'lucide-react';
-// FeaturesStrip, TestimonialsSection, InstagramSection intentionally removed
 
 export const revalidate = 60;
 
-// ── Skeleton grid ────────────────────────────────────────────────────────────
-function ProductGridSkeleton({ count = 4 }: { count?: number }) {
+function ProductGridSkeleton({ count = 8 }: { count?: number }) {
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
       {Array.from({ length: count }).map((_, i) => (
@@ -24,59 +28,8 @@ function ProductGridSkeleton({ count = 4 }: { count?: number }) {
   );
 }
 
-// ── Section heading ──────────────────────────────────────────────────────────
-function SectionHeading({
-  eyebrow,
-  title,
-  subtitle,
-  icon: Icon,
-  viewAllHref,
-}: {
-  eyebrow: string;
-  title: string;
-  subtitle?: string;
-  icon?: React.ElementType;
-  viewAllHref?: string;
-}) {
-  return (
-    <div className="mb-8 flex items-end justify-between">
-      <div>
-        <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-400">
-          {Icon && <Icon className="h-3.5 w-3.5" />}
-          {eyebrow}
-        </p>
-        <h2 className="mt-1 text-3xl font-extrabold tracking-tight text-zinc-900">
-          {title}
-        </h2>
-        {subtitle && (
-          <p className="mt-1.5 text-sm text-zinc-500">{subtitle}</p>
-        )}
-      </div>
-      {viewAllHref && (
-        <Link
-          href={viewAllHref}
-          className="hidden text-sm font-medium text-zinc-500 underline-offset-4 hover:underline sm:block"
-        >
-          View all →
-        </Link>
-      )}
-    </div>
-  );
-}
-
-// ── Product section ──────────────────────────────────────────────────────────
 async function FeaturedProductsSection() {
-  const { items } = await getProducts({ per_page: 4 }).catch(() => ({ items: [] }));
-  if (items.length === 0) return null;
-  return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-      {items.map((p) => <ProductCard key={p.id} product={p} />)}
-    </div>
-  );
-}
-
-async function TrendingProductsSection() {
-  const { items } = await getProducts({ per_page: 4 }).catch(() => ({ items: [] }));
+  const { items } = await getProducts({ per_page: 8 }).catch(() => ({ items: [] }));
   if (items.length === 0) return null;
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -85,56 +38,45 @@ async function TrendingProductsSection() {
   );
 }
 
-// ── Page ─────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   return (
-    <main className="flex flex-col">
-      {/* Announcement bar */}
+    <div className="flex flex-col">
       <AnnouncementBar />
-
-      {/* Hero slider */}
       <HeroSlider />
+      <CategoryGrid />
+      <PromoBanners />
+      <PreOrderSteps />
 
-      {/* Features strip */}
-
-      {/* ── Today's Best Choices ── */}
+      {/* Featured Products */}
       <section aria-labelledby="featured-heading" className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <SectionHeading
-          eyebrow="Handpicked for You"
-          title="Today's Best Choices"
-          subtitle="Discover today's standout picks."
-          icon={Flame}
-          viewAllHref="/products"
-        />
-        <Suspense fallback={<ProductGridSkeleton count={4} />}>
+        <div className="mb-8 flex items-end justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#C9A961]">
+              New Arrivals
+            </p>
+            <h2 id="featured-heading" className="mt-1 font-serif text-3xl font-bold text-[#0F5132]">
+              Latest Collection
+            </h2>
+          </div>
+          <Link
+            href="/products"
+            className="hidden text-sm font-medium text-[#0F5132] underline-offset-4 hover:underline sm:block"
+          >
+            View all →
+          </Link>
+        </div>
+        <Suspense fallback={<ProductGridSkeleton count={8} />}>
           <FeaturedProductsSection />
         </Suspense>
       </section>
 
-      {/* Promo banners */}
-      <PromoBanners />
-
-      {/* Shop by categories */}
-      <CategoryGrid />
-
-      {/* ── Trending Now ── */}
-      <section aria-labelledby="trending-heading" className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <SectionHeading
-          eyebrow="What's hot"
-          title="Trending Now"
-          subtitle="Our most-loved styles this season."
-          icon={Zap}
-          viewAllHref="/products"
-        />
-        <Suspense fallback={<ProductGridSkeleton count={4} />}>
-          <TrendingProductsSection />
-        </Suspense>
-      </section>
-
-      {/* Newsletter */}
+      <WholesaleBanner />
+      <CategoryBanners />
+      <TestimonialsSection />
+      <FeaturesStrip />
+      <ComingSoonSection />
+      <WhatsAppCTA />
       <NewsletterSection />
-    </main>
+    </div>
   );
 }
-
-

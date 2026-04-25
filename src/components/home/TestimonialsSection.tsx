@@ -2,47 +2,57 @@ import { Star } from 'lucide-react';
 
 const TESTIMONIALS = [
   {
-    name: 'Jenna L.',
-    role: 'Yoga Instructor',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&q=80',
+    name: 'Tahmina Akter',
+    location: 'Dhaka, Bangladesh',
+    badge: 'Ready Stock',
+    badgeColor: 'bg-emerald-100 text-emerald-700',
+    avatar: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=120&q=80',
     rating: 5,
-    text: '"Super comfortable and breathable — perfect for my daily workouts. The fabric feels amazing against the skin."',
+    text: '"The lawn suit arrived in 3 days! Quality is exactly like the photos — fabric is so soft and the embroidery is gorgeous. Will definitely order again for Eid."',
   },
   {
-    name: 'Marcus T.',
-    role: 'Personal Trainer',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80',
+    name: 'Roksana Begum',
+    location: 'Chittagong, Bangladesh',
+    badge: 'Pre-Order',
+    badgeColor: 'bg-amber-100 text-amber-700',
+    avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=120&q=80',
     rating: 5,
-    text: '"The fit is amazing. Stylish, flexible, and great for the gym. I get compliments every session!"',
+    text: '"Pre-ordered the luxury formal collection and it came in 12 days exactly as promised. The packaging was beautiful and the dress fits perfectly. 100% authentic!"',
   },
   {
-    name: 'Sofia R.',
-    role: 'Marathon Runner',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&q=80',
+    name: 'Nasrin Sultana',
+    location: 'Sylhet, Bangladesh',
+    badge: 'Ready Stock',
+    badgeColor: 'bg-emerald-100 text-emerald-700',
+    avatar: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=120&q=80',
     rating: 5,
-    text: '"Quality is top-notch. I feel more confident every time I wear it. Fast delivery and great packaging too."',
+    text: '"Ordered for my daughter\'s wedding. The embroidered dress was absolutely stunning. Everyone asked where I got it from. Best Pakistani dress seller in Bangladesh!"',
   },
   {
-    name: 'Daniel K.',
-    role: 'CrossFit Athlete',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&q=80',
+    name: 'Farhana Islam',
+    location: 'Rajshahi, Bangladesh',
+    badge: 'Wholesale',
+    badgeColor: 'bg-zinc-100 text-zinc-700',
+    avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=120&q=80',
     rating: 5,
-    text: '"Love the fabric! Lightweight and moves with me during every session. Best activewear I\'ve ever bought."',
+    text: '"I resell their catalog collection and my customers love it. The prices are fair, quality is consistent, and the team is very helpful with bulk orders. Highly recommended for resellers!"',
   },
 ];
 
 export function TestimonialsSection() {
   return (
-    <section className="bg-zinc-50 dark:bg-zinc-900/50 py-16">
+    <section aria-labelledby="testimonials-heading" className="bg-[#F9F7F3] py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="mb-10 text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Reviews
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#C9A961]">
+            Customer Reviews
           </p>
-          <h2 className="mt-1 text-3xl font-bold tracking-tight">What Our Customers Say</h2>
-          <p className="mt-2 text-muted-foreground">
-            Real feedback from those who train, move, and live in our gear.
+          <h2 id="testimonials-heading" className="mt-2 font-serif text-3xl font-bold text-[#0F5132] sm:text-4xl">
+            What Our Customers Say
+          </h2>
+          <p className="mt-2 text-sm text-zinc-500">
+            Real experiences from our customers across Bangladesh.
           </p>
         </div>
 
@@ -51,30 +61,33 @@ export function TestimonialsSection() {
           {TESTIMONIALS.map((t) => (
             <div
               key={t.name}
-              className="flex flex-col gap-4 rounded-2xl border bg-background p-6 shadow-sm"
+              className="flex flex-col gap-4 rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm"
             >
               {/* Stars */}
               <div className="flex gap-0.5">
                 {Array.from({ length: t.rating }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <Star key={i} className="h-4 w-4 fill-[#C9A961] text-[#C9A961]" />
                 ))}
               </div>
 
               {/* Quote */}
-              <p className="flex-1 text-sm leading-relaxed text-muted-foreground">{t.text}</p>
+              <p className="flex-1 text-sm leading-relaxed text-zinc-600">{t.text}</p>
 
               {/* Author */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 border-t border-zinc-50 pt-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={t.avatar}
                   alt={t.name}
-                  className="h-10 w-10 rounded-full object-cover"
+                  className="h-10 w-10 shrink-0 rounded-full object-cover"
                 />
-                <div>
-                  <p className="text-sm font-semibold">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.role}</p>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-zinc-900">{t.name}</p>
+                  <p className="truncate text-xs text-zinc-400">{t.location}</p>
                 </div>
+                <span className={`ml-auto shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${t.badgeColor}`}>
+                  {t.badge}
+                </span>
               </div>
             </div>
           ))}

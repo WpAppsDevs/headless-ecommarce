@@ -39,20 +39,6 @@ export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProp
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Page header – centered */}
-      <div className="border-b border-zinc-100 py-10 text-center">
-        <nav className="mb-3 flex items-center justify-center gap-2 text-sm text-zinc-400">
-          <Link href="/" className="transition-colors hover:text-zinc-600">Home</Link>
-          <span>›</span>
-          <span className="text-zinc-600">My Account</span>
-        </nav>
-        <h1 className="text-4xl font-bold text-zinc-900">My Account</h1>
-        <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-zinc-500">
-          Manage your profile, track orders, and easily update your personal details anytime,{' '}
-          all in one convenient place.
-        </p>
-      </div>
-
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
         {/* Mobile tab bar */}
         <div className="mb-6 flex overflow-x-auto rounded-xl border border-zinc-200 bg-white p-1 lg:hidden">

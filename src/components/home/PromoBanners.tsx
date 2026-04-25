@@ -1,101 +1,91 @@
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
-import { buttonVariants } from '@/components/ui/button';
 
-const BANNERS = [
+const COLLECTIONS = [
   {
-    tag: 'Just Dropped',
-    title: 'New\nArrivals',
-    subtitle: 'Fresh styles added every week. Be the first to shop.',
-    cta: 'Shop New Arrivals',
-    href: '/products?category=new-arrivals',
-    image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=900&q=80',
-    light: false,
+    tag: 'Summer Season',
+    title: 'Lawn\nCollection',
+    subtitle: 'Breathable, printed lawn suits for the warm season. Cool and elegant.',
+    cta: 'Shop Lawn',
+    href: '/products',
+    image: 'https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=900&q=80',
+    span: 'lg:col-span-2',
   },
   {
-    tag: 'Limited Time',
-    title: 'Up to 40%\nOff Sale',
-    subtitle: 'Premium picks at unbeatable prices. While stocks last.',
-    cta: 'Shop the Sale',
-    href: '/products?on_sale=true',
-    image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=900&q=80',
-    light: true,
+    tag: 'Festive Season',
+    title: 'Eid\nCollection',
+    subtitle: 'Embroidered formals perfect for Eid celebrations.',
+    cta: 'Shop Eid',
+    href: '/products',
+    image: 'https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?w=600&q=80',
+    span: '',
+  },
+  {
+    tag: 'Premium',
+    title: 'Luxury\nFormals',
+    subtitle: 'Hand-crafted embroidery and premium fabrics for special occasions.',
+    cta: 'Shop Luxury',
+    href: '/products',
+    image: 'https://images.unsplash.com/photo-1602573991155-21f0143bb56f?w=600&q=80',
+    span: '',
+  },
+  {
+    tag: 'Little Ones',
+    title: 'Kids\nCollection',
+    subtitle: 'Adorable Pakistani dresses for your little princesses.',
+    cta: 'Shop Kids',
+    href: '/products',
+    image: 'https://images.unsplash.com/photo-1518831959646-742c3a14ebf6?w=600&q=80',
+    span: '',
   },
 ];
 
 export function PromoBanners() {
   return (
-    <section
-      aria-label="Promotional banners"
-      className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8"
-    >
-      <div className="grid gap-5 sm:grid-cols-2">
-        {BANNERS.map((b) => (
-          <div
-            key={b.tag}
-            className="group relative overflow-hidden rounded-3xl"
+    <section aria-labelledby="collections-heading" className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+      {/* Heading */}
+      <div className="mb-8 text-center">
+        <p className="text-xs font-semibold uppercase tracking-widest text-[#C9A961]">
+          Curated for You
+        </p>
+        <h2 id="collections-heading" className="mt-2 font-serif text-3xl font-bold text-[#0F5132] sm:text-4xl">
+          Featured Collections
+        </h2>
+      </div>
+
+      {/* Grid: 1 large left + 3 small right */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {COLLECTIONS.map((col, idx) => (
+          <Link
+            key={col.tag}
+            href={col.href}
+            className={`group relative overflow-hidden rounded-2xl ${idx === 0 ? 'sm:row-span-2' : ''}`}
+            aria-label={`Browse ${col.title.replace('\n', ' ')}`}
           >
-            {/* Background image */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={b.image}
-              alt=""
-              aria-hidden="true"
-              className="h-80 w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              src={col.image}
+              alt={col.title.replace('\n', ' ')}
+              className={`w-full object-cover transition-transform duration-700 group-hover:scale-105 ${idx === 0 ? 'h-[480px] sm:h-full' : 'h-56'}`}
             />
-
-            {/* Gradient overlay */}
-            <div
-              className={cn(
-                'absolute inset-0',
-                b.light
-                  ? 'bg-gradient-to-r from-white/85 via-white/60 to-transparent'
-                  : 'bg-gradient-to-r from-zinc-950/80 via-zinc-950/50 to-transparent',
-              )}
-            />
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0F5132]/80 via-[#0F5132]/30 to-transparent" />
 
             {/* Content */}
-            <div className="absolute inset-0 flex flex-col justify-center px-8 py-8">
-              <span
-                className={cn(
-                  'mb-2 inline-flex w-fit rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest',
-                  b.light
-                    ? 'bg-zinc-900 text-white'
-                    : 'bg-white/20 text-white backdrop-blur-sm',
-                )}
-              >
-                {b.tag}
+            <div className="absolute bottom-0 left-0 right-0 p-5">
+              <span className="mb-2 inline-block rounded-full bg-[#C9A961] px-3 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-[#0F5132]">
+                {col.tag}
               </span>
-              <h3
-                className={cn(
-                  'whitespace-pre-line text-3xl font-extrabold leading-tight sm:text-4xl',
-                  b.light ? 'text-zinc-900' : 'text-white',
-                )}
-              >
-                {b.title}
+              <h3 className="whitespace-pre-line font-serif text-2xl font-bold leading-tight text-white">
+                {col.title}
               </h3>
-              <p
-                className={cn(
-                  'mt-2 max-w-xs text-sm',
-                  b.light ? 'text-zinc-600' : 'text-white/80',
-                )}
-              >
-                {b.subtitle}
-              </p>
-              <Link
-                href={b.href}
-                className={cn(
-                  buttonVariants({ size: 'sm' }),
-                  'mt-5 w-fit rounded-full px-6',
-                  b.light
-                    ? 'bg-zinc-900 text-white hover:bg-zinc-700'
-                    : 'bg-white text-zinc-900 hover:bg-zinc-100',
-                )}
-              >
-                {b.cta}
-              </Link>
+              {idx === 0 && (
+                <p className="mt-1 max-w-xs text-sm text-white/80">{col.subtitle}</p>
+              )}
+              <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#C9A961] underline-offset-2 group-hover:underline">
+                {col.cta} →
+              </span>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </section>
