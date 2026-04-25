@@ -23,11 +23,11 @@ const STEPS = [
 
 export function PreOrderSteps() {
   return (
-    <section aria-labelledby="preorder-heading" className="bg-[#0F5132] py-16">
+    <section aria-labelledby="preorder-heading" className="bg-[#7C3D52] py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="mb-10 text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-[#C9A961]">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#C4867A]">
             Pre-Order Process
           </p>
           <h2 id="preorder-heading" className="mt-2 font-serif text-3xl font-bold text-white sm:text-4xl">
@@ -46,13 +46,13 @@ export function PreOrderSteps() {
               {idx < STEPS.length - 1 && (
                 <div
                   aria-hidden="true"
-                  className="absolute left-[calc(50%+2rem)] top-6 hidden h-px w-[calc(100%+1.5rem)] bg-[#C9A961]/30 lg:block"
+                  className="absolute left-[calc(50%+2rem)] top-6 hidden h-px w-[calc(100%+1.5rem)] bg-[#C4867A]/30 lg:block"
                 />
               )}
 
               {/* Step number circle */}
-              <div className="relative flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#C9A961] bg-[#0F5132]">
-                <span className="font-mono text-sm font-bold text-[#C9A961]">{step}</span>
+              <div className="relative flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#C4867A] bg-[#7C3D52]">
+                <span className="font-mono text-sm font-bold text-[#C4867A]">{step}</span>
               </div>
 
               {/* Content */}

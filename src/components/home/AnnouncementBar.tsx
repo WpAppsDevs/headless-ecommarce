@@ -26,12 +26,12 @@ export function AnnouncementBar() {
   }, []);
 
   return (
-    <div className="bg-[#0F5132] text-white text-sm py-2.5 px-4 text-center overflow-hidden">
+    <div className="bg-[#7C3D52] text-white text-sm py-2.5 px-4 text-center overflow-hidden">
       <span
         className="inline-flex items-center gap-2 transition-opacity duration-400"
         style={{ opacity: visible ? 1 : 0 }}
       >
-        <Tag className="h-3.5 w-3.5 text-[#C9A961] shrink-0" />
+        <Tag className="h-3.5 w-3.5 text-[#C4867A] shrink-0" />
         {MESSAGES[index]}
       </span>
     </div>

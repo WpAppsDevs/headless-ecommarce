@@ -44,10 +44,10 @@ export function PromoBanners() {
     <section aria-labelledby="collections-heading" className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
       {/* Heading */}
       <div className="mb-8 text-center">
-        <p className="text-xs font-semibold uppercase tracking-widest text-[#C9A961]">
+        <p className="text-xs font-semibold uppercase tracking-widest text-[#C4867A]">
           Curated for You
         </p>
-        <h2 id="collections-heading" className="mt-2 font-serif text-3xl font-bold text-[#0F5132] sm:text-4xl">
+        <h2 id="collections-heading" className="mt-2 font-serif text-3xl font-bold text-[#7C3D52] sm:text-4xl">
           Featured Collections
         </h2>
       </div>
@@ -68,11 +68,11 @@ export function PromoBanners() {
               className={`w-full object-cover transition-transform duration-700 group-hover:scale-105 ${idx === 0 ? 'h-[480px] sm:h-full' : 'h-56'}`}
             />
             {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0F5132]/80 via-[#0F5132]/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#7C3D52]/80 via-[#7C3D52]/30 to-transparent" />
 
             {/* Content */}
             <div className="absolute bottom-0 left-0 right-0 p-5">
-              <span className="mb-2 inline-block rounded-full bg-[#C9A961] px-3 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-[#0F5132]">
+              <span className="mb-2 inline-block rounded-full bg-[#C4867A] px-3 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-[#7C3D52]">
                 {col.tag}
               </span>
               <h3 className="whitespace-pre-line font-serif text-2xl font-bold leading-tight text-white">
@@ -81,7 +81,7 @@ export function PromoBanners() {
               {idx === 0 && (
                 <p className="mt-1 max-w-xs text-sm text-white/80">{col.subtitle}</p>
               )}
-              <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#C9A961] underline-offset-2 group-hover:underline">
+              <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#C4867A] underline-offset-2 group-hover:underline">
                 {col.cta} →
               </span>
             </div>

@@ -39,10 +39,10 @@ export function FeaturesStrip() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="mb-10 text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-[#C9A961]">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#C4867A]">
             Our Promise
           </p>
-          <h2 id="why-us-heading" className="mt-2 font-serif text-3xl font-bold text-[#0F5132] sm:text-4xl">
+          <h2 id="why-us-heading" className="mt-2 font-serif text-3xl font-bold text-[#7C3D52] sm:text-4xl">
             Why Choose Us
           </h2>
         </div>
@@ -52,10 +52,10 @@ export function FeaturesStrip() {
           {FEATURES.map(({ icon: Icon, title, desc }) => (
             <div
               key={title}
-              className="flex flex-col items-center gap-3 rounded-2xl bg-[#F9F7F3] p-5 text-center"
+              className="flex flex-col items-center gap-3 rounded-2xl bg-[#F7ECEA] p-5 text-center"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0F5132]/10">
-                <Icon className="h-5 w-5 text-[#0F5132]" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#7C3D52]/10">
+                <Icon className="h-5 w-5 text-[#7C3D52]" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-zinc-900">{title}</p>
