@@ -8,7 +8,7 @@ const PURCHASE_TYPES = [
     desc1: 'Fast delivery in 2-5 days',
     desc2: 'across Bangladesh',
     href: '/products',
-    image: 'https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=400&q=80&fit=crop&crop=top',
+    image: 'https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=400&q=80&fit=crop&crop=top',
   },
   {
     icon: Boxes,
@@ -32,12 +32,12 @@ export function CategoryGrid() {
   return (
     <section className="bg-white py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-5 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-3">
           {PURCHASE_TYPES.map(({ icon: Icon, label, desc1, desc2, href, image }) => (
             <Link
               key={label}
               href={href}
-              className="group flex min-h-[160px] overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-zinc-100 transition-all hover:-translate-y-1 hover:shadow-md"
+              className="group flex min-h-[160px] overflow-hidden rounded-2xl bg-brand-card shadow-sm ring-1 ring-brand-border transition-all hover:-translate-y-1 hover:shadow-md"
               aria-label={`Browse ${label}`}
             >
               {/* Left: content */}
