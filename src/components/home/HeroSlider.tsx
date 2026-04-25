@@ -42,7 +42,7 @@ export function HeroSlider() {
             </p>
 
             {/* Headline — two lines; first line must stay on one line on desktop */}
-            <h1 className="mt-4 font-serif text-[2.6rem] font-bold leading-[1.05] text-brand-text sm:text-[3rem] lg:text-[3.4rem] xl:text-[3.7rem]">
+            <h1 className="mt-4 font-serif text-[2.2rem] font-bold leading-[1.05] text-brand-text sm:text-[3rem] lg:text-[3rem] xl:text-[3rem]">
               <span className="block whitespace-nowrap">Premium Pakistani Dresses</span>
               <span className="block">Stock &amp; Pre-Order Available</span>
             </h1>
