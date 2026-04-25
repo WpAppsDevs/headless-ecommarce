@@ -60,7 +60,7 @@ export function CategoryGrid() {
                   <h3 className="font-serif text-[17px] font-bold text-brand-text">{label}</h3>
                   <p className="mt-1 text-sm leading-relaxed text-brand-text-muted">{description}</p>
                 </div>
-                <span className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-widest text-brand-accent">
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-widest text-brand-wine">
                   Shop Now <span aria-hidden="true">→</span>
                 </span>
               </div>
