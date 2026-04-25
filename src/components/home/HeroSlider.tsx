@@ -34,7 +34,7 @@ export function HeroSlider() {
         </div>
 
         <div className="py-14 lg:py-16 xl:py-20">
-          <div className="max-w-[560px]">
+          <div className="max-w-[560px] lg:max-w-[640px] xl:max-w-[720px]">
 
             {/* Eyebrow */}
             <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand-wine">
@@ -42,7 +42,7 @@ export function HeroSlider() {
             </p>
 
             {/* Headline — two lines; first line must stay on one line on desktop */}
-            <h1 className="mt-4 font-serif text-[2.2rem] font-bold leading-[1.1] text-brand-text sm:text-[2.5rem] lg:text-[2.5rem] xl:text-[2.7rem]">
+            <h1 className="mt-4 font-serif text-[2.6rem] font-bold leading-[1.05] text-brand-text sm:text-[3rem] lg:text-[3.4rem] xl:text-[3.7rem]">
               <span className="block whitespace-nowrap">Premium Pakistani Dresses</span>
               <span className="block">Stock &amp; Pre-Order Available</span>
             </h1>
