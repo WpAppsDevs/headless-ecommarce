@@ -63,6 +63,8 @@
   --color-brand-preorder: var(--brand-preorder);
   --color-brand-dark: var(--brand-dark);
   --color-brand-wine: var(--brand-wine);
+  --color-brand-topbar: var(--brand-topbar);
+  --font-serif: var(--font-playfair), Georgia, "Times New Roman", serif;
 }
 
 :root {
@@ -84,6 +86,7 @@
   --brand-preorder: #D89A6A;
   --brand-dark: #2B2B2B;
   --brand-wine: #8B3A4A;
+  --brand-topbar: #C2899D;
 
   /* ── Shadcn/base-ui system vars — wired to brand tokens ─────────────────
      Default shadcn components (Button, Input, Card, Badge, etc.) auto-adopt

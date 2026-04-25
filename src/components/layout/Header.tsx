@@ -3,8 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
-import { ShoppingCart, Menu, X, Search, User, Heart } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { ShoppingCart, Menu, X, Search, User } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -14,13 +13,43 @@ import {
 } from '@/components/ui/sheet';
 import { useAuthStore } from '@/stores/authStore';
 import { useCartStore } from '@/stores/cartStore';
-import { config } from '@/lib/config';
 import { cn } from '@/lib/utils';
 
 const NAV_LINKS = [
-  { href: '/', label: 'Home' },
-  { href: '/products', label: 'Shop' },
+  { href: '/', label: 'HOME' },
+  { href: '/products?type=ready-stock', label: 'READY STOCK' },
+  { href: '/products?type=pre-order', label: 'PRE-ORDER' },
+  { href: '/products?type=catalog', label: 'CATALOG / WHOLESALE' },
+  { href: '/products?cat=women', label: 'WOMEN' },
+  { href: '/products?cat=men', label: 'MEN' },
+  { href: '/products?cat=kids', label: 'KIDS' },
+  { href: '/contact', label: 'CONTACT' },
 ];
+
+// ── Libaas Floral Logo ───────────────────────────────────────────────────────
+function LibaasLogo() {
+  return (
+    <Link href="/" className="flex shrink-0 flex-col leading-none" aria-label="Libaas — Pakistani Collection">
+      <div className="flex items-end gap-1">
+        <span className="font-serif text-[2rem] font-bold italic leading-none tracking-tight text-brand-text">
+          Libaas
+        </span>
+        {/* Small floral decoration */}
+        <svg viewBox="0 0 28 28" className="mb-0.5 h-6 w-6 text-brand-accent" fill="currentColor" aria-hidden="true">
+          <path d="M14 2C14 2 10 7 10 11C10 13.2 11.8 15 14 15C16.2 15 18 13.2 18 11C18 7 14 2 14 2Z" opacity="0.8"/>
+          <path d="M6 8C6 8 4 13 6 16C7.1 17.6 9 18.3 10.7 17.7C12.4 17.1 13.2 15.2 12.6 13.5C11.4 10.2 6 8 6 8Z" opacity="0.6"/>
+          <path d="M22 8C22 8 17 10.2 15.9 13.5C15.3 15.2 16.1 17.1 17.8 17.7C19.5 18.3 21.4 17.6 22.5 16C24.5 13 22 8 22 8Z" opacity="0.6"/>
+          <path d="M14 15C14 15 9 17 8 20.5C7.5 22.3 8.8 24.1 10.7 24.4C12.5 24.7 14.2 23.4 14.5 21.6C14.8 19.5 14 15 14 15Z" opacity="0.5"/>
+          <path d="M14 15C14 15 19 17 20 20.5C20.5 22.3 19.2 24.1 17.3 24.4C15.5 24.7 13.8 23.4 13.5 21.6C13.2 19.5 14 15 14 15Z" opacity="0.5"/>
+          <circle cx="14" cy="15" r="2.5" />
+        </svg>
+      </div>
+      <span className="text-[9px] font-semibold uppercase tracking-[0.35em] text-brand-text-muted">
+        Pakistani Collection
+      </span>
+    </Link>
+  );
+}
 
 // ── Search overlay ───────────────────────────────────────────────────────────
 function SearchOverlay({ onClose }: { onClose: () => void }) {
@@ -60,8 +89,32 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
   );
 }
 
-// ── Nav links ────────────────────────────────────────────────────────────────
-function NavLinks({ onClick }: { onClick?: () => void }) {
+// ── Desktop nav links ────────────────────────────────────────────────────────
+function DesktopNavLinks() {
+  const pathname = usePathname();
+  return (
+    <nav className="hidden items-center gap-5 xl:flex" aria-label="Main navigation">
+      {NAV_LINKS.map(({ href, label }) => {
+        const active = pathname === href || (href !== '/' && pathname.startsWith(href.split('?')[0]));
+        return (
+          <Link
+            key={href}
+            href={href}
+            className={cn(
+              'text-[11px] font-semibold tracking-[0.08em] transition-colors whitespace-nowrap',
+              active ? 'text-brand-wine' : 'text-zinc-700 hover:text-brand-wine',
+            )}
+          >
+            {label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+// ── Mobile nav links ─────────────────────────────────────────────────────────
+function MobileNavLinks({ onClick }: { onClick?: () => void }) {
   const pathname = usePathname();
   return (
     <>
@@ -73,13 +126,8 @@ function NavLinks({ onClick }: { onClick?: () => void }) {
             href={href}
             onClick={onClick}
             className={cn(
-              'relative text-sm font-medium transition-colors',
-              active
-                ? 'text-zinc-900'
-                : 'text-zinc-500 hover:text-zinc-900',
-              // animated underline
-              'after:absolute after:-bottom-0.5 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-brand-accent after:transition-transform hover:after:scale-x-100',
-              active && 'after:scale-x-100',
+              'text-sm font-medium transition-colors',
+              active ? 'text-brand-wine' : 'text-zinc-700 hover:text-brand-wine',
             )}
           >
             {label}
@@ -90,7 +138,7 @@ function NavLinks({ onClick }: { onClick?: () => void }) {
   );
 }
 
-// ── Auth links ───────────────────────────────────────────────────────────────
+// ── Auth dropdown content ────────────────────────────────────────────────────
 function UserMenu({ onClose }: { onClose?: () => void }) {
   const { isAuthenticated, logout } = useAuthStore();
 
@@ -136,109 +184,92 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-zinc-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-      <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto flex h-[68px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
         {/* Search overlay (full-width) */}
         {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
 
         {/* ── Logo ── */}
-        <Link href="/" className="flex shrink-0 items-center gap-2 text-xl font-black tracking-tight text-zinc-900">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-accent text-sm font-black text-white">
-            {config.siteName.charAt(0)}
-          </span>
-          {config.siteName}
-        </Link>
+        <LibaasLogo />
 
         {/* ── Desktop Nav ── */}
-        <nav className="hidden lg:flex items-center gap-8" aria-label="Main navigation">
-          <NavLinks />
-        </nav>
+        <DesktopNavLinks />
 
         {/* ── Desktop Right Icons ── */}
-        <div className="hidden lg:flex items-center gap-1">
+        <div className="hidden items-center gap-0.5 xl:flex">
           {/* Search */}
           <button
             onClick={() => setSearchOpen(true)}
             aria-label="Open search"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900"
           >
-            <Search className="h-[18px] w-[18px]" />
+            <Search className="h-[19px] w-[19px]" strokeWidth={1.8} />
           </button>
 
-          {/* Wishlist placeholder */}
-          <button
-            aria-label="Wishlist"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
-          >
-            <Heart className="h-[18px] w-[18px]" />
-          </button>
-
-          {/* Cart */}
-          <button
-            onClick={() => setCartDrawerOpen(true)}
-            aria-label={`Cart${itemCount > 0 ? ` — ${itemCount} items` : ''}`}
-            className="relative flex h-9 w-9 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
-          >
-            <ShoppingCart className="h-[18px] w-[18px]" />
-            {itemCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-brand-accent text-[10px] font-bold text-white">
-                {itemCount > 99 ? '99+' : itemCount}
-              </span>
-            )}
-          </button>
-
-          {/* User / Account */}
-          <div className="group relative ml-1">
+          {/* Account */}
+          <div className="group relative">
             <button
               aria-label="Account"
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900"
             >
-              <User className="h-[18px] w-[18px]" />
+              <User className="h-[19px] w-[19px]" strokeWidth={1.8} />
             </button>
             {/* Dropdown */}
             <div className="absolute right-0 top-full mt-2 hidden w-44 rounded-xl border border-zinc-100 bg-white p-3 shadow-xl group-hover:block">
               <UserMenu />
             </div>
           </div>
+
+          {/* Cart */}
+          <button
+            onClick={() => setCartDrawerOpen(true)}
+            aria-label={`Cart — ${itemCount} items`}
+            className="relative ml-0.5 flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900"
+          >
+            <ShoppingCart className="h-[19px] w-[19px]" strokeWidth={1.8} />
+            <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
+              {itemCount > 99 ? '99+' : itemCount}
+            </span>
+          </button>
         </div>
 
         {/* ── Mobile: search + cart + hamburger ── */}
-        <div className="flex lg:hidden items-center gap-1">
+        <div className="flex xl:hidden items-center gap-0.5">
           <button
             onClick={() => setSearchOpen(true)}
             aria-label="Open search"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-50"
           >
-            <Search className="h-5 w-5" />
+            <Search className="h-5 w-5" strokeWidth={1.8} />
           </button>
 
           <button
             onClick={() => setCartDrawerOpen(true)}
-            aria-label={`Cart${itemCount > 0 ? ` — ${itemCount} items` : ''}`}
-            className="relative flex h-9 w-9 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100"
+            aria-label={`Cart — ${itemCount} items`}
+            className="relative flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-50"
           >
-            <ShoppingCart className="h-5 w-5" />
-            {itemCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-brand-accent text-[10px] font-bold text-white">
-                {itemCount > 99 ? '99+' : itemCount}
-              </span>
-            )}
+            <ShoppingCart className="h-5 w-5" strokeWidth={1.8} />
+            <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
+              {itemCount > 99 ? '99+' : itemCount}
+            </span>
           </button>
 
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger
               aria-label="Open menu"
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 transition-colors"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-50 transition-colors"
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </SheetTrigger>
             <SheetContent side="right" className="w-72 p-0">
               <SheetHeader className="border-b px-6 py-4">
-                <SheetTitle className="text-left text-base font-black">{config.siteName}</SheetTitle>
+                <SheetTitle className="text-left">
+                  <span className="font-serif text-xl font-bold italic text-brand-text">Libaas</span>
+                </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-6 px-6 py-6">
                 <nav className="flex flex-col gap-4" aria-label="Mobile navigation">
-                  <NavLinks onClick={() => setMobileOpen(false)} />
+                  <MobileNavLinks onClick={() => setMobileOpen(false)} />
                 </nav>
                 <hr className="border-zinc-100" />
                 <div>
@@ -253,5 +284,3 @@ export function Header() {
     </header>
   );
 }
-
-

@@ -5,46 +5,35 @@ const PURCHASE_TYPES = [
   {
     icon: ShoppingBag,
     label: 'Ready Stock',
-    description: 'Fast delivery in 2-5 days across Bangladesh',
+    desc1: 'Fast delivery in 2-5 days',
+    desc2: 'across Bangladesh',
     href: '/products',
-    image: 'https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=400&q=80&fit=crop&crop=center',
   },
   {
     icon: Boxes,
     label: 'Pre-Order',
-    description: 'Imported from Pakistan. Delivery in 10-15 days',
+    desc1: 'Imported from Pakistan',
+    desc2: 'Delivery in 10-15 days',
     href: '/products',
-    image: 'https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&q=80&fit=crop&crop=top',
   },
   {
     icon: BookOpen,
     label: 'Catalog / Wholesale',
-    description: 'Bulk buying for resellers. Best price guarantee',
+    desc1: 'Bulk buying for resellers',
+    desc2: 'Best price guarantee',
     href: '/products',
-    image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=400&q=80&fit=crop&crop=center',
   },
 ];
 
 export function CategoryGrid() {
   return (
-    <section aria-labelledby="purchase-types-heading" className="bg-brand-bg py-14">
+    <section className="bg-white py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Heading */}
-        <div className="mb-10 text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-accent">
-            How to Shop With Us
-          </p>
-          <h2 id="purchase-types-heading" className="mt-2 font-serif text-3xl font-bold text-brand-text sm:text-4xl">
-            Choose Your Shopping Style
-          </h2>
-          <p className="mt-2 text-sm text-brand-text-muted">
-            Three ways to get the Pakistani dresses you love, delivered to your door.
-          </p>
-        </div>
-
-        {/* Cards — horizontal layout matching reference design */}
         <div className="grid gap-5 sm:grid-cols-3">
-          {PURCHASE_TYPES.map(({ icon: Icon, label, description, href, image }) => (
+          {PURCHASE_TYPES.map(({ icon: Icon, label, desc1, desc2, href, image }) => (
             <Link
               key={label}
               href={href}
@@ -53,19 +42,22 @@ export function CategoryGrid() {
             >
               {/* Left: content */}
               <div className="flex flex-1 flex-col justify-between gap-3 p-5">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-accent/15">
-                  <Icon className="h-5 w-5 text-brand-accent" />
+                {/* Icon circle */}
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-accent/20">
+                  <Icon className="h-5 w-5 text-brand-wine" strokeWidth={1.8} />
                 </div>
                 <div>
                   <h3 className="font-serif text-[17px] font-bold text-brand-text">{label}</h3>
-                  <p className="mt-1 text-sm leading-relaxed text-brand-text-muted">{description}</p>
+                  <p className="mt-1 text-[13px] leading-snug text-brand-text-muted">
+                    {desc1}<br />{desc2}
+                  </p>
                 </div>
-                <span className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-widest text-brand-wine">
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-wine">
                   Shop Now <span aria-hidden="true">→</span>
                 </span>
               </div>
 
-              {/* Right: image */}
+              {/* Right: product image */}
               <div className="relative w-32 shrink-0 overflow-hidden sm:w-28 lg:w-36">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
