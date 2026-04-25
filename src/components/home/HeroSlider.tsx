@@ -9,7 +9,7 @@ export function HeroSlider() {
       {/* ── Model image — absolute right half, desktop only ── */}
       <div className="absolute bottom-0 right-0 top-0 hidden w-[52%] lg:block" aria-hidden="true">
         <Image
-          src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1400&q=90&fit=crop&crop=top"
+          src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=1400&q=90&fit=crop&crop=top"
           alt=""
           fill
           className="object-cover object-[center_top]"
@@ -25,7 +25,7 @@ export function HeroSlider() {
         {/* ── Mobile image — stacks above text ── */}
         <div className="relative mt-6 h-[280px] overflow-hidden rounded-2xl lg:hidden">
           <Image
-            src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=900&q=85&fit=crop&crop=top"
+            src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=900&q=85&fit=crop&crop=top"
             alt="Premium Pakistani fashion collection"
             fill
             className="object-cover object-top"
@@ -53,30 +53,30 @@ export function HeroSlider() {
               or pre-order your favorite designs directly from Pakistan.
             </p>
 
-            {/* ── CTA Buttons — row on sm+ ── */}
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            {/* ── CTA Buttons — single row, no wrap ── */}
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-nowrap">
               {/* Filled wine */}
               <Link
                 href="/products"
-                className="inline-flex items-center justify-center gap-2.5 rounded-md bg-brand-wine px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-white transition hover:opacity-90"
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-brand-wine px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.08em] text-white transition hover:opacity-90 whitespace-nowrap"
               >
-                <ShoppingBag className="h-4 w-4" strokeWidth={2} />
+                <ShoppingBag className="h-4 w-4 shrink-0" strokeWidth={2} />
                 Shop Ready Stock
               </Link>
               {/* Outlined wine */}
               <Link
                 href="/products"
-                className="inline-flex items-center justify-center gap-2.5 rounded-md border-2 border-brand-wine px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-brand-wine transition hover:bg-brand-wine/5"
+                className="inline-flex items-center justify-center gap-2 rounded-md border-2 border-brand-wine px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.08em] text-brand-wine transition hover:bg-brand-wine/5 whitespace-nowrap"
               >
-                <Clock className="h-4 w-4" strokeWidth={2} />
+                <Clock className="h-4 w-4 shrink-0" strokeWidth={2} />
                 Pre-Order Collection
               </Link>
               {/* Outlined dark */}
               <Link
                 href="/products"
-                className="inline-flex items-center justify-center gap-2.5 rounded-md border border-zinc-400 px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-brand-text transition hover:border-zinc-600"
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-zinc-400 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.08em] text-brand-text transition hover:border-zinc-600 whitespace-nowrap"
               >
-                <BookOpen className="h-4 w-4" strokeWidth={2} />
+                <BookOpen className="h-4 w-4 shrink-0" strokeWidth={2} />
                 View Catalog
               </Link>
             </div>

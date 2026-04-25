@@ -8,7 +8,7 @@ const PURCHASE_TYPES = [
     desc1: 'Fast delivery in 2-5 days',
     desc2: 'across Bangladesh',
     href: '/products',
-    image: 'https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=400&q=80&fit=crop&crop=center',
+    image: 'https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=400&q=80&fit=crop&crop=top',
   },
   {
     icon: Boxes,
@@ -16,7 +16,7 @@ const PURCHASE_TYPES = [
     desc1: 'Imported from Pakistan',
     desc2: 'Delivery in 10-15 days',
     href: '/products',
-    image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&q=80&fit=crop&crop=top',
+    image: 'https://images.unsplash.com/photo-1594938298603-c8148c4b4157?w=400&q=80&fit=crop&crop=top',
   },
   {
     icon: BookOpen,

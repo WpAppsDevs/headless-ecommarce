@@ -7,6 +7,7 @@ import { AuthHydrator } from "@/components/layout/AuthHydrator";
 import { CartHydrator } from "@/components/layout/CartHydrator";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { config } from "@/lib/config";
+import { AnnouncementBar } from "@/components/home/AnnouncementBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,6 +43,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <AuthHydrator />
         <CartHydrator />
+        <AnnouncementBar />
         <Header />
         <CartDrawer />
         <main className="flex-1">{children}</main>

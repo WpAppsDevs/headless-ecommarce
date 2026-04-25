@@ -1,41 +1,90 @@
-Redesign the homepage hero section of a Pakistani fashion eCommerce website using the provided reference image.
+Redesign the current eCommerce homepage UI to exactly match the provided reference design.
 
-Reference:
- - Existing Design: `.design/existing-hero.png`
- - New Design: `.design/new-hero.png`
+IMPORTANT:
+- Keep the existing layout, structure, spacing, and content unchanged
+- Only update the visual design (colors, typography, styling, UI elements)
+- The final output must visually match the reference design as closely as possible
 
-Goals:
-- Match the visual style, layout, and premium feel of the reference
-- Keep it elegant, feminine, and modern
-- Optimize for conversion and clarity
+Reference Design:
+`.design/new-hero1.png`
 
-Layout:
-- Left side: text content (headline, subtext, CTA buttons)
-- Right side: high-quality model image
+Current Design:
+`.design/HeadlessECF-04-26-2026_02_10_AM.png`
 
-Content:
-- Headline: Premium Pakistani Dresses (Stock & Pre-Order Available)
-- Subtext: Shop ready stock or pre-order exclusive collections from Pakistan
-- 3 CTA buttons:
-  1. Shop Ready Stock
-  2. Pre-Order Collection
-  3. View Catalog
+--------------------------------------------------
+🎨 COLOR SYSTEM (STRICTLY FOLLOW)
 
-Design requirements:
-- Use soft lighting, pastel tones, and clean spacing
-- Add subtle shadows and depth
-- Use large readable typography
-- Include small trust indicators (delivery time, authenticity)
+Primary text: #2B2B2B
+Secondary text: #6F6F6F
 
-Color rules:
-- Follow the new color system (soft premium palette)
-- Avoid harsh or overly saturated colors
+Primary accent (buttons, highlights): #C97C7C
+Accent hover: #B46666
+Light accent background: #F3E4E4
 
-Mobile:
-- Stack image above text
-- Keep buttons full-width
-- Maintain spacing and readability
+Main background: #F8F5F2
+Section background: #FFFFFF
+Card background: #FBF7F5
 
-Output:
-- High-fidelity hero section UI
-- Ready for implementation (Figma or code)
+Border/divider: #E8E2DD
+
+Status colors:
+- Ready Stock: #7BAE7F
+- Pre-Order: #D89A6A
+
+--------------------------------------------------
+🎨 VISUAL STYLE REQUIREMENTS
+
+- Soft feminine premium aesthetic
+- Dusty pink tone (NOT bright pink or red)
+- Warm neutral background
+- Clean, minimal, elegant layout
+- Subtle shadows (soft depth, no harsh shadows)
+- Rounded corners (16–20px)
+- Smooth gradients where needed
+
+--------------------------------------------------
+🧩 UI ELEMENT UPDATES
+
+Update all UI elements to match reference:
+
+- Header / Navigation bar
+- Hero section (text styling + image blending + buttons)
+- CTA buttons (style, color, border, hover)
+- Product cards (background, spacing, shadow)
+- Category cards
+- Icons and badges
+- Section backgrounds
+- Footer
+
+--------------------------------------------------
+⚡ DESIGN DETAILS TO MATCH
+
+- Typography scale and weight similar to reference
+- Button styles (filled, outline, spacing)
+- Card shadows and elevation
+- Image softness and color tone
+- Spacing consistency
+- Border radius and UI smoothness
+
+--------------------------------------------------
+📱 RESPONSIVE RULES
+
+- Maintain mobile responsiveness
+- Stack layout properly
+- Keep consistent spacing and readability
+
+--------------------------------------------------
+🚀 OUTPUT
+
+- High-fidelity UI redesign
+- Visually identical style to reference
+- Clean, modern, premium fashion look
+
+--------------------------------------------------
+❗ STRICT RULE
+
+Do NOT introduce new layout structures or components.
+Do NOT change content hierarchy.
+ONLY transform the visual design to match the reference exactly.
+
+Match the reference design pixel-level as closely as possible. Prioritize visual similarity over creativity. Do not reinterpret the design.

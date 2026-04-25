@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { getProducts } from '@/lib/api/products';
 import { ProductCard } from '@/components/product/ProductCard';
 import { ProductCardSkeleton } from '@/components/product/ProductCardSkeleton';
-import { AnnouncementBar } from '@/components/home/AnnouncementBar';
 import { HeroSlider } from '@/components/home/HeroSlider';
 import { CategoryGrid } from '@/components/home/CategoryGrid';
 import { PromoBanners } from '@/components/home/PromoBanners';
@@ -41,7 +40,6 @@ async function FeaturedProductsSection() {
 export default function HomePage() {
   return (
     <div className="flex flex-col">
-      <AnnouncementBar />
       <HeroSlider />
       <CategoryGrid />
       <PromoBanners />
