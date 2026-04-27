@@ -26,13 +26,13 @@ const NAV_LINKS = [
   { href: '/contact', label: 'CONTACT' },
 ];
 
-// ── Libaas Floral Logo ───────────────────────────────────────────────────────
-function LibaasLogo() {
+// ── Site Logo ───────────────────────────────────────────────────────────────
+function SiteLogo() {
   return (
-    <Link href="/" className="flex shrink-0 flex-col leading-none" aria-label="Libaas — Pakistani Collection">
+    <Link href="/" className="flex shrink-0 flex-col leading-none" aria-label="Najifa&apos;s Shop — Pakistani Collection">
       <div className="flex items-end gap-1">
         <span className="font-serif text-[2rem] font-bold italic leading-none tracking-tight text-brand-text">
-          Libaas
+          Najifa&apos;s Shop
         </span>
         {/* Small floral decoration */}
         <svg viewBox="0 0 28 28" className="mb-0.5 h-6 w-6 text-brand-accent" fill="currentColor" aria-hidden="true">
@@ -190,7 +190,7 @@ export function Header() {
         {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
 
         {/* ── Logo ── */}
-        <LibaasLogo />
+        <SiteLogo />
 
         {/* ── Desktop Nav ── */}
         <DesktopNavLinks />
