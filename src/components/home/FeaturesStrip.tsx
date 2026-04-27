@@ -1,4 +1,4 @@
-import { ShieldCheck, Truck, Star, RotateCcw, HeadphonesIcon, Package } from 'lucide-react';
+import { ShieldCheck, Truck, Star, HeadphonesIcon } from 'lucide-react';
 
 const FEATURES = [
   {
@@ -15,16 +15,6 @@ const FEATURES = [
     icon: Star,
     title: 'Premium Quality',
     desc: 'Carefully curated fabrics and craftsmanship',
-  },
-  {
-    icon: Package,
-    title: 'Secure Packaging',
-    desc: 'Garments arrive fresh and wrinkle-free',
-  },
-  {
-    icon: RotateCcw,
-    title: 'Easy Exchange',
-    desc: '7-day exchange policy on ready stock',
   },
   {
     icon: HeadphonesIcon,
@@ -48,7 +38,7 @@ export function FeaturesStrip() {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {FEATURES.map(({ icon: Icon, title, desc }) => (
             <div
               key={title}
