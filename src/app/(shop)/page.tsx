@@ -42,9 +42,6 @@ export default function HomePage() {
     <div className="flex flex-col">
       <HeroSlider />
       <CategoryGrid />
-      <PromoBanners />
-      <PreOrderSteps />
-
       {/* Featured Products */}
       <section aria-labelledby="featured-heading" className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-end justify-between">
@@ -68,8 +65,11 @@ export default function HomePage() {
         </Suspense>
       </section>
 
-      <WholesaleBanner />
+      {/* <PromoBanners /> */}
+      <PreOrderSteps />
       <CategoryBanners />
+      <WholesaleBanner />
+
       <TestimonialsSection />
       <FeaturesStrip />
       <ComingSoonSection />

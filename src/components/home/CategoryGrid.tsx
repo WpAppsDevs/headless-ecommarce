@@ -39,7 +39,7 @@ const CATALOG_IMAGES = [
 
 export function CategoryGrid() {
   return (
-    <section className="bg-white py-10">
+    <section className="py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-4 sm:grid-cols-3">
           {PURCHASE_TYPES.map(({ icon: Icon, label, desc1, desc2, href, image, catalog }) => (

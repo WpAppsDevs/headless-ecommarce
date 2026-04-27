@@ -20,9 +20,6 @@ const NAV_LINKS = [
   { href: '/products?type=ready-stock', label: 'READY STOCK' },
   { href: '/products?type=pre-order', label: 'PRE-ORDER' },
   { href: '/products?type=catalog', label: 'CATALOG / WHOLESALE' },
-  { href: '/products?cat=women', label: 'WOMEN' },
-  { href: '/products?cat=men', label: 'MEN' },
-  { href: '/products?cat=kids', label: 'KIDS' },
   { href: '/contact', label: 'CONTACT' },
 ];
 
