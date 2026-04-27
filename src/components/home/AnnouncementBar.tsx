@@ -34,9 +34,9 @@ export function AnnouncementBar() {
         {/* Center: 3 items with pipe separators */}
         <div className="flex flex-1 items-center justify-center gap-2 text-[12px] font-medium sm:gap-4 lg:gap-6">
           <span className="hidden sm:inline">Pre-Order from Pakistan 🇵🇰</span>
-          <span className="inline sm:hidden text-[11px]">Pre-Order 🇵🇰 | 10-15 Days | Original</span>
+          <span className="inline sm:hidden text-[11px]">Pre-Order 🇵🇰| 15-25 Days | Original</span>
           <span className="hidden sm:inline text-white/50">|</span>
-          <span className="hidden sm:inline">Delivery in 10-15 Days</span>
+          <span className="hidden sm:inline">Delivery in 15-25 Days</span>
           <span className="hidden sm:inline text-white/50">|</span>
           <span className="hidden sm:inline">Authentic Pakistani Collections</span>
         </div>

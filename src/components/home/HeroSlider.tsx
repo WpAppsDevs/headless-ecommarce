@@ -94,7 +94,7 @@ export function HeroSlider() {
                 <Plane className="h-[18px] w-[18px] shrink-0 text-brand-wine/70" strokeWidth={1.5} />
                 <div>
                   <p className="text-[13px] font-semibold text-brand-text">Pre-Order Delivery</p>
-                  <p className="text-[12px] text-brand-text-muted">10-15 Days</p>
+                  <p className="text-[12px] text-brand-text-muted">15-25 Days</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 px-5 py-3.5">

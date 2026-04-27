@@ -15,7 +15,7 @@ const PURCHASE_TYPES = [
     icon: Boxes,
     label: 'Pre-Order',
     desc1: 'Imported from Pakistan',
-    desc2: 'Delivery in 10-15 days',
+    desc2: 'Delivery in 15-25 days',
     href: '/products',
     image: 'https://images.unsplash.com/photo-1733209773389-6a37a36761c5?w=400&q=85&fit=crop',
     catalog: false,
