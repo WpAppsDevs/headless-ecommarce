@@ -4,20 +4,20 @@ import { ShoppingBag, Clock, BookOpen, Truck, Plane, ShieldCheck } from 'lucide-
 
 export function HeroSlider() {
   return (
-    <section className="relative min-h-[520px] overflow-hidden bg-white lg:min-h-[620px]">
+    <section className="relative min-h-[520px] overflow-hidden bg-[#FBF0F2] lg:min-h-[620px]">
 
       {/* ── Model image — absolute right half, desktop only ── */}
       <div className="absolute bottom-0 right-0 top-0 hidden w-[52%] lg:block" aria-hidden="true">
         <Image
-          src="https://images.unsplash.com/photo-1773439877255-55e63cf17b2c?w=1400&q=90&fit=crop"
+          src="https://images.unsplash.com/photo-1733470381421-a705c07f4242?w=1400&q=90&fit=crop"
           alt=""
           fill
-          className="object-cover object-center"
+          className="object-cover object-top"
           priority
           sizes="52vw"
         />
-        {/* Fade from white to transparent on the left edge */}
-        <div className="absolute inset-y-0 left-0 w-56 bg-gradient-to-r from-white via-white/70 to-transparent" />
+        {/* Fade from blush to transparent on the left edge */}
+        <div className="absolute inset-y-0 left-0 w-56 bg-gradient-to-r from-[#FBF0F2] via-[#FBF0F2]/70 to-transparent" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
@@ -25,10 +25,10 @@ export function HeroSlider() {
         {/* ── Mobile image — stacks above text ── */}
         <div className="relative mt-6 h-[300px] overflow-hidden rounded-2xl lg:hidden">
           <Image
-            src="https://images.unsplash.com/photo-1773439877255-55e63cf17b2c?w=900&q=85&fit=crop"
+            src="https://images.unsplash.com/photo-1733470381421-a705c07f4242?w=900&q=85&fit=crop"
             alt="Premium Pakistani fashion collection"
             fill
-            className="object-cover object-center"
+            className="object-cover object-top"
             priority
           />
         </div>
@@ -82,7 +82,7 @@ export function HeroSlider() {
             </div>
 
             {/* ── Trust bar: white card with vertical dividers ── */}
-            <div className="mt-7 inline-flex w-full flex-col divide-y divide-brand-border overflow-hidden rounded-xl border border-brand-border bg-white shadow-sm sm:w-auto sm:flex-row sm:divide-x sm:divide-y-0">
+            <div className="mt-7 inline-flex w-full flex-col divide-y divide-brand-border overflow-hidden rounded-xl border border-brand-border bg-white/80 shadow-sm sm:w-auto sm:flex-row sm:divide-x sm:divide-y-0">
               <div className="flex items-center gap-3 px-5 py-3.5">
                 <Truck className="h-[18px] w-[18px] shrink-0 text-brand-wine/70" strokeWidth={1.5} />
                 <div>
