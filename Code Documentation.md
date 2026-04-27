@@ -30,7 +30,7 @@ This is a **Next.js 16 (App Router)** headless eCommerce frontend built for a Wo
 - **State Management**: Zustand (lightweight client-side state)
 - **UI Components**: Base UI (Radix UI primitives)
 - **TypeScript**: Strict mode, full type safety
-- **Backend**: WordPress REST API + WooCom merce
+- **Backend**: WordPress REST API + WooCommerce
 - **Authentication**: JWT (httpOnly cookies + access token in memory)
 - **Deployment**: Vercel
 
@@ -69,38 +69,65 @@ src/
 │   │   └── account/              # User account endpoints
 │   │       └── orders/route.ts
 │   ├── (shop)/                   # Layout group
-│   │   ├── layout.tsx            # Shop layout (not used for home)
 │   │   ├── page.tsx              # Homepage
 │   │   └── products/
 │   │       ├── page.tsx          # Product listing page
 │   │       └── [slug]/page.tsx   # Product detail page
 │   ├── layout.tsx                # Root layout (header, footer, hydration)
+│   ├── error.tsx                 # Global error boundary (CSR)
+│   ├── not-found.tsx             # Custom 404 page
 │   ├── page.tsx                  # Homepage redirect
 │   ├── login/page.tsx            # Login page (CSR)
 │   ├── register/page.tsx         # Registration page (CSR)
+│   ├── forgot-password/page.tsx  # Forgot password page (static)
+│   ├── reset-password/page.tsx   # Reset password page (CSR)
 │   ├── account/page.tsx          # User account dashboard (CSR protected)
 │   ├── cart/page.tsx             # Full cart page (CSR)
 │   ├── checkout/page.tsx         # Checkout page (CSR)
 │   └── order-confirmation/[id]/page.tsx
 │
 ├── components/                   # Reusable React components
-│   ├── ui/                       # Base UI components (button, sheet, etc)
+│   ├── ui/                       # Base UI components
 │   │   ├── button.tsx
-│   │   ├── sheet.tsx
-│   │   └── ...
+│   │   ├── sheet.tsx             # Slide-in drawer
+│   │   ├── badge.tsx
+│   │   ├── card.tsx
+│   │   ├── input.tsx
+│   │   ├── label.tsx
+│   │   ├── skeleton.tsx          # Loading skeleton
+│   │   └── PageHeader.tsx        # Reusable page heading with breadcrumb
 │   ├── layout/                   # Layout components
 │   │   ├── Header.tsx            # Global header/navigation
 │   │   ├── Footer.tsx            # Global footer
-│   │   └── AuthHydrator.tsx      # Auth restoration on page load
+│   │   ├── AuthHydrator.tsx      # Auth restoration on page load
+│   │   └── CartHydrator.tsx      # Cart restoration on page load
+│   ├── auth/                     # Authentication form components
+│   │   ├── LoginForm.tsx
+│   │   ├── RegisterForm.tsx
+│   │   ├── ForgotPasswordForm.tsx
+│   │   └── ResetPasswordForm.tsx
 │   ├── home/                     # Homepage sections
-│   │   ├── HeroSection.tsx
-│   │   ├── CategoryShowcase.tsx
-│   │   ├── FeaturedProducts.tsx
+│   │   ├── AnnouncementBar.tsx   # Top announcement/promo strip
+│   │   ├── HeroSlider.tsx        # Hero banner/slideshow
+│   │   ├── CategoryGrid.tsx      # Category grid display
+│   │   ├── CategoryBanners.tsx   # Promotional category banners
+│   │   ├── FeaturesStrip.tsx     # Feature highlights (shipping, returns, etc)
+│   │   ├── PromoBanners.tsx      # Promotional image banners
+│   │   ├── PreOrderSteps.tsx     # How-to-order steps
+│   │   ├── WholesaleBanner.tsx   # Wholesale call-to-action
+│   │   ├── ComingSoonSection.tsx # Upcoming products teaser
+│   │   ├── TestimonialsSection.tsx
+│   │   ├── InstagramSection.tsx
+│   │   ├── WhatsAppCTA.tsx       # WhatsApp contact button
 │   │   └── NewsletterSection.tsx
-│   ├── product/                  # Product detail components
+│   ├── product/                  # Product components
+│   │   ├── ProductCard.tsx       # Single product card
+│   │   ├── ProductCardSkeleton.tsx
+│   │   ├── ProductGrid.tsx       # Grid wrapper for product cards
 │   │   ├── ProductImages.tsx     # Image gallery
 │   │   ├── VariationSelector.tsx # Color/size selection
 │   │   ├── ProductTabs.tsx       # Description/info tabs
+│   │   ├── SearchBar.tsx         # Product search input
 │   │   └── RelatedProducts.tsx
 │   ├── shop/                     # Shop listing components
 │   │   ├── ShopSidebar.tsx       # Filters
@@ -108,22 +135,36 @@ src/
 │   │   └── ShopClient.tsx        # Client state shell
 │   ├── cart/                     # Cart components
 │   │   ├── CartDrawer.tsx        # Mini cart sidebar
-│   │   ├── CartItem.tsx
-│   │   ├── CartSummary.tsx
-│   │   └── FreeShippingBar.tsx
+│   │   ├── CartItem.tsx          # Cart item (drawer)
+│   │   ├── CartItemRow.tsx       # Cart item row (full cart page)
+│   │   ├── CartPageContent.tsx   # Full cart page layout
+│   │   ├── CartSummary.tsx       # Order total summary
+│   │   ├── CouponSection.tsx     # Coupon code input
+│   │   ├── FreeShippingBar.tsx   # Progress bar to free shipping
+│   │   └── RecommendedProducts.tsx
 │   ├── checkout/                 # Checkout components
-│   │   ├── CheckoutForm.tsx
-│   │   └── OrderSummary.tsx
+│   │   ├── CheckoutForm.tsx      # Billing/shipping form
+│   │   ├── StripeForm.tsx        # Stripe card element
+│   │   └── BacsInfo.tsx          # Bank transfer payment info
 │   └── account/                  # Account page components
-│       └── OrdersList.tsx        # Paginated orders table
+│       ├── AccountLayout.tsx     # Sidebar + tab layout
+│       ├── Dashboard.tsx         # Account overview/stats
+│       ├── Orders.tsx            # Orders tab
+│       ├── OrdersList.tsx        # Paginated orders table
+│       ├── OrderCard.tsx         # Single order card
+│       ├── OrderDetailsModal.tsx # Order detail modal
+│       ├── Address.tsx           # Address management
+│       ├── Settings.tsx          # Profile settings form
+│       └── StatsCard.tsx         # Stat summary card
 │
 ├── lib/                          # Utility and service modules
 │   ├── api/                      # API layer (typed fetch wrappers)
 │   │   ├── client.ts             # Central apiClient with auth & retry logic
 │   │   ├── products.ts           # Product endpoints
 │   │   ├── cart.ts               # Cart endpoints
-│   │   ├── checkout.ts           # User & order endpoints
-│   │   └── orders.ts             # Orders pagination
+│   │   ├── checkout.ts           # Checkout & order placement
+│   │   ├── orders.ts             # Orders pagination
+│   │   └── user.ts               # User profile endpoints (placeholder)
 │   ├── config.ts                 # App configuration & constants
 │   ├── errors.ts                 # Custom error class
 │   └── utils.ts                  # Utility functions (cn, etc)
@@ -190,7 +231,7 @@ export function setOnUnauthorized(fn: () => void)
 
 **Auth:** Guest JWT (localStorage) or user token
 
-**Note:** Cart API does **NOT** return item prices; prices calculated at checkout only.
+**Note:** Cart API returns item prices (`price` field) as strings (e.g., `"99.99"`). Full order totals are calculated at checkout.
 
 #### `checkout.ts` — User & Orders
 
@@ -294,7 +335,7 @@ interface AuthState {
 - `register(email, password, first_name, last_name)` — POST to `/api/auth/register`
 - `logout()` — Clear token, call `/api/auth/logout`
 - `refreshToken()` — Call `/api/auth/refresh`
-- `hydrate()` — Restore auth on page load (async, sets `hydrated: true` when done)
+- `hydrate()` — Restore auth on page load: calls `/api/auth/refresh` for a new access token, then `/api/auth/me` to populate user profile; sets `hydrated: true` when done
 
 **Key Logic:**
 - `tokenCache.set()` called on login/register → stores JWT in memory
@@ -317,7 +358,7 @@ interface CartState {
 
 **Actions:**
 - `fetchCart()` — GET current cart
-- `addItem(productId, variationId, quantity)` — POST add
+- `addItem(productId, variationId, quantity, attributes?)` — POST add (optional `attributes` map for variation attributes, e.g. `{ pa_color: 'blue' }`)
 - `updateItem(itemId, quantity)` — PUT update
 - `removeItem(itemId)` — DELETE remove
 - `clearGuestToken()` — Wipe localStorage `cart_token` on login
@@ -574,6 +615,7 @@ export default async function RootLayout({ children }) {
     <html>
       <body>
         <AuthHydrator />  {/* Client component to restore auth */}
+        <CartHydrator />  {/* Client component to restore cart */}
         <Header />        {/* Server component */}
         {children}        {/* Dynamic page */}
       </body>
@@ -588,9 +630,36 @@ Base UI components exported from `src/components/ui/`:
 
 - `button.tsx` — Primary button component (do NOT use `asChild`)
 - `sheet.tsx` — Slide-in drawer (used for mini cart)
-- Others as needed
+- `badge.tsx` — Status/label badge
+- `card.tsx` — Card container
+- `input.tsx` — Form input field
+- `label.tsx` — Form label
+- `skeleton.tsx` — Loading skeleton placeholder
+- `PageHeader.tsx` — Reusable page heading with optional breadcrumb
 
 **Tailwind-only styling** — no CSS files
+
+### Auth Components (`src/components/auth/`)
+
+Form components for all auth flows. Each is a `'use client'` component using `react-hook-form` + `zod` for validation.
+
+| Component | Page | Behaviour |
+|-----------|------|-----------|
+| `LoginForm` | `/login` | Calls `useAuthStore().login()` |
+| `RegisterForm` | `/register` | Calls `useAuthStore().register()` |
+| `ForgotPasswordForm` | `/forgot-password` | POSTs to WordPress `/wp-json/api/auth/forgot-password`; always shows success (anti-enumeration) |
+| `ResetPasswordForm` | `/reset-password?key=&login=` | POSTs `key`+`login` from query params + new password to WordPress; redirects to `/login?reset=success` |
+
+### CartHydrator (`src/components/layout/CartHydrator.tsx`)
+
+Client component mounted in the root layout (alongside `AuthHydrator`) that restores cart state on page load.
+
+**Logic:**
+- Waits for `authStore.hydrated` before acting
+- Logged-in users → calls `fetchCart()` immediately after hydration
+- Guest with saved `localStorage['cart_token']` → calls `fetchCart()` to restore items
+- Fresh guest (no token) → skips entirely (avoids spurious 401 → `/login` redirect)
+- Uses a `didFetch` ref to prevent double-invocation in React Strict Mode
 
 ---
 
@@ -661,6 +730,33 @@ try {
   }
 }
 ```
+
+### Password Reset Flow
+
+```
+1. User visits /forgot-password → submits email
+   ↓
+2. ForgotPasswordForm POSTs to WordPress /wp-json/api/auth/forgot-password
+   → Always shows "success" message (anti-enumeration)
+   ↓
+3. WordPress emails reset link: /reset-password?key=XXX&login=username
+   ↓
+4. User clicks link → ResetPasswordForm reads ?key & ?login from URL
+   → Validates both params present (shows error if not)
+   ↓
+5. User submits new password
+   → POSTs { key, login, new_password } to /wp-json/api/auth/reset-password
+   ↓
+6. On success → redirects to /login?reset=success
+   On failure (invalid/expired key) → shows inline error
+```
+
+### Special Pages
+
+| File | Purpose |
+|------|---------|
+| `src/app/error.tsx` | Global error boundary — catches unhandled errors in the React tree; shows "Try Again" + "Back to Home" buttons |
+| `src/app/not-found.tsx` | Custom 404 page — shown for any unmatched route |
 
 ---
 
@@ -1060,11 +1156,15 @@ vercel --prod
 
 ### Key Files to Know
 
-- **`src/app/layout.tsx`** — Root layout, global header/footer, auth hydration
-- **`src/stores/authStore.ts`** — Auth state, login/logout logic
+- **`src/app/layout.tsx`** — Root layout, global header/footer, auth & cart hydration
+- **`src/app/error.tsx`** — Global error boundary
+- **`src/app/not-found.tsx`** — Custom 404 page
+- **`src/stores/authStore.ts`** — Auth state, login/logout/hydrate logic
 - **`src/stores/cartStore.ts`** — Cart state, add/remove/update items
 - **`src/lib/api/client.ts`** — Central API client with error handling & auto-refresh
 - **`src/lib/config.ts`** — Configuration & environment variables
+- **`src/components/layout/AuthHydrator.tsx`** — Auth state restoration on page load
+- **`src/components/layout/CartHydrator.tsx`** — Cart state restoration on page load
 - **`src/components/layout/Header.tsx`** — Global navigation
 - **`src/app/api/auth/login/route.ts`** — Login endpoint proxy
 
@@ -1082,6 +1182,6 @@ When adding features:
 
 ---
 
-**Last Updated:** April 21, 2026  
+**Last Updated:** April 27, 2026  
 **Maintained By:** Development Team  
 **For Questions:** See README.md or contact the team
