@@ -25,7 +25,7 @@ const FEATURES = [
 
 export function FeaturesStrip() {
   return (
-    <section aria-labelledby="why-us-heading" className="bg-white py-16">
+    <section aria-labelledby="why-us-heading" className="py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="mb-10 text-center">
