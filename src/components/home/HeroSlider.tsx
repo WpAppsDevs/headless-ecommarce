@@ -4,20 +4,20 @@ import { ShoppingBag, Clock, BookOpen, Truck, Plane, ShieldCheck } from 'lucide-
 
 export function HeroSlider() {
   return (
-    <section className="relative min-h-[520px] overflow-hidden bg-brand-bg lg:min-h-[620px]">
+    <section className="relative min-h-[520px] overflow-hidden bg-white lg:min-h-[620px]">
 
       {/* ── Model image — absolute right half, desktop only ── */}
       <div className="absolute bottom-0 right-0 top-0 hidden w-[52%] lg:block" aria-hidden="true">
         <Image
-          src="https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=1400&q=90&fit=crop&crop=top"
+          src="https://images.unsplash.com/photo-1773439877255-55e63cf17b2c?w=1400&q=90&fit=crop"
           alt=""
           fill
-          className="object-cover object-[center_top]"
+          className="object-cover object-center"
           priority
           sizes="52vw"
         />
-        {/* Fade from brand-bg to transparent on the left edge */}
-        <div className="absolute inset-y-0 left-0 w-56 bg-gradient-to-r from-brand-bg via-brand-bg/70 to-transparent" />
+        {/* Fade from white to transparent on the left edge */}
+        <div className="absolute inset-y-0 left-0 w-56 bg-gradient-to-r from-white via-white/70 to-transparent" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
@@ -25,10 +25,10 @@ export function HeroSlider() {
         {/* ── Mobile image — stacks above text ── */}
         <div className="relative mt-6 h-[300px] overflow-hidden rounded-2xl lg:hidden">
           <Image
-            src="https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=900&q=85&fit=crop&crop=top"
+            src="https://images.unsplash.com/photo-1773439877255-55e63cf17b2c?w=900&q=85&fit=crop"
             alt="Premium Pakistani fashion collection"
             fill
-            className="object-cover object-top"
+            className="object-cover object-center"
             priority
           />
         </div>

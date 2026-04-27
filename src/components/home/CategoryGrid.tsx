@@ -8,7 +8,8 @@ const PURCHASE_TYPES = [
     desc1: 'Fast delivery in 2-5 days',
     desc2: 'across Bangladesh',
     href: '/products',
-    image: 'https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=400&q=80&fit=crop&crop=top',
+    image: 'https://images.unsplash.com/photo-1669197802765-1a736d7f7ab3?w=400&q=85&fit=crop',
+    catalog: false,
   },
   {
     icon: Boxes,
@@ -16,7 +17,8 @@ const PURCHASE_TYPES = [
     desc1: 'Imported from Pakistan',
     desc2: 'Delivery in 10-15 days',
     href: '/products',
-    image: 'https://images.unsplash.com/photo-1594938298603-c8148c4b4157?w=400&q=80&fit=crop&crop=top',
+    image: 'https://images.unsplash.com/photo-1773439878533-77383b20577c?w=400&q=85&fit=crop',
+    catalog: false,
   },
   {
     icon: BookOpen,
@@ -24,8 +26,15 @@ const PURCHASE_TYPES = [
     desc1: 'Bulk buying for resellers',
     desc2: 'Best price guarantee',
     href: '/products',
-    image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=400&q=80&fit=crop&crop=center',
+    image: '',
+    catalog: true,
   },
+];
+
+const CATALOG_IMAGES = [
+  'https://images.unsplash.com/photo-1669197794864-144d527aaf35?w=200&q=80&fit=crop',
+  'https://images.unsplash.com/photo-1669197802765-1a736d7f7ab3?w=200&q=80&fit=crop',
+  'https://images.unsplash.com/photo-1773439878222-c383967772de?w=200&q=80&fit=crop',
 ];
 
 export function CategoryGrid() {
@@ -33,7 +42,7 @@ export function CategoryGrid() {
     <section className="bg-white py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-4 sm:grid-cols-3">
-          {PURCHASE_TYPES.map(({ icon: Icon, label, desc1, desc2, href, image }) => (
+          {PURCHASE_TYPES.map(({ icon: Icon, label, desc1, desc2, href, image, catalog }) => (
             <Link
               key={label}
               href={href}
@@ -59,12 +68,33 @@ export function CategoryGrid() {
 
               {/* Right: product image */}
               <div className="relative w-32 shrink-0 overflow-hidden sm:w-28 lg:w-36">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={image}
-                  alt={label}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+                {catalog ? (
+                  /* Catalog: polaroid-style overlapping photos */
+                  <div className="relative flex h-full w-full items-center justify-center bg-brand-accent/5 p-2">
+                    {CATALOG_IMAGES.map((src, i) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        key={i}
+                        src={src}
+                        alt=""
+                        className="absolute h-[75%] w-[55%] rounded-sm object-cover shadow-md ring-2 ring-white"
+                        style={{
+                          top: '50%',
+                          left: '50%',
+                          transform: `translate(-50%, -50%) rotate(${(i - 1) * 9}deg) translate(${(i - 1) * 18}px, ${i === 1 ? -4 : 4}px)`,
+                          zIndex: i === 1 ? 3 : i === 0 ? 1 : 2,
+                        }}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={image}
+                    alt={label}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                )}
               </div>
             </Link>
           ))}
