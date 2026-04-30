@@ -17,7 +17,7 @@ const STEPS = [
   {
     step: '04',
     title: 'Receive & Enjoy',
-    desc: 'Your order arrives in 10–15 days, carefully packaged and ready to wear.',
+    desc: 'Your order arrives in 15–25 days, carefully packaged and ready to wear.',
   },
 ];
 

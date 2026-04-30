@@ -26,7 +26,7 @@ export function ForgotPasswordForm() {
 
   const onSubmit = async (values: FormValues) => {
     try {
-      await apiClient(`${config.apiBase}/wp-json/api/auth/forgot-password`, {
+      await apiClient(`${config.apiBase}/api/auth/forgot-password`, {
         method: 'POST',
         body: JSON.stringify({ email: values.email }),
       });

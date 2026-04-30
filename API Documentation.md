@@ -481,6 +481,8 @@ Returns a paginated list of published WooCommerce products.
 | `page` | integer | `1` | Page number |
 | `per_page` | integer | `10` | Items per page (max 100) |
 | `category` | string | — | Filter by category slug |
+| `brand` | string | — | Filter by brand slug (`product_brand` taxonomy) |
+| `tag` | string | — | Filter by product tag slug |
 | `search` | string | — | Keyword search |
 
 #### Example Request
@@ -500,25 +502,90 @@ GET /wp-json/wpadhlwrapi/v1/products?page=1&per_page=12&category=t-shirts
       "name": "Classic Crew Neck Tee",
       "slug": "classic-crew-neck-tee",
       "permalink": "https://example.com/product/classic-crew-neck-tee/",
+      "date_created": "2024-01-15T10:30:00",
+      "date_created_gmt": "2024-01-15T10:30:00",
+      "date_modified": "2024-06-01T08:00:00",
+      "date_modified_gmt": "2024-06-01T08:00:00",
       "type": "variable",
       "status": "publish",
+      "featured": false,
+      "catalog_visibility": "visible",
       "description": "<p>Premium cotton t-shirt...</p>",
       "short_description": "Everyday essential.",
       "sku": "TEE-001",
       "price": "29.99",
       "regular_price": "34.99",
       "sale_price": "29.99",
+      "date_on_sale_from": null,
+      "date_on_sale_from_gmt": null,
+      "date_on_sale_to": null,
+      "date_on_sale_to_gmt": null,
+      "price_html": "<span class=\"woocommerce-Price-amount\">$29.99</span>",
       "on_sale": true,
-      "stock_status": "instock",
-      "stock_quantity": null,
+      "purchasable": true,
+      "total_sales": 134,
+      "virtual": false,
+      "downloadable": false,
+      "downloads": [],
+      "download_limit": -1,
+      "download_expiry": -1,
+      "external_url": "",
+      "button_text": "",
+      "tax_status": "taxable",
+      "tax_class": "",
       "manage_stock": false,
+      "stock_quantity": null,
+      "stock_status": "instock",
+      "backorders": "no",
+      "backorders_allowed": false,
+      "backordered": false,
+      "sold_individually": false,
+      "weight": "0.3",
+      "dimensions": { "length": "30", "width": "25", "height": "2" },
+      "shipping_required": true,
+      "shipping_taxable": true,
+      "shipping_class": "",
+      "shipping_class_id": 0,
+      "reviews_allowed": true,
+      "average_rating": "4.50",
+      "rating_count": 22,
+      "related_ids": [10, 11, 12],
+      "upsell_ids": [],
+      "cross_sell_ids": [],
+      "parent_id": 0,
+      "purchase_note": "",
       "categories": [
         { "id": 9, "name": "T-Shirts", "slug": "t-shirts" }
       ],
-      "images": [
-        { "id": 101, "url": "https://example.com/wp-content/uploads/tee-front.jpg", "alt": "Tee front view" }
+      "tags": [
+        { "id": 3, "name": "Sale", "slug": "sale" }
       ],
-      "variations": [201, 202, 203]
+      "images": [
+        {
+          "id": 101,
+          "date_created": "2024-01-15T10:28:00",
+          "date_created_gmt": "2024-01-15T10:28:00",
+          "date_modified": "2024-01-15T10:28:00",
+          "date_modified_gmt": "2024-01-15T10:28:00",
+          "src": "https://example.com/wp-content/uploads/tee-front.jpg",
+          "name": "tee-front",
+          "alt": "Tee front view"
+        }
+      ],
+      "attributes": [
+        {
+          "id": 1,
+          "name": "Size",
+          "slug": "pa_size",
+          "position": 0,
+          "visible": true,
+          "variation": true,
+          "options": ["S", "M", "L", "XL"]
+        }
+      ],
+      "default_attributes": [],
+      "variations": [201, 202, 203],
+      "grouped_products": []
     }
   ],
   "meta": {
@@ -565,32 +632,149 @@ GET /wp-json/wpadhlwrapi/v1/products/classic-crew-neck-tee
     "id": 42,
     "name": "Classic Crew Neck Tee",
     "slug": "classic-crew-neck-tee",
+    "permalink": "https://example.com/product/classic-crew-neck-tee/",
+    "date_created": "2024-01-15T10:30:00",
+    "date_created_gmt": "2024-01-15T10:30:00",
+    "date_modified": "2024-06-01T08:00:00",
+    "date_modified_gmt": "2024-06-01T08:00:00",
     "type": "variable",
+    "status": "publish",
+    "featured": false,
+    "catalog_visibility": "visible",
+    "description": "<p>Premium cotton t-shirt...</p>",
+    "short_description": "Everyday essential.",
+    "sku": "TEE-001",
     "price": "29.99",
     "regular_price": "34.99",
     "sale_price": "29.99",
+    "date_on_sale_from": null,
+    "date_on_sale_from_gmt": null,
+    "date_on_sale_to": null,
+    "date_on_sale_to_gmt": null,
+    "price_html": "<span class=\"woocommerce-Price-amount\">$29.99</span>",
     "on_sale": true,
-    "stock_status": "instock",
+    "purchasable": true,
+    "total_sales": 134,
+    "virtual": false,
+    "downloadable": false,
+    "downloads": [],
+    "download_limit": -1,
+    "download_expiry": -1,
+    "external_url": "",
+    "button_text": "",
+    "tax_status": "taxable",
+    "tax_class": "",
+    "manage_stock": false,
     "stock_quantity": null,
+    "stock_status": "instock",
+    "backorders": "no",
+    "backorders_allowed": false,
+    "backordered": false,
+    "sold_individually": false,
+    "weight": "0.3",
+    "dimensions": { "length": "30", "width": "25", "height": "2" },
+    "shipping_required": true,
+    "shipping_taxable": true,
+    "shipping_class": "",
+    "shipping_class_id": 0,
+    "reviews_allowed": true,
+    "average_rating": "4.50",
+    "rating_count": 22,
+    "related_ids": [10, 11, 12],
+    "upsell_ids": [],
+    "cross_sell_ids": [],
+    "parent_id": 0,
+    "purchase_note": "",
     "categories": [{ "id": 9, "name": "T-Shirts", "slug": "t-shirts" }],
+    "tags": [{ "id": 3, "name": "Sale", "slug": "sale" }],
     "images": [
-      { "id": 101, "url": "https://example.com/.../tee-front.jpg", "alt": "Tee front" }
+      {
+        "id": 101,
+        "date_created": "2024-01-15T10:28:00",
+        "date_created_gmt": "2024-01-15T10:28:00",
+        "date_modified": "2024-01-15T10:28:00",
+        "date_modified_gmt": "2024-01-15T10:28:00",
+        "src": "https://example.com/wp-content/uploads/tee-front.jpg",
+        "name": "tee-front",
+        "alt": "Tee front view"
+      }
+    ],
+    "attributes": [
+      {
+        "id": 1,
+        "name": "Size",
+        "slug": "pa_size",
+        "position": 0,
+        "visible": true,
+        "variation": true,
+        "options": ["S", "M", "L", "XL"]
+      },
+      {
+        "id": 2,
+        "name": "Color",
+        "slug": "pa_color",
+        "position": 1,
+        "visible": true,
+        "variation": true,
+        "options": ["Red", "Blue", "White"]
+      }
+    ],
+    "default_attributes": [
+      { "id": 1, "name": "Size", "option": "M" }
     ],
     "variations": [
       {
         "id": 201,
+        "date_created": "2024-01-15T10:31:00",
+        "date_created_gmt": "2024-01-15T10:31:00",
+        "date_modified": "2024-06-01T08:00:00",
+        "date_modified_gmt": "2024-06-01T08:00:00",
+        "description": "",
+        "permalink": "https://example.com/product/classic-crew-neck-tee/?attribute_pa_size=S&attribute_pa_color=Red",
         "sku": "TEE-001-S-RED",
         "price": "29.99",
         "regular_price": "34.99",
         "sale_price": "29.99",
+        "date_on_sale_from": null,
+        "date_on_sale_from_gmt": null,
+        "date_on_sale_to": null,
+        "date_on_sale_to_gmt": null,
         "on_sale": true,
-        "stock_status": "instock",
-        "stock_quantity": 15,
+        "purchasable": true,
+        "virtual": false,
+        "downloadable": false,
+        "downloads": [],
+        "download_limit": -1,
+        "download_expiry": -1,
+        "tax_status": "taxable",
+        "tax_class": "",
         "manage_stock": true,
-        "attributes": { "pa_size": "S", "pa_color": "Red" },
-        "image": "https://example.com/.../tee-red.jpg"
+        "stock_quantity": 15,
+        "stock_status": "instock",
+        "backorders": "no",
+        "backorders_allowed": false,
+        "backordered": false,
+        "weight": "0.3",
+        "dimensions": { "length": "30", "width": "25", "height": "2" },
+        "shipping_class": "",
+        "shipping_class_id": 0,
+        "image": {
+          "id": 102,
+          "date_created": "2024-01-15T10:29:00",
+          "date_created_gmt": "2024-01-15T10:29:00",
+          "date_modified": "2024-01-15T10:29:00",
+          "date_modified_gmt": "2024-01-15T10:29:00",
+          "src": "https://example.com/wp-content/uploads/tee-red.jpg",
+          "name": "tee-red",
+          "alt": "Red tee"
+        },
+        "attributes": [
+          { "id": 1, "name": "Size", "option": "S" },
+          { "id": 2, "name": "Color", "option": "Red" }
+        ]
       }
-    ]
+    ],
+    "grouped_products": []
   }
 }
 ```
@@ -611,19 +795,102 @@ Same shape, with `"variations": []`.
 
 **When to use:**
 - `GET /products` — product listing pages, category pages, search results
+- `GET /products?brand=nike` — brand-specific listing pages
+- `GET /products?tag=sale` — tag-filtered listing pages
 - `GET /products/{slug}` — product detail page (PDP); use this instead of making separate variation requests
 
 **Typical Flow:**
 1. `GET /products?category=shoes&page=1&per_page=12` → render product grid
-2. User clicks product → `GET /products/nike-air-max` → render PDP with all variation options pre-loaded
-3. User selects a variation → read from `data.variations` array (no extra API call needed)
-4. User adds to cart → `POST /wpadhlwrapi/v1/cart/add` with the selected `variation_id`
+2. `GET /products?brand=nike&tag=sale` → render filtered listing
+3. User clicks product → `GET /products/nike-air-max` → render PDP with all variation options pre-loaded
+4. User selects a variation → read from `data.variations` array (no extra API call needed)
+5. User adds to cart → `POST /wpadhlwrapi/v1/cart/add` with the selected `variation_id`
 
 **Next.js Example:**
 
 ```typescript
 // lib/api/products.ts
 const API_BASE = process.env.NEXT_PUBLIC_WP_URL + '/wp-json/wpadhlwrapi/v1';
+
+export interface ProductImage {
+  id: number;
+  date_created: string | null;
+  date_created_gmt: string | null;
+  date_modified: string | null;
+  date_modified_gmt: string | null;
+  src: string;
+  name: string;
+  alt: string;
+}
+
+export interface ProductAttribute {
+  id: number;
+  name: string;
+  slug: string;
+  position: number;
+  visible: boolean;
+  variation: boolean;
+  options: string[];
+}
+
+export interface VariationAttribute {
+  id: number;
+  name: string;
+  option: string;
+}
+
+export interface Variation {
+  id: number;
+  sku: string;
+  price: string;
+  regular_price: string;
+  sale_price: string;
+  on_sale: boolean;
+  purchasable: boolean;
+  stock_status: string;
+  stock_quantity: number | null;
+  manage_stock: boolean;
+  weight: string;
+  dimensions: { length: string; width: string; height: string };
+  image: ProductImage | null;
+  attributes: VariationAttribute[];
+}
+
+export interface Product {
+  id: number;
+  name: string;
+  slug: string;
+  permalink: string;
+  date_created: string | null;
+  date_modified: string | null;
+  type: string;
+  status: string;
+  featured: boolean;
+  description: string;
+  short_description: string;
+  sku: string;
+  price: string;
+  regular_price: string;
+  sale_price: string;
+  price_html: string;
+  on_sale: boolean;
+  purchasable: boolean;
+  total_sales: number;
+  virtual: boolean;
+  downloadable: boolean;
+  stock_status: string;
+  stock_quantity: number | null;
+  manage_stock: boolean;
+  average_rating: string;
+  rating_count: number;
+  categories: { id: number; name: string; slug: string }[];
+  tags: { id: number; name: string; slug: string }[];
+  images: ProductImage[];
+  attributes: ProductAttribute[];
+  default_attributes: VariationAttribute[];
+  variations: Variation[];
+  grouped_products: number[];
+}
 
 export async function getProducts(params: {
   page?: number;
@@ -638,13 +905,14 @@ export async function getProducts(params: {
     ...(params.search && { search: params.search }),
   });
   const res = await fetch(`${API_BASE}/products?${query}`);
-  return res.json(); // { success, data, meta }
+  return res.json() as Promise<{ success: boolean; data: Product[]; meta: { page: number; total: number; total_pages: number } }>;
 }
 
-export async function getProduct(slug: string) {
+export async function getProduct(slug: string): Promise<Product | null> {
   const res = await fetch(`${API_BASE}/products/${slug}`);
   if (res.status === 404) return null;
-  return res.json(); // { success, data: { ...product, variations: [...] } }
+  const json = await res.json();
+  return json.success ? json.data : null;
 }
 ```
 
@@ -1184,24 +1452,110 @@ Authorization: Bearer eyJhbGci...
   "data": [
     {
       "id": 42,
+      "parent_id": 0,
+      "number": "42",
+      "order_key": "wc_order_abc123",
+      "created_via": "checkout",
+      "version": "8.0.0",
       "status": "processing",
       "currency": "USD",
+      "date_created": "2024-01-15T10:30:00",
+      "date_created_gmt": "2024-01-15T10:30:00",
+      "date_modified": "2024-01-15T10:31:00",
+      "date_modified_gmt": "2024-01-15T10:31:00",
+      "discount_total": "5.00",
+      "discount_tax": "0.00",
+      "shipping_total": "10.00",
+      "shipping_tax": "0.00",
+      "cart_tax": "1.35",
       "total": "99.00",
-      "date_created": "2024-01-15T10:30:00+00:00",
+      "total_tax": "1.35",
+      "prices_include_tax": false,
+      "customer_id": 7,
+      "customer_ip_address": "127.0.0.1",
+      "customer_user_agent": "Mozilla/5.0",
+      "customer_note": "",
+      "payment_method": "stripe",
+      "payment_method_title": "Credit Card (Stripe)",
+      "transaction_id": "pi_3abc123",
+      "date_paid": "2024-01-15T10:30:45",
+      "date_paid_gmt": "2024-01-15T10:30:45",
+      "date_completed": null,
+      "date_completed_gmt": null,
+      "cart_hash": "e24df9c8b1d5fe6",
+      "billing": {
+        "first_name": "Jane",
+        "last_name": "Doe",
+        "company": "",
+        "address_1": "123 Main St",
+        "address_2": "Apt 4B",
+        "city": "New York",
+        "state": "NY",
+        "postcode": "10001",
+        "country": "US",
+        "email": "jane@example.com",
+        "phone": "555-867-5309"
+      },
+      "shipping": {
+        "first_name": "Jane",
+        "last_name": "Doe",
+        "company": "",
+        "address_1": "123 Main St",
+        "address_2": "Apt 4B",
+        "city": "New York",
+        "state": "NY",
+        "postcode": "10001",
+        "country": "US"
+      },
       "line_items": [
         {
-          "product_id": 7,
+          "id": 315,
           "name": "Classic Crew Neck Tee — Red / S",
+          "product_id": 7,
+          "variation_id": 201,
           "quantity": 2,
-          "line_total": "59.98"
-        },
-        {
-          "product_id": 12,
-          "name": "Canvas Tote Bag",
-          "quantity": 1,
-          "line_total": "39.02"
+          "tax_class": "",
+          "subtotal": "59.98",
+          "subtotal_tax": "0.50",
+          "total": "54.98",
+          "total_tax": "0.46",
+          "taxes": [{ "id": 9, "total": "0.46", "subtotal": "0.50" }],
+          "sku": "TEE-001-S-RED",
+          "price": 29.99,
+          "image": "https://your-wp-site.com/wp-content/uploads/tee-red-300x300.jpg"
         }
-      ]
+      ],
+      "tax_lines": [
+        {
+          "id": 318,
+          "rate_code": "US-NY-STATE TAX",
+          "rate_id": 9,
+          "label": "State Tax",
+          "compound": false,
+          "tax_total": "0.85",
+          "shipping_tax_total": "0.00"
+        }
+      ],
+      "shipping_lines": [
+        {
+          "id": 316,
+          "method_title": "Flat Rate",
+          "method_id": "flat_rate",
+          "total": "10.00",
+          "total_tax": "0.00",
+          "taxes": []
+        }
+      ],
+      "fee_lines": [],
+      "coupon_lines": [
+        {
+          "id": 320,
+          "code": "SAVE5",
+          "discount": "5.00",
+          "discount_tax": "0.00"
+        }
+      ],
+      "refunds": []
     }
   ],
   "meta": {
@@ -1216,9 +1570,19 @@ Authorization: Bearer eyJhbGci...
 #### Notes
 
 - Orders are returned in **descending date order** (newest first).
-- `product_id` always reflects the **parent product ID**, even for variation line items — useful for building product links.
-- `date_created` is ISO 8601 with timezone offset; `null` for orders missing this data.
-- Shipping, fee, and tax line items are excluded — only product lines are returned.
+- All date fields (`date_created`, `date_modified`, `date_paid`, `date_completed`) are returned in both local WP-timezone (`*`) and UTC (`*_gmt`) variants. `null` when the event has not occurred.
+- All price/total fields are decimal strings (e.g. `"10.00"`) to preserve precision.
+- `payment_method` is the WooCommerce gateway slug (e.g. `"stripe"`, `"bacs"`); `payment_method_title` is the customer-facing label.
+- `billing` contains 11 fields including `email` and `phone`; `shipping` contains 9 fields (no `email`/`phone` — WooCommerce convention).
+- `line_items[].product_id` always reflects the **parent product ID**, even for variation line items — useful for building product page links.
+- `line_items[].variation_id` is `0` for non-variation products.
+- `line_items[].image` is the product thumbnail at `woocommerce_thumbnail` size. Falls back to the WC placeholder if no image is set; empty string `""` if the product was deleted.
+- `tax_lines` contains one entry per tax rate applied to the order.
+- `shipping_lines` contains one entry per shipping method applied to the order.
+- `fee_lines` contains any manual or programmatic fees added to the order.
+- `coupon_lines` contains one entry per coupon applied, with the discount amount.
+- `refunds` contains any refunds applied; `total` is always a negative string (e.g. `"-10.00"`).
+- `cart_hash` is the MD5 hash WooCommerce uses for cart session deduplication.
 
 #### Error Cases
 
@@ -1245,17 +1609,137 @@ Authorization: Bearer eyJhbGci...
 // lib/api/orders.ts
 const API_BASE = process.env.NEXT_PUBLIC_WP_URL + '/wp-json/api';
 
+interface OrderAddress {
+  first_name: string;
+  last_name: string;
+  company: string;
+  address_1: string;
+  address_2: string;
+  city: string;
+  state: string;
+  postcode: string;
+  country: string;
+  email?: string; // billing only
+  phone?: string; // billing only
+}
+
+interface OrderItemTax {
+  id: number;
+  total: string;
+  subtotal?: string;
+}
+
+interface OrderItem {
+  id: number;
+  name: string;
+  product_id: number;
+  variation_id: number;
+  quantity: number;
+  tax_class: string;
+  subtotal: string;
+  subtotal_tax: string;
+  total: string;
+  total_tax: string;
+  taxes: OrderItemTax[];
+  sku: string;
+  price: number;
+  image: string;
+}
+
+interface TaxLine {
+  id: number;
+  rate_code: string;
+  rate_id: number;
+  label: string;
+  compound: boolean;
+  tax_total: string;
+  shipping_tax_total: string;
+}
+
+interface ShippingLine {
+  id: number;
+  method_title: string;
+  method_id: string;
+  total: string;
+  total_tax: string;
+  taxes: { id: number; total: string }[];
+}
+
+interface FeeLine {
+  id: number;
+  name: string;
+  tax_class: string;
+  tax_status: string;
+  total: string;
+  total_tax: string;
+  taxes: OrderItemTax[];
+}
+
+interface CouponLine {
+  id: number;
+  code: string;
+  discount: string;
+  discount_tax: string;
+}
+
+interface Refund {
+  id: number;
+  reason: string;
+  total: string; // negative, e.g. "-10.00"
+}
+
+interface Order {
+  id: number;
+  parent_id: number;
+  number: string;
+  order_key: string;
+  created_via: string;
+  version: string;
+  status: string;
+  currency: string;
+  date_created: string | null;
+  date_created_gmt: string | null;
+  date_modified: string | null;
+  date_modified_gmt: string | null;
+  discount_total: string;
+  discount_tax: string;
+  shipping_total: string;
+  shipping_tax: string;
+  cart_tax: string;
+  total: string;
+  total_tax: string;
+  prices_include_tax: boolean;
+  customer_id: number;
+  customer_note: string;
+  billing: OrderAddress;
+  shipping: OrderAddress;
+  payment_method: string;
+  payment_method_title: string;
+  transaction_id: string;
+  date_paid: string | null;
+  date_paid_gmt: string | null;
+  date_completed: string | null;
+  date_completed_gmt: string | null;
+  cart_hash: string;
+  line_items: OrderItem[];
+  tax_lines: TaxLine[];
+  shipping_lines: ShippingLine[];
+  fee_lines: FeeLine[];
+  coupon_lines: CouponLine[];
+  refunds: Refund[];
+}
+
 export async function getOrders(page = 1, perPage = 10) {
   const res = await fetch(`${API_BASE}/orders?page=${page}&per_page=${perPage}`, {
     headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
   });
   if (res.status === 401) throw new Error('Unauthorized');
-  return res.json(); // { success, data, meta }
+  return res.json() as Promise<{ success: boolean; data: Order[]; meta: { page: number; per_page: number; total: number; total_pages: number } }>;
 }
 
 // React component usage
 export function OrdersList() {
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [meta, setMeta] = useState({ page: 1, total_pages: 1 });
 
   useEffect(() => {
@@ -1269,8 +1753,33 @@ export function OrdersList() {
     <div>
       {orders.map((order) => (
         <div key={order.id}>
-          <h3>Order #{order.id}</h3>
-          <p>Status: {order.status} | Total: {order.currency} {order.total}</p>
+          <h3>Order #{order.number}</h3>
+          <p>
+            Status: {order.status} | Total: {order.currency} {order.total} |
+            Tax: {order.total_tax} | Shipping: {order.shipping_total}
+          </p>
+          {order.date_paid && <p>Paid: {new Date(order.date_paid).toLocaleDateString()}</p>}
+          <p>Payment: {order.payment_method_title}</p>
+          <p>
+            Shipped to: {order.shipping.address_1}, {order.shipping.city},{' '}
+            {order.shipping.country}
+          </p>
+          {order.coupon_lines.length > 0 && (
+            <p>Coupons: {order.coupon_lines.map((c) => c.code).join(', ')} (−{order.discount_total})</p>
+          )}
+          <ul>
+            {order.line_items.map((item) => (
+              <li key={item.id}>
+                {item.image && (
+                  <img src={item.image} alt={item.name} width={60} height={60} />
+                )}
+                {item.name} × {item.quantity} — {order.currency} {item.total}
+              </li>
+            ))}
+          </ul>
+          {order.refunds.length > 0 && (
+            <p>Refunded: {order.currency} {order.refunds.reduce((s, r) => s + Math.abs(parseFloat(r.total)), 0).toFixed(2)}</p>
+          )}
         </div>
       ))}
     </div>

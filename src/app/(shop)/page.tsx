@@ -13,7 +13,6 @@ import { TestimonialsSection } from '@/components/home/TestimonialsSection';
 import { FeaturesStrip } from '@/components/home/FeaturesStrip';
 import { ComingSoonSection } from '@/components/home/ComingSoonSection';
 import { WhatsAppCTA } from '@/components/home/WhatsAppCTA';
-import { NewsletterSection } from '@/components/home/NewsletterSection';
 
 export const revalidate = 60;
 
@@ -74,7 +73,6 @@ export default function HomePage() {
       <FeaturesStrip />
       <ComingSoonSection />
       <WhatsAppCTA />
-      <NewsletterSection />
     </div>
   );
 }

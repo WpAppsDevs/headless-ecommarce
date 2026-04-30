@@ -44,7 +44,7 @@ export function ResetPasswordForm() {
   const onSubmit = async (values: FormValues) => {
     setApiError(null);
     try {
-      await apiClient(`${config.apiBase}/wp-json/api/auth/reset-password`, {
+      await apiClient(`${config.apiBase}/api/auth/reset-password`, {
         method: 'POST',
         body: JSON.stringify({ key, login, new_password: values.new_password }),
       });
