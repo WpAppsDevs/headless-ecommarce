@@ -176,6 +176,12 @@ export function Footer() {
                 Get updates on new collections and exclusive offers.
               </p>
               <FooterNewsletterForm />
+              <div className="mt-5 flex flex-wrap items-center gap-2">
+                <VisaBadge />
+                <MastercardBadge />
+                <AmexBadge />
+                <CodBadge />
+              </div>
             </div>
 
           </div>
@@ -184,9 +190,11 @@ export function Footer() {
 
       {/* ── Bottom bar ────────────────────────────────────────────────── */}
       <div className="bg-[#f5e4de]">
-        {/* Legal links row */}
-        <div className="mx-auto max-w-7xl border-b border-[#e8d0c8] px-6 py-3 lg:px-8">
-          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 sm:justify-start">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-5 sm:flex-row lg:px-8">
+          <p className="text-xs text-brand-text-muted">
+            © {year} {config.siteName}. All rights reserved.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5">
             {LEGAL_LINKS.map(({ href, label }, idx) => (
               <span key={label} className="flex items-center gap-5">
                 <Link
@@ -200,19 +208,6 @@ export function Footer() {
                 )}
               </span>
             ))}
-          </div>
-        </div>
-
-        {/* Copyright + payment row */}
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-5 sm:flex-row lg:px-8">
-          <p className="text-xs text-brand-text-muted">
-            © {year} {config.siteName}. All rights reserved.
-          </p>
-          <div className="flex items-center gap-2">
-            <VisaBadge />
-            <MastercardBadge />
-            <AmexBadge />
-            <CodBadge />
           </div>
         </div>
       </div>

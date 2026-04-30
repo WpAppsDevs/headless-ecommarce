@@ -17,9 +17,9 @@ import { cn } from '@/lib/utils';
 
 const NAV_LINKS = [
   { href: '/', label: 'HOME' },
-  { href: '/products?type=ready-stock', label: 'READY STOCK' },
-  { href: '/products?type=pre-order', label: 'PRE-ORDER' },
-  { href: '/products?type=catalog', label: 'CATALOG / WHOLESALE' },
+  { href: '/products?tag=ready-stock', label: 'READY STOCK' },
+  { href: '/products?tag=pre-order', label: 'PRE-ORDER' },
+  { href: '/products?tag=catalog', label: 'CATALOG / WHOLESALE' },
   { href: '/contact', label: 'CONTACT' },
 ];
 
