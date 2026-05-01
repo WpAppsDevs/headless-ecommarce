@@ -29,7 +29,7 @@ const STEPS = [
 
 export function PreOrderSteps() {
   return (
-    <section aria-labelledby="preorder-heading" className="bg-brand-dark py-20">
+    <section aria-labelledby="preorder-heading" className="bg-brand-dark-surface py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="mb-14 text-center">

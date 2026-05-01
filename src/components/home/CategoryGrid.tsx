@@ -46,13 +46,13 @@ export function CategoryGrid() {
             <Link
               key={label}
               href={href}
-              className="group flex min-h-[160px] overflow-hidden rounded-2xl bg-brand-card shadow-sm ring-1 ring-brand-border transition-all hover:-translate-y-1 hover:shadow-md"
+              className="group flex min-h-[160px] overflow-hidden rounded-2xl bg-brand-card shadow-md ring-1 ring-brand-border transition-all hover:-translate-y-1 hover:shadow-lg"
               aria-label={`Browse ${label}`}
             >
               {/* Left: content */}
               <div className="flex flex-1 flex-col justify-between gap-3 p-5">
                 {/* Icon circle */}
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-accent/20">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-accent-light">
                   <Icon className="h-5 w-5 text-brand-wine" strokeWidth={1.8} />
                 </div>
                 <div>

@@ -1,6 +1,6 @@
 export function WhatsAppCTA() {
   return (
-    <section aria-label="WhatsApp contact" className="bg-[#F9F7F3] py-8">
+    <section aria-label="WhatsApp contact" className="bg-brand-section py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <a
           href="https://wa.me/"

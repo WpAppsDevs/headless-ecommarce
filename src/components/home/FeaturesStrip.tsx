@@ -29,10 +29,10 @@ export function FeaturesStrip() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="mb-10 text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-brand-accent">
+          <span className="inline-block rounded-full bg-brand-accent/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-accent">
             Our Promise
-          </p>
-          <h2 id="why-us-heading" className="mt-2 font-serif text-3xl font-bold text-brand-text sm:text-4xl">
+          </span>
+          <h2 id="why-us-heading" className="mt-4 font-serif text-3xl font-bold text-brand-text sm:text-4xl">
             Why Choose Us
           </h2>
         </div>

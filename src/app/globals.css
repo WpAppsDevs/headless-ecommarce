@@ -64,6 +64,8 @@
   --color-brand-dark: var(--brand-dark);
   --color-brand-wine: var(--brand-wine);
   --color-brand-topbar: var(--brand-topbar);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-dark-surface: var(--brand-dark-surface);
   --font-serif: var(--font-playfair), Georgia, "Times New Roman", serif;
 }
 
@@ -87,6 +89,8 @@
   --brand-dark: #2B2B2B;
   --brand-wine: #ba6d74;
   --brand-topbar: #C2899D;
+  --brand-gold: #C5A56A;
+  --brand-dark-surface: #180E0A;
 
   /* ── Shadcn/base-ui system vars — wired to brand tokens ─────────────────
      Default shadcn components (Button, Input, Card, Badge, etc.) auto-adopt

@@ -12,7 +12,7 @@ const FEATURES = ['No MOQ', 'Dedicated Account Manager', 'Cash on Delivery Avail
 
 export function WholesaleBanner() {
   return (
-    <section aria-labelledby="wholesale-heading" className="relative overflow-hidden bg-brand-dark py-20">
+    <section aria-labelledby="wholesale-heading" className="relative overflow-hidden bg-brand-dark-surface py-20">
       {/* Warm radial glows */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <div className="absolute -right-64 -top-64 h-[32rem] w-[32rem] rounded-full bg-brand-accent/[0.07] blur-3xl" />
@@ -80,12 +80,12 @@ export function WholesaleBanner() {
                     key={label}
                     className="flex flex-col items-center rounded-xl bg-brand-accent/[0.07] px-4 py-5 ring-1 ring-brand-accent/10"
                   >
-                    <span className="font-serif text-2xl font-bold text-brand-accent">{value}</span>
+                    <span className="font-serif text-2xl font-bold text-brand-gold">{value}</span>
                     <span className="mt-1 text-center text-xs leading-snug text-white/55">{label}</span>
                   </div>
                 ))}
               </div>
-              <p className="mt-4 text-center text-xs text-white/35">
+              <p className="mt-4 text-center text-xs text-white/50">
                 Trusted by boutique owners across Bangladesh
               </p>
             </div>

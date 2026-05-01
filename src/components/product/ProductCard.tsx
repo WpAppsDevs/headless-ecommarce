@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import type { Product } from '@/lib/api/products';
 
 const PLACEHOLDER =
-  'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22400%22%3E%3Crect width=%22400%22 height=%22400%22 fill=%22%23f1f5f9%22/%3E%3C/svg%3E';
+  'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22400%22%3E%3Crect width=%22400%22 height=%22400%22 fill=%22%23FBF7F5%22/%3E%3C/svg%3E';
 
 function StarRating({ score = 4.5 }: { score?: number }) {
   const full = Math.floor(score);
