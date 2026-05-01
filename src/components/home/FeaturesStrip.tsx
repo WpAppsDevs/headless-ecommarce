@@ -25,7 +25,7 @@ const FEATURES = [
 
 export function FeaturesStrip() {
   return (
-    <section aria-labelledby="why-us-heading" className="py-16">
+    <section aria-labelledby="why-us-heading" className="bg-brand-bg py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="mb-10 text-center">
@@ -42,14 +42,20 @@ export function FeaturesStrip() {
           {FEATURES.map(({ icon: Icon, title, desc }) => (
             <div
               key={title}
-              className="flex flex-col items-center gap-3 rounded-2xl bg-brand-bg p-5 text-center"
+              className="flex flex-col items-center gap-4 rounded-2xl border border-brand-border bg-brand-section p-6 text-center shadow-sm"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-accent/10">
-                <Icon className="h-5 w-5 text-brand-accent" />
+              {/* Icon tile */}
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-brand-accent-light">
+                <Icon className="h-6 w-6 text-brand-accent" strokeWidth={1.5} />
               </div>
+
+              {/* Accent rule */}
+              <div className="h-px w-8 rounded-full bg-brand-accent/40" />
+
+              {/* Text */}
               <div>
-                <p className="text-sm font-semibold text-zinc-900">{title}</p>
-                <p className="mt-0.5 text-xs leading-relaxed text-zinc-500">{desc}</p>
+                <p className="text-sm font-semibold text-brand-text">{title}</p>
+                <p className="mt-1 text-xs leading-relaxed text-brand-text-muted">{desc}</p>
               </div>
             </div>
           ))}
