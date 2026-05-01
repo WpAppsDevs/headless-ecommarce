@@ -8,7 +8,7 @@ const PURCHASE_TYPES = [
     desc1: 'Fast delivery in 2-5 days',
     desc2: 'across Bangladesh',
     href: '/products',
-    image: 'https://images.unsplash.com/photo-1733731402878-09226b46c4f1?w=400&q=85&fit=crop',
+    image: '/images/category-grid/ready-stock.jpg',
     catalog: false,
   },
   {
@@ -17,7 +17,7 @@ const PURCHASE_TYPES = [
     desc1: 'Imported from Pakistan',
     desc2: 'Delivery in 15-25 days',
     href: '/products',
-    image: 'https://images.unsplash.com/photo-1733209773389-6a37a36761c5?w=400&q=85&fit=crop',
+    image: '/images/category-grid/pre-order.jpg',
     catalog: false,
   },
   {
@@ -32,9 +32,9 @@ const PURCHASE_TYPES = [
 ];
 
 const CATALOG_IMAGES = [
-  'https://images.unsplash.com/photo-1733731402680-50c115b0c5b3?w=200&q=80&fit=crop',
-  'https://images.unsplash.com/photo-1733209484732-6b094322a89f?w=200&q=80&fit=crop',
-  'https://images.unsplash.com/photo-1733731406510-d2f6405c85dc?w=200&q=80&fit=crop',
+  '/images/category-grid/catalog-1.jpg',
+  '/images/category-grid/catalog-2.jpg',
+  '/images/category-grid/catalog-3.jpg',
 ];
 
 export function CategoryGrid() {

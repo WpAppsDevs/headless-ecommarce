@@ -7,7 +7,7 @@ const COLLECTIONS = [
     subtitle: 'Breathable, printed lawn suits for the warm season. Cool and elegant.',
     cta: 'Shop Lawn',
     href: '/products',
-    image: 'https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=900&q=80',
+    image: '/images/collections/lawn.jpg',
     span: 'lg:col-span-2',
   },
   {
@@ -16,7 +16,7 @@ const COLLECTIONS = [
     subtitle: 'Embroidered formals perfect for Eid celebrations.',
     cta: 'Shop Eid',
     href: '/products',
-    image: 'https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?w=600&q=80',
+    image: '/images/collections/eid.jpg',
     span: '',
   },
   {
@@ -25,7 +25,7 @@ const COLLECTIONS = [
     subtitle: 'Hand-crafted embroidery and premium fabrics for special occasions.',
     cta: 'Shop Luxury',
     href: '/products',
-    image: 'https://images.unsplash.com/photo-1602573991155-21f0143bb56f?w=600&q=80',
+    image: '/images/collections/luxury.jpg',
     span: '',
   },
   {
@@ -34,7 +34,7 @@ const COLLECTIONS = [
     subtitle: 'Adorable Pakistani dresses for your little princesses.',
     cta: 'Shop Kids',
     href: '/products',
-    image: 'https://images.unsplash.com/photo-1518831959646-742c3a14ebf6?w=600&q=80',
+    image: '/images/collections/kids.jpg',
     span: '',
   },
 ];

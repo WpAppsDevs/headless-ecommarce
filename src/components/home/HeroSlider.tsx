@@ -9,7 +9,7 @@ export function HeroSlider() {
       {/* ── Model image — absolute right half, desktop only ── */}
       <div className="absolute bottom-0 right-0 top-0 hidden w-[52%] lg:block" aria-hidden="true">
         <Image
-          src="https://images.unsplash.com/photo-1733470381421-a705c07f4242?w=1400&q=90&fit=crop"
+          src="/images/hero/women-fashion.jpg"
           alt=""
           fill
           className="object-cover object-top"
@@ -25,7 +25,7 @@ export function HeroSlider() {
         {/* ── Mobile image — stacks above text ── */}
         <div className="relative mt-6 h-[300px] overflow-hidden rounded-2xl lg:hidden">
           <Image
-            src="https://images.unsplash.com/photo-1733470381421-a705c07f4242?w=900&q=85&fit=crop"
+            src="/images/hero/women-fashion.jpg"
             alt="Premium Pakistani fashion collection"
             fill
             className="object-cover object-top"

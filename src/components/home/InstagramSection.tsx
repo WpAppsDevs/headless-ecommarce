@@ -14,12 +14,12 @@ function IgIcon({ className }: { className?: string }) {
 }
 
 const IG_POSTS = [
-  'https://images.unsplash.com/photo-1556906781-9a412961a28c?w=400&q=80',
-  'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80',
-  'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&q=80',
-  'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&q=80',
-  'https://images.unsplash.com/photo-1594938298603-c8148c4b4621?w=400&q=80',
-  'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&q=80',
+  '/images/instagram/post-1.jpg',
+  '/images/instagram/post-2.jpg',
+  '/images/instagram/post-3.jpg',
+  '/images/instagram/post-4.jpg',
+  '/images/instagram/post-5.jpg',
+  '/images/instagram/post-6.jpg',
 ];
 
 export function InstagramSection() {
