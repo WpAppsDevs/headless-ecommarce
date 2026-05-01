@@ -47,30 +47,25 @@ export default function HomePage() {
       {/* Featured Products */}
       <section aria-labelledby="featured-heading" className="bg-brand-section py-16">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 flex items-end justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-brand-accent">
-                New Arrivals
-              </p>
-              <h2 id="featured-heading" className="mt-1 font-serif text-3xl font-bold text-brand-text sm:text-4xl">
-                Latest Collection
-              </h2>
-            </div>
-            <Link
-              href="/products"
-              className="hidden items-center gap-1.5 rounded-full border border-brand-border bg-brand-bg px-5 py-2 text-sm font-medium text-brand-text transition hover:border-brand-accent/40 hover:text-brand-accent sm:inline-flex"
-            >
-              View all <span aria-hidden="true">→</span>
-            </Link>
+          {/* Heading — matches other section headings */}
+          <div className="mb-10 text-center">
+            <span className="inline-block rounded-full bg-brand-accent/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-accent">
+              New Arrivals
+            </span>
+            <h2 id="featured-heading" className="mt-4 font-serif text-3xl font-bold text-brand-text sm:text-4xl">
+              Latest Collection
+            </h2>
           </div>
+
           <Suspense fallback={<ProductGridSkeleton count={8} />}>
             <FeaturedProductsSection />
           </Suspense>
-          {/* Mobile view-all */}
-          <div className="mt-8 flex justify-center sm:hidden">
+
+          {/* View all — after grid */}
+          <div className="mt-10 flex justify-center">
             <Link
               href="/products"
-              className="inline-flex items-center gap-1.5 rounded-full border border-brand-border bg-brand-bg px-6 py-2.5 text-sm font-medium text-brand-text transition hover:border-brand-accent/40 hover:text-brand-accent"
+              className="inline-flex items-center gap-2 rounded-full border border-brand-border bg-brand-bg px-8 py-3 text-sm font-medium text-brand-text transition hover:border-brand-accent/40 hover:text-brand-accent"
             >
               View all products <span aria-hidden="true">→</span>
             </Link>
