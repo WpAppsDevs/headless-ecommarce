@@ -33,7 +33,7 @@ function StarRating({ score = 4.5 }: { score?: number }) {
           />
         </svg>
       ))}
-      <span className="ml-1 text-xs text-zinc-400">{score}</span>
+      <span className="ml-1 text-xs text-brand-text-muted">{score}</span>
     </div>
   );
 }
@@ -55,11 +55,11 @@ export function ProductCard({ product }: { product: Product }) {
       : 0;
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-2xl bg-white border border-zinc-100 shadow-sm transition-shadow duration-300 hover:shadow-xl">
+    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-brand-border bg-brand-section shadow-sm transition-shadow duration-300 hover:shadow-xl">
       {/* Image */}
       <Link
         href={`/products/${product.slug}`}
-        className="relative block aspect-[3/4] overflow-hidden bg-zinc-50"
+        className="relative block aspect-[3/4] overflow-hidden bg-brand-card"
         aria-label={`View ${product.name}`}
       >
         <Image
@@ -88,12 +88,12 @@ export function ProductCard({ product }: { product: Product }) {
         {/* Badges */}
         <div className="absolute left-3 top-3 flex flex-col gap-1.5">
           {isOnSale && discount > 0 && (
-            <Badge className="rounded-full bg-rose-500 px-2.5 py-0.5 text-[11px] font-semibold text-white shadow-none hover:bg-rose-500">
+            <Badge className="rounded-full bg-brand-wine px-2.5 py-0.5 text-[11px] font-semibold text-white shadow-none hover:bg-brand-wine">
               -{discount}%
             </Badge>
           )}
           {isNew && (
-            <Badge className="rounded-full bg-zinc-900 px-2.5 py-0.5 text-[11px] font-semibold text-white shadow-none hover:bg-zinc-900">
+            <Badge className="rounded-full bg-brand-dark px-2.5 py-0.5 text-[11px] font-semibold text-white shadow-none hover:bg-brand-dark">
               NEW
             </Badge>
           )}
@@ -102,7 +102,7 @@ export function ProductCard({ product }: { product: Product }) {
         {/* Wishlist */}
         <button
           aria-label="Add to wishlist"
-          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-zinc-500 opacity-0 shadow-md backdrop-blur-sm transition-all duration-200 hover:text-rose-500 group-hover:opacity-100"
+          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-brand-text-muted opacity-0 shadow-md backdrop-blur-sm transition-all duration-200 hover:text-brand-wine group-hover:opacity-100"
         >
           <Heart className="h-4 w-4" />
         </button>
@@ -111,7 +111,7 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="absolute inset-x-0 bottom-0 translate-y-full transition-transform duration-300 group-hover:translate-y-0">
           <Link
             href={`/products/${product.slug}`}
-            className="flex w-full items-center justify-center gap-2 bg-zinc-900/95 py-3 text-sm font-medium text-white backdrop-blur-sm hover:bg-zinc-800"
+            className="flex w-full items-center justify-center gap-2 bg-brand-dark/95 py-3 text-sm font-medium text-white backdrop-blur-sm hover:bg-brand-dark"
           >
             <Eye className="h-4 w-4" />
             Quick View
@@ -122,7 +122,7 @@ export function ProductCard({ product }: { product: Product }) {
       {/* Info */}
       <div className="flex flex-col gap-2 p-4">
         <Link href={`/products/${product.slug}`} className="group/name">
-          <h3 className="line-clamp-1 text-sm font-semibold text-zinc-800 transition-colors group-hover/name:text-zinc-500">
+          <h3 className="line-clamp-1 text-sm font-semibold text-brand-text transition-colors group-hover/name:text-brand-accent">
             {product.name}
           </h3>
         </Link>
@@ -132,11 +132,11 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="flex items-baseline gap-2">
           {isOnSale ? (
             <>
-              <span className="text-base font-bold text-zinc-900">${product.sale_price}</span>
-              <span className="text-sm text-zinc-400 line-through">${product.regular_price}</span>
+              <span className="text-base font-bold text-brand-text">${product.sale_price}</span>
+              <span className="text-sm text-brand-text-muted line-through">${product.regular_price}</span>
             </>
           ) : (
-            <span className="text-base font-bold text-zinc-900">${product.price}</span>
+            <span className="text-base font-bold text-brand-text">${product.price}</span>
           )}
         </div>
       </div>
