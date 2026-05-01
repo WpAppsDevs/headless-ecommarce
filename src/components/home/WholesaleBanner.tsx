@@ -8,7 +8,7 @@ const STATS = [
   { value: '৳500+', label: 'Min. Order Value' },
 ];
 
-const FEATURES = ['No MOQ', 'Dedicated Account Manager', 'Cash on Delivery Available'];
+const FEATURES = ['Stock: Cash on Delivery', 'Pre-Order: 70% Advance', 'MOQ: As Per Catalog'];
 
 export function WholesaleBanner() {
   return (
