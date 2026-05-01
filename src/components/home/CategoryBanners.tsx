@@ -26,7 +26,7 @@ const BANNERS = [
 
 export function CategoryBanners() {
   return (
-    <section aria-labelledby="categories-heading" className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+    <section aria-labelledby="categories-heading" className="mx-auto max-w-screen-2xl px-4 py-14 sm:px-6 lg:px-8">
       {/* Heading */}
       <div className="mb-8 text-center">
         <p className="text-xs font-semibold uppercase tracking-widest text-brand-accent">
