@@ -7,7 +7,7 @@ const BANNERS = [
     tagline: 'Pakistani Dresses for Every Occasion',
     cta: 'Shop Women',
     href: '/products',
-    image: 'https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=900&q=80',
+    image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=900&q=80',
     available: true,
   },
   {
@@ -15,7 +15,7 @@ const BANNERS = [
     tagline: 'Shalwar Kameez & Formal Kurtas',
     cta: 'Coming Soon',
     href: null,
-    image: 'https://images.unsplash.com/photo-1564584217132-2271feaeb3c5?w=900&q=80',
+    image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=900&q=80',
     available: false,
   },
   {
@@ -23,7 +23,7 @@ const BANNERS = [
     tagline: 'Adorable Pakistani Outfits for Children',
     cta: 'Coming Soon',
     href: null,
-    image: 'https://images.unsplash.com/photo-1518831959646-742c3a14ebf6?w=900&q=80',
+    image: 'https://images.unsplash.com/photo-1476234251651-f353703a034d?w=900&q=80',
     available: false,
   },
 ];
