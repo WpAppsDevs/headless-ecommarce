@@ -57,7 +57,7 @@ export function HeroSlider() {
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-nowrap">
               {/* Filled wine */}
               <Link
-                href="/products"
+                href="/products?tag=ready-stock"
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-wine px-5 py-3 text-[11.5px] font-bold uppercase tracking-[0.08em] text-white transition hover:opacity-90 whitespace-nowrap"
               >
                 <ShoppingBag className="h-4 w-4 shrink-0" strokeWidth={2} />
@@ -65,7 +65,7 @@ export function HeroSlider() {
               </Link>
               {/* Outlined wine */}
               <Link
-                href="/products"
+                href="/products?tag=pre-order"
                 className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-brand-wine px-5 py-3 text-[11.5px] font-bold uppercase tracking-[0.08em] text-brand-wine transition hover:bg-brand-wine/5 whitespace-nowrap"
               >
                 <Clock className="h-4 w-4 shrink-0" strokeWidth={2} />
@@ -73,7 +73,7 @@ export function HeroSlider() {
               </Link>
               {/* Outlined dark */}
               <Link
-                href="/products"
+                href="/products?tag=catalog"
                 className="inline-flex items-center justify-center gap-2 rounded-lg border border-brand-text/40 px-5 py-3 text-[11.5px] font-bold uppercase tracking-[0.08em] text-brand-text transition hover:border-brand-text/70 whitespace-nowrap"
               >
                 <BookOpen className="h-4 w-4 shrink-0" strokeWidth={2} />
