@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
@@ -26,24 +27,15 @@ const NAV_LINKS = [
 // ── Site Logo ───────────────────────────────────────────────────────────────
 function SiteLogo() {
   return (
-    <Link href="/" className="flex shrink-0 flex-col leading-none" aria-label="Najifa&apos;s Shop — Pakistani Collection">
-      <div className="flex items-end gap-1">
-        <span className="font-serif text-[2rem] font-bold italic leading-none tracking-tight text-brand-text">
-          Najifa&apos;s Shop
-        </span>
-        {/* Small floral decoration */}
-        <svg viewBox="0 0 28 28" className="mb-0.5 h-6 w-6 text-brand-accent" fill="currentColor" aria-hidden="true">
-          <path d="M14 2C14 2 10 7 10 11C10 13.2 11.8 15 14 15C16.2 15 18 13.2 18 11C18 7 14 2 14 2Z" opacity="0.8"/>
-          <path d="M6 8C6 8 4 13 6 16C7.1 17.6 9 18.3 10.7 17.7C12.4 17.1 13.2 15.2 12.6 13.5C11.4 10.2 6 8 6 8Z" opacity="0.6"/>
-          <path d="M22 8C22 8 17 10.2 15.9 13.5C15.3 15.2 16.1 17.1 17.8 17.7C19.5 18.3 21.4 17.6 22.5 16C24.5 13 22 8 22 8Z" opacity="0.6"/>
-          <path d="M14 15C14 15 9 17 8 20.5C7.5 22.3 8.8 24.1 10.7 24.4C12.5 24.7 14.2 23.4 14.5 21.6C14.8 19.5 14 15 14 15Z" opacity="0.5"/>
-          <path d="M14 15C14 15 19 17 20 20.5C20.5 22.3 19.2 24.1 17.3 24.4C15.5 24.7 13.8 23.4 13.5 21.6C13.2 19.5 14 15 14 15Z" opacity="0.5"/>
-          <circle cx="14" cy="15" r="2.5" />
-        </svg>
-      </div>
-      <span className="text-[9px] font-semibold uppercase tracking-[0.35em] text-brand-text-muted">
-        Pakistani Collection
-      </span>
+    <Link href="/" className="flex shrink-0 items-center" aria-label="Najifa's Shop — Pakistani Collection">
+      <Image
+        src="/images/Najifa's Shop Logo.png"
+        alt="Najifa's Shop"
+        width={140}
+        height={48}
+        className="h-12 w-auto object-contain"
+        priority
+      />
     </Link>
   );
 }
@@ -261,7 +253,13 @@ export function Header() {
             <SheetContent side="right" className="w-72 p-0">
               <SheetHeader className="border-b px-6 py-4">
                 <SheetTitle className="text-left">
-                  <span className="font-serif text-xl font-bold italic text-brand-text">Libaas</span>
+                  <Image
+                    src="/images/Najifa's Shop Logo.png"
+                    alt="Najifa's Shop"
+                    width={120}
+                    height={40}
+                    className="h-10 w-auto object-contain"
+                  />
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-6 px-6 py-6">
