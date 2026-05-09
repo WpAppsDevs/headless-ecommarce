@@ -7,10 +7,17 @@ import { config } from '@/lib/config';
 // ---------------------------------------------------------------------------
 
 export interface OrderLineItem {
-  product_id: number;
+  id: number;
   name: string;
+  product_id: number;
+  variation_id: number;
   quantity: number;
-  line_total: string;
+  subtotal: string;
+  /** Line total (after discounts). Matches the `total` field in the API response. */
+  total: string;
+  sku: string;
+  price: number;
+  image: string;
 }
 
 export interface OrderBilling {

@@ -98,7 +98,7 @@ export function ProductCard({ product }: { product: Product }) {
       >
         {/* Primary image */}
         <Image
-          src={image?.url ?? PLACEHOLDER}
+          src={image?.src ?? PLACEHOLDER}
           alt={image?.alt ?? product.name}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -111,7 +111,7 @@ export function ProductCard({ product }: { product: Product }) {
         {/* Hover / alternate image */}
         {hoverImage && (
           <Image
-            src={hoverImage.url}
+            src={hoverImage.src}
             alt=""
             fill
             sizes="(max-width: 640px) 50vw, 25vw"

@@ -156,7 +156,7 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
           <SectionCard title="Products">
             <div className="divide-y divide-zinc-100">
               {order.line_items.map((item, i) => {
-                const unitPrice = item.quantity > 0 ? Number(item.line_total) / item.quantity : 0;
+                const unitPrice = item.quantity > 0 ? Number(item.total) / item.quantity : 0;
                 return (
                   <div key={i} className="flex items-start gap-4 py-4 first:pt-0 last:pb-0">
                     <div className="h-16 w-16 shrink-0 rounded-xl bg-zinc-100" />
@@ -175,7 +175,7 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
                       </div>
                       <div className="flex justify-between gap-6 text-zinc-500">
                         <span>Total:</span>
-                        <span className="font-semibold text-zinc-900">${Number(item.line_total).toFixed(2)}</span>
+                        <span className="font-semibold text-zinc-900">${Number(item.total).toFixed(2)}</span>
                       </div>
                     </div>
                   </div>

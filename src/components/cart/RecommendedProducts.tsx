@@ -34,7 +34,7 @@ function ProductCard({ product }: { product: Product }) {
       >
         {image ? (
           <Image
-            src={image.url}
+            src={image.src}
             alt={image.alt || product.name}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"

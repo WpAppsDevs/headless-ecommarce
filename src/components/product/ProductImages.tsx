@@ -16,7 +16,7 @@ interface Props {
 
 export function ProductImages({ images, name, isOnSale }: Props) {
   const [active, setActive] = useState(0);
-  const src = images[active]?.url || PLACEHOLDER;
+  const src = images[active]?.src || PLACEHOLDER;
   const alt = images[active]?.alt || name;
 
   return (
@@ -37,7 +37,7 @@ export function ProductImages({ images, name, isOnSale }: Props) {
               )}
             >
               <Image
-                src={img.url || PLACEHOLDER}
+                src={img.src || PLACEHOLDER}
                 alt={img.alt}
                 fill
                 className="object-cover"

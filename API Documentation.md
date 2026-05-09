@@ -35,6 +35,8 @@ This plugin exposes WooCommerce data through a stateless REST API designed for h
 - **JWT authentication:** Access tokens (1 hour) + refresh tokens (14 days). Guest shoppers receive a separate guest JWT for cart persistence.
 - **Custom cart table:** All cart state is stored in `wp_hl_cart` — independent of WooCommerce's session-based cart.
 - **Normalizer pattern:** All responses are explicitly whitelisted — no raw WordPress/WooCommerce internal fields are ever exposed.
+- **Service layer:** Business logic lives in dedicated `*Service` classes (`AuthService`, `CartService`, `UserService`). Controllers are thin request/response adapters — they validate params, call the service or query WooCommerce directly, and return the envelope.
+- **Centralised route registry:** All REST routes are declared in `routes/*.php` files loaded by `Core\Router`. Controllers no longer call `register_rest_route()` themselves.
 - **Extensible payment layer:** New payment gateways can be added via a WordPress filter without modifying plugin code.
 
 ---
