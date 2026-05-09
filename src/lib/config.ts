@@ -11,7 +11,7 @@ export const config = {
   apiBase: WP_URL + '/wp-json',
   productsNs: 'wpadhlwrapi/v1',
   apiNs: 'api',
-  siteName: process.env.NEXT_PUBLIC_SITE_NAME ?? 'HeadlessECF',
+  siteName: process.env.NEXT_PUBLIC_SITE_NAME ?? "Najifa's Shop",
   hero: {
     title: process.env.NEXT_PUBLIC_HERO_TITLE ?? 'Shop the Latest Collection',
     subtitle:

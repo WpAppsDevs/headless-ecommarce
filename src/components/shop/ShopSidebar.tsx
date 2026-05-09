@@ -8,6 +8,8 @@ import type { ProductCategory } from '@/lib/api/products';
 interface ShopSidebarProps {
   categories: ProductCategory[];
   selectedCategory: string;
+  selectedTag?: string;
+  selectedBrand?: string;
   priceRange: [number, number];
   activePriceRange: [number, number];
   onPriceRangeChange: (range: [number, number]) => void;
@@ -33,12 +35,37 @@ const COLOR_OPTIONS = [
 
 const SIZE_OPTIONS = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
+const TAG_OPTIONS = [
+  { label: 'Ready Stock', slug: 'ready-stock' },
+  { label: 'Pre-Order', slug: 'pre-order' },
+  { label: 'Catalog', slug: 'catalog' },
+  { label: 'Eid Collection', slug: 'eid-collection' },
+  { label: 'Summer Collection', slug: 'summer-collection' },
+  { label: 'Winter Collection', slug: 'winter-collection' },
+];
+
+const BRAND_OPTIONS = [
+  { label: 'Gul Ahmed', slug: 'gul-ahmed' },
+  { label: 'Khaadi', slug: 'khaadi' },
+  { label: 'Sapphire', slug: 'sapphire' },
+  { label: 'Alkaram', slug: 'alkaram' },
+  { label: 'Sana Safinaz', slug: 'sana-safinaz' },
+  { label: 'Maria B', slug: 'maria-b' },
+];
+
 const SECTION_TITLE = 'text-[11px] font-semibold uppercase tracking-widest text-zinc-400 mb-3';
 
-function buildCategoryHref(slug: string | null, currentSearch?: string) {
+function buildHref(params: {
+  category?: string | null;
+  tag?: string | null;
+  brand?: string | null;
+  search?: string;
+}) {
   const qs = new URLSearchParams();
-  if (slug) qs.set('category', slug);
-  if (currentSearch) qs.set('search', currentSearch);
+  if (params.category) qs.set('category', params.category);
+  if (params.tag) qs.set('tag', params.tag);
+  if (params.brand) qs.set('brand', params.brand);
+  if (params.search) qs.set('search', params.search);
   const q = qs.toString();
   return `/products${q ? `?${q}` : ''}`;
 }
@@ -46,6 +73,8 @@ function buildCategoryHref(slug: string | null, currentSearch?: string) {
 export function ShopSidebar({
   categories,
   selectedCategory,
+  selectedTag,
+  selectedBrand,
   priceRange,
   activePriceRange,
   onPriceRangeChange,
@@ -65,7 +94,7 @@ export function ShopSidebar({
         <ul className="space-y-1.5">
           <li>
             <Link
-              href={buildCategoryHref(null, currentSearch)}
+              href={buildHref({ tag: selectedTag, brand: selectedBrand, search: currentSearch })}
               className={cn(
                 'flex items-center gap-1.5 text-sm transition-all duration-150',
                 !selectedCategory
@@ -87,7 +116,7 @@ export function ShopSidebar({
             return (
               <li key={cat.id}>
                 <Link
-                  href={buildCategoryHref(cat.slug, currentSearch)}
+                  href={buildHref({ category: cat.slug, tag: selectedTag, brand: selectedBrand, search: currentSearch })}
                   className={cn(
                     'flex items-center gap-1.5 text-sm transition-all duration-150',
                     isActive ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
@@ -100,6 +129,80 @@ export function ShopSidebar({
                     )}
                   />
                   {cat.name}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+      <hr className="border-zinc-100" />
+
+      {/* Tags */}
+      <div>
+        <p className={SECTION_TITLE}>Tags</p>
+        <ul className="space-y-1.5">
+          <li>
+            <Link
+              href={buildHref({ category: selectedCategory, brand: selectedBrand, search: currentSearch })}
+              className={cn(
+                'flex items-center gap-1.5 text-sm transition-all duration-150',
+                !selectedTag ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
+              )}
+            >
+              <ChevronRight className={cn('h-3.5 w-3.5 shrink-0', !selectedTag ? 'opacity-100' : 'opacity-0')} />
+              All
+            </Link>
+          </li>
+          {TAG_OPTIONS.map(({ label, slug }) => {
+            const isActive = selectedTag === slug;
+            return (
+              <li key={slug}>
+                <Link
+                  href={buildHref({ category: selectedCategory, tag: slug, brand: selectedBrand, search: currentSearch })}
+                  className={cn(
+                    'flex items-center gap-1.5 text-sm transition-all duration-150',
+                    isActive ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
+                  )}
+                >
+                  <ChevronRight className={cn('h-3.5 w-3.5 shrink-0', isActive ? 'opacity-100' : 'opacity-0')} />
+                  {label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+      <hr className="border-zinc-100" />
+
+      {/* Brands */}
+      <div>
+        <p className={SECTION_TITLE}>Brands</p>
+        <ul className="space-y-1.5">
+          <li>
+            <Link
+              href={buildHref({ category: selectedCategory, tag: selectedTag, search: currentSearch })}
+              className={cn(
+                'flex items-center gap-1.5 text-sm transition-all duration-150',
+                !selectedBrand ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
+              )}
+            >
+              <ChevronRight className={cn('h-3.5 w-3.5 shrink-0', !selectedBrand ? 'opacity-100' : 'opacity-0')} />
+              All
+            </Link>
+          </li>
+          {BRAND_OPTIONS.map(({ label, slug }) => {
+            const isActive = selectedBrand === slug;
+            return (
+              <li key={slug}>
+                <Link
+                  href={buildHref({ category: selectedCategory, tag: selectedTag, brand: slug, search: currentSearch })}
+                  className={cn(
+                    'flex items-center gap-1.5 text-sm transition-all duration-150',
+                    isActive ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
+                  )}
+                >
+                  <ChevronRight className={cn('h-3.5 w-3.5 shrink-0', isActive ? 'opacity-100' : 'opacity-0')} />
+                  {label}
                 </Link>
               </li>
             );
@@ -230,3 +333,5 @@ export function ShopSidebar({
     </aside>
   );
 }
+
+

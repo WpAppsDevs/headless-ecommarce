@@ -53,8 +53,8 @@ export function HeroSlider() {
               or pre-order your favorite designs directly from Pakistan.
             </p>
 
-            {/* ── CTA Buttons — single row, no wrap ── */}
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-nowrap">
+            {/* ── CTA Buttons — wrap naturally, full-width on mobile ── */}
+            <div className="mt-8 flex flex-wrap gap-3">
               {/* Primary — filled dark */}
               <Link
                 href="/products?tag=ready-stock"

@@ -107,20 +107,30 @@ export default async function ProductPage({ params }: PageProps) {
           {/* Name */}
           <h1 className="text-3xl font-bold leading-tight text-zinc-900">{product.name}</h1>
 
-          {/* Static star rating */}
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-0.5">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Star
-                  key={i}
-                  className="h-4 w-4"
-                  fill={i <= 4 ? '#f59e0b' : 'none'}
-                  stroke={i <= 4 ? '#f59e0b' : '#d1d5db'}
-                />
-              ))}
+          {/* Dynamic star rating from API */}
+          {(product.rating_count ?? 0) > 0 ? (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-0.5">
+                {[1, 2, 3, 4, 5].map((i) => {
+                  const avg = parseFloat(product.average_rating ?? '0');
+                  const filled = i <= Math.floor(avg);
+                  const half = !filled && i === Math.ceil(avg) && avg % 1 >= 0.5;
+                  return (
+                    <Star
+                      key={i}
+                      className="h-4 w-4"
+                      fill={filled || half ? '#f59e0b' : 'none'}
+                      stroke={filled || half ? '#f59e0b' : '#d1d5db'}
+                    />
+                  );
+                })}
+              </div>
+              <span className="text-sm text-zinc-500">{product.average_rating} / 5</span>
+              <span className="text-sm text-zinc-400">({product.rating_count} Reviews)</span>
             </div>
-            <span className="text-sm text-zinc-400">(128 Reviews)</span>
-          </div>
+          ) : (
+            <p className="text-sm text-zinc-400">No reviews yet</p>
+          )}
 
           {/* Short description */}
           {product.short_description && (

@@ -42,7 +42,7 @@ export function FeaturesStrip() {
           {FEATURES.map(({ icon: Icon, title, desc }) => (
             <div
               key={title}
-              className="flex flex-col items-center gap-4 rounded-2xl border border-brand-border bg-brand-section p-6 text-center shadow-sm"
+              className="flex flex-col items-center gap-4 rounded-2xl border border-brand-border bg-brand-section p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-accent/40 hover:shadow-lg hover:shadow-brand-accent/20 cursor-default"
             >
               {/* Icon tile */}
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-brand-accent-light">

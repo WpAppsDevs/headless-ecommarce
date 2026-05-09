@@ -14,6 +14,8 @@ interface ShopClientProps {
   meta: PaginationMeta;
   initialCategory?: string;
   initialSearch?: string;
+  initialTag?: string;
+  initialBrand?: string;
   serverPage: number;
 }
 
@@ -44,13 +46,15 @@ export function ShopClient({
   meta,
   initialCategory,
   initialSearch,
+  initialTag,
+  initialBrand,
   serverPage,
 }: ShopClientProps) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('default');
   const [activePriceRange, setActivePriceRange] = useState<[number, number]>([0, 9999]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [viewCols, setViewCols] = useState<2 | 3 | 4>(4);
+  const [viewCols, setViewCols] = useState<2 | 3 | 4>(3);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const priceRange = useMemo<[number, number]>(() => {
@@ -122,6 +126,8 @@ export function ShopClient({
     if (p > 1) qs.set('page', String(p));
     if (initialCategory) qs.set('category', initialCategory);
     if (initialSearch) qs.set('search', initialSearch);
+    if (initialTag) qs.set('tag', initialTag);
+    if (initialBrand) qs.set('brand', initialBrand);
     const q = qs.toString();
     return `/products${q ? `?${q}` : ''}`;
   }
@@ -139,6 +145,8 @@ export function ShopClient({
   const sidebarProps = {
     categories,
     selectedCategory: initialCategory ?? '',
+    selectedTag: initialTag ?? '',
+    selectedBrand: initialBrand ?? '',
     priceRange,
     activePriceRange,
     onPriceRangeChange: setActivePriceRange,

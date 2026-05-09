@@ -1,25 +1,42 @@
 You are a senior frontend engineer specializing in Next.js (App Router) and headless eCommerce UI architecture.
 
-Task 1: Footer Section
-- Change footer logo. Use header logo.
-- Change email support@headlessecf.com to support@najifasshop.com
-- Change mobile number +880 1XXX-XXXXXX to +880 1841-654663
-- Change HeadlessECF to Najifa's Shop
-- implement mailchimp functionality for Subscribe to Newsletter section. When user click Subscribe button email added to mailchimp.
+Debug the bellow task and Fix the issues
 
-Task 2: Chat with us on Whatsapp Section
-- +8801841654663 add this number as Whatsapp number.
+Task 1:
+- Header Account Icon sub-menu not clickable
 
-Task 3: Ornaments Collection section
-- implement mailchimp functionality for Notify Me. When user click Notify Me button email added to mailchimp.
+Task 2:
+- Home page Hero section View Catalog button UI issue
 
-Task 4: Wholesale CTA section
-- Update Contact on WhatsApp number. use ths +8801841654663 as whatsapp number.
-- change `Trusted by boutique owners across Bangladesh` to `Built for Resellers, Boutiques & Fashion Entrepreneurs`
-- add Hover glow effect for Stat item
-- Change Active Resellers 500 to 50
-- Change `Catalog Designs` to  `Repeat Clients` and `50+` to `90%`
-- Change `Min. Order Value` to  `Client Satisfaction` and `৳500+` to `99%`
+Task 3:
+- Tag and band wise filter not works
+
+Task 4:
+- fixed responsive issue for product card on mobile version
 
 Task 5:
-- Change api endpoint base ur `https://api.themejoker.com/` to `https://api.najifasshop.com/`
+- Add hover glow for Why Choose Us item
+
+Task 6:
+- All over site change `HeadlessECF` to `Najifa's Shop`
+
+Task 7:
+- On the products page display 3 products per row
+
+Task 8:
+- add tags and Brands Filter on the products page
+
+Task 9:
+- Product review must be dynamic from product information. if api not provide those information inform me. I added those information.
+
+Task 10:
+- Debug the user login and auth system. check if this works properly. if not fixed.
+
+Task 11:
+When user click add to cart, it's take long time to complete adding cart. Fixed this
+
+task 12:
+- When user client a link, button it's take long time to process. fixed this
+
+Task 13:
+- Product card image slider not working

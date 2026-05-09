@@ -79,7 +79,24 @@ export const useCartStore = create<CartState & CartActions>((set) => ({
   },
 
   addItem: async (productId, variationId, quantity, attributes) => {
-    set({ loading: true, error: null });
+    // Optimistic update — immediately add a placeholder item so the cart
+    // drawer shows activity without waiting for the network round-trip.
+    const tempId = `temp-${Date.now()}`;
+    const optimisticItem: CartItem = {
+      id: tempId,
+      cart_token: '',
+      user_id: null,
+      product_id: String(productId),
+      variation_id: String(variationId),
+      quantity: String(quantity),
+      meta: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      product_name: 'Adding…',
+      product_image: null,
+      price: '0',
+    };
+    set((state) => ({ items: [...state.items, optimisticItem], error: null }));
     try {
       const data = await apiAddToCart(productId, variationId, quantity, attributes);
 
@@ -94,9 +111,13 @@ export const useCartStore = create<CartState & CartActions>((set) => ({
         set({ guestToken: data.guest_token });
       }
 
-      set({ items: data.items, cartToken: data.cart_token, loading: false });
+      set({ items: data.items, cartToken: data.cart_token });
     } catch (e) {
-      set({ error: toErrorMsg(e, 'Failed to add item to cart'), loading: false });
+      // Revert the optimistic item on failure
+      set((state) => ({
+        items: state.items.filter((i) => i.id !== tempId),
+        error: toErrorMsg(e, 'Failed to add item to cart'),
+      }));
     }
   },
 

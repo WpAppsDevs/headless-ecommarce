@@ -168,8 +168,21 @@ function UserMenu({ onClose }: { onClose?: () => void }) {
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement>(null);
   const itemCount = useCartStore((s) => s.items.length);
   const setCartDrawerOpen = useCartStore((s) => s.setCartDrawerOpen);
+
+  // Close account dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (accountRef.current && !accountRef.current.contains(e.target as Node)) {
+        setAccountOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-zinc-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
@@ -196,17 +209,20 @@ export function Header() {
           </button>
 
           {/* Account */}
-          <div className="group relative">
+          <div className="relative" ref={accountRef}>
             <button
               aria-label="Account"
+              aria-expanded={accountOpen}
+              onClick={() => setAccountOpen((v) => !v)}
               className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900"
             >
               <User className="h-[19px] w-[19px]" strokeWidth={1.8} />
             </button>
-            {/* Dropdown */}
-            <div className="absolute right-0 top-full mt-2 hidden w-44 rounded-xl border border-zinc-100 bg-white p-3 shadow-xl group-hover:block">
-              <UserMenu />
-            </div>
+            {accountOpen && (
+              <div className="absolute right-0 top-full mt-2 w-44 rounded-xl border border-zinc-100 bg-white p-3 shadow-xl z-50">
+                <UserMenu onClose={() => setAccountOpen(false)} />
+              </div>
+            )}
           </div>
 
           {/* Cart */}

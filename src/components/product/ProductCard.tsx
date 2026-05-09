@@ -55,10 +55,12 @@ export function ProductCard({ product }: { product: Product }) {
   const [qty, setQty] = useState(1);
   const [wished, setWished] = useState(false);
   const [adding, setAdding] = useState(false);
+  const [activeImg, setActiveImg] = useState(0);
   const addItem = useCartStore((s) => s.addItem);
+  const setCartDrawerOpen = useCartStore((s) => s.setCartDrawerOpen);
 
-  const image = product.images[0];
-  const hoverImage = product.images[1];
+  const allImages = product.images.slice(0, 3);
+  const image = allImages[0];
   const isOnSale =
     product.on_sale && product.sale_price && product.sale_price !== product.regular_price;
   const isNew = !product.on_sale;
@@ -79,6 +81,7 @@ export function ProductCard({ product }: { product: Product }) {
   async function handleAddToCart() {
     if (adding || isOutOfStock) return;
     setAdding(true);
+    setCartDrawerOpen(true);
     try {
       await addItem(product.id, 0, qty);
     } finally {
@@ -96,27 +99,28 @@ export function ProductCard({ product }: { product: Product }) {
         aria-label={`View ${product.name}`}
         tabIndex={-1}
       >
-        {/* Primary image */}
-        <Image
-          src={image?.src ?? PLACEHOLDER}
-          alt={image?.alt ?? product.name}
-          fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className={cn(
-            'object-cover transition-all duration-500',
-            hoverImage ? 'group-hover:opacity-0' : 'group-hover:scale-105',
-          )}
-        />
-
-        {/* Hover / alternate image */}
-        {hoverImage && (
+        {/* Image slider — show activeImg, fade between images */}
+        {allImages.length > 0 ? allImages.map((img, i) => (
           <Image
-            src={hoverImage.src}
-            alt=""
+            key={i}
+            src={img?.src ?? PLACEHOLDER}
+            alt={i === 0 ? (img?.alt ?? product.name) : ''}
             fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className={cn(
+              'object-cover transition-opacity duration-500',
+              i === activeImg ? 'opacity-100' : 'opacity-0',
+            )}
+            priority={i === 0}
+            aria-hidden={i !== activeImg}
+          />
+        )) : (
+          <Image
+            src={PLACEHOLDER}
+            alt={product.name}
+            fill
+            className="object-cover"
             sizes="(max-width: 640px) 50vw, 25vw"
-            className="absolute inset-0 object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-            aria-hidden="true"
           />
         )}
 
@@ -137,21 +141,26 @@ export function ProductCard({ product }: { product: Product }) {
           )}
         </div>
 
-        {/* Image carousel dots — bottom-center (decorative) */}
-        <div
-          className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5"
-          aria-hidden="true"
-        >
-          {[0, 1, 2].map((i) => (
-            <span
-              key={i}
-              className={cn(
-                'h-1.5 w-1.5 rounded-full transition-colors',
-                i === 0 ? 'bg-white' : 'bg-white/50',
-              )}
-            />
-          ))}
-        </div>
+        {/* Image carousel dots — clickable, bottom-center */}
+        {allImages.length > 1 && (
+          <div
+            className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5"
+            aria-label="Image navigation"
+          >
+            {allImages.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={(e) => { e.preventDefault(); setActiveImg(i); }}
+                aria-label={`Show image ${i + 1}`}
+                className={cn(
+                  'h-1.5 w-1.5 rounded-full transition-colors',
+                  i === activeImg ? 'bg-white' : 'bg-white/50',
+                )}
+              />
+            ))}
+          </div>
+        )}
       </Link>
 
       {/* Wishlist button — always visible, positioned over image top-right */}
@@ -171,7 +180,7 @@ export function ProductCard({ product }: { product: Product }) {
       </button>
 
       {/* ── Content area ───────────────────────────────────────────────────── */}
-      <div className="flex flex-1 flex-col gap-2 p-4">
+      <div className="flex flex-1 flex-col gap-2 p-3 sm:p-4">
 
         {/* Title */}
         <Link href={`/products/${product.slug}`} className="group/name">
@@ -219,12 +228,12 @@ export function ProductCard({ product }: { product: Product }) {
               type="button"
               onClick={() => setQty((q) => Math.max(1, q - 1))}
               aria-label="Decrease quantity"
-              className="flex h-9 w-8 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text"
+              className="flex h-8 w-7 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text sm:h-9 sm:w-8"
             >
               −
             </button>
             <span
-              className="w-7 select-none text-center text-sm font-semibold text-brand-text"
+              className="w-6 select-none text-center text-sm font-semibold text-brand-text sm:w-7"
               aria-live="polite"
             >
               {qty}
@@ -233,7 +242,7 @@ export function ProductCard({ product }: { product: Product }) {
               type="button"
               onClick={() => setQty((q) => q + 1)}
               aria-label="Increase quantity"
-              className="flex h-9 w-8 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text"
+              className="flex h-8 w-7 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text sm:h-9 sm:w-8"
             >
               +
             </button>
