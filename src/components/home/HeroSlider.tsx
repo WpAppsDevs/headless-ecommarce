@@ -72,13 +72,13 @@ export function HeroSlider() {
                 Pre-Order Collection
               </Link>
               {/* Tertiary — outlined */}
-              <Link
+              {/* <Link
                 href="/products?tag=catalog"
                 className="inline-flex items-center justify-center gap-2 rounded-lg border border-brand-text/30 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] text-brand-text transition hover:border-brand-text/60 whitespace-nowrap"
               >
                 <BookOpen className="h-4 w-4 shrink-0" strokeWidth={2} />
                 View Catalog
-              </Link>
+              </Link> */}
             </div>
 
             {/* ── Trust bar: white card with vertical dividers ── */}

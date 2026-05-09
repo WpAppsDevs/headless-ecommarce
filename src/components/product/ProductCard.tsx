@@ -104,7 +104,7 @@ export function ProductCard({ product }: { product: Product }) {
           <Image
             key={i}
             src={img?.src || PLACEHOLDER}
-            alt={i === 0 ? (img?.alt ?? product.name) : ''}
+            alt={i === 0 ? (img?.alt || product.name) : ''}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className={cn(
