@@ -126,7 +126,9 @@ function normalizeVariation(
   attrSlugMap: Map<number, string>,
 ): ProductVariation {
   const attributes: Record<string, string> = {};
-  for (const attr of raw.attributes ?? []) {
+  // Guard: API may return `{}` (empty object) instead of `[]` when no attributes exist
+  const attrsArr = Array.isArray(raw.attributes) ? raw.attributes : [];
+  for (const attr of attrsArr) {
     const slug =
       attrSlugMap.get(attr.id) ??
       `pa_${attr.name.toLowerCase().replace(/\s+/g, '_')}`;
@@ -172,7 +174,7 @@ export async function getProducts(params: {
     `${base()}/products?${qs}`,
     { next: { revalidate: 60 } },
   );
-  return { items: json.data, meta: json.meta };
+  return { items: Array.isArray(json.data) ? json.data : [], meta: json.meta };
 }
 
 export async function getProduct(slug: string): Promise<Product> {
@@ -189,15 +191,23 @@ export async function getProduct(slug: string): Promise<Product> {
   const raw = json.data;
 
   // Build attribute id → slug map for variation normalisation
+  // Guard: API may return `{}` instead of `[]` for empty arrays
   const attrSlugMap = new Map<number, string>(
-    (raw.attributes ?? []).map((a) => [a.id, a.slug]),
+    (Array.isArray(raw.attributes) ? raw.attributes : []).map((a) => [a.id, a.slug]),
   );
 
-  const variations = (raw.variations ?? []).map((v) =>
+  const rawVariations = Array.isArray(raw.variations) ? raw.variations : [];
+  const variations = rawVariations.map((v) =>
     typeof v === 'number' ? v : normalizeVariation(v, attrSlugMap),
   );
 
-  return { ...raw, variations } as Product;
+  return {
+    ...raw,
+    categories: Array.isArray(raw.categories) ? raw.categories : [],
+    images: Array.isArray(raw.images) ? raw.images : [],
+    attributes: Array.isArray(raw.attributes) ? raw.attributes : [],
+    variations,
+  } as Product;
 }
 
 /** Fetches all product slugs across all pages — used for generateStaticParams. */
