@@ -2,10 +2,10 @@ import Link from 'next/link';
 import { Phone, ArrowRight } from 'lucide-react';
 
 const STATS = [
-  { value: '500+', label: 'Active Resellers' },
-  { value: '50+', label: 'Catalog Designs' },
+  { value: '50+', label: 'Active Resellers' },
+  { value: '90%', label: 'Repeat Clients' },
   { value: '7', label: 'Divisions Covered' },
-  { value: '৳500+', label: 'Min. Order Value' },
+  { value: '99%', label: 'Client Satisfaction' },
 ];
 
 const FEATURES = ['Stock: Cash on Delivery', 'Pre-Order: 70% Advance', 'MOQ: As Per Catalog'];
@@ -57,7 +57,7 @@ export function WholesaleBanner() {
                 View Catalog <ArrowRight className="h-4 w-4" strokeWidth={2} />
               </Link>
               <a
-                href="https://wa.me/"
+                href="https://wa.me/8801841654663"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-brand-accent/25 bg-brand-accent/[0.08] px-7 py-3 text-sm font-semibold text-white transition hover:bg-brand-accent/15"
@@ -78,7 +78,7 @@ export function WholesaleBanner() {
                 {STATS.map(({ value, label }) => (
                   <div
                     key={label}
-                    className="flex flex-col items-center rounded-xl bg-brand-accent/[0.07] px-4 py-5 ring-1 ring-brand-accent/10"
+                    className="flex flex-col items-center rounded-xl bg-brand-accent/[0.07] px-4 py-5 ring-1 ring-brand-accent/10 transition-all duration-300 hover:bg-brand-accent/[0.13] hover:ring-brand-accent/30 hover:shadow-lg hover:shadow-brand-accent/20"
                   >
                     <span className="font-serif text-2xl font-bold text-brand-gold">{value}</span>
                     <span className="mt-1 text-center text-xs leading-snug text-white/55">{label}</span>
@@ -86,7 +86,7 @@ export function WholesaleBanner() {
                 ))}
               </div>
               <p className="mt-4 text-center text-xs text-white/50">
-                Trusted by boutique owners across Bangladesh
+                  Built for Resellers, Boutiques &amp; Fashion Entrepreneurs
               </p>
             </div>
           </div>

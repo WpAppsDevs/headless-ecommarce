@@ -3,7 +3,7 @@ export function WhatsAppCTA() {
     <section aria-label="WhatsApp contact" className="bg-brand-section py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <a
-          href="https://wa.me/"
+          href="https://wa.me/8801841654663"
           target="_blank"
           rel="noopener noreferrer"
           className="group flex flex-col items-center justify-between gap-4 rounded-2xl bg-[#25D366] px-8 py-6 transition hover:bg-[#1fb855] sm:flex-row"

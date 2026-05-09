@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { config } from '@/lib/config';
 import { Mail, Phone, HelpCircle, Truck, RefreshCcw, Phone as PhoneIcon, MapPin } from 'lucide-react';
@@ -97,13 +98,14 @@ export function Footer() {
 
             {/* Column 1 — Brand */}
             <div className="space-y-6 lg:pr-8">
-              <Link href="/" className="inline-flex items-center gap-3">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-accent text-lg font-black text-white shadow-sm">
-                  {config.siteName.charAt(0)}
-                </span>
-                <span className="text-xl font-black text-brand-text">
-                  Headless<span className="text-brand-accent">ECF</span>
-                </span>
+              <Link href="/" className="inline-flex items-center" aria-label="Najifa's Shop">
+                <Image
+                  src="/images/Najifa's Shop Logo.png"
+                  alt="Najifa's Shop"
+                  width={160}
+                  height={56}
+                  className="h-14 w-auto object-contain"
+                />
               </Link>
 
               <p className="max-w-xs text-sm leading-relaxed text-brand-text-muted">
@@ -139,11 +141,11 @@ export function Footer() {
               <div className="space-y-2.5">
                 <p className="flex items-center gap-2.5 text-sm text-brand-text-muted">
                   <Mail className="h-4 w-4 shrink-0 text-brand-accent" />
-                  support@headlessecf.com
+                  support@najifasshop.com
                 </p>
                 <p className="flex items-center gap-2.5 text-sm text-brand-text-muted">
                   <Phone className="h-4 w-4 shrink-0 text-brand-accent" />
-                  +880 1XXX-XXXXXX
+                  +880 1841-654663
                 </p>
               </div>
             </div>

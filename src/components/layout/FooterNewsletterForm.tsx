@@ -7,14 +7,30 @@ export function FooterNewsletterForm() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim()) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setSubmitted(true);
-    setLoading(false);
+    setError('');
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok || data?.alreadySubscribed) {
+        setSubmitted(true);
+      } else {
+        setError(data?.error ?? 'Something went wrong. Please try again.');
+      }
+    } catch {
+      setError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (submitted) {
@@ -57,6 +73,9 @@ export function FooterNewsletterForm() {
           )}
         </button>
       </div>
+      {error && (
+        <p className="text-xs font-medium text-rose-500">{error}</p>
+      )}
       <p className="flex items-center gap-2 text-xs text-brand-text-muted">
         <Lock className="h-3.5 w-3.5 shrink-0" />
         We respect your privacy. Unsubscribe at any time.
@@ -64,3 +83,4 @@ export function FooterNewsletterForm() {
     </form>
   );
 }
+
