@@ -59,7 +59,7 @@ export function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((s) => s.addItem);
   const setCartDrawerOpen = useCartStore((s) => s.setCartDrawerOpen);
 
-  const allImages = product.images.slice(0, 3);
+  const allImages = (Array.isArray(product.images) ? product.images : []).slice(0, 3);
   const image = allImages[0];
   const isOnSale =
     product.on_sale && product.sale_price && product.sale_price !== product.regular_price;
@@ -103,7 +103,7 @@ export function ProductCard({ product }: { product: Product }) {
         {allImages.length > 0 ? allImages.map((img, i) => (
           <Image
             key={i}
-            src={img?.src ?? PLACEHOLDER}
+            src={img?.src || PLACEHOLDER}
             alt={i === 0 ? (img?.alt ?? product.name) : ''}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"

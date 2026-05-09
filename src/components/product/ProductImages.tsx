@@ -16,47 +16,63 @@ interface Props {
 
 export function ProductImages({ images, name, isOnSale }: Props) {
   const [active, setActive] = useState(0);
-  const src = images[active]?.src || PLACEHOLDER;
-  const alt = images[active]?.alt || name;
+  // Track which images have failed to load so we can fall back to placeholder
+  const [failedIndices, setFailedIndices] = useState<Set<number>>(new Set());
+
+  const validImages = Array.isArray(images) ? images : [];
+  const activeSrc =
+    failedIndices.has(active) || !validImages[active]?.src
+      ? PLACEHOLDER
+      : validImages[active].src;
+  const activeAlt = validImages[active]?.alt || name;
+
+  function handleError(index: number) {
+    setFailedIndices((prev) => new Set(prev).add(index));
+  }
 
   return (
     <div className="flex flex-col-reverse gap-3 lg:flex-row">
       {/* Thumbnail strip — horizontal on mobile, vertical on desktop */}
-      {images.length > 1 && (
+      {validImages.length > 1 && (
         <div className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-y-auto lg:overflow-x-visible lg:pb-0">
-          {images.map((img, i) => (
-            <button
-              key={img.id}
-              onClick={() => setActive(i)}
-              aria-label={img.alt || `Image ${i + 1}`}
-              className={cn(
-                'relative h-16 w-16 lg:h-20 lg:w-20 shrink-0 overflow-hidden rounded-xl border-2 transition-all',
-                active === i
-                  ? 'border-zinc-900 opacity-100'
-                  : 'border-transparent opacity-50 hover:opacity-80',
-              )}
-            >
-              <Image
-                src={img.src || PLACEHOLDER}
-                alt={img.alt}
-                fill
-                className="object-cover"
-                sizes="80px"
-              />
-            </button>
-          ))}
+          {validImages.map((img, i) => {
+            const thumbSrc = failedIndices.has(i) || !img.src ? PLACEHOLDER : img.src;
+            return (
+              <button
+                key={img.id ?? i}
+                onClick={() => setActive(i)}
+                aria-label={img.alt || `Image ${i + 1}`}
+                className={cn(
+                  'relative h-16 w-16 lg:h-20 lg:w-20 shrink-0 overflow-hidden rounded-xl border-2 transition-all',
+                  active === i
+                    ? 'border-zinc-900 opacity-100'
+                    : 'border-transparent opacity-50 hover:opacity-80',
+                )}
+              >
+                <Image
+                  src={thumbSrc}
+                  alt={img.alt}
+                  fill
+                  className="object-cover"
+                  sizes="80px"
+                  onError={() => handleError(i)}
+                />
+              </button>
+            );
+          })}
         </div>
       )}
 
       {/* Main image */}
       <div className="group relative aspect-[4/5] min-w-0 flex-1 overflow-hidden rounded-2xl bg-zinc-100">
         <Image
-          src={src}
-          alt={alt}
+          src={activeSrc}
+          alt={activeAlt}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-105"
           priority
           sizes="(max-width: 1024px) 100vw, 50vw"
+          onError={() => handleError(active)}
         />
         {isOnSale && (
           <div className="absolute left-3 top-3">

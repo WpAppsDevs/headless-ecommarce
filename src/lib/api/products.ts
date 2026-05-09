@@ -174,7 +174,16 @@ export async function getProducts(params: {
     `${base()}/products?${qs}`,
     { next: { revalidate: 60 } },
   );
-  return { items: Array.isArray(json.data) ? json.data : [], meta: json.meta };
+  // Normalize per-product array fields — the API may return `{}` instead of
+  // `[]` for empty collections (e.g. images, categories) on some products.
+  const items = (Array.isArray(json.data) ? json.data : []).map((p) => ({
+    ...p,
+    images: Array.isArray(p.images) ? p.images : [],
+    categories: Array.isArray(p.categories) ? p.categories : [],
+    attributes: Array.isArray(p.attributes) ? p.attributes : [],
+    variations: Array.isArray(p.variations) ? p.variations : [],
+  }));
+  return { items, meta: json.meta };
 }
 
 export async function getProduct(slug: string): Promise<Product> {

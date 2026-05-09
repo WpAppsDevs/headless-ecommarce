@@ -49,7 +49,7 @@ export function PreOrderSteps() {
           {STEPS.map(({ step, icon: Icon, title, desc }) => (
             <div
               key={step}
-              className="relative overflow-hidden rounded-2xl border border-brand-accent/10 bg-brand-accent/[0.06] p-6"
+              className="group relative overflow-hidden rounded-2xl border border-brand-accent/10 bg-brand-accent/[0.06] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-brand-accent/30 hover:bg-brand-accent/[0.10] hover:shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
             >
               {/* Ghost step number — decorative */}
               <span
@@ -60,7 +60,7 @@ export function PreOrderSteps() {
               </span>
 
               {/* Icon */}
-              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-accent/20">
+              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-accent/20 transition-colors duration-300 group-hover:bg-brand-accent/30">
                 <Icon className="h-5 w-5 text-brand-accent" strokeWidth={1.5} />
               </div>
 
