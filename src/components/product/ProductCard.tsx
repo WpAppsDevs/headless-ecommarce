@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart, ShoppingBag } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cartStore';
+import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import type { Product } from '@/lib/api/products';
 
 const PLACEHOLDER =
@@ -53,7 +54,6 @@ function StarRating({ score = 4.5, count = 0 }: { score?: number; count?: number
 // ── Main Card ────────────────────────────────────────────────────────────────
 export function ProductCard({ product }: { product: Product }) {
   const [qty, setQty] = useState(1);
-  const [wished, setWished] = useState(false);
   const [adding, setAdding] = useState(false);
   const [activeImg, setActiveImg] = useState(0);
   const addItem = useCartStore((s) => s.addItem);
@@ -164,20 +164,7 @@ export function ProductCard({ product }: { product: Product }) {
       </Link>
 
       {/* Wishlist button — always visible, positioned over image top-right */}
-      <button
-        type="button"
-        onClick={() => setWished((w) => !w)}
-        aria-label={wished ? 'Remove from wishlist' : 'Add to wishlist'}
-        aria-pressed={wished}
-        className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md transition-transform duration-200 hover:scale-110"
-      >
-        <Heart
-          className={cn(
-            'h-4 w-4 transition-colors duration-200',
-            wished ? 'fill-brand-wine text-brand-wine' : 'text-zinc-400',
-          )}
-        />
-      </button>
+      <WishlistButton productId={product.id} productName={product.name} variant="card" />
 
       {/* ── Content area ───────────────────────────────────────────────────── */}
       <div className="flex flex-1 flex-col gap-2 p-3 sm:p-4">

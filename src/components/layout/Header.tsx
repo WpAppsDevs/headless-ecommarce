@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
-import { ShoppingCart, Menu, X, Search, User } from 'lucide-react';
+import { ShoppingCart, Menu, X, Search, User, Heart } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/sheet';
 import { useAuthStore } from '@/stores/authStore';
 import { useCartStore } from '@/stores/cartStore';
+import { useWishlistStore } from '@/stores/wishlistStore';
 import { cn } from '@/lib/utils';
 
 const NAV_LINKS = [
@@ -172,6 +173,7 @@ export function Header() {
   const accountRef = useRef<HTMLDivElement>(null);
   const itemCount = useCartStore((s) => s.items.length);
   const setCartDrawerOpen = useCartStore((s) => s.setCartDrawerOpen);
+  const wishlistCount = useWishlistStore((s) => s.count);
 
   // Close account dropdown on outside click
   useEffect(() => {
@@ -225,6 +227,20 @@ export function Header() {
             )}
           </div>
 
+          {/* Wishlist */}
+          <Link
+            href="/wishlist"
+            aria-label={`Wishlist — ${wishlistCount} items`}
+            className="relative flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900"
+          >
+            <Heart className="h-[19px] w-[19px]" strokeWidth={1.8} />
+            {wishlistCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
+                {wishlistCount > 99 ? '99+' : wishlistCount}
+              </span>
+            )}
+          </Link>
+
           {/* Cart */}
           <button
             onClick={() => setCartDrawerOpen(true)}
@@ -247,6 +263,19 @@ export function Header() {
           >
             <Search className="h-5 w-5" strokeWidth={1.8} />
           </button>
+
+          <Link
+            href="/wishlist"
+            aria-label={`Wishlist — ${wishlistCount} items`}
+            className="relative flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-50"
+          >
+            <Heart className="h-5 w-5" strokeWidth={1.8} />
+            {wishlistCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
+                {wishlistCount > 99 ? '99+' : wishlistCount}
+              </span>
+            )}
+          </Link>
 
           <button
             onClick={() => setCartDrawerOpen(true)}
@@ -282,6 +311,23 @@ export function Header() {
                 <nav className="flex flex-col gap-4" aria-label="Mobile navigation">
                   <MobileNavLinks onClick={() => setMobileOpen(false)} />
                 </nav>
+                <hr className="border-zinc-100" />
+                <div>
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-400">My Lists</p>
+                  <Link
+                    href="/wishlist"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-2 text-sm font-medium text-zinc-700 hover:text-zinc-900 transition-colors"
+                  >
+                    <Heart className="h-4 w-4 text-brand-wine" />
+                    Wishlist
+                    {wishlistCount > 0 && (
+                      <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-wine px-1 text-[10px] font-bold text-white">
+                        {wishlistCount}
+                      </span>
+                    )}
+                  </Link>
+                </div>
                 <hr className="border-zinc-100" />
                 <div>
                   <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-400">Account</p>

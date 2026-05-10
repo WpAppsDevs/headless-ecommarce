@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { tokenCache, setOnUnauthorized } from '@/lib/api/client';
 import { useCartStore } from '@/stores/cartStore';
+import { useWishlistStore } from '@/stores/wishlistStore';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -87,8 +88,9 @@ export const useAuthStore = create<AuthState>((set, get) => {
         // Guest cart was merged into the user cart on login
         clearGuestToken();
         set({ user: json.data.user, isAuthenticated: true, loading: false });
-        // Refresh cart to reflect the server-side merged state
+        // Refresh cart and sync guest wishlist to server in parallel
         void useCartStore.getState().fetchCart();
+        void useWishlistStore.getState().syncGuestWishlist();
       } catch (e) {
         set({ loading: false });
         throw e;
@@ -113,6 +115,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
         clearGuestToken();
         set({ user: json.data.user, isAuthenticated: true, loading: false });
         void useCartStore.getState().fetchCart();
+        void useWishlistStore.getState().syncGuestWishlist();
       } catch (e) {
         set({ loading: false });
         throw e;

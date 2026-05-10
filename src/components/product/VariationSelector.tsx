@@ -1,10 +1,11 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Loader2, ShoppingCart, CheckCircle2, Heart, Minus, Plus, Truck, RotateCcw } from 'lucide-react';
+import { Loader2, ShoppingCart, CheckCircle2, Minus, Plus, Truck, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cartStore';
+import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import type { Product, ProductVariation } from '@/lib/api/products';
 
 // ---------------------------------------------------------------------------
@@ -63,7 +64,6 @@ export function VariationSelector({ product }: { product: Product }) {
   const [selected, setSelected] = useState<Record<string, string>>({});
   const [added, setAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const [wishlisted, setWishlisted] = useState(false);
 
   const attrKeys = useMemo(() => {
     const keys = new Set<string>();
@@ -270,18 +270,11 @@ export function VariationSelector({ product }: { product: Product }) {
           )}
         </Button>
 
-        <button
-          aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-          onClick={() => setWishlisted((w) => !w)}
-          className={cn(
-            'flex h-[52px] w-[52px] items-center justify-center rounded-xl border-2 transition-colors',
-            wishlisted
-              ? 'border-rose-500 bg-rose-50 text-rose-500'
-              : 'border-zinc-200 text-zinc-400 hover:border-zinc-300',
-          )}
-        >
-          <Heart className="h-5 w-5" fill={wishlisted ? 'currentColor' : 'none'} />
-        </button>
+        <WishlistButton
+          productId={product.id}
+          productName={product.name}
+          variant="detail"
+        />
       </div>
 
       {/* 6. Delivery strip */}
