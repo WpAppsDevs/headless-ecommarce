@@ -8,12 +8,14 @@ import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cartStore';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import type { Product } from '@/lib/api/products';
+import { useFormatPrice } from '@/lib/utils/currency';
 
 const PLACEHOLDER =
   'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22%3E%3Crect width=%22400%22 height=%22500%22 fill=%22%23FBF7F5%22/%3E%3C/svg%3E';
 
 const MAROON = '#5C1A22';
 const MAROON_DARK = '#4A1119';
+const fmt          = useFormatPrice();
 
 // ── Star Rating ──────────────────────────────────────────────────────────────
 function StarRating({ score = 4.5, count = 0 }: { score?: number; count?: number }) {
@@ -187,11 +189,11 @@ export function ProductCard({ product }: { product: Product }) {
         {/* Price */}
         <div className="flex items-baseline gap-2">
           <span className="text-lg font-bold sm:text-xl" style={{ color: MAROON }}>
-            ${displayPrice}
+            {fmt(Number(displayPrice))}
           </span>
           {isOnSale && product.regular_price && (
             <span className="text-xs text-brand-text-muted line-through">
-              ${product.regular_price}
+              {fmt(Number(product.regular_price))}
             </span>
           )}
         </div>
