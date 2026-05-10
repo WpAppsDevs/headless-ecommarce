@@ -81,6 +81,15 @@ export interface PaginationMeta {
 // Internal raw types (API shape before normalization)
 // ---------------------------------------------------------------------------
 
+/** Raw image shape — API may return `src` OR `url` depending on plugin version. */
+interface RawImage {
+  id: number;
+  src?: string;
+  url?: string;
+  alt?: string;
+  [key: string]: unknown;
+}
+
 interface RawVariationAttribute {
   id: number;
   name: string;
@@ -97,7 +106,7 @@ interface RawVariation {
   stock_status: string;
   stock_quantity: number | null;
   manage_stock: boolean;
-  image: { id: number; src: string; name: string; alt: string } | null;
+  image: { id: number; src?: string; url?: string; name: string; alt: string } | null;
   attributes: RawVariationAttribute[];
 }
 
@@ -106,6 +115,18 @@ interface RawVariation {
 // ---------------------------------------------------------------------------
 
 const base = () => `${config.apiBase}/${config.productsNs}`;
+
+/**
+ * Normalizes a raw image object so `src` is always populated.
+ * The API may return either `src` or `url` depending on the plugin version.
+ */
+function normalizeImage(raw: RawImage): ProductImage {
+  return {
+    id: raw.id ?? 0,
+    src: raw.src || raw.url || '',
+    alt: raw.alt ?? '',
+  };
+}
 
 async function wpFetch<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, init);
@@ -145,7 +166,7 @@ function normalizeVariation(
     stock_quantity: raw.stock_quantity ?? null,
     manage_stock: raw.manage_stock ?? false,
     attributes,
-    image: raw.image?.src ?? '',
+    image: raw.image?.src || raw.image?.url || '',
   };
 }
 
@@ -176,9 +197,13 @@ export async function getProducts(params: {
   );
   // Normalize per-product array fields — the API may return `{}` instead of
   // `[]` for empty collections (e.g. images, categories) on some products.
+  // Also normalize images: the API may return `url` instead of `src` depending
+  // on the plugin version, so we always ensure `src` is populated.
   const items = (Array.isArray(json.data) ? json.data : []).map((p) => ({
     ...p,
-    images: Array.isArray(p.images) ? p.images : [],
+    images: (Array.isArray(p.images) ? p.images : []).map((img) =>
+      normalizeImage(img as RawImage),
+    ),
     categories: Array.isArray(p.categories) ? p.categories : [],
     attributes: Array.isArray(p.attributes) ? p.attributes : [],
     variations: Array.isArray(p.variations) ? p.variations : [],
@@ -213,7 +238,9 @@ export async function getProduct(slug: string): Promise<Product> {
   return {
     ...raw,
     categories: Array.isArray(raw.categories) ? raw.categories : [],
-    images: Array.isArray(raw.images) ? raw.images : [],
+    images: (Array.isArray(raw.images) ? raw.images : []).map((img) =>
+      normalizeImage(img as RawImage),
+    ),
     attributes: Array.isArray(raw.attributes) ? raw.attributes : [],
     variations,
   } as Product;
