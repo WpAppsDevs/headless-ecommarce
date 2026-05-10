@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ChevronRight, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ProductCategory } from '@/lib/api/products';
+import { useFormatPrice } from '@/lib/utils/currency';
 
 interface ShopSidebarProps {
   categories: ProductCategory[];
@@ -86,6 +87,7 @@ export function ShopSidebar({
   activeFilterCount,
   currentSearch,
 }: ShopSidebarProps) {
+  const fmt = useFormatPrice();
   return (
     <aside className="space-y-7">
       {/* Categories */}
@@ -249,7 +251,7 @@ export function ShopSidebar({
           </div>
         </div>
         <p className="text-xs text-zinc-400">
-          ${activePriceRange[0]} – ${activePriceRange[1]}
+          {fmt(activePriceRange[0])} – {fmt(activePriceRange[1])}
         </p>
       </div>
       <hr className="border-zinc-100" />

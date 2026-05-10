@@ -4,6 +4,7 @@ import { Hourglass, PackageX, Package } from 'lucide-react';
 import type { Order } from '@/lib/api/orders';
 import type { UserProfile } from '@/lib/api/checkout';
 import { StatsCard } from './StatsCard';
+import { useFormatPrice } from '@/lib/utils/currency';
 
 interface DashboardProps {
   profile: UserProfile | null;
@@ -30,6 +31,7 @@ export function Dashboard({ orders }: DashboardProps) {
   const awaitingPickup  = orders.filter(o => ['pending', 'processing', 'on-hold'].includes(o.status)).length;
   const cancelledOrders = orders.filter(o => o.status === 'cancelled').length;
   const recentOrders    = orders.slice(0, 6);
+  const fmt             = useFormatPrice();
 
   return (
     <div className="space-y-6">
@@ -81,7 +83,7 @@ export function Dashboard({ orders }: DashboardProps) {
                           <span className="text-zinc-400">—</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-zinc-700">${Number(order.total).toFixed(2)}</td>
+                      <td className="px-6 py-4 text-zinc-700">{fmt(Number(order.total))}</td>
                       <td className="px-6 py-4">
                         <span className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${badgeClass}`}>
                           {STATUS_LABELS[order.status] ?? order.status}

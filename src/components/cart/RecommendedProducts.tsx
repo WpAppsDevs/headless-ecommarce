@@ -4,11 +4,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCartStore } from '@/stores/cartStore';
 import type { Product } from '@/lib/api/products';
+import { useFormatPrice } from '@/lib/utils/currency';
 
 const SIZES = ['S', 'M', 'L', 'XL'];
 
 function ProductCard({ product }: { product: Product }) {
   const { addItem, loading } = useCartStore();
+  const fmt = useFormatPrice();
   const image = product.images[0];
   const isOnSale =
     product.on_sale &&
@@ -85,13 +87,13 @@ function ProductCard({ product }: { product: Product }) {
         <div className="flex items-baseline gap-2">
           {isOnSale ? (
             <>
-              <span className="text-sm font-bold text-zinc-900">${product.sale_price}</span>
+              <span className="text-sm font-bold text-zinc-900">{fmt(product.sale_price)}</span>
               <span className="text-xs font-medium text-zinc-400 line-through">
-                ${product.regular_price}
+                {fmt(product.regular_price)}
               </span>
             </>
           ) : (
-            <span className="text-sm font-bold text-zinc-900">${product.price}</span>
+            <span className="text-sm font-bold text-zinc-900">{fmt(product.price)}</span>
           )}
         </div>
       </div>

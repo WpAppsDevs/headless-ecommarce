@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cartStore';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
+import { useFormatPrice } from '@/lib/utils/currency';
 import type { Product, ProductVariation } from '@/lib/api/products';
 
 // ---------------------------------------------------------------------------
@@ -60,6 +61,7 @@ export function VariationSelector({ product }: { product: Product }) {
   const addItem = useCartStore((s) => s.addItem);
   const loading = useCartStore((s) => s.loading);
   const cartError = useCartStore((s) => s.error);
+  const fmt = useFormatPrice();
 
   const [selected, setSelected] = useState<Record<string, string>>({});
   const [added, setAdded] = useState(false);
@@ -124,10 +126,10 @@ export function VariationSelector({ product }: { product: Product }) {
     <div className="flex flex-col gap-6">
       {/* 1. Price block */}
       <div className="flex items-baseline gap-3">
-        <span className="text-3xl font-bold text-zinc-900">${displayPrice}</span>
+        <span className="text-3xl font-bold text-zinc-900">{fmt(displayPrice)}</span>
         {isOnSale && displayRegularPrice && (
           <>
-            <span className="text-lg text-zinc-400 line-through">${displayRegularPrice}</span>
+            <span className="text-lg text-zinc-400 line-through">{fmt(displayRegularPrice)}</span>
             {savePercent > 0 && (
               <span className="rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-semibold text-rose-600">
                 Save {savePercent}%

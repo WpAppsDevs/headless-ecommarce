@@ -3,6 +3,7 @@
 import { type ReactNode } from 'react';
 import { X, Home, Printer, Download, RotateCcw, Check } from 'lucide-react';
 import type { Order } from '@/lib/api/orders';
+import { useFormatPrice } from '@/lib/utils/currency';
 
 // ── Status config ────────────────────────────────────────────────────────────
 
@@ -110,6 +111,7 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
   const discount     = Number(order.discount_total ?? 0);
   const shippingCost = Number(order.shipping_total ?? 0);
   const subtotalMrp  = total + discount - shippingCost;
+  const fmt          = useFormatPrice();
 
   const b = order.billing;
   const s = order.shipping;
@@ -167,7 +169,7 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
                     <div className="shrink-0 space-y-0.5 text-right text-[12px]">
                       <div className="flex justify-between gap-6 text-zinc-500">
                         <span>Price:</span>
-                        <span className="font-medium text-zinc-700">${unitPrice.toFixed(2)}</span>
+                        <span className="font-medium text-zinc-700">{fmt(unitPrice)}</span>
                       </div>
                       <div className="flex justify-between gap-6 text-zinc-500">
                         <span>Qty:</span>
@@ -175,7 +177,7 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
                       </div>
                       <div className="flex justify-between gap-6 text-zinc-500">
                         <span>Total:</span>
-                        <span className="font-semibold text-zinc-900">${Number(item.total).toFixed(2)}</span>
+                        <span className="font-semibold text-zinc-900">{fmt(Number(item.total))}</span>
                       </div>
                     </div>
                   </div>
@@ -184,7 +186,7 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
             </div>
             <div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-4">
               <span className="text-[13px] font-semibold text-zinc-700">Total Amount:</span>
-              <span className="text-[15px] font-bold text-brand-wine">${total.toFixed(2)}</span>
+              <span className="text-[15px] font-bold text-brand-wine">{fmt(total)}</span>
             </div>
           </SectionCard>
 
@@ -290,23 +292,23 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
               </div>
               <div className="flex justify-between text-[13px] text-zinc-600">
                 <span>Subtotal (MRP):</span>
-                <span className="font-medium text-zinc-800">${subtotalMrp.toFixed(2)}</span>
+                <span className="font-medium text-zinc-800">{fmt(subtotalMrp)}</span>
               </div>
               {discount > 0 && (
                 <div className="flex justify-between text-[13px] text-zinc-600">
                   <span>Discount applied:</span>
-                  <span className="font-medium text-[#E57373]">-${discount.toFixed(2)}</span>
+                  <span className="font-medium text-[#E57373]">-{fmt(discount)}</span>
                 </div>
               )}
               <div className="flex justify-between text-[13px] text-zinc-600">
                 <span>Delivery Charge:</span>
                 <span className={`font-medium ${shippingCost === 0 ? 'text-[#7BAE7F]' : 'text-zinc-800'}`}>
-                  {shippingCost === 0 ? 'Free' : `$${shippingCost.toFixed(2)}`}
+                  {shippingCost === 0 ? 'Free' : fmt(shippingCost)}
                 </span>
               </div>
               <div className="flex items-center justify-between border-t border-zinc-100 pt-4">
                 <span className="text-[14px] font-bold text-zinc-900">Amount Paid</span>
-                <span className="text-[16px] font-bold text-brand-wine">${total.toFixed(2)}</span>
+                <span className="text-[16px] font-bold text-brand-wine">{fmt(total)}</span>
               </div>
             </div>
           </div>

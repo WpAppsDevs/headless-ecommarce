@@ -7,6 +7,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useCartStore } from '@/stores/cartStore';
 import { CartItem } from './CartItem';
 import { FreeShippingBar } from './FreeShippingBar';
+import { useFormatPrice } from '@/lib/utils/currency';
 
 type ActionPanel = 'note' | 'shipping' | 'coupon' | null;
 
@@ -20,6 +21,7 @@ export function CartDrawer() {
     0,
   );
   const totalQty = items.reduce((s, i) => s + Number(i.quantity), 0);
+  const fmt = useFormatPrice();
 
   const togglePanel = (panel: Exclude<ActionPanel, null>) =>
     setActivePanel((prev) => (prev === panel ? null : panel));
@@ -145,7 +147,7 @@ export function CartDrawer() {
             <div className="shrink-0 border-t px-5 py-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-zinc-900">Subtotal</span>
-                <span className="text-sm font-bold text-zinc-900">${subtotal.toFixed(2)}</span>
+                <span className="text-sm font-bold text-zinc-900">{fmt(subtotal)}</span>
               </div>
             </div>
 

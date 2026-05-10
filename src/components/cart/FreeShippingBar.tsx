@@ -1,5 +1,7 @@
 'use client';
 
+import { useFormatPrice } from '@/lib/utils/currency';
+
 interface Props {
   total: number;
   threshold?: number;
@@ -9,6 +11,7 @@ export function FreeShippingBar({ total, threshold = 100 }: Props) {
   const progress = Math.min((total / threshold) * 100, 100);
   const remaining = Math.max(threshold - total, 0);
   const isFree = total >= threshold;
+  const fmt = useFormatPrice();
 
   return (
     <div className="space-y-2.5">
@@ -20,7 +23,7 @@ export function FreeShippingBar({ total, threshold = 100 }: Props) {
         ) : (
           <>
             Buy{' '}
-            <span className="font-semibold text-rose-500">${remaining.toFixed(2)}</span>
+            <span className="font-semibold text-rose-500">{fmt(remaining)}</span>
             {' '}more to get{' '}
             <span className="font-semibold text-zinc-900">Freeship</span>
           </>

@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { AuthHydrator } from "@/components/layout/AuthHydrator";
 import { CartHydrator } from "@/components/layout/CartHydrator";
 import { WishlistHydrator } from "@/components/layout/WishlistHydrator";
+import { CurrencyHydrator } from "@/components/layout/CurrencyHydrator";
 import { Toaster } from "sonner";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { config } from "@/lib/config";
@@ -46,6 +47,7 @@ export default function RootLayout({
         <AuthHydrator />
         <CartHydrator />
         <WishlistHydrator />
+        <CurrencyHydrator />
         <AnnouncementBar />
         <Header />
         <CartDrawer />

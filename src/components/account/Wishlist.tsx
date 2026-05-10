@@ -8,6 +8,7 @@ import { useWishlistStore } from '@/stores/wishlistStore';
 import { apiGetWishlist } from '@/lib/api/wishlist';
 import { ApiError } from '@/lib/errors';
 import type { Product } from '@/lib/api/products';
+import { useFormatPrice } from '@/lib/utils/currency';
 
 const PLACEHOLDER =
   'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22%3E%3Crect width=%22400%22 height=%22500%22 fill=%22%23FBF7F5%22/%3E%3C/svg%3E';
@@ -19,6 +20,7 @@ const PLACEHOLDER =
 function WishlistProductCard({ product, onRemove }: { product: Product; onRemove: () => void }) {
   const image = product.images[0];
   const price = product.sale_price || product.price;
+  const fmt = useFormatPrice();
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-brand-border bg-white shadow-sm transition-shadow hover:shadow-md">
@@ -58,7 +60,7 @@ function WishlistProductCard({ product, onRemove }: { product: Product; onRemove
         )}
 
         <div className="mt-auto flex items-center justify-between pt-2">
-          <span className="text-base font-bold text-brand-wine">${price}</span>
+          <span className="text-base font-bold text-brand-wine">{fmt(price)}</span>
           <Link
             href={`/products/${product.slug}`}
             className="flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-zinc-700"

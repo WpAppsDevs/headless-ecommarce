@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/stores/cartStore';
+import { useFormatPrice } from '@/lib/utils/currency';
 
 type ShippingOption = 'free' | 'local' | 'flat';
 
@@ -22,6 +23,7 @@ export function CartSummary() {
   );
   const [shipping, setShipping] = useState<ShippingOption>('free');
   const [agreed, setAgreed] = useState(false);
+  const fmt = useFormatPrice();
 
   const shippingCost = SHIPPING_OPTIONS.find((o) => o.id === shipping)?.price ?? 0;
 
@@ -32,7 +34,7 @@ export function CartSummary() {
       {/* Subtotal */}
       <div className="flex items-center justify-between text-sm">
         <span className="font-medium text-zinc-600">Subtotal</span>
-        <span className="font-semibold text-zinc-900">${subtotal.toFixed(2)}</span>
+        <span className="font-semibold text-zinc-900">{fmt(subtotal)}</span>
       </div>
 
       {/* Discounts */}
@@ -64,7 +66,7 @@ export function CartSummary() {
                 <span className="text-sm text-zinc-700">{opt.label}</span>
               </div>
               <span className="text-sm font-semibold text-zinc-900">
-                ${opt.price.toFixed(2)}
+                {fmt(opt.price)}
               </span>
             </label>
           ))}
@@ -77,7 +79,7 @@ export function CartSummary() {
       <div className="flex items-center justify-between">
         <span className="text-base font-bold text-zinc-900">Total</span>
         <span className="text-base font-bold text-zinc-900">
-          ${(subtotal + shippingCost).toFixed(2)}
+          {fmt(subtotal + shippingCost)}
         </span>
       </div>
 

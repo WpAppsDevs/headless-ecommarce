@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Minus, Plus, X } from 'lucide-react';
 import { useCartStore } from '@/stores/cartStore';
 import type { CartItem } from '@/lib/api/cart';
+import { useFormatPrice } from '@/lib/utils/currency';
 
 interface Props {
   item: CartItem;
@@ -24,6 +25,7 @@ export function CartItemRow({ item }: Props) {
   const { attributes } = parseMeta(item.meta);
   const productName = item.product_name ? String(item.product_name) : `Product #${item.product_id}`;
   const imageUrl = item.product_image ? String(item.product_image) : null;
+  const fmt = useFormatPrice();
 
   const attrEntries = Object.entries(attributes).map(([k, v]) => ({
     label: k.replace(/^pa_/, '').replace(/_/g, ' '),
@@ -77,7 +79,7 @@ export function CartItemRow({ item }: Props) {
 
       {/* Price — unit price */}
       <td className="py-5 pr-4 text-sm font-medium text-zinc-900 whitespace-nowrap">
-        ${parseFloat(item.price || '0').toFixed(2)}
+        {fmt(parseFloat(item.price || '0'))}
       </td>
 
       {/* Quantity stepper */}
