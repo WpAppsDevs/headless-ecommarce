@@ -5,6 +5,8 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AuthHydrator } from "@/components/layout/AuthHydrator";
 import { CartHydrator } from "@/components/layout/CartHydrator";
+import { WishlistHydrator } from "@/components/layout/WishlistHydrator";
+import { Toaster } from "sonner";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { config } from "@/lib/config";
 import { AnnouncementBar } from "@/components/home/AnnouncementBar";
@@ -43,9 +45,11 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <AuthHydrator />
         <CartHydrator />
+        <WishlistHydrator />
         <AnnouncementBar />
         <Header />
         <CartDrawer />
+        <Toaster richColors position="top-right" />
         <main className="flex-1">{children}</main>
         <Footer />
       </body>
