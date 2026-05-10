@@ -1,5 +1,4 @@
-import { apiClient, tokenCache } from './client';
-import { config } from '@/lib/config';
+import { tokenCache } from './client';
 import { ApiError } from '@/lib/errors';
 import type { Product, PaginationMeta } from './products';
 
@@ -37,9 +36,6 @@ export interface WishlistListResult {
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Wishlist endpoints live under the 'api' namespace, not 'wpadhlwrapi/v1'. */
-const ns = config.apiNs; // 'api'
-
 /** Normalize raw image objects (API may return url instead of src). */
 function normalizeImage(img: Record<string, unknown>) {
   return {
@@ -49,56 +45,76 @@ function normalizeImage(img: Record<string, unknown>) {
   };
 }
 
+/** Build auth header from in-memory tokenCache. */
+function authHeader(): Record<string, string> {
+  const token = tokenCache.get();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 // ---------------------------------------------------------------------------
-// API functions
+// API functions — all call Next.js proxy routes (/api/wishlist/*)
+// to avoid CORS issues with the WordPress API.
 // ---------------------------------------------------------------------------
 
 /**
- * POST /wp-json/api/wishlist
+ * POST /api/wishlist
  * Toggles the wishlist state: adds if absent, removes if present.
  */
 export async function apiToggleWishlist(productId: number): Promise<WishlistToggleResult> {
-  return apiClient<WishlistToggleResult>(`${ns}/wishlist`, {
+  const res = await fetch('/api/wishlist', {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeader() },
     body: JSON.stringify({ product_id: productId }),
   });
+  const json = await res.json();
+  if (!res.ok || json?.success === false) {
+    throw new ApiError(json?.code ?? 'api_error', json?.message ?? `HTTP ${res.status}`);
+  }
+  return (json?.data ?? json) as WishlistToggleResult;
 }
 
 /**
- * DELETE /wp-json/api/wishlist/{product_id}
+ * DELETE /api/wishlist/{product_id}
  * Idempotent remove — HTTP 200 even if product was not in the wishlist.
  */
 export async function apiRemoveFromWishlist(productId: number): Promise<WishlistRemoveResult> {
-  return apiClient<WishlistRemoveResult>(`${ns}/wishlist/${productId}`, {
+  const res = await fetch(`/api/wishlist/${productId}`, {
     method: 'DELETE',
+    headers: { 'Content-Type': 'application/json', ...authHeader() },
   });
+  const json = await res.json();
+  if (!res.ok || json?.success === false) {
+    throw new ApiError(json?.code ?? 'api_error', json?.message ?? `HTTP ${res.status}`);
+  }
+  return (json?.data ?? json) as WishlistRemoveResult;
 }
 
 /**
- * GET /wp-json/api/wishlist/check/{product_id}
+ * GET /api/wishlist/check/{product_id}
  * Lightweight status check with no product data fetch.
  */
 export async function apiCheckWishlist(productId: number): Promise<WishlistCheckResult> {
-  return apiClient<WishlistCheckResult>(`${ns}/wishlist/check/${productId}`);
+  const res = await fetch(`/api/wishlist/check/${productId}`, {
+    headers: { 'Content-Type': 'application/json', ...authHeader() },
+    cache: 'no-store',
+  });
+  const json = await res.json();
+  if (!res.ok || json?.success === false) {
+    throw new ApiError(json?.code ?? 'api_error', json?.message ?? `HTTP ${res.status}`);
+  }
+  return (json?.data ?? json) as WishlistCheckResult;
 }
 
 /**
- * GET /wp-json/api/wishlist
+ * GET /api/wishlist?page=&per_page=
  * Returns full product objects with pagination meta.
- *
- * We fetch directly instead of going through apiClient because parseBody strips
- * the `meta` field by returning only `body.data`. Both `data` (products) and
- * `meta` (total count / pages) are needed here.
  */
 export async function apiGetWishlist(page = 1, per_page = 50): Promise<WishlistListResult> {
-  const token = tokenCache.get();
   const qs = new URLSearchParams({ page: String(page), per_page: String(per_page) });
 
-  const res = await fetch(`${config.apiBase}/${ns}/wishlist?${qs}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
+  const res = await fetch(`/api/wishlist?${qs}`, {
+    headers: { 'Content-Type': 'application/json', ...authHeader() },
+    cache: 'no-store',
   });
 
   const json = await res.json();
@@ -106,7 +122,6 @@ export async function apiGetWishlist(page = 1, per_page = 50): Promise<WishlistL
     throw new ApiError(json?.code ?? 'api_error', json?.message ?? `HTTP ${res.status}`);
   }
 
-  // Normalize image src/url field (same issue as products endpoint)
   const products: Product[] = (Array.isArray(json.data) ? json.data : []).map(
     (p: Record<string, unknown>) => ({
       ...p,
