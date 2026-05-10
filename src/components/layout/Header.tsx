@@ -229,7 +229,7 @@ export function Header() {
 
           {/* Wishlist */}
           <Link
-            href="/wishlist"
+            href="/account?tab=wishlist"
             aria-label={`Wishlist — ${wishlistCount} items`}
             className="relative flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900"
           >
@@ -265,7 +265,7 @@ export function Header() {
           </button>
 
           <Link
-            href="/wishlist"
+            href="/account?tab=wishlist"
             aria-label={`Wishlist — ${wishlistCount} items`}
             className="relative flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-50"
           >
@@ -315,7 +315,7 @@ export function Header() {
                 <div>
                   <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-400">My Lists</p>
                   <Link
-                    href="/wishlist"
+                    href="/account?tab=wishlist"
                     onClick={() => setMobileOpen(false)}
                     className="flex items-center gap-2 text-sm font-medium text-zinc-700 hover:text-zinc-900 transition-colors"
                   >
