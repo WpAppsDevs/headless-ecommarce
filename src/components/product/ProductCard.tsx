@@ -15,7 +15,6 @@ const PLACEHOLDER =
 
 const MAROON = '#5C1A22';
 const MAROON_DARK = '#4A1119';
-const fmt          = useFormatPrice();
 
 // ── Star Rating ──────────────────────────────────────────────────────────────
 function StarRating({ score = 4.5, count = 0 }: { score?: number; count?: number }) {
@@ -60,6 +59,7 @@ export function ProductCard({ product }: { product: Product }) {
   const [activeImg, setActiveImg] = useState(0);
   const addItem = useCartStore((s) => s.addItem);
   const setCartDrawerOpen = useCartStore((s) => s.setCartDrawerOpen);
+  const fmt = useFormatPrice();
 
   const allImages = (Array.isArray(product.images) ? product.images : []).slice(0, 3);
   const image = allImages[0];
