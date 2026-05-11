@@ -16,8 +16,13 @@ Currently:
 - Tags, Brands, Colors, Sizes are **hardcoded** in the frontend
 - Colors and Sizes do **not** filter the product list at all (no API support)
 
-These 3 new endpoints + 1 products endpoint update will make all filters fully
+These 4 new endpoints + 1 products endpoint update will make all filters fully
 dynamic from WooCommerce data.
+
+> **Brand taxonomy note:** Brands in this store are registered as the custom
+> taxonomy `product_brand` (not a WooCommerce product attribute). They behave
+> like Categories and Tags — `get_terms('product_brand')` — and **must not**
+> appear in the `product-attributes` endpoint.
 
 ---
 
@@ -200,14 +205,114 @@ function wpadhlwrapi_get_product_tags( WP_REST_Request $request ) {
 
 ---
 
-## Endpoint 3 — Product Attributes (Colors, Sizes, Brands)
+## Endpoint 3 — Product Brands
+
+```
+GET /wp-json/wpadhlwrapi/v1/product-brands
+```
+
+Returns **all** terms from the `product_brand` custom taxonomy.
+
+### Query Parameters
+
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `hide_empty` | boolean | `true` | Only brands with at least 1 product |
+| `per_page` | int | `100` | Max results |
+
+### Response Format
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 51,
+      "name": "Khaadi",
+      "slug": "khaadi",
+      "count": 6,
+      "image": "https://api.najifasshop.com/wp-content/uploads/khaadi-logo.jpg"
+    },
+    {
+      "id": 52,
+      "name": "Gul Ahmed",
+      "slug": "gul-ahmed",
+      "count": 4,
+      "image": null
+    }
+  ],
+  "meta": {
+    "total": 10
+  }
+}
+```
+
+> `image` is stored as term meta `thumbnail_id` (same pattern as `product_cat`).
+> Return `null` if no image is set.
+
+### PHP Implementation Notes
+
+```php
+register_rest_route('wpadhlwrapi/v1', '/product-brands', [
+    'methods'             => 'GET',
+    'callback'            => 'wpadhlwrapi_get_product_brands',
+    'permission_callback' => '__return_true',
+    'args' => [
+        'hide_empty' => [ 'default' => true, 'sanitize_callback' => 'rest_sanitize_boolean' ],
+        'per_page'   => [ 'default' => 100,  'sanitize_callback' => 'absint' ],
+    ],
+]);
+
+function wpadhlwrapi_get_product_brands( WP_REST_Request $request ) {
+    $cache_key = 'wpadhlwrapi_product-brands';
+    $cached    = get_transient( $cache_key );
+    if ( $cached !== false ) {
+        return rest_ensure_response( $cached );
+    }
+
+    $terms = get_terms([
+        'taxonomy'   => 'product_brand',  // custom taxonomy, NOT pa_brand attribute
+        'hide_empty' => $request['hide_empty'],
+        'number'     => $request['per_page'],
+        'orderby'    => 'name',
+        'order'      => 'ASC',
+    ]);
+    if ( is_wp_error( $terms ) ) {
+        return new WP_Error('fetch_error', $terms->get_error_message(), ['status' => 500]);
+    }
+    $data = array_map( function( $term ) {
+        $thumbnail_id = get_term_meta( $term->term_id, 'thumbnail_id', true );
+        $image        = $thumbnail_id ? wp_get_attachment_url( $thumbnail_id ) : null;
+        return [
+            'id'    => $term->term_id,
+            'name'  => $term->name,
+            'slug'  => $term->slug,
+            'count' => $term->count,
+            'image' => $image,
+        ];
+    }, $terms );
+
+    $response = [
+        'success' => true,
+        'data'    => $data,
+        'meta'    => [ 'total' => count( $data ) ],
+    ];
+    set_transient( $cache_key, $response, HOUR_IN_SECONDS * 6 );
+    return rest_ensure_response( $response );
+}
+```
+
+---
+
+## Endpoint 4 — Product Attributes (Colors, Sizes)
 
 ```
 GET /wp-json/wpadhlwrapi/v1/product-attributes
 ```
 
-Returns all WooCommerce product attribute terms grouped by attribute name.
-This powers the **Color**, **Size**, and **Brand** filters dynamically.
+Returns WooCommerce product attribute terms (e.g. Color, Size) grouped by
+attribute. **Brands are excluded** — they use the `product_brand` taxonomy
+and are served by `/product-brands` above.
 
 ### Query Parameters
 
@@ -238,23 +343,17 @@ None required. Returns all attributes and their terms.
         { "id": 22, "name": "L",  "slug": "l",  "count": 12 },
         { "id": 23, "name": "XL", "slug": "xl", "count": 9  }
       ]
-    },
-    "pa_brand": {
-      "id": 3,
-      "name": "Brand",
-      "slug": "pa_brand",
-      "terms": [
-        { "id": 30, "name": "Khaadi",     "slug": "khaadi",     "count": 6 },
-        { "id": 31, "name": "Gul Ahmed",  "slug": "gul-ahmed",  "count": 4 }
-      ]
     }
   }
 }
 ```
 
-> **Note:** The attribute slugs (`pa_color`, `pa_size`, `pa_brand`) are
-> WooCommerce's default prefix. If your store uses different attribute names,
-> the response will reflect whatever you have in WooCommerce → Products → Attributes.
+> **Note:** `pa_brand` is intentionally absent. Brands are a custom taxonomy
+> (`product_brand`), not a WooCommerce attribute. See Endpoint 3 above.
+>
+> The attribute slugs (`pa_color`, `pa_size`) use WooCommerce's default `pa_`
+> prefix. If your store uses different attribute names, the response will
+> reflect whatever you have in WooCommerce → Products → Attributes.
 
 ### PHP Implementation Notes
 
@@ -302,7 +401,7 @@ function wpadhlwrapi_get_product_attributes( WP_REST_Request $request ) {
 
 ---
 
-## Endpoint 4 — Products Endpoint Update (Attribute Filtering)
+## Endpoint 5 — Products Endpoint Update (Attribute + Brand Filtering)
 
 The existing `GET /wpadhlwrapi/v1/products` endpoint needs support for
 attribute filter query parameters so Colors, Sizes, and Brands can be
@@ -312,9 +411,9 @@ filtered server-side.
 
 | Param | Example | Maps to |
 |-------|---------|---------|
-| `color` | `?color=red` | `tax_query` on `pa_color` taxonomy |
-| `size` | `?size=m` | `tax_query` on `pa_size` taxonomy |
-| `brand` | `?brand=khaadi` | `tax_query` on `pa_brand` taxonomy |
+| `color` | `?color=red` | `tax_query` on `pa_color` taxonomy (WC attribute) |
+| `size` | `?size=m` | `tax_query` on `pa_size` taxonomy (WC attribute) |
+| `brand` | `?brand=khaadi` | `tax_query` on `product_brand` taxonomy (custom taxonomy) |
 
 > These can be generalised as `?attribute[pa_color]=red` if you prefer a
 > single flexible param, but individual params are simpler for the frontend.
@@ -341,10 +440,9 @@ if ( ! empty( $request['size'] ) ) {
     ];
 }
 if ( ! empty( $request['brand'] ) ) {
-    // "brand" can be a product_tag, a custom taxonomy, or pa_brand attribute
-    // Use whichever matches your WooCommerce setup:
+    // product_brand is a custom taxonomy (like product_cat), NOT a WC attribute
     $tax_query[] = [
-        'taxonomy' => 'pa_brand', // or 'product_tag' if brand is a tag
+        'taxonomy' => 'product_brand',
         'field'    => 'slug',
         'terms'    => sanitize_text_field( $request['brand'] ),
     ];
@@ -360,8 +458,8 @@ if ( ! empty( $tax_query ) ) {
 
 ## Caching Recommendation
 
-All 3 filter endpoints (`product-categories`, `product-tags`, `product-attributes`)
-can be cached aggressively since they change infrequently:
+All 4 filter endpoints (`product-categories`, `product-tags`, `product-brands`,
+`product-attributes`) can be cached aggressively since they change infrequently:
 
 ```php
 // At the top of each callback, before get_terms():
@@ -383,6 +481,7 @@ add_action('delete_term',  'wpadhlwrapi_clear_filter_cache');
 function wpadhlwrapi_clear_filter_cache() {
     delete_transient('wpadhlwrapi_product-categories');
     delete_transient('wpadhlwrapi_product-tags');
+    delete_transient('wpadhlwrapi_product-brands');
     delete_transient('wpadhlwrapi_product-attributes');
 }
 ```
@@ -393,10 +492,10 @@ function wpadhlwrapi_clear_filter_cache() {
 
 Once these endpoints are live, the frontend changes will be:
 
-1. **`src/app/api/product-filters/route.ts`** — Proxy route (CORS fix, same pattern as `/api/store-settings`)
-2. **`src/lib/api/filters.ts`** — `getProductFilters()` fetch function
-3. **`src/app/(shop)/products/page.tsx`** — Fetch categories + tags + attributes at build/request time (server component), pass as props to `ShopClient`
-4. **`src/components/shop/ShopSidebar.tsx`** — Remove hardcoded arrays; accept `tags`, `brands`, `colors`, `sizes` as props
-5. **`src/components/shop/ShopClient.tsx`** — Pass attribute props through to sidebar; add `color`/`size`/`brand` to URL params when filtering
+1. **`src/app/api/product-filters/route.ts`** — Proxy route (CORS fix, same pattern as `/api/store-settings`); proxies categories, tags, **brands**, and attributes
+2. **`src/lib/api/filters.ts`** — `getProductFilters()` fetch function (includes `product-brands` call)
+3. **`src/app/(shop)/products/page.tsx`** — Fetch categories + tags + **brands** + attributes at build/request time (server component), pass as props to `ShopClient`
+4. **`src/components/shop/ShopSidebar.tsx`** — Remove hardcoded arrays; accept `tags`, `brands`, `colors`, `sizes` as props (`brands` now comes from taxonomy, not attributes)
+5. **`src/components/shop/ShopClient.tsx`** — Pass attribute + brand props through to sidebar; add `color`/`size`/`brand` to URL params when filtering
 
 No new dependencies needed — uses the same patterns already in the codebase.
