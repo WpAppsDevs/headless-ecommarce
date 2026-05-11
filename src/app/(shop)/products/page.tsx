@@ -1,4 +1,5 @@
 import { getProducts } from '@/lib/api/products';
+import { getProductFilters } from '@/lib/api/filters';
 import { ShopClient } from '@/components/shop/ShopClient';
 import { PageHeader } from '@/components/ui/PageHeader';
 import type { BreadcrumbItem } from '@/components/ui/PageHeader';
@@ -17,9 +18,18 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   const tag = params.tag?.trim() || undefined;
   const brand = params.brand?.trim() || undefined;
 
-  const { items, meta } = await getProducts({ page, per_page: 12, category, search, tag, brand }).catch(
-    () => ({ items: [], meta: { page: 1, per_page: 12, total: 0, total_pages: 1 } }),
-  );
+  const [{ items, meta }, filters] = await Promise.all([
+    getProducts({ page, per_page: 12, category, search, tag, brand }).catch(
+      () => ({ items: [], meta: { page: 1, per_page: 12, total: 0, total_pages: 1 } }),
+    ),
+    getProductFilters().catch(() => ({
+      categories: [],
+      tags: [],
+      brands: [],
+      colorTerms: [],
+      sizeTerms: [],
+    })),
+  ]);
 
   const categoryLabel = category
     ? category.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
@@ -43,6 +53,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
         initialTag={tag}
         initialBrand={brand}
         serverPage={page}
+        filters={filters}
       />
     </>
   );

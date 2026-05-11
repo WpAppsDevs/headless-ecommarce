@@ -3,11 +3,15 @@
 import Link from 'next/link';
 import { ChevronRight, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { ProductCategory } from '@/lib/api/products';
+import type { FilterTag, FilterBrand, FilterAttributeTerm } from '@/lib/api/filters';
 import { useFormatPrice } from '@/lib/utils/currency';
 
 interface ShopSidebarProps {
-  categories: ProductCategory[];
+  categories: Array<{ id: number; name: string; slug: string }>;
+  tags: FilterTag[];
+  brands: FilterBrand[];
+  colorTerms: FilterAttributeTerm[];
+  sizeTerms: FilterAttributeTerm[];
   selectedCategory: string;
   selectedTag?: string;
   selectedBrand?: string;
@@ -15,44 +19,45 @@ interface ShopSidebarProps {
   activePriceRange: [number, number];
   onPriceRangeChange: (range: [number, number]) => void;
   selectedColors: string[];
-  onColorToggle: (color: string) => void;
+  onColorToggle: (slug: string) => void;
   selectedSizes: string[];
-  onSizeToggle: (size: string) => void;
+  onSizeToggle: (slug: string) => void;
   onClearAll: () => void;
   activeFilterCount: number;
   currentSearch?: string;
 }
 
-const COLOR_OPTIONS = [
-  { name: 'Black', hex: '#18181b' },
-  { name: 'White', hex: '#ffffff' },
-  { name: 'Gray', hex: '#71717a' },
-  { name: 'Red', hex: '#ef4444' },
-  { name: 'Blue', hex: '#3b82f6' },
-  { name: 'Green', hex: '#22c55e' },
-  { name: 'Pink', hex: '#ec4899' },
-  { name: 'Beige', hex: '#d4a96a' },
-];
+/** Maps common WooCommerce color term slugs to CSS hex values. */
+const COLOR_HEX_MAP: Record<string, string> = {
+  black:   '#18181b',
+  white:   '#ffffff',
+  gray:    '#71717a',
+  grey:    '#71717a',
+  red:     '#ef4444',
+  blue:    '#3b82f6',
+  green:   '#22c55e',
+  pink:    '#ec4899',
+  beige:   '#d4a96a',
+  yellow:  '#eab308',
+  orange:  '#f97316',
+  purple:  '#a855f7',
+  brown:   '#92400e',
+  navy:    '#1e3a5f',
+  maroon:  '#7f1d1d',
+  gold:    '#f59e0b',
+  silver:  '#9ca3af',
+  cream:   '#fef3c7',
+  olive:   '#65a30d',
+  teal:    '#0d9488',
+  sky:     '#0ea5e9',
+  indigo:  '#6366f1',
+  rose:    '#f43f5e',
+  fuchsia: '#d946ef',
+};
 
-const SIZE_OPTIONS = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-
-const TAG_OPTIONS = [
-  { label: 'Ready Stock', slug: 'ready-stock' },
-  { label: 'Pre-Order', slug: 'pre-order' },
-  { label: 'Catalog', slug: 'catalog' },
-  { label: 'Eid Collection', slug: 'eid-collection' },
-  { label: 'Summer Collection', slug: 'summer-collection' },
-  { label: 'Winter Collection', slug: 'winter-collection' },
-];
-
-const BRAND_OPTIONS = [
-  { label: 'Gul Ahmed', slug: 'gul-ahmed' },
-  { label: 'Khaadi', slug: 'khaadi' },
-  { label: 'Sapphire', slug: 'sapphire' },
-  { label: 'Alkaram', slug: 'alkaram' },
-  { label: 'Sana Safinaz', slug: 'sana-safinaz' },
-  { label: 'Maria B', slug: 'maria-b' },
-];
+function getColorHex(slug: string): string {
+  return COLOR_HEX_MAP[slug.toLowerCase()] ?? '#9ca3af';
+}
 
 const SECTION_TITLE = 'text-[11px] font-semibold uppercase tracking-widest text-zinc-400 mb-3';
 
@@ -73,6 +78,10 @@ function buildHref(params: {
 
 export function ShopSidebar({
   categories,
+  tags,
+  brands,
+  colorTerms,
+  sizeTerms,
   selectedCategory,
   selectedTag,
   selectedBrand,
@@ -137,88 +146,96 @@ export function ShopSidebar({
           })}
         </ul>
       </div>
-      <hr className="border-zinc-100" />
 
-      {/* Tags */}
-      <div>
-        <p className={SECTION_TITLE}>Tags</p>
-        <ul className="space-y-1.5">
-          <li>
-            <Link
-              href={buildHref({ category: selectedCategory, brand: selectedBrand, search: currentSearch })}
-              className={cn(
-                'flex items-center gap-1.5 text-sm transition-all duration-150',
-                !selectedTag ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
-              )}
-            >
-              <ChevronRight className={cn('h-3.5 w-3.5 shrink-0', !selectedTag ? 'opacity-100' : 'opacity-0')} />
-              All
-            </Link>
-          </li>
-          {TAG_OPTIONS.map(({ label, slug }) => {
-            const isActive = selectedTag === slug;
-            return (
-              <li key={slug}>
+      {/* Tags — only rendered when the endpoint is live */}
+      {tags.length > 0 && (
+        <>
+          <hr className="border-zinc-100" />
+          <div>
+            <p className={SECTION_TITLE}>Tags</p>
+            <ul className="space-y-1.5">
+              <li>
                 <Link
-                  href={buildHref({ category: selectedCategory, tag: slug, brand: selectedBrand, search: currentSearch })}
+                  href={buildHref({ category: selectedCategory, brand: selectedBrand, search: currentSearch })}
                   className={cn(
                     'flex items-center gap-1.5 text-sm transition-all duration-150',
-                    isActive ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
+                    !selectedTag ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
                   )}
                 >
-                  <ChevronRight className={cn('h-3.5 w-3.5 shrink-0', isActive ? 'opacity-100' : 'opacity-0')} />
-                  {label}
+                  <ChevronRight className={cn('h-3.5 w-3.5 shrink-0', !selectedTag ? 'opacity-100' : 'opacity-0')} />
+                  All
                 </Link>
               </li>
-            );
-          })}
-        </ul>
-      </div>
-      <hr className="border-zinc-100" />
+              {tags.map(({ name, slug }) => {
+                const isActive = selectedTag === slug;
+                return (
+                  <li key={slug}>
+                    <Link
+                      href={buildHref({ category: selectedCategory, tag: slug, brand: selectedBrand, search: currentSearch })}
+                      className={cn(
+                        'flex items-center gap-1.5 text-sm transition-all duration-150',
+                        isActive ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
+                      )}
+                    >
+                      <ChevronRight className={cn('h-3.5 w-3.5 shrink-0', isActive ? 'opacity-100' : 'opacity-0')} />
+                      {name}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </>
+      )}
 
-      {/* Brands */}
-      <div>
-        <p className={SECTION_TITLE}>Brands</p>
-        <ul className="space-y-1.5">
-          <li>
-            <Link
-              href={buildHref({ category: selectedCategory, tag: selectedTag, search: currentSearch })}
-              className={cn(
-                'flex items-center gap-1.5 text-sm transition-all duration-150',
-                !selectedBrand ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
-              )}
-            >
-              <ChevronRight className={cn('h-3.5 w-3.5 shrink-0', !selectedBrand ? 'opacity-100' : 'opacity-0')} />
-              All
-            </Link>
-          </li>
-          {BRAND_OPTIONS.map(({ label, slug }) => {
-            const isActive = selectedBrand === slug;
-            return (
-              <li key={slug}>
+      {/* Brands — only rendered when the endpoint is live */}
+      {brands.length > 0 && (
+        <>
+          <hr className="border-zinc-100" />
+          <div>
+            <p className={SECTION_TITLE}>Brands</p>
+            <ul className="space-y-1.5">
+              <li>
                 <Link
-                  href={buildHref({ category: selectedCategory, tag: selectedTag, brand: slug, search: currentSearch })}
+                  href={buildHref({ category: selectedCategory, tag: selectedTag, search: currentSearch })}
                   className={cn(
                     'flex items-center gap-1.5 text-sm transition-all duration-150',
-                    isActive ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
+                    !selectedBrand ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
                   )}
                 >
-                  <ChevronRight className={cn('h-3.5 w-3.5 shrink-0', isActive ? 'opacity-100' : 'opacity-0')} />
-                  {label}
+                  <ChevronRight className={cn('h-3.5 w-3.5 shrink-0', !selectedBrand ? 'opacity-100' : 'opacity-0')} />
+                  All
                 </Link>
               </li>
-            );
-          })}
-        </ul>
-      </div>
-      <hr className="border-zinc-100" />
+              {brands.map(({ name, slug }) => {
+                const isActive = selectedBrand === slug;
+                return (
+                  <li key={slug}>
+                    <Link
+                      href={buildHref({ category: selectedCategory, tag: selectedTag, brand: slug, search: currentSearch })}
+                      className={cn(
+                        'flex items-center gap-1.5 text-sm transition-all duration-150',
+                        isActive ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
+                      )}
+                    >
+                      <ChevronRight className={cn('h-3.5 w-3.5 shrink-0', isActive ? 'opacity-100' : 'opacity-0')} />
+                      {name}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </>
+      )}
 
       {/* Price Range */}
+      <hr className="border-zinc-100" />
       <div>
         <p className={SECTION_TITLE}>Price Range</p>
         <div className="flex items-center gap-2 mb-3">
           <div className="flex-1">
-            <label className="text-xs text-zinc-400 mb-1 block">Min $</label>
+            <label className="text-xs text-zinc-400 mb-1 block">Min</label>
             <input
               type="number"
               min={priceRange[0]}
@@ -234,7 +251,7 @@ export function ShopSidebar({
             />
           </div>
           <div className="flex-1">
-            <label className="text-xs text-zinc-400 mb-1 block">Max $</label>
+            <label className="text-xs text-zinc-400 mb-1 block">Max</label>
             <input
               type="number"
               min={activePriceRange[0]}
@@ -254,72 +271,77 @@ export function ShopSidebar({
           {fmt(activePriceRange[0])} – {fmt(activePriceRange[1])}
         </p>
       </div>
-      <hr className="border-zinc-100" />
 
-      {/* Colors */}
-      <div>
-        <p className={SECTION_TITLE}>Color</p>
-        <div className="flex flex-wrap gap-2">
-          {COLOR_OPTIONS.map((color) => {
-            const isActive = selectedColors.includes(color.name);
-            const isWhite = color.name === 'White';
-            return (
-              <button
-                key={color.name}
-                onClick={() => onColorToggle(color.name)}
-                title={color.name}
-                aria-label={`${isActive ? 'Remove' : 'Add'} ${color.name} filter`}
-                style={{ backgroundColor: color.hex }}
-                className={cn(
-                  'h-7 w-7 rounded-full border-2 flex items-center justify-center transition-all duration-150',
-                  isWhite ? 'border-zinc-300' : '',
-                  isActive
-                    ? 'border-zinc-900 scale-110'
-                    : !isWhite
-                    ? 'border-zinc-100 hover:border-zinc-400'
-                    : 'hover:border-zinc-400',
-                )}
-              >
-                {isActive && (
-                  <span
+      {/* Colors — only rendered when the endpoint is live */}
+      {colorTerms.length > 0 && (
+        <>
+          <hr className="border-zinc-100" />
+          <div>
+            <p className={SECTION_TITLE}>Color</p>
+            <div className="flex flex-wrap gap-2">
+              {colorTerms.map((color) => {
+                const hex = getColorHex(color.slug);
+                const isActive = selectedColors.includes(color.slug);
+                const isWhite = color.slug === 'white';
+                return (
+                  <button
+                    key={color.slug}
+                    onClick={() => onColorToggle(color.slug)}
+                    title={color.name}
+                    aria-label={`${isActive ? 'Remove' : 'Add'} ${color.name} filter`}
+                    style={{ backgroundColor: hex }}
                     className={cn(
-                      'text-[10px] font-bold leading-none',
-                      isWhite ? 'text-zinc-900' : 'text-white',
+                      'h-7 w-7 rounded-full border-2 flex items-center justify-center transition-all duration-150',
+                      isWhite ? 'border-zinc-300' : '',
+                      isActive
+                        ? 'border-zinc-900 scale-110'
+                        : !isWhite
+                        ? 'border-zinc-100 hover:border-zinc-400'
+                        : 'hover:border-zinc-400',
                     )}
                   >
-                    ✓
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-      <hr className="border-zinc-100" />
+                    {isActive && (
+                      <span className={cn('text-[10px] font-bold leading-none', isWhite ? 'text-zinc-900' : 'text-white')}>
+                        ✓
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
 
-      {/* Sizes */}
-      <div>
-        <p className={SECTION_TITLE}>Size</p>
-        <div className="flex flex-wrap gap-2">
-          {SIZE_OPTIONS.map((size) => {
-            const isActive = selectedSizes.includes(size);
-            return (
-              <button
-                key={size}
-                onClick={() => onSizeToggle(size)}
-                className={cn(
-                  'rounded-md border px-3 py-1.5 text-xs font-medium transition-all duration-150',
-                  isActive
-                    ? 'bg-zinc-900 text-white border-zinc-900'
-                    : 'border-zinc-200 text-zinc-600 hover:border-zinc-400',
-                )}
-              >
-                {size}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      {/* Sizes — only rendered when the endpoint is live */}
+      {sizeTerms.length > 0 && (
+        <>
+          <hr className="border-zinc-100" />
+          <div>
+            <p className={SECTION_TITLE}>Size</p>
+            <div className="flex flex-wrap gap-2">
+              {sizeTerms.map((size) => {
+                const isActive = selectedSizes.includes(size.slug);
+                return (
+                  <button
+                    key={size.slug}
+                    onClick={() => onSizeToggle(size.slug)}
+                    className={cn(
+                      'rounded-md border px-3 py-1.5 text-xs font-medium transition-all duration-150',
+                      isActive
+                        ? 'bg-zinc-900 text-white border-zinc-900'
+                        : 'border-zinc-200 text-zinc-600 hover:border-zinc-400',
+                    )}
+                  >
+                    {size.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
+
       <hr className="border-zinc-100" />
 
       {/* Clear All */}
@@ -335,5 +357,3 @@ export function ShopSidebar({
     </aside>
   );
 }
-
-

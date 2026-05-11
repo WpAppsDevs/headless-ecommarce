@@ -4,7 +4,8 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { X, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { Product, PaginationMeta, ProductCategory } from '@/lib/api/products';
+import type { Product, PaginationMeta } from '@/lib/api/products';
+import type { ProductFilters } from '@/lib/api/filters';
 import { ProductCard } from '@/components/product/ProductCard';
 import { ShopSidebar } from '@/components/shop/ShopSidebar';
 import { ShopTopBar, type SortOrder } from '@/components/shop/ShopTopBar';
@@ -17,6 +18,7 @@ interface ShopClientProps {
   initialTag?: string;
   initialBrand?: string;
   serverPage: number;
+  filters: ProductFilters;
 }
 
 function gridColsClass(cols: 2 | 3 | 4) {
@@ -49,6 +51,7 @@ export function ShopClient({
   initialTag,
   initialBrand,
   serverPage,
+  filters,
 }: ShopClientProps) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('default');
   const [activePriceRange, setActivePriceRange] = useState<[number, number]>([0, 9999]);
@@ -63,9 +66,11 @@ export function ShopClient({
     return [Math.floor(Math.min(...prices)), Math.ceil(Math.max(...prices))];
   }, [initialProducts]);
 
-  const categories = useMemo<ProductCategory[]>(() => {
+  // Prefer server-fetched categories (all of them); fall back to categories
+  // embedded in the current page's products if the endpoint isn't live yet.
+  const derivedCategories = useMemo(() => {
     const seen = new Set<number>();
-    const result: ProductCategory[] = [];
+    const result: Array<{ id: number; name: string; slug: string }> = [];
     for (const product of initialProducts) {
       for (const cat of product.categories) {
         if (!seen.has(cat.id)) {
@@ -77,10 +82,36 @@ export function ShopClient({
     return result;
   }, [initialProducts]);
 
+  const categories = filters.categories.length > 0 ? filters.categories : derivedCategories;
+
   const filteredProducts = useMemo(() => {
     let list = initialProducts.filter((p) => {
       const price = parseFloat(p.price) || 0;
-      return price >= activePriceRange[0] && price <= activePriceRange[1];
+      if (price < activePriceRange[0] || price > activePriceRange[1]) return false;
+
+      // Client-side color filter — matches term slug against pa_color options
+      if (selectedColors.length > 0) {
+        const colorAttr = (Array.isArray(p.attributes) ? p.attributes : [])
+          .find((a) => a.slug === 'pa_color');
+        if (!colorAttr) return false;
+        const hasColor = selectedColors.some((slug) =>
+          colorAttr.options.some((o) => o.toLowerCase() === slug.toLowerCase()),
+        );
+        if (!hasColor) return false;
+      }
+
+      // Client-side size filter — matches term slug against pa_size options
+      if (selectedSizes.length > 0) {
+        const sizeAttr = (Array.isArray(p.attributes) ? p.attributes : [])
+          .find((a) => a.slug === 'pa_size');
+        if (!sizeAttr) return false;
+        const hasSize = selectedSizes.some((slug) =>
+          sizeAttr.options.some((o) => o.toLowerCase() === slug.toLowerCase()),
+        );
+        if (!hasSize) return false;
+      }
+
+      return true;
     });
 
     if (sortOrder === 'price-asc') {
@@ -144,6 +175,10 @@ export function ShopClient({
 
   const sidebarProps = {
     categories,
+    tags: filters.tags,
+    brands: filters.brands,
+    colorTerms: filters.colorTerms,
+    sizeTerms: filters.sizeTerms,
     selectedCategory: initialCategory ?? '',
     selectedTag: initialTag ?? '',
     selectedBrand: initialBrand ?? '',
