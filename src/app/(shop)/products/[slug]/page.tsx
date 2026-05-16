@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { Star, Tag, Package } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { getProduct, getAllProductSlugs } from '@/lib/api/products';
+import { getRatingAggregate } from '@/lib/api/reviews';
 import { ProductImages } from '@/components/product/ProductImages';
 import { VariationSelector } from '@/components/product/VariationSelector';
 import { ProductTabs } from '@/components/product/ProductTabs';
@@ -63,12 +64,38 @@ export default async function ProductPage({ params }: PageProps) {
     throw e;
   }
 
+  // Fetch rating aggregate in parallel with product; used for JSON-LD + Reviews tab
+  const ratingAggregate = await getRatingAggregate(product.id);
+
   const isOnSale =
     product.on_sale && product.sale_price && product.sale_price !== product.regular_price;
   const primaryCategory = product.categories[0];
 
   return (
     <>
+      {/* JSON-LD structured data for SEO */}
+      {ratingAggregate && ratingAggregate.total_reviews > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Product',
+              name: product.name,
+              image: product.images[0]?.src,
+              description: product.short_description?.replace(/<[^>]+>/g, '') ?? '',
+              sku: product.sku,
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: ratingAggregate.average_rating.toFixed(1),
+                reviewCount: ratingAggregate.total_reviews,
+                bestRating: '5',
+                worstRating: '1',
+              },
+            }),
+          }}
+        />
+      )}
       <PageHeader
         title={product.name}
         breadcrumbs={[
@@ -167,6 +194,9 @@ export default async function ProductPage({ params }: PageProps) {
           description={product.description}
           sku={product.sku}
           categories={product.categories}
+          productId={product.id}
+          productName={product.name}
+          initialAggregate={ratingAggregate}
         />
       </div>
 

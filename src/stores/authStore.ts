@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { tokenCache, setOnUnauthorized } from '@/lib/api/client';
 import { useCartStore } from '@/stores/cartStore';
 import { useWishlistStore } from '@/stores/wishlistStore';
+import { useReviewStore } from '@/stores/reviewStore';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -129,6 +130,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
       await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
       set({ user: null, isAuthenticated: false });
       useCartStore.getState().clearCart();
+      useReviewStore.getState().clear();
     },
 
     // ── refreshToken ────────────────────────────────────────────────────────

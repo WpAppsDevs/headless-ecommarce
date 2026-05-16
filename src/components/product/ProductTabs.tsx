@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ProductReviewsSection } from '@/components/reviews/ProductReviewsSection';
+import { ReviewsErrorBoundary } from '@/components/reviews/ReviewsErrorBoundary';
 import type { ProductCategory } from '@/lib/api/products';
+import type { RatingAggregate } from '@/lib/api/reviews';
 
 const TABS = ['Description', 'Additional Info', 'Reviews', 'Shipping & Returns'] as const;
 type Tab = (typeof TABS)[number];
@@ -12,9 +14,12 @@ interface Props {
   description?: string;
   sku?: string;
   categories?: ProductCategory[];
+  productId: number;
+  productName: string;
+  initialAggregate?: RatingAggregate | null;
 }
 
-export function ProductTabs({ description, sku, categories }: Props) {
+export function ProductTabs({ description, sku, categories, productId, productName, initialAggregate }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>('Description');
 
   return (
@@ -77,48 +82,13 @@ export function ProductTabs({ description, sku, categories }: Props) {
         )}
 
         {activeTab === 'Reviews' && (
-          <div className="max-w-xl">
-            <div className="mb-6 flex items-center gap-6">
-              <div className="text-center">
-                <div className="text-5xl font-bold text-zinc-900">4.5</div>
-                <div className="mt-1 flex items-center justify-center gap-0.5">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <Star
-                      key={i}
-                      className="h-4 w-4"
-                      fill={i <= 4 ? '#f59e0b' : 'none'}
-                      stroke={i <= 4 ? '#f59e0b' : '#d1d5db'}
-                    />
-                  ))}
-                </div>
-                <p className="mt-1 text-xs text-zinc-400">Based on 128 reviews</p>
-              </div>
-
-              {/* Star bars */}
-              <div className="flex-1 space-y-1.5">
-                {[
-                  { stars: 5, pct: 60 },
-                  { stars: 4, pct: 25 },
-                  { stars: 3, pct: 10 },
-                  { stars: 2, pct: 3 },
-                  { stars: 1, pct: 2 },
-                ].map(({ stars, pct }) => (
-                  <div key={stars} className="flex items-center gap-2">
-                    <span className="w-4 text-xs text-zinc-500">{stars}</span>
-                    <Star className="h-3 w-3 text-amber-400" fill="#fbbf24" stroke="#fbbf24" />
-                    <div className="h-1.5 flex-1 rounded-full bg-zinc-100">
-                      <div
-                        className="h-1.5 rounded-full bg-amber-400"
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
-                    <span className="w-6 text-xs text-zinc-400">{pct}%</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <p className="text-sm italic text-zinc-400">Be the first to review.</p>
-          </div>
+          <ReviewsErrorBoundary>
+            <ProductReviewsSection
+              productId={productId}
+              productName={productName}
+              initialAggregate={initialAggregate}
+            />
+          </ReviewsErrorBoundary>
         )}
 
         {activeTab === 'Shipping & Returns' && (

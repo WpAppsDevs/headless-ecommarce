@@ -45,6 +45,13 @@ export interface OrderShipping {
   country: string;
 }
 
+export interface OrderRefund {
+  id: number;
+  reason: string;
+  /** Always a negative string value, e.g. "-10.00" */
+  total: string;
+}
+
 export interface Order {
   id: number;
   status: string;
@@ -57,6 +64,7 @@ export interface Order {
   payment_method_title?: string;
   discount_total?: string;
   shipping_total?: string;
+  refunds?: OrderRefund[];
 }
 
 export interface OrdersMeta {

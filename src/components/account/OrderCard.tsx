@@ -1,7 +1,11 @@
 'use client';
 
-import { Eye, Home } from 'lucide-react';
+import { useState } from 'react';
+import { Eye, Home, PenLine } from 'lucide-react';
 import type { Order } from '@/lib/api/orders';
+import { useReviewStore } from '@/stores/reviewStore';
+import { ReviewModal } from '@/components/review-modal/ReviewModal';
+import type { ReviewableItem } from '@/components/review-modal/ReviewModal';
 
 interface OrderCardProps {
   order: Order;
@@ -32,6 +36,9 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
   const canCancel = CANCELLABLE.includes(order.status);
   const isPaid    = PAID_STATUSES.includes(order.status);
 
+  const isReviewed = useReviewStore((s) => s.isReviewed);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+
   const b = order.billing;
   const s = order.shipping;
 
@@ -45,6 +52,19 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
     ? [addrSrc.address_1, `${addrSrc.city}, ${addrSrc.state} ${addrSrc.postcode}`.trim()]
         .filter(Boolean).join(' ')
     : '—';
+
+  // Eligibility: order must be paid and not fully refunded
+  const totalRefunded = (order.refunds ?? []).reduce(
+    (sum, r) => sum + Math.abs(parseFloat(r.total)),
+    0,
+  );
+  const isFullyRefunded = totalRefunded >= parseFloat(order.total);
+  const eligibleItems: ReviewableItem[] = isPaid && !isFullyRefunded
+    ? order.line_items
+        .filter((item) => !isReviewed(item.product_id))
+        .map((item) => ({ product_id: item.product_id, name: item.name, image: item.image }))
+    : [];
+  const hasReviewableItems = eligibleItems.length > 0;
 
   return (
     <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm">
@@ -109,6 +129,15 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
               Cancel Order
             </button>
           )}
+          {hasReviewableItems && (
+            <button
+              onClick={() => setReviewModalOpen(true)}
+              className="flex items-center gap-1.5 rounded-lg border border-[#D89A6A]/60 px-4 py-2 text-[12px] font-semibold text-[#D89A6A] transition hover:bg-[#D89A6A]/5"
+            >
+              <PenLine className="h-3.5 w-3.5" strokeWidth={2} />
+              Write Review
+            </button>
+          )}
           <button
             onClick={onViewDetails}
             className="flex items-center gap-1.5 rounded-lg bg-brand-wine px-4 py-2 text-[12px] font-semibold text-white transition hover:opacity-90"
@@ -118,6 +147,14 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
           </button>
         </div>
       </div>
+
+      {/* Review modal */}
+      <ReviewModal
+        isOpen={reviewModalOpen}
+        onClose={() => setReviewModalOpen(false)}
+        orderId={order.id}
+        items={eligibleItems}
+      />
     </div>
   );
 }
