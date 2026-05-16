@@ -104,7 +104,8 @@ export function Footer() {
                   alt="Najifa's Shop"
                   width={160}
                   height={56}
-                  className="h-14 w-auto object-contain"
+                  className="h-14 object-contain"
+                  style={{ width: 'auto' }}
                 />
               </Link>
 

@@ -34,7 +34,8 @@ function SiteLogo() {
         alt="Najifa's Shop"
         width={140}
         height={48}
-        className="h-12 w-auto object-contain"
+        className="h-12 object-contain"
+        style={{ width: 'auto' }}
         priority
       />
     </Link>
@@ -303,7 +304,8 @@ export function Header() {
                     alt="Najifa's Shop"
                     width={120}
                     height={40}
-                    className="h-10 w-auto object-contain"
+                    className="h-10 object-contain"
+                    style={{ width: 'auto' }}
                   />
                 </SheetTitle>
               </SheetHeader>

@@ -92,6 +92,7 @@ export function ReviewImageUpload({ files, onChange, disabled = false }: ReviewI
                 src={URL.createObjectURL(file)}
                 alt={file.name}
                 fill
+                sizes="80px"
                 className="object-cover"
                 unoptimized
               />

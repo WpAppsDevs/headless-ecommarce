@@ -30,6 +30,7 @@ export function HeroSlider() {
             fill
             className="object-cover object-top"
             priority
+            sizes="(min-width: 640px) calc(100vw - 5rem), calc(100vw - 3rem)"
           />
         </div>
 
