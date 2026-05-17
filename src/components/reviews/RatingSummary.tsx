@@ -12,7 +12,7 @@ export function RatingSummary({ aggregate }: RatingSummaryProps) {
   const stars = [5, 4, 3, 2, 1] as const;
 
   const countFor = (s: number) =>
-    aggregate[`rating_${s}` as keyof RatingAggregate] as number;
+    aggregate.distribution?.[String(s)] ?? 0;
 
   return (
     <div className="flex items-center gap-6">

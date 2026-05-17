@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { config } from '@/lib/config';
 
-/** Proxy for POST /wp-json/api/reviews — avoids CORS for browser requests */
+/** Proxy for POST /wp-json/api/reviews/media/upload (multipart/form-data, one file at a time) */
 export async function POST(req: NextRequest) {
   try {
     const authHeader = req.headers.get('Authorization');
@@ -12,15 +12,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = await req.text();
+    // Parse multipart from the client and forward as-is to WordPress.
+    // Do NOT set Content-Type — fetch will attach the boundary automatically.
+    const formData = await req.formData();
 
-    const wpRes = await fetch(`${config.apiBase}/${config.apiNs}/reviews`, {
+    const wpRes = await fetch(`${config.apiBase}/${config.apiNs}/reviews/media/upload`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: authHeader,
-      },
-      body,
+      headers: { Authorization: authHeader },
+      body: formData,
       cache: 'no-store',
     });
 

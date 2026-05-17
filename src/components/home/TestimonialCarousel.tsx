@@ -65,13 +65,13 @@ export function TestimonialCarousel({ reviews }: TestimonialCarouselProps) {
         {/* Author */}
         <div className="mt-5 flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100 text-sm font-semibold text-zinc-600">
-            {(review.author_name ?? 'A').charAt(0).toUpperCase()}
+            {(review.author.name ?? 'A').charAt(0).toUpperCase()}
           </div>
           <div>
             <p className="text-sm font-medium text-zinc-800">
-              {review.author_name ?? 'Verified Customer'}
+              {review.author.name ?? 'Verified Customer'}
             </p>
-            {review.is_verified && (
+            {review.author.is_verified && (
               <p className="flex items-center gap-1 text-xs text-[#7BAE7F]">
                 <BadgeCheck className="h-3 w-3" strokeWidth={2.5} />
                 Verified Purchase

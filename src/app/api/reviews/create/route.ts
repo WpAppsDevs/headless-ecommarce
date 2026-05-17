@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { config } from '@/lib/config';
 
-/** Proxy for POST /wp-json/api/reviews/{review_id}/vote */
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ review_id: string }> },
-) {
+/** Proxy for POST /wp-json/api/reviews/create */
+export async function POST(req: NextRequest) {
   try {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -15,10 +12,9 @@ export async function POST(
       );
     }
 
-    const { review_id } = await params;
     const body = await req.text();
 
-    const wpRes = await fetch(`${config.apiBase}/${config.apiNs}/reviews/${review_id}/vote`, {
+    const wpRes = await fetch(`${config.apiBase}/${config.apiNs}/reviews/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -8,25 +8,28 @@ import { config } from '@/lib/config';
 
 export interface ReviewMedia {
   id: number;
-  file_url: string;
-  file_type: string;
+  url: string;
+  type: string;
+  mime_type: string;
+  size: number;
+}
+
+export interface ReviewAuthor {
+  name: string;
+  is_verified: boolean;
+  avatar_url: string | null;
 }
 
 export interface Review {
   id: number;
   product_id: number;
-  user_id: number;
+  author: ReviewAuthor;
   rating: number;
   title: string;
   content: string;
   status: 'pending' | 'approved' | 'rejected';
-  is_verified: boolean;
-  helpful_count: number;
-  unhelpful_count: number;
-  created_at: string;
   media: ReviewMedia[];
-  author_name?: string;
-  author_avatar?: string;
+  date: string;
 }
 
 export interface ReviewInput {
@@ -52,25 +55,15 @@ export interface RatingAggregate {
   product_id: number;
   total_reviews: number;
   average_rating: number;
-  rating_1: number;
-  rating_2: number;
-  rating_3: number;
-  rating_4: number;
-  rating_5: number;
-}
-
-export interface VoteResult {
-  review_id: number;
-  helpful_count: number;
-  unhelpful_count: number;
-  user_vote: 'helpful' | 'unhelpful' | null;
+  distribution: Record<string, number>;
 }
 
 export interface MediaUploadResult {
   id: number;
-  review_id: number;
-  file_url: string;
-  file_type: string;
+  url: string;
+  type: string;
+  mime_type: string;
+  size: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -115,10 +108,9 @@ export async function getProductReviews(
   if (!res.ok || json?.success === false) {
     throw new ApiError(json?.code ?? 'api_error', json?.message ?? `HTTP ${res.status}`);
   }
-  const d = json?.data ?? json;
   return {
-    reviews: d.reviews ?? [],
-    meta: d.meta ?? { total: 0, page, per_page: perPage, total_pages: 0 },
+    reviews: Array.isArray(json.data) ? (json.data as Review[]) : [],
+    meta: (json.meta as ReviewsMeta) ?? { total: 0, page, per_page: perPage, total_pages: 0 },
   };
 }
 
@@ -163,7 +155,7 @@ export async function getRandomReviews(limit = 5): Promise<Review[]> {
 // ---------------------------------------------------------------------------
 
 export async function submitReview(data: ReviewInput): Promise<Review> {
-  const res = await fetch('/api/reviews', {
+  const res = await fetch('/api/reviews/create', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeader() },
     body: JSON.stringify(data),
@@ -175,29 +167,21 @@ export async function uploadReviewMedia(
   reviewId: number,
   files: File[],
 ): Promise<MediaUploadResult[]> {
-  const form = new FormData();
+  const results: MediaUploadResult[] = [];
   for (const file of files) {
-    form.append('media[]', file);
+    const form = new FormData();
+    form.append('review_id', String(reviewId));
+    form.append('file', file);
+    // Do NOT set Content-Type — browser sets it with the multipart boundary
+    const res = await fetch('/api/reviews/media/upload', {
+      method: 'POST',
+      headers: authHeader(),
+      body: form,
+    });
+    const result = await handleResponse<MediaUploadResult>(res);
+    results.push(result);
   }
-  // Do NOT set Content-Type — browser sets it with the multipart boundary
-  const res = await fetch(`/api/reviews/${reviewId}/media`, {
-    method: 'POST',
-    headers: authHeader(),
-    body: form,
-  });
-  return handleResponse<MediaUploadResult[]>(res);
-}
-
-export async function voteReview(
-  reviewId: number,
-  vote: 'helpful' | 'unhelpful',
-): Promise<VoteResult> {
-  const res = await fetch(`/api/reviews/${reviewId}/vote`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...authHeader() },
-    body: JSON.stringify({ vote }),
-  });
-  return handleResponse<VoteResult>(res);
+  return results;
 }
 
 export async function deleteReview(reviewId: number): Promise<void> {
