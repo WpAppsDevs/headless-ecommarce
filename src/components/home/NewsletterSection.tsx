@@ -13,9 +13,19 @@ export function NewsletterSection() {
     e.preventDefault();
     if (!email.trim()) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setSubmitted(true);
-    setLoading(false);
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok || data?.alreadySubscribed) {
+        setSubmitted(true);
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
