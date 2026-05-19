@@ -46,11 +46,12 @@ function friendlyError(code: string): string {
 interface ReviewFormProps {
   productId: number;
   productName: string;
+  orderId?: number;
   onSuccess?: (review: Review) => void;
   onCancel?: () => void;
 }
 
-export function ReviewForm({ productId, productName, onSuccess, onCancel }: ReviewFormProps) {
+export function ReviewForm({ productId, productName, orderId, onSuccess, onCancel }: ReviewFormProps) {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const markAsReviewed = useReviewStore((s) => s.markAsReviewed);
@@ -77,6 +78,7 @@ export function ReviewForm({ productId, productName, onSuccess, onCancel }: Revi
     try {
       const review = await submitReview({
         product_id: productId,
+        order_id: orderId,
         rating: values.rating,
         title: values.title || undefined,
         content: values.content,

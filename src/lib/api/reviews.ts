@@ -34,6 +34,7 @@ export interface Review {
 
 export interface ReviewInput {
   product_id: number;
+  order_id?: number;
   rating: number;
   title?: string;
   content: string;

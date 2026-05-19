@@ -139,6 +139,7 @@ export function ReviewModal({ isOpen, onClose, orderId, items, onSuccess }: Revi
             <ReviewForm
               productId={selectedItem.product_id}
               productName={selectedItem.name}
+              orderId={orderId}
               onSuccess={handleSuccess}
               onCancel={items.length > 1 ? () => setSelectedItem(null) : onClose}
             />

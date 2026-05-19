@@ -11,11 +11,12 @@
 5. [API Layer](#api-layer)
 6. [State Management](#state-management)
 7. [Components & Pages](#components--pages)
-8. [Authentication & Authorization](#authentication--authorization)
-9. [Coding Conventions](#coding-conventions)
-10. [Security Practices](#security-practices)
-11. [How-To Guides](#how-to-guides)
-12. [Deployment & Configuration](#deployment--configuration)
+8. [Review System](#review-system)
+9. [Authentication & Authorization](#authentication--authorization)
+10. [Coding Conventions](#coding-conventions)
+11. [Security Practices](#security-practices)
+12. [How-To Guides](#how-to-guides)
+13. [Deployment & Configuration](#deployment--configuration)
 
 ---
 
@@ -42,7 +43,7 @@ This is a **Next.js 16 (App Router)** headless eCommerce frontend built for a Wo
 ├─────────────────────────────────────────────────────────┤
 │  Components — Reusable UI building blocks               │
 ├─────────────────────────────────────────────────────────┤
-│  Stores (Zustand) — Client-side state (auth, cart)      │
+│  Stores (Zustand) — Client-side state (auth, cart, wishlist, reviews) │
 ├─────────────────────────────────────────────────────────┤
 │  API Layer — Typed fetch wrappers, error handling       │
 ├─────────────────────────────────────────────────────────┤
@@ -66,13 +67,24 @@ src/
 │   │   │   ├── logout/route.ts
 │   │   │   ├── refresh/route.ts
 │   │   │   └── me/route.ts
-│   │   └── account/              # User account endpoints
-│   │       └── orders/route.ts
+│   │   ├── account/              # User account endpoints
+│   │   │   └── orders/route.ts
+│   │   ├── reviews/              # Review system proxies
+│   │   │   ├── create/route.ts            # POST create review
+│   │   │   ├── media/upload/route.ts      # POST upload review media
+│   │   │   ├── random/route.ts            # GET random reviews (ISR 600s)
+│   │   │   ├── product/[product_id]/route.ts   # GET reviews for a product
+│   │   │   ├── aggregate/[product_id]/route.ts # GET rating aggregate (ISR 300s)
+│   │   │   └── [review_id]/route.ts       # DELETE review
+│   │   └── wishlist/             # Wishlist proxies
+│   │       ├── route.ts                   # GET wishlist / POST add
+│   │       ├── check/[id]/route.ts        # GET check if product is wishlisted
+│   │       └── [id]/route.ts              # DELETE remove from wishlist
 │   ├── (shop)/                   # Layout group
 │   │   ├── page.tsx              # Homepage
 │   │   └── products/
 │   │       ├── page.tsx          # Product listing page
-│   │       └── [slug]/page.tsx   # Product detail page
+│   │       └── [slug]/page.tsx   # Product detail page (SSR + ISR, JSON-LD)
 │   ├── layout.tsx                # Root layout (header, footer, hydration)
 │   ├── error.tsx                 # Global error boundary (CSR)
 │   ├── not-found.tsx             # Custom 404 page
@@ -117,6 +129,7 @@ src/
 │   │   ├── WholesaleBanner.tsx   # Wholesale call-to-action
 │   │   ├── ComingSoonSection.tsx # Upcoming products teaser
 │   │   ├── TestimonialsSection.tsx
+│   │   ├── TestimonialCarousel.tsx # Live reviews carousel (uses Review[])
 │   │   ├── InstagramSection.tsx
 │   │   ├── WhatsAppCTA.tsx       # WhatsApp contact button
 │   │   └── NewsletterSection.tsx
@@ -126,9 +139,22 @@ src/
 │   │   ├── ProductGrid.tsx       # Grid wrapper for product cards
 │   │   ├── ProductImages.tsx     # Image gallery
 │   │   ├── VariationSelector.tsx # Color/size selection
-│   │   ├── ProductTabs.tsx       # Description/info tabs
+│   │   ├── ProductTabs.tsx       # Description/reviews tabs (wired to live data)
 │   │   ├── SearchBar.tsx         # Product search input
 │   │   └── RelatedProducts.tsx
+│   ├── reviews/                  # Review display & submission components
+│   │   ├── StarRatingInput.tsx       # Interactive 1–5 star picker
+│   │   ├── ReviewImageUpload.tsx     # Drag-and-drop / browse image uploader
+│   │   ├── ReviewForm.tsx            # RHF + Zod review submission form
+│   │   ├── ReviewCard.tsx            # Single review with lightbox
+│   │   ├── ReviewListSkeleton.tsx    # Loading skeleton for review list
+│   │   ├── ReviewList.tsx            # Paginated/sorted review list
+│   │   ├── RatingSummary.tsx         # Average + distribution bar chart
+│   │   ├── ReviewFilters.tsx         # Sort dropdown (newest / most helpful)
+│   │   ├── ProductReviewsSection.tsx # Full reviews tab (summary + list + CTA)
+│   │   └── ReviewsErrorBoundary.tsx  # Error boundary for reviews tab
+│   ├── review-modal/
+│   │   └── ReviewModal.tsx       # Modal: product picker → ReviewForm
 │   ├── shop/                     # Shop listing components
 │   │   ├── ShopSidebar.tsx       # Filters
 │   │   ├── ShopTopBar.tsx        # Sort/view options
@@ -151,11 +177,15 @@ src/
 │       ├── Dashboard.tsx         # Account overview/stats
 │       ├── Orders.tsx            # Orders tab
 │       ├── OrdersList.tsx        # Paginated orders table
-│       ├── OrderCard.tsx         # Single order card
+│       ├── OrderCard.tsx         # Single order card + Write Review button
 │       ├── OrderDetailsModal.tsx # Order detail modal
+│       ├── Wishlist.tsx          # Wishlist tab
 │       ├── Address.tsx           # Address management
 │       ├── Settings.tsx          # Profile settings form
 │       └── StatsCard.tsx         # Stat summary card
+│
+├── hooks/                        # Custom React hooks
+│   └── useDebounce.ts            # Generic debounce hook
 │
 ├── lib/                          # Utility and service modules
 │   ├── api/                      # API layer (typed fetch wrappers)
@@ -164,14 +194,20 @@ src/
 │   │   ├── cart.ts               # Cart endpoints
 │   │   ├── checkout.ts           # Checkout & order placement
 │   │   ├── orders.ts             # Orders pagination
-│   │   └── user.ts               # User profile endpoints (placeholder)
+│   │   ├── reviews.ts            # Review system (read + mutations)
+│   │   ├── wishlist.ts           # Wishlist endpoints
+│   │   ├── filters.ts            # Shop filter helpers
+│   │   └── user.ts               # User profile endpoints
 │   ├── config.ts                 # App configuration & constants
 │   ├── errors.ts                 # Custom error class
 │   └── utils.ts                  # Utility functions (cn, etc)
 │
 ├── stores/                       # Zustand state stores
 │   ├── authStore.ts              # Authentication state & actions
-│   └── cartStore.ts              # Shopping cart state & actions
+│   ├── cartStore.ts              # Shopping cart state & actions
+│   ├── wishlistStore.ts          # Wishlist state & actions
+│   ├── reviewStore.ts            # Reviewed product ID tracking (session)
+│   └── currencyStore.ts          # Currency/locale state
 │
 └── (assets in public/)           # Images, fonts, etc (via /public)
 ```
@@ -250,6 +286,59 @@ export function setOnUnauthorized(fn: () => void)
 - Raw `fetch()` (not `apiClient`) to preserve `meta` pagination field
 - Browser calls `/api/account/orders` proxy (server-to-server CORS bypass)
 
+#### `reviews.ts` — Review System
+
+**Types:**
+```ts
+interface ReviewAuthor { name: string; is_verified: boolean; avatar_url?: string }
+interface ReviewMedia  { url: string; type: 'image'|'video'; mime_type: string; size: number }
+interface Review {
+  id: number; product_id: number; author: ReviewAuthor
+  rating: number; title: string; content: string
+  date: string; media: ReviewMedia[]; status: string
+}
+interface RatingAggregate {
+  average: number; count: number
+  distribution: Record<string, number>  // { "1": N, ..., "5": N }
+}
+interface ReviewInput {
+  product_id: number; rating: number; title: string; content: string
+  order_id?: number; media_ids?: number[]
+}
+interface MediaUploadResult { id: number; url: string }
+```
+
+**Functions:**
+- `getProductReviews(productId, page, perPage, sort)` — Paginated reviews for a product
+- `getRatingAggregate(productId)` — Star distribution + average
+- `getRandomReviews(count)` — Random approved reviews for homepage carousel
+- `submitReview(input)` — POST create review (auth required)
+- `uploadReviewMedia(reviewId, files)` — Upload one file per request, looping; returns `MediaUploadResult[]`
+- `deleteReview(reviewId)` — DELETE review (auth required)
+
+**CORS Proxy Pattern:**
+- `isClient = typeof window !== 'undefined'`
+- Browser calls: `/api/reviews/*` (Next.js route handler)
+- Server calls: direct `config.apiBase` with `{ next: { revalidate: N } }` for ISR
+
+**Endpoint Mapping:**
+| Function | Browser proxy | WP endpoint |
+|---|---|---|
+| `getProductReviews` | `/api/reviews/product/{id}` | `GET /wp-json/wpadhlwrapi/v1/reviews?product_id={id}` |
+| `getRatingAggregate` | `/api/reviews/aggregate/{id}` | `GET /wp-json/wpadhlwrapi/v1/reviews/aggregate?product_id={id}` |
+| `getRandomReviews` | `/api/reviews/random` | `GET /wp-json/wpadhlwrapi/v1/reviews/random` |
+| `submitReview` | `/api/reviews/create` | `POST /wp-json/api/reviews/create` |
+| `uploadReviewMedia` | `/api/reviews/media/upload` | `POST /wp-json/api/reviews/media/upload` |
+| `deleteReview` | `/api/reviews/{id}` | `DELETE /wp-json/api/reviews/{id}` |
+
+#### `wishlist.ts` — Wishlist Endpoints
+
+**Functions:**
+- `getWishlist(page, perPage)` — Paginated wishlist items (auth required)
+- `addToWishlist(productId)` — Add product (auth required)
+- `removeFromWishlist(productId)` — Remove product (auth required)
+- `checkWishlist(productId)` — Check if product is in wishlist (auth required)
+
 ---
 
 ### 2. **Route Handlers** (`src/app/api/`)
@@ -314,6 +403,62 @@ Next.js route handlers act as **server-side proxies** to the WordPress API. This
 2. Queries WordPress `/wp-json/api/orders?page=...&per_page=...`
 3. Returns full response (including `meta` pagination field)
 
+#### `/api/reviews/create` — POST
+
+**Purpose:** Submit a new review (auth required)
+
+**Body:** `ReviewInput` (product_id, rating, title, content, order_id?, media_ids?)
+
+**Proxies to:** `POST /wp-json/api/reviews/create`
+
+#### `/api/reviews/media/upload` — POST
+
+**Purpose:** Upload a single review image
+
+**Body:** `multipart/form-data` with `file` (Blob) + `review_id` (number)
+
+**Important:** Do **not** set `Content-Type` manually — browser sets the boundary automatically.
+
+**Proxies to:** `POST /wp-json/api/reviews/media/upload`
+
+#### `/api/reviews/product/[product_id]` — GET
+
+**Purpose:** Fetch paginated reviews for a product
+
+**Query params:** `?page=1&per_page=10&sort=newest`
+
+**Proxies to:** `GET /wp-json/wpadhlwrapi/v1/reviews?product_id={id}`
+
+#### `/api/reviews/aggregate/[product_id]` — GET
+
+**Purpose:** Fetch rating distribution + average (ISR 300s)
+
+**Proxies to:** `GET /wp-json/wpadhlwrapi/v1/reviews/aggregate?product_id={id}`
+
+#### `/api/reviews/random` — GET
+
+**Purpose:** Fetch random approved reviews for testimonials (ISR 600s)
+
+**Proxies to:** `GET /wp-json/wpadhlwrapi/v1/reviews/random`
+
+#### `/api/reviews/[review_id]` — DELETE
+
+**Purpose:** Delete a review (auth required, author or admin only)
+
+**Proxies to:** `DELETE /wp-json/api/reviews/{id}`
+
+#### `/api/wishlist` — GET / POST
+
+**Purpose:** Get wishlist or add item (auth required)
+
+#### `/api/wishlist/[id]` — DELETE
+
+**Purpose:** Remove item from wishlist (auth required)
+
+#### `/api/wishlist/check/[id]` — GET
+
+**Purpose:** Check if product is in wishlist (auth required)
+
 ---
 
 ### 3. **State Management** (`src/stores/`)
@@ -370,6 +515,46 @@ interface CartState {
 - Guest token passed to all cart endpoints via `getGuestToken()`
 - Logged-in users pass user token instead
 - Cart endpoints return full `CartData` (items + token) — state updated atomically
+
+#### `wishlistStore.ts` — Zustand Wishlist Store
+
+**State:**
+```ts
+interface WishlistState {
+  items: WishlistItem[]
+  total: number
+  loading: boolean
+  error: string | null
+}
+```
+
+**Actions:**
+- `fetchWishlist(page?, perPage?)` — GET paginated wishlist
+- `addItem(productId)` — POST add to wishlist
+- `removeItem(productId)` — DELETE from wishlist
+- `isInWishlist(productId)` — boolean check (local state)
+- `clear()` — Reset on logout
+
+#### `reviewStore.ts` — Zustand Review Tracking Store
+
+**Purpose:** Track which products have been reviewed in the current session to prevent duplicate review submissions and update UI state (hides "Write Review" button after submission).
+
+**State:**
+```ts
+interface ReviewState {
+  reviewedProductIds: number[]
+}
+```
+
+**Actions:**
+- `markReviewed(productId)` — Add ID to reviewed list
+- `isReviewed(productId)` — boolean check
+- `clear()` — Reset on logout
+
+**Key Logic:**
+- `markReviewed()` called on successful `submitReview()`
+- `isReviewed()` used in `OrderCard.tsx` eligibility check to hide the "Write Review" button
+- Store is cleared in `authStore.logout()` to reset state on sign-out
 
 ---
 
@@ -663,6 +848,130 @@ Client component mounted in the root layout (alongside `AuthHydrator`) that rest
 
 ---
 
+## Review System
+
+The review system enables customers to rate and review products they have purchased. It spans API layer, route handlers, Zustand store, and a dedicated component tree.
+
+### Architecture
+
+```
+Orders page (account/OrderCard.tsx)
+  └─ eligibility check → "Write Review" button
+       └─ ReviewModal.tsx (product picker if multi-item order)
+            └─ ReviewForm.tsx (RHF + Zod)
+                 ├─ StarRatingInput.tsx
+                 └─ ReviewImageUpload.tsx
+                      └─ uploadReviewMedia() → /api/reviews/media/upload
+
+Product detail page (products/[slug]/page.tsx)
+  └─ ProductTabs.tsx
+       └─ ProductReviewsSection.tsx
+            ├─ RatingSummary.tsx
+            ├─ ReviewFilters.tsx
+            └─ ReviewList.tsx
+                 └─ ReviewCard.tsx (lightbox, author, date)
+
+Homepage (TestimonialsSection.tsx)
+  └─ TestimonialCarousel.tsx ← getRandomReviews() (ISR 600s)
+```
+
+### Review Eligibility (`OrderCard.tsx`)
+
+The "Write Review" button is shown only when **all** of:
+1. `order.status` is `'completed'` or `'processing'`
+2. Total refunded < order total (not fully refunded)
+3. `reviewStore.isReviewed(productId)` returns `false` (not already reviewed this session)
+
+```ts
+const isEligible =
+  ['completed', 'processing'].includes(order.status) &&
+  Math.abs(parseFloat(refund.total)) < parseFloat(order.total) &&
+  !reviewStore.isReviewed(productId)
+```
+
+After a successful submission, `reviewStore.markReviewed(productId)` is called, hiding the button immediately.
+
+### Review Submission Flow
+
+```
+1. User clicks "Write Review" on OrderCard
+   ↓
+2. ReviewModal opens (orderId passed as prop)
+   → If multi-item order: user picks which product to review
+   ↓
+3. ReviewForm renders with productId + orderId
+   ↓
+4. User fills in: rating (StarRatingInput), title, content, images (ReviewImageUpload)
+   ↓
+5. On submit:
+   a. submitReview({ product_id, rating, title, content, order_id, media_ids? })
+      POST /api/reviews/create → POST /wp-json/api/reviews/create
+   b. If images: uploadReviewMedia(reviewId, files) — loops one file per request
+      POST /api/reviews/media/upload (multipart/form-data, no explicit Content-Type)
+      → POST /wp-json/api/reviews/media/upload
+   ↓
+6. reviewStore.markReviewed(productId) — hides button
+7. Toast notification shown (sonner)
+```
+
+### Review Display Flow
+
+```
+Server (products/[slug]/page.tsx, ISR 300s):
+  → getRatingAggregate(productId) → JSON-LD AggregateRating + RatingSummary props
+
+Client (ProductReviewsSection.tsx):
+  → getProductReviews(productId, page, perPage, sort) on mount and filter change
+  → renders ReviewList → ReviewCard (author.name, author.is_verified, date, media[].url)
+  → pagination via ReviewList state
+```
+
+### Key Type Contracts
+
+```ts
+// Review as returned by API
+interface Review {
+  id: number
+  product_id: number
+  author: { name: string; is_verified: boolean; avatar_url?: string }
+  rating: number          // 1–5
+  title: string
+  content: string
+  date: string            // ISO 8601, e.g. "2025-01-15T10:30:00"
+  media: ReviewMedia[]
+  status: string
+}
+
+// Media as returned by API
+interface ReviewMedia {
+  url: string             // NOT file_url
+  type: 'image' | 'video'
+  mime_type: string
+  size: number
+}
+
+// Rating aggregate
+interface RatingAggregate {
+  average: number
+  count: number
+  distribution: Record<string, number>  // { "1": 0, "2": 1, "3": 5, "4": 12, "5": 30 }
+}
+```
+
+### Edge Cases Handled
+
+| Scenario | Handling |
+|----------|----------|
+| Guest order (no account) | "Write Review" never shown — requires authentication |
+| Already reviewed | `reviewStore.isReviewed(productId)` hides button (session-scoped) |
+| Fully refunded order | Ineligible — refund total check prevents showing button |
+| `processing` status | Eligible — customer may review before final completion |
+| Multi-item order | ReviewModal lets user pick which product to review |
+| Media upload failure | Partial success — review saved, media upload error shown separately |
+| `sizes` on review images | All `<Image>` inside ReviewCard + ReviewImageUpload use `sizes="80px"` |
+
+---
+
 ## Authentication & Authorization
 
 ### Token Flow
@@ -938,34 +1247,72 @@ throw new Error(`User ${email} not found in database`)  // Leaks user existence
 
 ### Add a New API Endpoint
 
-**Step 1:** Create the wrapper in `src/lib/api/products.ts` (or appropriate module)
+**Step 1:** Create the typed wrapper in the appropriate `src/lib/api/*.ts` module.
 
+For **public read** endpoints (no auth, can be called server-side with ISR):
 ```ts
+// src/lib/api/reviews.ts
+const isClient = typeof window !== 'undefined'
+
 export async function getProductReviews(productId: number): Promise<Review[]> {
-  return apiClient<Review[]>(`${config.productsNs}/products/${productId}/reviews`)
+  const base = isClient ? '' : config.apiBase
+  const ns   = isClient ? '/api/reviews/product' : `/${config.productsNs}/reviews`
+  const res  = await fetch(`${base}${ns}/${productId}`, {
+    next: { revalidate: 60 },  // ISR on server, ignored on client
+  })
+  const json = await res.json()
+  return json.data as Review[]
 }
 ```
 
-**Step 2:** Use in a component
-
+For **authenticated mutation** endpoints (always proxied through Next.js):
 ```ts
-const reviews = await getProductReviews(product.id)
+export async function submitReview(input: ReviewInput): Promise<Review> {
+  const token = authHeader()  // reads tokenCache
+  const res = await fetch('/api/reviews/create', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...token },
+    body: JSON.stringify(input),
+  })
+  const json = await res.json()
+  return json.data as Review
+}
 ```
 
-**Step 3:** (If protected) Create a Next.js route handler proxy
+**Step 2:** Create the Next.js route handler proxy in `src/app/api/`:
 
 ```ts
-// src/app/api/account/reviews/route.ts
-export async function GET(req: NextRequest) {
+// src/app/api/reviews/create/route.ts
+import { NextRequest, NextResponse } from 'next/server'
+import { config } from '@/lib/config'
+
+export async function POST(req: NextRequest) {
   const token = req.headers.get('Authorization')
-  const productId = req.nextUrl.searchParams.get('product_id')
+  const body  = await req.json()
 
   const wpRes = await fetch(
-    `${config.apiBase}/${config.apiNs}/reviews?product_id=${productId}`,
-    { headers: { Authorization: token ?? '' } }
+    `${config.apiBase}/${config.apiNs}/reviews/create`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token ?? '',
+      },
+      body: JSON.stringify(body),
+    }
   )
-  return NextResponse.json(await wpRes.json())
+  return NextResponse.json(await wpRes.json(), { status: wpRes.status })
 }
+```
+
+**Step 3:** Use in a component (client) or page (server)
+
+```ts
+// Client
+const review = await submitReview({ product_id: 42, rating: 5, title: 'Great!', content: '...' })
+
+// Server (ISR)
+const reviews = await getProductReviews(42)  // cached for 60s
 ```
 
 ### Add a New Page
@@ -1149,6 +1496,9 @@ vercel --prod
 | "Double-slash in URL" | `NEXT_PUBLIC_WP_URL` has trailing slash | Config strips trailing slash: `.replace(/\/$/, '')` |
 | "404 on product page" | ISR revalidation stale | Rebuild or trigger manual revalidation |
 | Build fails on Vercel | `NEXT_PUBLIC_WP_URL` not set | Add to Vercel env vars |
+| "Cannot find module 'X'" at runtime | Stale Turbopack SSR chunk cache | `rm -rf .next` then restart dev server |
+| Logo aspect-ratio warning | Tailwind `w-auto` not detected by Next.js Image | Use inline `style={{ width: 'auto' }}` instead of Tailwind class |
+| `sizes="100vw"` warning on padded images | Image is inside a padded container | Use `calc(100vw - Xrem)` based on actual container padding |
 
 ---
 
@@ -1161,12 +1511,20 @@ vercel --prod
 - **`src/app/not-found.tsx`** — Custom 404 page
 - **`src/stores/authStore.ts`** — Auth state, login/logout/hydrate logic
 - **`src/stores/cartStore.ts`** — Cart state, add/remove/update items
+- **`src/stores/wishlistStore.ts`** — Wishlist state
+- **`src/stores/reviewStore.ts`** — Reviewed product ID tracking (prevents duplicate reviews)
 - **`src/lib/api/client.ts`** — Central API client with error handling & auto-refresh
+- **`src/lib/api/reviews.ts`** — Full review system API layer (types + functions)
 - **`src/lib/config.ts`** — Configuration & environment variables
 - **`src/components/layout/AuthHydrator.tsx`** — Auth state restoration on page load
 - **`src/components/layout/CartHydrator.tsx`** — Cart state restoration on page load
 - **`src/components/layout/Header.tsx`** — Global navigation
+- **`src/components/reviews/ProductReviewsSection.tsx`** — Full reviews tab (summary + list + CTA)
+- **`src/components/review-modal/ReviewModal.tsx`** — Review submission modal
+- **`src/components/account/OrderCard.tsx`** — Order card with review eligibility + "Write Review" button
 - **`src/app/api/auth/login/route.ts`** — Login endpoint proxy
+- **`src/app/api/reviews/create/route.ts`** — Review submission proxy
+- **`src/app/api/reviews/media/upload/route.ts`** — Media upload proxy (single file per request)
 
 ---
 
@@ -1182,6 +1540,6 @@ When adding features:
 
 ---
 
-**Last Updated:** April 27, 2026  
+**Last Updated:** May 19, 2026  
 **Maintained By:** Development Team  
 **For Questions:** See README.md or contact the team
