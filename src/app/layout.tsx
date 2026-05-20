@@ -11,6 +11,7 @@ import { Toaster } from "sonner";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { config } from "@/lib/config";
 import { AnnouncementBar } from "@/components/home/AnnouncementBar";
+import { getMenuByLocation } from "@/lib/api/menus";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,11 +34,13 @@ export const metadata: Metadata = {
   description: "Headless eCommerce powered by WooCommerce",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const navLinks = await getMenuByLocation('primary');
+
   return (
     <html
       lang="en"
@@ -49,7 +52,7 @@ export default function RootLayout({
         <WishlistHydrator />
         <CurrencyHydrator />
         <AnnouncementBar />
-        <Header />
+        <Header navLinks={navLinks} />
         <CartDrawer />
         <Toaster richColors position="top-right" />
         <main className="flex-1">{children}</main>

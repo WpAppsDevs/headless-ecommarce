@@ -17,12 +17,14 @@ import { useCartStore } from '@/stores/cartStore';
 import { useWishlistStore } from '@/stores/wishlistStore';
 import { cn } from '@/lib/utils';
 
-const NAV_LINKS = [
-  { href: '/', label: 'HOME' },
-  { href: '/products?tag=ready-stock', label: 'READY STOCK' },
-  { href: '/products?tag=pre-order', label: 'PRE-ORDER' },
-  { href: '/products?tag=catalog', label: 'CATALOG / WHOLESALE' },
-  { href: '/contact', label: 'CONTACT' },
+import type { NavLink } from '@/lib/api/menus';
+
+const STATIC_NAV_LINKS: NavLink[] = [
+  { href: '/', label: 'HOME', target: '_self' },
+  { href: '/products?tag=ready-stock', label: 'READY STOCK', target: '_self' },
+  { href: '/products?tag=pre-order', label: 'PRE-ORDER', target: '_self' },
+  { href: '/products?tag=catalog', label: 'CATALOG / WHOLESALE', target: '_self' },
+  { href: '/contact', label: 'CONTACT', target: '_self' },
 ];
 
 // ── Site Logo ───────────────────────────────────────────────────────────────
@@ -81,16 +83,18 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
 }
 
 // ── Desktop nav links ────────────────────────────────────────────────────────
-function DesktopNavLinks() {
+function DesktopNavLinks({ links }: { links: NavLink[] }) {
   const pathname = usePathname();
   return (
     <nav className="hidden items-center gap-5 xl:flex" aria-label="Main navigation">
-      {NAV_LINKS.map(({ href, label }) => {
+      {links.map(({ href, label, target }) => {
         const active = pathname === href || (href !== '/' && pathname.startsWith(href.split('?')[0]));
         return (
           <Link
             key={href}
             href={href}
+            target={target}
+            rel={target === '_blank' ? 'noopener noreferrer' : undefined}
             className={cn(
               'text-[11px] font-semibold tracking-[0.08em] transition-colors whitespace-nowrap',
               active ? 'text-brand-wine' : 'text-zinc-700 hover:text-brand-wine',
@@ -105,16 +109,18 @@ function DesktopNavLinks() {
 }
 
 // ── Mobile nav links ─────────────────────────────────────────────────────────
-function MobileNavLinks({ onClick }: { onClick?: () => void }) {
+function MobileNavLinks({ links, onClick }: { links: NavLink[]; onClick?: () => void }) {
   const pathname = usePathname();
   return (
     <>
-      {NAV_LINKS.map(({ href, label }) => {
+      {links.map(({ href, label, target }) => {
         const active = pathname === href || (href !== '/' && pathname.startsWith(href.split('?')[0]));
         return (
           <Link
             key={href}
             href={href}
+            target={target}
+            rel={target === '_blank' ? 'noopener noreferrer' : undefined}
             onClick={onClick}
             className={cn(
               'text-sm font-medium transition-colors',
@@ -167,7 +173,8 @@ function UserMenu({ onClose }: { onClose?: () => void }) {
 }
 
 // ── Main Header ──────────────────────────────────────────────────────────────
-export function Header() {
+export function Header({ navLinks }: { navLinks?: NavLink[] }) {
+  const links = navLinks && navLinks.length > 0 ? navLinks : STATIC_NAV_LINKS;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -198,7 +205,7 @@ export function Header() {
         <SiteLogo />
 
         {/* ── Desktop Nav ── */}
-        <DesktopNavLinks />
+        <DesktopNavLinks links={links} />
 
         {/* ── Desktop Right Icons ── */}
         <div className="hidden items-center gap-0.5 xl:flex">
@@ -311,7 +318,7 @@ export function Header() {
               </SheetHeader>
               <div className="flex flex-col gap-6 px-6 py-6">
                 <nav className="flex flex-col gap-4" aria-label="Mobile navigation">
-                  <MobileNavLinks onClick={() => setMobileOpen(false)} />
+                  <MobileNavLinks links={links} onClick={() => setMobileOpen(false)} />
                 </nav>
                 <hr className="border-zinc-100" />
                 <div>
