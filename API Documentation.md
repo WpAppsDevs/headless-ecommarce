@@ -21,9 +21,13 @@ This document is structured for both human developers and AI code-generation sys
 8. [Checkout](#8-checkout)
 9. [Orders](#9-orders)
 10. [Customer (User Profile)](#10-customer-user-profile)
-11. [Error Reference](#11-error-reference)
-12. [Complete Typical Flows](#12-complete-typical-flows)
-13. [Environment Configuration](#13-environment-configuration)
+11. [Wishlist](#11-wishlist)
+12. [Store Settings](#12-store-settings)
+13. [Shop Filter Endpoints](#13-shop-filter-endpoints)
+14. [Reviews](#14-reviews)
+15. [Error Reference](#15-error-reference)
+16. [Complete Typical Flows](#16-complete-typical-flows)
+17. [Environment Configuration](#17-environment-configuration)
 
 ---
 
@@ -49,8 +53,8 @@ Base: https://your-wp-site.com/wp-json
 
 | Namespace | Full Base URL | Used For |
 |---|---|---|
-| `wpadhlwrapi/v1` | `/wp-json/wpadhlwrapi/v1/` | Products, Cart |
-| `api` | `/wp-json/api/` | Auth, Checkout, Orders, User |
+| `wpadhlwrapi/v1` | `/wp-json/wpadhlwrapi/v1/` | Products, Cart, Store Settings, Reviews (public reads) |
+| `api` | `/wp-json/api/` | Auth, Checkout, Orders, User, Reviews (mutations) |
 
 ---
 
@@ -81,6 +85,7 @@ The following route prefixes require a valid `Authorization: Bearer` header. Req
 | `/api/user` | `GET /api/user` |
 | `/api/orders` | `GET /api/orders` |
 | `/api/checkout` | `POST /api/checkout` |
+| `/api/wishlist` | `GET`, `POST`, `DELETE /api/wishlist`, `GET /api/wishlist/check/{product_id}` |
 
 All other routes (`/api/auth/*`, `/wpadhlwrapi/v1/*`) are publicly accessible.
 
@@ -485,6 +490,8 @@ Returns a paginated list of published WooCommerce products.
 | `category` | string | — | Filter by category slug |
 | `brand` | string | — | Filter by brand slug (`product_brand` taxonomy) |
 | `tag` | string | — | Filter by product tag slug |
+| `color` | string | — | Filter by color attribute slug (`pa_color` taxonomy) |
+| `size` | string | — | Filter by size attribute slug (`pa_size` taxonomy) |
 | `search` | string | — | Keyword search |
 
 #### Example Request
@@ -797,14 +804,15 @@ Same shape, with `"variations": []`.
 
 **When to use:**
 - `GET /products` — product listing pages, category pages, search results
-- `GET /products?brand=nike` — brand-specific listing pages
+- `GET /products?brand=khaadi` — brand-specific listing pages
 - `GET /products?tag=sale` — tag-filtered listing pages
+- `GET /products?color=red&size=m` — attribute-filtered listing pages (sidebar filters)
 - `GET /products/{slug}` — product detail page (PDP); use this instead of making separate variation requests
 
 **Typical Flow:**
 1. `GET /products?category=shoes&page=1&per_page=12` → render product grid
-2. `GET /products?brand=nike&tag=sale` → render filtered listing
-3. User clicks product → `GET /products/nike-air-max` → render PDP with all variation options pre-loaded
+2. `GET /products?brand=khaadi&color=red&size=m` → render filtered listing
+3. User clicks product → `GET /products/classic-kurta` → render PDP with all variation options pre-loaded
 4. User selects a variation → read from `data.variations` array (no extra API call needed)
 5. User adds to cart → `POST /wpadhlwrapi/v1/cart/add` with the selected `variation_id`
 
@@ -898,12 +906,20 @@ export async function getProducts(params: {
   page?: number;
   per_page?: number;
   category?: string;
+  brand?: string;
+  tag?: string;
+  color?: string;
+  size?: string;
   search?: string;
 }) {
   const query = new URLSearchParams({
     page: String(params.page ?? 1),
     per_page: String(params.per_page ?? 12),
     ...(params.category && { category: params.category }),
+    ...(params.brand && { brand: params.brand }),
+    ...(params.tag && { tag: params.tag }),
+    ...(params.color && { color: params.color }),
+    ...(params.size && { size: params.size }),
     ...(params.search && { search: params.search }),
   });
   const res = await fetch(`${API_BASE}/products?${query}`);
@@ -1901,7 +1917,964 @@ export function CheckoutPage() {
 
 ---
 
-## 11. Error Reference
+## 11. Wishlist
+
+All wishlist endpoints require a valid `Authorization: Bearer <access_token>` header.
+The authenticated user is resolved from the JWT — no session or cookie is involved.
+
+### 11.1 Get Wishlist Products
+
+```
+GET /wp-json/api/wishlist
+```
+
+Returns a paginated list of normalized WooCommerce products in the current user's wishlist.
+
+**Query Parameters**
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `page` | integer | 1 | Page number (1-indexed). |
+| `per_page` | integer | 20 | Items per page (max 100). |
+
+**Success Response — HTTP 200**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 42,
+      "name": "Wireless Headphones",
+      "slug": "wireless-headphones",
+      "price": "99.00",
+      "regular_price": "129.00",
+      "sale_price": "99.00",
+      "images": [ { "src": "https://..." } ]
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "per_page": 20,
+    "total": 3,
+    "total_pages": 1,
+    "count": 3
+  }
+}
+```
+
+**Empty wishlist — HTTP 200**
+
+```json
+{
+  "success": true,
+  "data": [],
+  "meta": { "page": 1, "per_page": 20, "total": 0, "total_pages": 0, "count": 0 }
+}
+```
+
+---
+
+### 11.2 Toggle Wishlist (Add / Remove)
+
+```
+POST /wp-json/api/wishlist
+```
+
+Adds the product if it is **not** in the wishlist; removes it if it **is**. Returns the new state in one round-trip — ideal for heart/bookmark buttons.
+
+**Request Body**
+
+```json
+{ "product_id": 42 }
+```
+
+**Success Response — HTTP 200 (added)**
+
+```json
+{
+  "success": true,
+  "data": {
+    "in_wishlist": true,
+    "count": 4
+  }
+}
+```
+
+**Success Response — HTTP 200 (removed)**
+
+```json
+{
+  "success": true,
+  "data": {
+    "in_wishlist": false,
+    "count": 3
+  }
+}
+```
+
+**Error — product not found — HTTP 404**
+
+```json
+{
+  "code": "product_not_found",
+  "message": "Product not found or is not available.",
+  "data": { "status": 404 }
+}
+```
+
+---
+
+### 11.3 Remove from Wishlist
+
+```
+DELETE /wp-json/api/wishlist/{product_id}
+```
+
+Removes the product from the wishlist. Idempotent — returns HTTP 200 even if the product was not in the wishlist.
+
+**URL Parameters**
+
+| Parameter | Type | Description |
+|---|---|---|
+| `product_id` | integer | WooCommerce product ID. |
+
+**Success Response — HTTP 200**
+
+```json
+{
+  "success": true,
+  "data": {
+    "product_id": 42,
+    "in_wishlist": false,
+    "count": 3
+  }
+}
+```
+
+---
+
+### 11.4 Check Wishlist Status
+
+```
+GET /wp-json/api/wishlist/check/{product_id}
+```
+
+Lightweight check — returns whether a product is in the wishlist and the total count. No product data is fetched, making this fast for UI badges and icon states.
+
+**URL Parameters**
+
+| Parameter | Type | Description |
+|---|---|---|
+| `product_id` | integer | WooCommerce product ID. |
+
+**Success Response — HTTP 200**
+
+```json
+{
+  "success": true,
+  "data": {
+    "product_id": 42,
+    "in_wishlist": true,
+    "count": 4
+  }
+}
+```
+
+---
+
+### 11.5 AI-Friendly: Wishlist
+
+```
+MODULE: Wishlist
+NAMESPACE: api
+AUTH: Bearer JWT required on all endpoints
+
+ENDPOINTS:
+  GET    /api/wishlist                    → get_items()    → Response::list()
+  POST   /api/wishlist                    → toggle_item()  → Response::success()
+  DELETE /api/wishlist/{product_id}       → remove_item()  → Response::success()
+  GET    /api/wishlist/check/{product_id} → check_item()   → Response::success()
+
+CLASSES:
+  WishlistController   → routes/wishlist.php   → thin adapter, calls WishlistService
+  WishlistService      → business logic, product validation, N+1-free retrieval
+  WishlistRepository   → $wpdb CRUD against wp_user_wishlist_products
+
+TABLE: wp_user_wishlist_products
+  id BIGINT PK
+  user_id BIGINT NOT NULL
+  product_id BIGINT NOT NULL
+  created_at DATETIME
+  UNIQUE KEY (user_id, product_id)
+
+KEY BEHAVIOURS:
+  • POST uses toggle semantics (add if absent, remove if present)
+  • INSERT IGNORE prevents duplicate inserts at DB level
+  • N+1 prevention: IDs fetched in 1 query; products loaded via wc_get_products(include:[...])
+  • Product validation checks wc_get_product() + post_status=publish before writing
+  • DELETE is idempotent — no 404 on missing entry
+```
+
+---
+
+## 12. Store Settings
+
+No authentication required. Returns read-only store configuration grouped by concern.
+
+### 12.1 Get Store Settings
+
+```
+GET /wp-json/wpadhlwrapi/v1/store-settings
+```
+
+**Success Response — HTTP 200**
+
+```json
+{
+  "success": true,
+  "data": {
+    "currency": {
+      "code": "USD",
+      "symbol": "$",
+      "position": "left",
+      "decimal_separator": ".",
+      "thousand_separator": ",",
+      "num_decimals": 2
+    },
+    "store": {
+      "name": "My Store",
+      "description": "The best store around.",
+      "url": "https://mystore.com",
+      "country": "US",
+      "state": "CA",
+      "address": "123 Main St",
+      "address_2": "",
+      "city": "Los Angeles",
+      "postcode": "90001",
+      "timezone": "America/Los_Angeles",
+      "locale": "en_US"
+    },
+    "tax": {
+      "enabled": true,
+      "display_shop": "incl",
+      "display_cart": "incl",
+      "include_in_price": true
+    },
+    "shipping": {
+      "enabled": true,
+      "free_shipping_available": false
+    },
+    "catalog": {
+      "per_page": 12,
+      "default_sort": "menu_order",
+      "reviews_enabled": true,
+      "ratings_enabled": true
+    }
+  }
+}
+```
+
+**Field Reference**
+
+| Field | Type | Source WooCommerce Option |
+|---|---|---|
+| `currency.code` | string | `woocommerce_currency` |
+| `currency.symbol` | string | Derived via `get_woocommerce_currency_symbol()` |
+| `currency.position` | string | `woocommerce_currency_pos` (`left`, `right`, `left_space`, `right_space`) |
+| `currency.decimal_separator` | string | `woocommerce_price_decimal_sep` |
+| `currency.thousand_separator` | string | `woocommerce_price_thousand_sep` |
+| `currency.num_decimals` | integer | `woocommerce_price_num_decimals` |
+| `store.name` | string | `blogname` |
+| `store.description` | string | `blogdescription` |
+| `store.url` | string | `home` |
+| `store.country` | string | `woocommerce_default_country` (parsed — `CC` part) |
+| `store.state` | string | `woocommerce_default_country` (parsed — `STATE` part) |
+| `store.address` | string | `woocommerce_store_address` |
+| `store.address_2` | string | `woocommerce_store_address_2` |
+| `store.city` | string | `woocommerce_store_city` |
+| `store.postcode` | string | `woocommerce_store_postcode` |
+| `store.timezone` | string | WordPress timezone string |
+| `store.locale` | string | `WPLANG` constant (fallback `en_US`) |
+| `tax.enabled` | boolean | `woocommerce_calc_taxes` |
+| `tax.display_shop` | string | `woocommerce_tax_display_shop` |
+| `tax.display_cart` | string | `woocommerce_tax_display_cart` |
+| `tax.include_in_price` | boolean | `woocommerce_prices_include_tax` |
+| `shipping.enabled` | boolean | WC shipping modules active |
+| `shipping.free_shipping_available` | boolean | Any enabled free-shipping zone method |
+| `catalog.per_page` | integer | `posts_per_page` |
+| `catalog.default_sort` | string | `woocommerce_default_catalog_orderby` |
+| `catalog.reviews_enabled` | boolean | `woocommerce_enable_reviews` |
+| `catalog.ratings_enabled` | boolean | `woocommerce_enable_review_rating` |
+
+**Error Response — HTTP 500**
+
+```json
+{
+  "success": false,
+  "code": "settings_unavailable",
+  "message": "Could not load store settings."
+}
+```
+
+**Next.js Usage Example**
+
+```ts
+// lib/api/store-settings.ts
+export async function getStoreSettings() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_WP_URL}/wp-json/wpadhlwrapi/v1/store-settings`, {
+    next: { revalidate: 3600 }, // cache for 1 hour — settings rarely change
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.message);
+  return json.data;
+}
+```
+
+---
+
+## 13. Shop Filter Endpoints
+
+All four filter endpoints are fully public (no authentication required) and are designed to power the headless shop sidebar. Responses are cached with 6-hour transients and automatically invalidated on any term change.
+
+> **Brand taxonomy note:** Brands (`product_brand`) are a custom taxonomy — NOT a WooCommerce product attribute. They are served by `/product-brands` and intentionally excluded from `/product-attributes`.
+
+---
+
+### 13.1 Product Categories
+
+```
+GET /wp-json/wpadhlwrapi/v1/product-categories
+```
+
+Returns all WooCommerce product categories.
+
+**Query Parameters**
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `hide_empty` | boolean | `true` | Only return categories that have products |
+| `per_page` | integer | `100` | Maximum results |
+| `parent` | integer | — | Filter by parent category ID (for nested categories) |
+
+**Success Response — HTTP 200**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 30,
+      "name": "Women",
+      "slug": "women",
+      "parent": 0,
+      "description": "",
+      "count": 45,
+      "image": "https://example.com/wp-content/uploads/women.jpg"
+    },
+    {
+      "id": 31,
+      "name": "Kurta",
+      "slug": "kurta",
+      "parent": 30,
+      "description": "",
+      "count": 18,
+      "image": null
+    }
+  ],
+  "meta": {
+    "total": 2
+  }
+}
+```
+
+---
+
+### 13.2 Product Tags
+
+```
+GET /wp-json/wpadhlwrapi/v1/product-tags
+```
+
+Returns all WooCommerce product tags.
+
+**Query Parameters**
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `hide_empty` | boolean | `true` | Only tags with at least 1 product |
+| `per_page` | integer | `100` | Maximum results |
+
+**Success Response — HTTP 200**
+
+```json
+{
+  "success": true,
+  "data": [
+    { "id": 41, "name": "Ready Stock", "slug": "ready-stock", "count": 12 },
+    { "id": 42, "name": "Pre-Order",   "slug": "pre-order",   "count": 7  }
+  ],
+  "meta": {
+    "total": 2
+  }
+}
+```
+
+---
+
+### 13.3 Product Brands
+
+```
+GET /wp-json/wpadhlwrapi/v1/product-brands
+```
+
+Returns all terms from the `product_brand` custom taxonomy.
+
+**Query Parameters**
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `hide_empty` | boolean | `true` | Only brands with at least 1 product |
+| `per_page` | integer | `100` | Maximum results |
+
+**Success Response — HTTP 200**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 51,
+      "name": "Khaadi",
+      "slug": "khaadi",
+      "count": 6,
+      "image": "https://example.com/wp-content/uploads/khaadi-logo.jpg"
+    },
+    {
+      "id": 52,
+      "name": "Gul Ahmed",
+      "slug": "gul-ahmed",
+      "count": 4,
+      "image": null
+    }
+  ],
+  "meta": {
+    "total": 2
+  }
+}
+```
+
+> `image` is read from the `thumbnail_id` term meta (same pattern as `product_cat`). Returns `null` if no image is set.
+
+---
+
+### 13.4 Product Attributes
+
+```
+GET /wp-json/wpadhlwrapi/v1/product-attributes
+```
+
+Returns all registered WooCommerce product attribute taxonomies (e.g. `pa_color`, `pa_size`) with their terms grouped per attribute. `product_brand` is intentionally excluded.
+
+**Query Parameters**
+
+None.
+
+**Success Response — HTTP 200**
+
+```json
+{
+  "success": true,
+  "data": {
+    "pa_color": {
+      "id": 1,
+      "name": "Color",
+      "slug": "pa_color",
+      "terms": [
+        { "id": 10, "name": "Red",   "slug": "red",   "count": 5 },
+        { "id": 11, "name": "Black", "slug": "black", "count": 8 }
+      ]
+    },
+    "pa_size": {
+      "id": 2,
+      "name": "Size",
+      "slug": "pa_size",
+      "terms": [
+        { "id": 20, "name": "S",  "slug": "s",  "count": 10 },
+        { "id": 21, "name": "M",  "slug": "m",  "count": 14 },
+        { "id": 22, "name": "L",  "slug": "l",  "count": 12 },
+        { "id": 23, "name": "XL", "slug": "xl", "count": 9  }
+      ]
+    }
+  }
+}
+```
+
+---
+
+### 13.5 Next.js Usage Example
+
+```typescript
+// lib/api/catalog.ts
+const API_BASE = process.env.NEXT_PUBLIC_WP_URL + '/wp-json/wpadhlwrapi/v1';
+
+const CACHE_OPTIONS = { next: { revalidate: 21600 } }; // 6 hours — matches server-side transient TTL
+
+export async function getProductCategories(params?: { hide_empty?: boolean; per_page?: number; parent?: number }) {
+  const query = new URLSearchParams();
+  if (params?.hide_empty === false) query.set('hide_empty', 'false');
+  if (params?.per_page) query.set('per_page', String(params.per_page));
+  if (params?.parent != null) query.set('parent', String(params.parent));
+  const res = await fetch(`${API_BASE}/product-categories?${query}`, CACHE_OPTIONS);
+  const json = await res.json();
+  return json.data as { id: number; name: string; slug: string; parent: number; count: number; image: string | null }[];
+}
+
+export async function getProductTags() {
+  const res = await fetch(`${API_BASE}/product-tags`, CACHE_OPTIONS);
+  const json = await res.json();
+  return json.data as { id: number; name: string; slug: string; count: number }[];
+}
+
+export async function getProductBrands() {
+  const res = await fetch(`${API_BASE}/product-brands`, CACHE_OPTIONS);
+  const json = await res.json();
+  return json.data as { id: number; name: string; slug: string; count: number; image: string | null }[];
+}
+
+export async function getProductAttributes() {
+  const res = await fetch(`${API_BASE}/product-attributes`, CACHE_OPTIONS);
+  const json = await res.json();
+  return json.data as Record<string, {
+    id: number; name: string; slug: string;
+    terms: { id: number; name: string; slug: string; count: number }[];
+  }>;
+}
+```
+
+---
+
+## 14. Review System
+
+The review system now exposes public read endpoints plus protected create/upload/delete mutations. The old **Vote on a Review** flow has been removed entirely. Internally, the feature is organized into `Controller/`, `Repository/`, `Service/`, and `Support/` folders, plus a transient-backed `RateLimiter` and a WooCommerce admin moderation screen.
+
+| Operation | Namespace | Auth Required |
+|---|---|---|
+| Read product reviews, random reviews, rating aggregates | `wpadhlwrapi/v1` | ❌ None |
+| Create reviews, upload review media, delete reviews | `api` | ✅ Bearer JWT |
+
+**Review layer modules**
+- `Controller/` — `ReviewController`
+- `Repository/` — `ReviewRepository`, `ReviewAggregateRepository`, `ReviewMediaRepository`
+- `Service/` — `ReviewService`, `ReviewAggregateService`, `ReviewMediaService`
+- `Support/` — `ReviewNormalizer`, `ReviewValidator`
+- `Service/RateLimiter.php` — transient-based submission throttling (`3` submissions per 24 hours)
+- `Admin/` — `AdminReviewController` for WooCommerce moderation
+
+> **Note:** `Error Reference` and `Complete Typical Flows` anchors have shifted to sections 15 and 16.
+
+**Namespace / file reference**
+
+| Class | Namespace | Purpose |
+|---|---|---|
+| `ReviewController` | `Reviews\Controller` | HTTP adapter for public and protected review endpoints |
+| `ReviewRepository` | `Reviews\Repository` | CRUD for the `custom_product_reviews` table |
+| `ReviewAggregateRepository` | `Reviews\Repository` | CRUD for the `custom_review_aggregates` table |
+| `ReviewMediaRepository` | `Reviews\Repository` | CRUD for the `custom_review_media` table |
+| `ReviewService` | `Reviews\Service` | Business logic for create, list, delete, and moderate |
+| `ReviewAggregateService` | `Reviews\Service` | Rating aggregate calculation and WooCommerce meta sync |
+| `ReviewMediaService` | `Reviews\Service` | File upload validation, storage, and media linking |
+| `RateLimiter` | `Reviews\Service` | Transient-based rate limiting (`3` submissions per 24h) |
+| `ReviewNormalizer` | `Reviews\Support` | Transforms raw DB rows into frontend-safe arrays |
+| `ReviewValidator` | `Reviews\Support` | Input validation for review creation |
+| `ReviewServiceProvider` | `Reviews` | Registers review services/controllers in the plugin container |
+| `AdminReviewController` | `Reviews\Admin` | WordPress admin UI for approve/reject/delete actions |
+
+---
+
+### 14.1 GET Product Reviews (Public)
+
+Retrieve a paginated list of **approved** reviews for a specific product.
+
+```
+GET /wp-json/wpadhlwrapi/v1/reviews/product/{product_id}
+```
+
+**Auth:** None
+
+**Query Parameters:**
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `page` | integer | `1` | Page number (1-based) |
+| `per_page` | integer | `10` | Reviews per page (max `50`) |
+| `orderby` | string | `created_at` | Sort field: `created_at` (date) or `helpful_count` |
+
+**Success Response `200`:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "product_id": 42,
+      "author": {
+        "name": "John Doe",
+        "is_verified": true,
+        "avatar_url": "https://example.com/avatar.jpg"
+      },
+      "rating": 5,
+      "title": "Great product",
+      "content": "Detailed review content...",
+      "status": "approved",
+      "media": [
+        {
+          "id": 1,
+          "url": "https://example.com/wp-content/uploads/reviews/2024/01/image.jpg",
+          "type": "image",
+          "mime_type": "image/jpeg",
+          "size": 12345
+        }
+      ],
+      "date": "2024-01-15T10:30:00+00:00"
+    }
+  ],
+  "meta": {
+    "total": 25,
+    "page": 1,
+    "per_page": 10,
+    "total_pages": 3
+  }
+}
+```
+
+> **Implementation note:** This endpoint uses `Response::list()`, so `meta` is a top-level key and the review rows are returned directly in `data`.
+
+**Next.js Example:**
+
+```tsx
+async function getProductReviews(productId: number, page = 1) {
+  const res = await fetch(
+    `${process.env.WP_URL}/wp-json/wpadhlwrapi/v1/reviews/product/${productId}?page=${page}&per_page=10&orderby=created_at`
+  );
+  if (!res.ok) throw new Error('Failed to fetch reviews');
+  const payload = await res.json();
+  return { reviews: payload.data, meta: payload.meta };
+}
+```
+
+---
+
+### 14.2 GET Random Reviews (Public)
+
+Return a random selection of approved reviews across all products. Suitable for testimonial blocks or homepage carousels.
+
+```
+GET /wp-json/wpadhlwrapi/v1/reviews/random
+```
+
+**Auth:** None
+
+**Query Parameters:**
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `limit` | integer | `5` | Number of reviews to return (max `10`) |
+
+**Success Response `200`:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 17,
+      "product_id": 88,
+      "author": {
+        "name": "Jane Doe",
+        "is_verified": true,
+        "avatar_url": "https://example.com/avatar.jpg"
+      },
+      "rating": 5,
+      "title": "Life changing!",
+      "content": "Could not be happier with this purchase.",
+      "status": "approved",
+      "media": [],
+      "date": "2024-10-03T08:14:22+00:00"
+    }
+  ]
+}
+```
+
+**Next.js Example:**
+
+```tsx
+// Server Component — no token needed
+async function HomepageReviews() {
+  const res = await fetch(
+    `${process.env.WP_URL}/wp-json/wpadhlwrapi/v1/reviews/random?limit=5`,
+    { next: { revalidate: 600 } }
+  );
+  const { data: reviews } = await res.json();
+  return <TestimonialCarousel reviews={reviews} />;
+}
+```
+
+---
+
+### 14.3 GET Rating Aggregate (Public)
+
+Return the aggregate rating data for a product: total review count, average rating, and the per-star distribution.
+
+```
+GET /wp-json/wpadhlwrapi/v1/reviews/aggregate/{product_id}
+```
+
+**Auth:** None
+
+**Success Response `200`:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "product_id": 42,
+    "total_reviews": 25,
+    "average_rating": 4.5,
+    "distribution": {
+      "1": 1,
+      "2": 2,
+      "3": 3,
+      "4": 8,
+      "5": 11
+    }
+  }
+}
+```
+
+**Next.js Example:**
+
+```tsx
+async function getRatingAggregate(productId: number) {
+  const res = await fetch(
+    `${process.env.WP_URL}/wp-json/wpadhlwrapi/v1/reviews/aggregate/${productId}`,
+    { next: { revalidate: 600 } }
+  );
+  return (await res.json()).data;
+}
+```
+
+---
+
+### 14.4 POST Create Review (Protected)
+
+Create a new review for the authenticated user.
+
+```
+POST /wp-json/api/reviews/create
+```
+
+**Auth:** Bearer JWT (required)
+
+**Content-Type:** `application/json`
+
+**Request Body:**
+
+```json
+{
+  "product_id": 42,
+  "rating": 5,
+  "title": "Great product",
+  "content": "Detailed review content..."
+}
+```
+
+| Field | Type | Required | Constraints |
+|---|---|---|---|
+| `product_id` | integer | ✅ | Must be a published WooCommerce product |
+| `rating` | integer | ✅ | Must be between `1` and `5` |
+| `title` | string | ❌ | Optional review headline |
+| `content` | string | ✅ | Must be non-empty after stripping tags |
+
+**Validation / business rules:**
+- Authenticated users only (`get_current_user_id() > 0`)
+- Product must exist, be published, and be of type `product`
+- Rate limited to `3` submissions per `24` hours per user
+- Duplicate/spam check uses a transient keyed from the normalized content hash plus `product_id`
+- A user can only review the same product once
+- Verified purchase is derived from WooCommerce orders with status `completed` or `processing`
+- Review status is `approved` when `hl_review_auto_approve` is enabled; otherwise `pending`
+
+**Success Response `201`:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 55,
+    "product_id": 42,
+    "author": {
+      "name": "John Doe",
+      "is_verified": true,
+      "avatar_url": "https://example.com/avatar.jpg"
+    },
+    "rating": 5,
+    "title": "Great product",
+    "content": "Detailed review content...",
+    "status": "pending",
+    "media": [],
+    "date": "2024-01-15T10:30:00+00:00"
+  }
+}
+```
+
+**Error Responses:**
+
+| Code | HTTP | Description |
+|---|---|---|
+| `unauthenticated` | `401` | Missing or invalid authenticated user context |
+| `invalid_product` | `404` | Product does not exist or is not published |
+| `invalid_rating` | `400` | Rating outside the `1`–`5` range |
+| `empty_content` | `400` | Content is empty or whitespace-only |
+| `rate_limited` | `429` | More than `3` reviews submitted within `24` hours |
+| `duplicate_review` | `409` | Identical content for the same product was submitted recently |
+| `already_reviewed` | `409` | The user has already reviewed this product |
+| `insert_failed` | `500` | Database insert failed |
+
+**Next.js Example:**
+
+```tsx
+async function submitReview(token: string, data: ReviewInput) {
+  const res = await fetch(`${process.env.WP_URL}/wp-json/api/reviews/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const { code, message } = await res.json();
+    throw new Error(`[${code}] ${message}`);
+  }
+  return (await res.json()).data;
+}
+```
+
+---
+
+### 14.5 POST Upload Review Media (Protected)
+
+Upload a single media file and attach it to an existing review.
+
+```
+POST /wp-json/api/reviews/media/upload
+```
+
+**Auth:** Bearer JWT (required)
+
+**Content-Type:** `multipart/form-data`
+
+**Request Fields:**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `file` | binary | ✅ | Image or MP4 file to upload |
+| `review_id` | integer | ✅ | Review ID the media should be linked to |
+
+**Constraints:**
+- Allowed MIME types: `image/jpeg`, `image/png`, `image/webp`, `image/gif`, `video/mp4`
+- Max file size: `5 MB`
+- Max `5` media items per review
+- Blocked extensions include executable/script types such as `.php`, `.js`, `.html`, `.exe`, `.sh`, `.py`
+- Files are stored in the WordPress uploads directory under a `reviews/` subdirectory
+
+**Success Response `201`:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "url": "https://example.com/wp-content/uploads/reviews/2024/01/image.jpg",
+    "type": "image",
+    "mime_type": "image/jpeg",
+    "size": 204800
+  }
+}
+```
+
+**Next.js Example:**
+
+```tsx
+async function uploadReviewMedia(token: string, reviewId: number, file: File) {
+  const formData = new FormData();
+  formData.append('review_id', String(reviewId));
+  formData.append('file', file);
+
+  const res = await fetch(`${process.env.WP_URL}/wp-json/api/reviews/media/upload`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!res.ok) throw new Error('Failed to upload review media');
+  return (await res.json()).data;
+}
+```
+
+---
+
+### 14.6 DELETE Delete Review (Protected)
+
+Permanently delete a review. The acting user must own the review or have the `manage_woocommerce` capability.
+
+```
+DELETE /wp-json/api/reviews/{review_id}
+```
+
+**Auth:** Bearer JWT (required)
+
+**Success Response `200`:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "deleted": true,
+    "review_id": 42
+  }
+}
+```
+
+**Error Responses:**
+
+| Code | HTTP | Description |
+|---|---|---|
+| `review_not_found` | `404` | Review does not exist |
+| `forbidden` | `403` | Acting user is neither the review owner nor an admin |
+| `delete_failed` | `500` | Database delete failure |
+
+---
+
+### 14.7 Review System Notes
+
+- **Caching:** Product review lists are cached for `5` minutes in cache group `hl_reviews` using keys shaped like `product_{id}_p{page}_pp{per_page}_ob{orderby}`. Aggregates are cached for `10` minutes under `hl_aggregate_{product_id}`. Random review lists are cached for `10` minutes under `hl_reviews_random_{limit}`.
+- **Cache invalidation:** Product/list/aggregate caches are recalculated or flushed when an approved review is created, when an approved review is deleted, or when moderation changes a review's approval state.
+- **Rate limiting:** Review creation is limited to `3` submissions per `24` hours per authenticated user via transients like `hl_review_rate_{md5("user_{id}")}`.
+- **Spam check:** Duplicate content protection stores a transient shaped like `hl_review_spam_{md5(strtolower(trim(content)))}_{product_id}` for `24` hours.
+- **Auto-approve:** Controlled by the `hl_review_auto_approve` WordPress option.
+- **Media storage:** Review uploads are written to the standard WordPress uploads directory under `reviews/`.
+- **Admin moderation:** `AdminReviewController` registers a WooCommerce → Reviews submenu and supports approve, reject, and delete actions for users with the `manage_woocommerce` capability.
+- **Normalization:** `ReviewNormalizer` removes sensitive/internal fields such as guest email, IP address, and user agent from API responses.
+- **WooCommerce sync:** `ReviewAggregateService` syncs `_wc_average_rating`, `_wc_review_count`, and `_wc_rating_count` after aggregate recalculation.
+
+---
+
+## 15. Error Reference
 
 ### HTTP Status Codes
 
@@ -1967,7 +2940,7 @@ export function CheckoutPage() {
 
 ---
 
-## 12. Complete Typical Flows
+## 16. Complete Typical Flows
 
 ### Flow A — Guest Purchase (Stripe)
 
@@ -2076,7 +3049,7 @@ export function CheckoutPage() {
 
 ---
 
-## 13. Environment Configuration
+## 17. Environment Configuration
 
 ### Required WordPress Constants (add to `wp-config.php`)
 
@@ -2134,4 +3107,4 @@ This document must be updated whenever:
 - Error codes or HTTP status codes change
 - A new payment gateway is built in
 
-Update the relevant section, add the endpoint to the [Complete Typical Flows](#11-complete-typical-flows) if it belongs to a user journey, and update the [Error Reference](#10-error-reference) for any new error codes.
+Update the relevant section, add the endpoint to the [Complete Typical Flows](#14-complete-typical-flows) if it belongs to a user journey, and update the [Error Reference](#13-error-reference) for any new error codes.
