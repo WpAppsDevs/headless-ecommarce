@@ -54,7 +54,7 @@ export function ShopClient({
   filters,
 }: ShopClientProps) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('default');
-  const [activePriceRange, setActivePriceRange] = useState<[number, number]>([0, 9999]);
+  const [activePriceRange, setActivePriceRange] = useState<[number, number] | null>(null);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [viewCols, setViewCols] = useState<2 | 3 | 4>(3);
@@ -85,9 +85,10 @@ export function ShopClient({
   const categories = filters.categories.length > 0 ? filters.categories : derivedCategories;
 
   const filteredProducts = useMemo(() => {
+    const effectivePriceRange = activePriceRange ?? priceRange;
     let list = initialProducts.filter((p) => {
       const price = parseFloat(p.price) || 0;
-      if (price < activePriceRange[0] || price > activePriceRange[1]) return false;
+      if (price < effectivePriceRange[0] || price > effectivePriceRange[1]) return false;
 
       // Client-side color filter — matches term slug against pa_color options
       if (selectedColors.length > 0) {
@@ -123,18 +124,18 @@ export function ShopClient({
     }
 
     return list;
-  }, [initialProducts, activePriceRange, sortOrder]);
+  }, [initialProducts, activePriceRange, priceRange, sortOrder]);
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
-    if (activePriceRange[0] !== priceRange[0] || activePriceRange[1] !== priceRange[1]) count += 1;
+    if (activePriceRange !== null) count += 1;
     count += selectedColors.length;
     count += selectedSizes.length;
     return count;
-  }, [activePriceRange, priceRange, selectedColors, selectedSizes]);
+  }, [activePriceRange, selectedColors, selectedSizes]);
 
   function handleClearAll() {
-    setActivePriceRange(priceRange);
+    setActivePriceRange(null);
     setSelectedColors([]);
     setSelectedSizes([]);
     setSortOrder('default');
@@ -183,7 +184,7 @@ export function ShopClient({
     selectedTag: initialTag ?? '',
     selectedBrand: initialBrand ?? '',
     priceRange,
-    activePriceRange,
+    activePriceRange: activePriceRange ?? priceRange,
     onPriceRangeChange: setActivePriceRange,
     selectedColors,
     onColorToggle: handleColorToggle,
