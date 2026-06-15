@@ -184,7 +184,12 @@ export function ProductCard({ product }: { product: Product }) {
         )}
 
         {/* Rating */}
-        <StarRating score={4.5} count={28} />
+        {(product.rating_count ?? 0) > 0 && product.average_rating && (
+          <StarRating
+            score={parseFloat(product.average_rating)}
+            count={product.rating_count}
+          />
+        )}
 
         {/* Price */}
         <div className="flex items-baseline gap-2">
