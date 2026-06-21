@@ -85,7 +85,7 @@ export default function TrackOrderPage() {
         )}
 
         {/* Results */}
-        {result && !loading && (
+        {result && !loading && result.orders.length > 0 && (
           <div className="space-y-6">
             {result.orders.map((order) => (
               <div key={order.id} className="space-y-6">
@@ -96,6 +96,18 @@ export default function TrackOrderPage() {
                 />
               </div>
             ))}
+          </div>
+        )}
+
+        {/* No Orders Found */}
+        {result && !loading && result.orders.length === 0 && (
+          <div className="text-center py-16 space-y-4">
+            <PackageX className="h-12 w-12 text-zinc-300 mx-auto" />
+            <div>
+              <p className="text-sm font-medium text-zinc-500">
+                No orders found for this email address
+              </p>
+            </div>
           </div>
         )}
       </div>

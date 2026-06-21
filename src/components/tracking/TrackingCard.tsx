@@ -51,15 +51,17 @@ export function TrackingCard({ order, tracking }: TrackingCardProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <CreditCard className="h-4 w-4 text-brand-accent shrink-0" strokeWidth={1.5} />
-          <div>
-            <p className="text-xs text-brand-text-muted">Payment Method</p>
-            <p className="text-sm font-medium text-brand-text">
-              {order.payment_method?.toUpperCase() ?? 'N/A'}
-            </p>
+        {order.payment_method && (
+          <div className="flex items-center gap-3">
+            <CreditCard className="h-4 w-4 text-brand-accent shrink-0" strokeWidth={1.5} />
+            <div>
+              <p className="text-xs text-brand-text-muted">Payment Method</p>
+              <p className="text-sm font-medium text-brand-text">
+                {order.payment_method.toUpperCase()}
+              </p>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="flex items-center gap-3">
           <DollarSign className="h-4 w-4 text-brand-accent shrink-0" strokeWidth={1.5} />
@@ -71,15 +73,17 @@ export function TrackingCard({ order, tracking }: TrackingCardProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Mail className="h-4 w-4 text-brand-accent shrink-0" strokeWidth={1.5} />
-          <div>
-            <p className="text-xs text-brand-text-muted">Billing Email</p>
-            <p className="text-sm font-medium text-brand-text truncate max-w-[180px]">
-              {order.billing_email}
-            </p>
+        {order.billing_email && (
+          <div className="flex items-center gap-3">
+            <Mail className="h-4 w-4 text-brand-accent shrink-0" strokeWidth={1.5} />
+            <div>
+              <p className="text-xs text-brand-text-muted">Billing Email</p>
+              <p className="text-sm font-medium text-brand-text truncate max-w-[180px]">
+                {order.billing_email}
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Tracking Details */}

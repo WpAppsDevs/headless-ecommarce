@@ -27,8 +27,8 @@ export interface TrackingOrder {
   created_at: string;
   total: string;
   currency: string;
-  payment_method: string;
-  billing_email: string;
+  payment_method?: string;
+  billing_email?: string;
 }
 
 export interface TrackingResult {
@@ -50,9 +50,23 @@ export async function searchTracking(payload: TrackingSearchPayload): Promise<Tr
   const isClient = typeof window !== 'undefined';
   const url = isClient ? '/api/tracking/search' : `${config.apiBase}/${config.apiNs}/tracking/search`;
 
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+
+  if (isClient) {
+    try {
+      const { tokenCache } = await import('./client');
+      const token = tokenCache.get();
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+    } catch {
+      // Not on client — skip token injection
+    }
+  }
+
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify(payload),
   });
 
@@ -64,5 +78,21 @@ export async function searchTracking(payload: TrackingSearchPayload): Promise<Tr
       : new ApiError('api_error', `HTTP ${res.status}`);
   }
 
-  return json.data as TrackingResult;
+  const raw = json.data;
+
+  // API returns a single order object — wrap in array for UI consumption
+  return {
+    orders: raw.order ? [raw.order] : [],
+    tracking: raw.tracking ?? {
+      provider: '',
+      tracking_number: null,
+      tracking_url: null,
+      status: '',
+      estimated_delivery: null,
+      shipped_at: null,
+      delivered_at: null,
+      shipping_events: [],
+    },
+    timeline: raw.timeline ?? [],
+  };
 }
