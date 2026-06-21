@@ -22,12 +22,14 @@ This document is structured for both human developers and AI code-generation sys
 9. [Orders](#9-orders)
 10. [Customer (User Profile)](#10-customer-user-profile)
 11. [Wishlist](#11-wishlist)
-12. [Store Settings](#12-store-settings)
-13. [Shop Filter Endpoints](#13-shop-filter-endpoints)
-14. [Reviews](#14-reviews)
-15. [Error Reference](#15-error-reference)
-16. [Complete Typical Flows](#16-complete-typical-flows)
-17. [Environment Configuration](#17-environment-configuration)
+12. [Navigation](#12-navigation)
+13. [Store Settings](#13-store-settings)
+14. [Shop Filter Endpoints](#14-shop-filter-endpoints)
+15. [Reviews](#15-reviews)
+16. [Order Tracking](#16-order-tracking)
+17. [Error Reference](#17-error-reference)
+18. [Complete Typical Flows](#18-complete-typical-flows)
+19. [Environment Configuration](#19-environment-configuration)
 
 ---
 
@@ -86,6 +88,7 @@ The following route prefixes require a valid `Authorization: Bearer` header. Req
 | `/api/orders` | `GET /api/orders` |
 | `/api/checkout` | `POST /api/checkout` |
 | `/api/wishlist` | `GET`, `POST`, `DELETE /api/wishlist`, `GET /api/wishlist/check/{product_id}` |
+| `/api/tracking` | `GET /api/tracking/order/{order_id}`, `POST /api/tracking/search` |
 
 All other routes (`/api/auth/*`, `/wpadhlwrapi/v1/*`) are publicly accessible.
 
@@ -2118,11 +2121,263 @@ KEY BEHAVIOURS:
 
 ---
 
-## 12. Store Settings
+## 12. Navigation
+
+All navigation endpoints are **fully public** (no authentication required). They return WordPress nav menu data normalised for headless frontends, including a custom `icon_class` field that can be set per menu item in the WP admin.
+
+### 12.1 List Menu Locations
+
+```
+GET /wp-json/wpadhlwrapi/v1/menus
+```
+
+Returns every registered nav menu location and whether a menu is currently assigned to it. Useful for dynamic header/footer rendering — the client can discover available locations at runtime.
+
+**Success Response — HTTP 200**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "location": "primary",
+      "description": "Primary Menu",
+      "assigned": true
+    },
+    {
+      "location": "footer",
+      "description": "Footer Menu",
+      "assigned": true
+    },
+    {
+      "location": "mobile",
+      "description": "Mobile Menu",
+      "assigned": false
+    }
+  ]
+}
+```
+
+---
+
+### 12.2 Get Menu Items by Location
+
+```
+GET /wp-json/wpadhlwrapi/v1/menus/{location}
+```
+
+Returns a flat, ordered list of nav menu items assigned to the given location. Each item includes a `parent` field (`menu_item_parent` ID) so the client can reconstruct a nested tree. The list is sorted by `menu_order` (the drag-and-drop order from Appearance → Menus).
+
+**URL Parameters**
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `location` | string | ✅ | Registered nav menu location slug (e.g. `primary`, `footer`) |
+
+**Success Response — HTTP 200**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 101,
+      "title": "Home",
+      "url": "https://example.com/",
+      "target": "_self",
+      "parent": 0,
+      "order": 1,
+      "classes": ["menu-item-home"],
+      "icon_class": "fa-solid fa-house",
+      "object": "custom",
+      "object_id": 101,
+      "type": "custom"
+    },
+    {
+      "id": 102,
+      "title": "Shop",
+      "url": "https://example.com/shop/",
+      "target": "_self",
+      "parent": 0,
+      "order": 2,
+      "classes": [],
+      "icon_class": "",
+      "object": "page",
+      "object_id": 5,
+      "type": "post_type"
+    },
+    {
+      "id": 103,
+      "title": "T-Shirts",
+      "url": "https://example.com/product-category/t-shirts/",
+      "target": "_self",
+      "parent": 102,
+      "order": 3,
+      "classes": [],
+      "icon_class": "",
+      "object": "product_cat",
+      "object_id": 9,
+      "type": "taxonomy"
+    },
+    {
+      "id": 104,
+      "title": "Kurta",
+      "url": "https://example.com/product-category/kurta/",
+      "target": "_self",
+      "parent": 102,
+      "order": 4,
+      "classes": [],
+      "icon_class": "",
+      "object": "product_cat",
+      "object_id": 10,
+      "type": "taxonomy"
+    }
+  ]
+}
+```
+
+**Menu Item Fields**
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | integer | WordPress nav menu item post ID |
+| `title` | string | Display label for the menu item |
+| `url` | string | Full URL the item links to |
+| `target` | string | Link target: `_self`, `_blank`, or custom value (defaults to `_self`) |
+| `parent` | integer | Parent menu item ID (`0` for top-level items) |
+| `order` | integer | Display order within the menu (from WP admin drag-and-drop) |
+| `classes` | string[] | CSS classes assigned to the menu item |
+| `icon_class` | string | Custom icon class (e.g. `fa-solid fa-house`), set via Appearance → Menus editor |
+| `object` | string | Underlying WP object type: `custom`, `post_type`, `taxonomy` |
+| `object_id` | integer | ID of the underlying WP object (post ID, term ID, etc.) |
+| `type` | string | Menu item type: `custom`, `post_type`, `taxonomy` |
+
+**Error Cases**
+
+| Code | HTTP | Condition |
+|---|---|---|
+| `no_menu` | 404 | Location does not exist or has no menu assigned |
+
+**Empty Menu — HTTP 200**
+
+```json
+{
+  "success": true,
+  "data": []
+}
+```
+
+---
+
+### 12.3 AI-Friendly: Navigation
+
+**When to use:**
+- `GET /menus` — discover available nav menu locations (header, footer, mobile, etc.)
+- `GET /menus/{location}` — fetch items for a specific location to render a navigation bar or footer
+
+**Building a nested menu tree client-side:**
+
+```typescript
+// lib/api/navigation.ts
+const API_BASE = process.env.NEXT_PUBLIC_WP_URL + '/wp-json/wpadhlwrapi/v1';
+
+export interface MenuItem {
+  id: number;
+  title: string;
+  url: string;
+  target: string;
+  parent: number;
+  order: number;
+  classes: string[];
+  icon_class: string;
+  object: string;
+  object_id: number;
+  type: string;
+}
+
+export interface MenuLocation {
+  location: string;
+  description: string;
+  assigned: boolean;
+}
+
+export async function getMenuLocations(): Promise<MenuLocation[]> {
+  const res = await fetch(`${API_BASE}/menus`);
+  const json = await res.json();
+  return json.success ? json.data : [];
+}
+
+export async function getMenuByLocation(location: string): Promise<MenuItem[] | null> {
+  const res = await fetch(`${API_BASE}/menus/${location}`);
+  if (res.status === 404) return null;
+  const json = await res.json();
+  return json.success ? json.data : null;
+}
+
+// Build a nested tree from the flat list
+export function buildMenuTree(items: MenuItem[]): MenuItem[] {
+  const map = new Map<number, MenuItem & { children?: MenuItem[] }>();
+  const roots: (MenuItem & { children?: MenuItem[] })[] = [];
+
+  items.forEach((item) => {
+    map.set(item.id, { ...item, children: [] });
+  });
+
+  items.forEach((item) => {
+    const node = map.get(item.id)!;
+    if (item.parent === 0 || !map.has(item.parent)) {
+      roots.push(node);
+    } else {
+      map.get(item.parent)!.children!.push(node);
+    }
+  });
+
+  return roots;
+}
+
+// React component usage
+export function HeaderNav() {
+  const [menu, setMenu] = useState<MenuItem[]>([]);
+
+  useEffect(() => {
+    getMenuByLocation('primary').then((items) => setMenu(items ?? []));
+  }, []);
+
+  const tree = buildMenuTree(menu);
+
+  return (
+    <nav>
+      {tree.map((item) => (
+        <div key={item.id}>
+          <a href={item.url} target={item.target}>
+            {item.icon_class && <i className={item.icon_class} />}
+            {item.title}
+          </a>
+          {item.children && item.children.length > 0 && (
+            <ul>
+              {item.children.map((child) => (
+                <li key={child.id}>
+                  <a href={child.url} target={child.target}>
+                    {child.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ))}
+    </nav>
+  );
+}
+```
+
+---
+
+## 13. Store Settings
 
 No authentication required. Returns read-only store configuration grouped by concern.
 
-### 12.1 Get Store Settings
+### 13.1 Get Store Settings
 
 ```
 GET /wp-json/wpadhlwrapi/v1/store-settings
@@ -2233,7 +2488,7 @@ export async function getStoreSettings() {
 
 ---
 
-## 13. Shop Filter Endpoints
+## 14. Shop Filter Endpoints
 
 All four filter endpoints are fully public (no authentication required) and are designed to power the headless shop sidebar. Responses are cached with 6-hour transients and automatically invalidated on any term change.
 
@@ -2241,7 +2496,7 @@ All four filter endpoints are fully public (no authentication required) and are 
 
 ---
 
-### 13.1 Product Categories
+### 14.1 Product Categories
 
 ```
 GET /wp-json/wpadhlwrapi/v1/product-categories
@@ -2290,7 +2545,7 @@ Returns all WooCommerce product categories.
 
 ---
 
-### 13.2 Product Tags
+### 14.2 Product Tags
 
 ```
 GET /wp-json/wpadhlwrapi/v1/product-tags
@@ -2322,7 +2577,7 @@ Returns all WooCommerce product tags.
 
 ---
 
-### 13.3 Product Brands
+### 14.3 Product Brands
 
 ```
 GET /wp-json/wpadhlwrapi/v1/product-brands
@@ -2368,7 +2623,7 @@ Returns all terms from the `product_brand` custom taxonomy.
 
 ---
 
-### 13.4 Product Attributes
+### 14.4 Product Attributes
 
 ```
 GET /wp-json/wpadhlwrapi/v1/product-attributes
@@ -2412,7 +2667,7 @@ None.
 
 ---
 
-### 13.5 Next.js Usage Example
+### 14.5 Next.js Usage Example
 
 ```typescript
 // lib/api/catalog.ts
@@ -2454,7 +2709,7 @@ export async function getProductAttributes() {
 
 ---
 
-## 14. Review System
+## 15. Review System
 
 The review system now exposes public read endpoints plus protected create/upload/delete mutations. The old **Vote on a Review** flow has been removed entirely. Internally, the feature is organized into `Controller/`, `Repository/`, `Service/`, and `Support/` folders, plus a transient-backed `RateLimiter` and a WooCommerce admin moderation screen.
 
@@ -2471,7 +2726,7 @@ The review system now exposes public read endpoints plus protected create/upload
 - `Service/RateLimiter.php` — transient-based submission throttling (`3` submissions per 24 hours)
 - `Admin/` — `AdminReviewController` for WooCommerce moderation
 
-> **Note:** `Error Reference` and `Complete Typical Flows` anchors have shifted to sections 15 and 16.
+> **Note:** `Error Reference` and `Complete Typical Flows` anchors have shifted to sections 16 and 17.
 
 **Namespace / file reference**
 
@@ -2492,7 +2747,7 @@ The review system now exposes public read endpoints plus protected create/upload
 
 ---
 
-### 14.1 GET Product Reviews (Public)
+### 15.1 GET Product Reviews (Public)
 
 Retrieve a paginated list of **approved** reviews for a specific product.
 
@@ -2566,7 +2821,7 @@ async function getProductReviews(productId: number, page = 1) {
 
 ---
 
-### 14.2 GET Random Reviews (Public)
+### 15.2 GET Random Reviews (Public)
 
 Return a random selection of approved reviews across all products. Suitable for testimonial blocks or homepage carousels.
 
@@ -2623,7 +2878,7 @@ async function HomepageReviews() {
 
 ---
 
-### 14.3 GET Rating Aggregate (Public)
+### 15.3 GET Rating Aggregate (Public)
 
 Return the aggregate rating data for a product: total review count, average rating, and the per-star distribution.
 
@@ -2667,7 +2922,7 @@ async function getRatingAggregate(productId: number) {
 
 ---
 
-### 14.4 POST Create Review (Protected)
+### 15.4 POST Create Review (Protected)
 
 Create a new review for the authenticated user.
 
@@ -2764,7 +3019,7 @@ async function submitReview(token: string, data: ReviewInput) {
 
 ---
 
-### 14.5 POST Upload Review Media (Protected)
+### 15.5 POST Upload Review Media (Protected)
 
 Upload a single media file and attach it to an existing review.
 
@@ -2828,7 +3083,7 @@ async function uploadReviewMedia(token: string, reviewId: number, file: File) {
 
 ---
 
-### 14.6 DELETE Delete Review (Protected)
+### 15.6 DELETE Delete Review (Protected)
 
 Permanently delete a review. The acting user must own the review or have the `manage_woocommerce` capability.
 
@@ -2860,7 +3115,7 @@ DELETE /wp-json/api/reviews/{review_id}
 
 ---
 
-### 14.7 Review System Notes
+### 15.7 Review System Notes
 
 - **Caching:** Product review lists are cached for `5` minutes in cache group `hl_reviews` using keys shaped like `product_{id}_p{page}_pp{per_page}_ob{orderby}`. Aggregates are cached for `10` minutes under `hl_aggregate_{product_id}`. Random review lists are cached for `10` minutes under `hl_reviews_random_{limit}`.
 - **Cache invalidation:** Product/list/aggregate caches are recalculated or flushed when an approved review is created, when an approved review is deleted, or when moderation changes a review's approval state.
@@ -2874,7 +3129,297 @@ DELETE /wp-json/api/reviews/{review_id}
 
 ---
 
-## 15. Error Reference
+## 16. Order Tracking
+
+Order tracking endpoints allow headless frontends to retrieve shipping/tracking information for WooCommerce orders. The system uses a **shipping adapter pattern** — providers (WooCommerce meta, Steadfast courier, etc.) are resolved at runtime, so new shipping providers can be added without modifying core plugin code.
+
+**Authentication model:**
+- `GET /api/tracking/order/{order_id}` — **Requires JWT Bearer token.** The authenticated user must own the order (verified by customer ID or billing email).
+- `POST /api/tracking/search` — **No JWT required.** Guest users can look up their orders by providing the billing email associated with the order.
+
+### 16.1 GET Order Tracking (Authenticated)
+
+```
+GET /wp-json/api/tracking/order/{order_id}
+```
+
+**Auth:** Bearer JWT (required)
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `order_id` | integer | ✅ | WooCommerce order ID |
+
+**Route Schema:**
+- `order_id` — regex `\d+`, required integer.
+
+**Success Response — HTTP 200:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "order": {
+      "id": 1234,
+      "status": "processing",
+      "created_at": "2025-01-15T10:30:00",
+      "total": "500.00",
+      "currency": "BDT",
+      "payment_method": "cod",
+      "billing_email": "customer@example.com"
+    },
+    "tracking": {
+      "provider": "steadfast",
+      "tracking_number": "SF123456789",
+      "tracking_url": "https://portal.steadfast.com.bd/track/SF123456789",
+      "status": "in_transit",
+      "estimated_delivery": "2025-01-20",
+      "shipped_at": "2025-01-16T08:00:00",
+      "delivered_at": null,
+      "shipping_events": [
+        { "status": "picked_up", "date": "2025-01-16T08:00:00" },
+        { "status": "in_transit", "date": "2025-01-17T14:30:00" }
+      ]
+    },
+    "timeline": [
+      { "status": "Order Placed", "date": "2025-01-15T10:30:00" },
+      { "status": "Payment Received", "date": "2025-01-15T10:30:00" },
+      { "status": "Processing", "date": "2025-01-15T10:35:00" },
+      { "status": "Picked Up", "date": "2025-01-16T08:00:00" },
+      { "status": "In Transit", "date": "2025-01-17T14:30:00" }
+    ]
+  }
+}
+```
+
+**Order shape fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | integer | WooCommerce order ID |
+| `status` | string | Order status (e.g. `pending`, `processing`, `completed`) |
+| `created_at` | string | ISO 8601 date |
+| `total` | string | Order total |
+| `currency` | string | Currency code (e.g. `BDT`, `USD`) |
+
+**Tracking shape fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `provider` | string | Shipping provider slug (e.g. `woocommerce`, `steadfast`) |
+| `tracking_number` | string\|null | Tracking/consignment number |
+| `tracking_url` | string\|null | Public tracking URL |
+| `status` | string | Normalized delivery status |
+| `estimated_delivery` | string\|null | Estimated delivery date |
+| `shipped_at` | string\|null | ISO 8601 date when shipped |
+| `delivered_at` | string\|null | ISO 8601 date when delivered |
+| `shipping_events` | array | Chronological list of `{ status, date }` events |
+
+**Timeline:** A merged chronological array of WooCommerce order status changes and provider-specific shipping events. Each entry has `{ status, date }`.
+
+**Error Responses:**
+
+| Code | HTTP | Description |
+|---|---|---|
+| `not_found` | `404` | Order ID does not exist |
+| `restricted` | `403` | Authenticated user does not own this order and email doesn't match |
+| `unauthenticated` | `401` | Missing or invalid JWT Bearer token |
+| `invalid_order_id` | `400` | Order ID parameter is not a valid integer |
+
+**Next.js Example:**
+
+```tsx
+async function getOrderTracking(token: string, orderId: number) {
+  const res = await fetch(
+    `${process.env.WP_URL}/wp-json/api/tracking/order/${orderId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    const { code, message } = await res.json();
+    throw new Error(`[${code}] ${message}`);
+  }
+
+  return (await res.json()).data;
+}
+```
+
+---
+
+### 16.2 POST Search Tracking (Guest Lookup)
+
+```
+POST /wp-json/api/tracking/search
+```
+
+**Auth:** None required (email-based verification)
+
+**Content-Type:** `application/json`
+
+**Request Body:**
+
+```json
+{
+  "email": "customer@example.com",
+  "order_id": 1234
+}
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `email` | string | ✅ | Billing email associated with the order(s) |
+| `order_id` | integer | ❌ | Specific order ID to filter results (optional) |
+
+**Route Schema:**
+- `email` — required string with `sanitize_callback: 'sanitize_email'`.
+- `order_id` — optional integer with `sanitize_callback: 'absint'`.
+
+**Business logic:**
+1. `TrackingService::search_by_email($email, $user_id, $order_id)` queries WooCommerce orders with the given billing email.
+2. If `order_id` is provided, results are filtered to that specific order.
+3. Each matching order goes through the shipping adapter → normalize → response pipeline.
+4. Returns an array of normalized tracking results for all matching orders.
+
+**Success Response — HTTP 200:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "orders": [
+      {
+        "id": 1234,
+        "status": "processing",
+        "created_at": "2025-01-15T10:30:00",
+        "total": "500.00",
+        "currency": "BDT",
+        "payment_method": "cod",
+        "billing_email": "customer@example.com"
+      }
+    ],
+    "tracking": {
+      "provider": "woocommerce",
+      "tracking_number": "WC123456",
+      "tracking_url": null,
+      "status": "processing",
+      "estimated_delivery": null,
+      "shipped_at": null,
+      "delivered_at": null,
+      "shipping_events": []
+    },
+    "timeline": [
+      { "status": "Order Placed", "date": "2025-01-15T10:30:00" },
+      { "status": "Payment Received", "date": "2025-01-15T10:30:00" },
+      { "status": "Processing", "date": "2025-01-15T10:35:00" }
+    ]
+  }
+}
+```
+
+If multiple orders match the email, the `orders` array contains all of them. The `tracking` and `timeline` fields reflect the most recent order in the set.
+
+**Error Responses:**
+
+| Code | HTTP | Description |
+|---|---|---|
+| `invalid_email` | `400` | Email parameter is missing or malformed |
+| `no_orders_found` | `404` | No orders exist for the given billing email |
+
+**Next.js Example:**
+
+```tsx
+async function searchTrackingByEmail(email: string, orderId?: number) {
+  const body: { email: string; order_id?: number } = { email };
+  if (orderId) body.order_id = orderId;
+
+  const res = await fetch(`${process.env.WP_URL}/wp-json/api/tracking/search`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const { code, message } = await res.json();
+    throw new Error(`[${code}] ${message}`);
+  }
+
+  return (await res.json()).data;
+}
+```
+
+---
+
+### 16.3 Shipping Adapter System
+
+The tracking module uses a **provider-agnostic adapter pattern**. New shipping providers can be integrated by implementing `ShippingAdapterInterface` and registering via a WordPress filter — no core plugin changes required.
+
+**Interface contract:**
+
+```php
+interface ShippingAdapterInterface {
+    public function get_tracking( int $order_id ): array|WP_Error;
+    public function getSlug(): string;
+}
+```
+
+**Built-in adapters:**
+
+| Adapter | Slug | Source |
+|---|---|---|
+| `WooCommerceAdapter` | `woocommerce` | WooCommerce order meta (`_tracking_provider`, `_tracking_number`, `_tracking_url`) |
+| `SteadfastAdapter` | `steadfast` | Steadfast courier API (Bangladesh) — queries by consignment ID, invoice ID, or tracking code |
+
+**Adapter resolution order:**
+1. Reads `_tracking_provider` meta from the WooCommerce order.
+2. Resolves the adapter from `ShippingAdapterRegistry` by slug.
+3. Falls back to `WooCommerceAdapter` if the slug is unknown or meta is absent.
+
+**Registering a custom adapter:**
+
+```php
+add_filter( 'wpadhlwrapi_register_shipping_adapters', function( array $adapters ): array {
+    $adapters[] = new MyCustomShippingAdapter();
+    return $adapters;
+} );
+```
+
+### 16.4 Steadfast API Integration
+
+The `SteadfastAdapter` integrates with the Steadfast courier API (Bangladesh) and supports three lookup methods:
+
+1. **Consignment ID** — reads `_steadfast_consignment_id` order meta and queries the Steadfast API.
+2. **Invoice ID** — reads `_steadfast_invoice_id` order meta and queries the Steadfast API.
+3. **Tracking code** — reads `_tracking_number` order meta and queries the Steadfast API.
+
+**API credentials** (resolved in priority order):
+1. `STEADFAST_API_KEY` / `STEADFAST_SECRET_KEY` constants (wp-config.php).
+2. `steadfast_api_key` / `steadfast_secret_key` WordPress options.
+
+**Steadfast status mapping:**
+
+| Steadfast `delivery_status` | Normalized status |
+|---|---|
+| `pending` | Pending |
+| `picked_up` | Picked Up |
+| `in_transit` | In Transit |
+| `delivered` | Delivered |
+| `cancelled` | Cancelled |
+| `returned` | Returned |
+
+**Steadfast shipping events:** Built from the Steadfast `status_history` array, providing chronological tracking milestones.
+
+**Error handling:** Steadfast API failures return `WP_Error('steadfast_api_error', 502)` which the `TrackingController` transforms into an HTTP 502 response with the standard `{ success: false, code, message }` envelope.
+
+---
+
+## 17. Error Reference
 
 ### HTTP Status Codes
 
@@ -2938,9 +3483,20 @@ DELETE /wp-json/api/reviews/{review_id}
 |---|---|
 | `user_not_found` | JWT valid but user account deleted |
 
+#### Tracking
+
+| Code | Trigger |
+|---|---|
+| `not_found` | Order ID does not exist |
+| `restricted` | Authenticated user does not own this order and email doesn't match |
+| `invalid_email` | Email parameter is missing or malformed |
+| `no_orders_found` | No orders exist for the given billing email |
+| `unknown_shipping_adapter` | Shipping provider slug not registered in the adapter registry |
+| `steadfast_api_error` | Steadfast courier API returned an error (HTTP 502) |
+
 ---
 
-## 16. Complete Typical Flows
+## 18. Complete Typical Flows
 
 ### Flow A — Guest Purchase (Stripe)
 
@@ -3049,7 +3605,7 @@ DELETE /wp-json/api/reviews/{review_id}
 
 ---
 
-## 17. Environment Configuration
+## 18. Environment Configuration
 
 ### Required WordPress Constants (add to `wp-config.php`)
 

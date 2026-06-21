@@ -1,7 +1,7 @@
 # Memory
 
 ## Project Overview
-See @Code Documentation.md for project overview and @package.json for available npm/pnpm commands for this project.
+See @CodeDocs.md for project overview and @package.json for available npm/pnpm commands for this project.
 
 ## Code Style Guidelines
 - Use descriptive variable names
@@ -13,3 +13,4 @@ Add important architectural decisions and patterns here.
 
 ## Common Workflows
 Document frequently used workflows and commands here.
+- Commit and push the latest changes with proper details.

@@ -16,8 +16,8 @@ export function TrackingStatus({ status, date, isCompleted, isLast }: TrackingSt
           className={cn(
             'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2',
             isCompleted
-              ? 'bg-green-500 border-green-500'
-              : 'bg-white border-zinc-300',
+              ? 'bg-brand-accent border-brand-accent'
+              : 'bg-brand-section border-brand-border',
           )}
         >
           {isCompleted && (
@@ -30,7 +30,7 @@ export function TrackingStatus({ status, date, isCompleted, isLast }: TrackingSt
           <div
             className={cn(
               'w-0.5 flex-1 min-h-[40px]',
-              isCompleted ? 'bg-green-300' : 'bg-zinc-200',
+              isCompleted ? 'bg-brand-accent/40' : 'bg-brand-border',
             )}
           />
         )}
@@ -40,12 +40,12 @@ export function TrackingStatus({ status, date, isCompleted, isLast }: TrackingSt
       <div className="flex-1 pb-6">
         <p className={cn(
           'text-sm font-semibold',
-          isCompleted ? 'text-zinc-900' : 'text-zinc-500',
+          isCompleted ? 'text-brand-text' : 'text-brand-text-muted',
         )}>
           {status}
         </p>
         {date && (
-          <p className="text-xs text-zinc-400 mt-1">
+          <p className="text-xs text-brand-text-muted/60 mt-1">
             {new Date(date).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'short',
