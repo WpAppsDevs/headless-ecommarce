@@ -96,3 +96,59 @@ export async function searchTracking(payload: TrackingSearchPayload): Promise<Tr
     timeline: raw.timeline ?? [],
   };
 }
+
+/**
+ * Authenticated user tracking their own order by ID.
+ * Calls GET /wp-json/{apiNs}/tracking/order/{id} via Next.js proxy.
+ * Requires Authorization: Bearer {token} header.
+ */
+export async function getTrackingByOrderId(orderId: number): Promise<TrackingResult> {
+  const isClient = typeof window !== 'undefined';
+  const url = isClient
+    ? `/api/tracking/order/${orderId}`
+    : `${config.apiBase}/${config.apiNs}/tracking/order/${orderId}`;
+
+  const headers: Record<string, string> = {};
+
+  if (isClient) {
+    try {
+      const { tokenCache } = await import('./client');
+      const token = tokenCache.get();
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+    } catch {
+      // Not on client — skip token injection
+    }
+  }
+
+  const res = await fetch(url, {
+    method: 'GET',
+    headers,
+    cache: 'no-store',
+  });
+
+  const json = await res.json();
+
+  if (!res.ok || json?.success === false) {
+    throw json?.code && json?.message
+      ? new ApiError(json.code, json.message)
+      : new ApiError('api_error', `HTTP ${res.status}`);
+  }
+
+  const raw = json.data;
+  return {
+    orders: raw.order ? [raw.order] : [],
+    tracking: raw.tracking ?? {
+      provider: '',
+      tracking_number: null,
+      tracking_url: null,
+      status: '',
+      estimated_delivery: null,
+      shipped_at: null,
+      delivered_at: null,
+      shipping_events: [],
+    },
+    timeline: raw.timeline ?? [],
+  };
+}

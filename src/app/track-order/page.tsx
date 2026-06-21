@@ -6,11 +6,13 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { TrackingForm } from '@/components/tracking/TrackingForm';
 import { TrackingCard } from '@/components/tracking/TrackingCard';
 import { TrackingTimeline } from '@/components/tracking/TrackingTimeline';
-import { searchTracking } from '@/lib/api/tracking';
+import { searchTracking, getTrackingByOrderId } from '@/lib/api/tracking';
 import { ApiError } from '@/lib/errors';
 import type { TrackingResult } from '@/lib/api/tracking';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function TrackOrderPage() {
+  const { isAuthenticated, hydrated } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<TrackingResult | null>(null);
@@ -21,8 +23,22 @@ export default function TrackOrderPage() {
     setResult(null);
 
     try {
-      const data = await searchTracking({ email, order_id: orderId });
-      setResult(data);
+      if (isAuthenticated && orderId) {
+        const data = await getTrackingByOrderId(orderId);
+        setResult(data);
+      } else if (!isAuthenticated) {
+        if (!email) {
+          setError('Email is required for guest tracking.');
+          setLoading(false);
+          return;
+        }
+        const data = await searchTracking({ email, order_id: orderId });
+        setResult(data);
+      } else {
+        setError('Please enter an order number.');
+        setLoading(false);
+        return;
+      }
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message);
@@ -47,7 +63,7 @@ export default function TrackOrderPage() {
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8 space-y-8">
         {/* Search Form */}
         <div className="rounded-2xl border border-brand-border bg-brand-section p-6 shadow-sm">
-          <TrackingForm onSubmit={handleTrackOrder} isLoading={loading} />
+          <TrackingForm onSubmit={handleTrackOrder} isLoading={loading} isAuthenticated={isAuthenticated} />
         </div>
 
         {/* Loading State */}
@@ -74,12 +90,25 @@ export default function TrackOrderPage() {
           <div className="flex flex-col items-center justify-center py-16 space-y-4 text-center">
             <MapPin className="h-12 w-12 text-brand-border" />
             <div>
-              <p className="text-sm font-medium text-brand-text-muted">
-                Enter your email address to track your order
-              </p>
-              <p className="text-xs text-brand-text-muted/60 mt-1">
-                You can optionally provide an order number for faster lookup
-              </p>
+              {hydrated && isAuthenticated ? (
+                <>
+                  <p className="text-sm font-medium text-brand-text-muted">
+                    Enter your order number to track your order
+                  </p>
+                  <p className="text-xs text-brand-text-muted/60 mt-1">
+                    We will look up your order using your authenticated account
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-medium text-brand-text-muted">
+                    Enter your email address to track your order
+                  </p>
+                  <p className="text-xs text-brand-text-muted/60 mt-1">
+                    You can optionally provide an order number for faster lookup
+                  </p>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -105,7 +134,9 @@ export default function TrackOrderPage() {
             <PackageX className="h-12 w-12 text-zinc-300 mx-auto" />
             <div>
               <p className="text-sm font-medium text-zinc-500">
-                No orders found for this email address
+                {hydrated && isAuthenticated
+                  ? 'No orders found with this order number'
+                  : 'No orders found for this email address'}
               </p>
             </div>
           </div>

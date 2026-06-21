@@ -64,7 +64,6 @@ export function TrackingCard({ order, tracking }: TrackingCardProps) {
         )}
 
         <div className="flex items-center gap-3">
-          <DollarSign className="h-4 w-4 text-brand-accent shrink-0" strokeWidth={1.5} />
           <div>
             <p className="text-xs text-brand-text-muted">Order Total</p>
             <p className="text-sm font-semibold text-brand-accent">
