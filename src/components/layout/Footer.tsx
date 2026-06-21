@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { config } from '@/lib/config';
-import { Mail, Phone, HelpCircle, Truck, RefreshCcw, Phone as PhoneIcon, MapPin } from 'lucide-react';
+import { Mail, Phone, HelpCircle, Truck, RefreshCcw, Phone as PhoneIcon, MapPin, FileText, Scale } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { FooterNewsletterForm } from './FooterNewsletterForm';
 
@@ -11,14 +11,17 @@ const HELP_LINKS: { href: string; label: string; Icon: LucideIcon }[] = [
   { href: '/returns',     label: 'Returns & Exchanges',  Icon: RefreshCcw  },
   // { href: '/contact',     label: 'Contact Us',           Icon: PhoneIcon   },
   { href: '/track-order', label: 'Track Order',          Icon: MapPin      },
+  { href: '/privacy-policy', label: 'Privacy Policy',     Icon: FileText    },
+  { href: '/terms',       label: 'Terms of Service',     Icon: Scale       },
 ];
 
-const LEGAL_LINKS = [
-  // { href: '/about',          label: 'About Us'         },
-  { href: '/privacy-policy', label: 'Privacy Policy'   },
-  { href: '/terms',          label: 'Terms of Service' },
-  // { href: '/contact',        label: 'Wholesale Inquiry' },
-];
+// LEGAL_LINKS commented out — Privacy Policy and Terms of Service moved to HELP_LINKS
+// const LEGAL_LINKS = [
+//   // { href: '/about',          label: 'About Us'         },
+//   { href: '/privacy-policy', label: 'Privacy Policy'   },
+//   { href: '/terms',          label: 'Terms of Service' },
+//   // { href: '/contact',        label: 'Wholesale Inquiry' },
+// ];
 
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
@@ -198,19 +201,7 @@ export function Footer() {
             © {year} {config.siteName}. All rights reserved.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5">
-            {LEGAL_LINKS.map(({ href, label }, idx) => (
-              <span key={label} className="flex items-center gap-5">
-                <Link
-                  href={href}
-                  className="text-xs text-brand-text-muted transition-colors hover:text-brand-accent"
-                >
-                  {label}
-                </Link>
-                {idx < LEGAL_LINKS.length - 1 && (
-                  <span className="text-brand-border">·</span>
-                )}
-              </span>
-            ))}
+            {/* LEGAL_LINKS commented out - moved to HELP_LINKS section */}
           </div>
         </div>
       </div>
