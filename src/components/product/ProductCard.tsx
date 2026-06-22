@@ -214,20 +214,20 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="flex-1" />
 
         {/* ── Qty + Action ──────────────────────────────────────────────── */}
-        <div className="mt-1 flex items-center gap-2">
+        <div className="mt-1 flex flex-col gap-2 sm:flex-row sm:items-center">
 
           {/* Quantity selector */}
-          <div className="flex items-center overflow-hidden rounded-lg border border-brand-border">
+          <div className="flex w-full items-center justify-center overflow-hidden rounded-lg border border-brand-border sm:w-auto">
             <button
               type="button"
               onClick={() => setQty((q) => Math.max(1, q - 1))}
               aria-label="Decrease quantity"
-              className="flex h-9 w-8 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text sm:h-9 sm:w-8"
+              className="flex h-10 w-10 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text sm:h-9 sm:w-8"
             >
               −
             </button>
             <span
-              className="w-7 select-none text-center text-sm font-semibold text-brand-text sm:w-7"
+              className="w-8 select-none text-center text-sm font-semibold text-brand-text sm:w-7"
               aria-live="polite"
             >
               {qty}
@@ -236,7 +236,7 @@ export function ProductCard({ product }: { product: Product }) {
               type="button"
               onClick={() => setQty((q) => q + 1)}
               aria-label="Increase quantity"
-              className="flex h-9 w-8 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text sm:h-9 sm:w-8"
+              className="flex h-10 w-10 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text sm:h-9 sm:w-8"
             >
               +
             </button>
@@ -246,13 +246,13 @@ export function ProductCard({ product }: { product: Product }) {
           {isVariable ? (
             <Link
               href={`/products/${product.slug}`}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2.5 px-3 text-[11px] font-semibold uppercase tracking-wide text-white transition-colors sm:text-sm sm:normal-case sm:tracking-normal sm:py-2"
+              className="flex w-full items-center justify-center gap-2 rounded-lg py-3 text-sm font-semibold uppercase tracking-wide text-white transition-colors sm:w-auto sm:py-2 sm:text-xs sm:normal-case sm:tracking-normal"
               style={{ backgroundColor: MAROON }}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = MAROON_DARK)}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = MAROON)}
             >
-              <ShoppingBag className="h-4 w-4 shrink-0 sm:h-3.5 sm:w-3.5" />
-              <span className="truncate sm:truncate-none">Select</span>
+              <ShoppingBag className="h-4 w-4 shrink-0" />
+              <span>Select Options</span>
             </Link>
           ) : (
             <button
@@ -260,7 +260,7 @@ export function ProductCard({ product }: { product: Product }) {
               onClick={handleAddToCart}
               disabled={adding || isOutOfStock}
               className={cn(
-                'flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2.5 px-3 text-[11px] font-semibold uppercase tracking-wide text-white transition-opacity sm:text-sm sm:normal-case sm:tracking-normal sm:py-2',
+                'flex w-full items-center justify-center gap-2 rounded-lg py-3 text-sm font-semibold uppercase tracking-wide text-white transition-opacity sm:w-auto sm:py-2 sm:text-xs sm:normal-case sm:tracking-normal',
                 isOutOfStock
                   ? 'cursor-not-allowed bg-zinc-300 text-zinc-500'
                   : 'cursor-pointer',
@@ -276,7 +276,7 @@ export function ProductCard({ product }: { product: Product }) {
                   (e.currentTarget as HTMLButtonElement).style.backgroundColor = adding ? MAROON_DARK : MAROON;
               }}
             >
-              <ShoppingBag className="h-4 w-4 shrink-0 sm:h-3.5 sm:w-3.5" />
+              <ShoppingBag className="h-4 w-4 shrink-0" />
               <span className="truncate">
                 {isOutOfStock ? 'Sold Out' : adding ? 'Adding…' : 'Add to Cart'}
               </span>
