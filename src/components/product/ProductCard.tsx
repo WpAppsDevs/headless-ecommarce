@@ -222,12 +222,12 @@ export function ProductCard({ product }: { product: Product }) {
               type="button"
               onClick={() => setQty((q) => Math.max(1, q - 1))}
               aria-label="Decrease quantity"
-              className="flex h-8 w-7 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text sm:h-9 sm:w-8"
+              className="flex h-9 w-8 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text sm:h-9 sm:w-8"
             >
               −
             </button>
             <span
-              className="w-6 select-none text-center text-sm font-semibold text-brand-text sm:w-7"
+              className="w-7 select-none text-center text-sm font-semibold text-brand-text sm:w-7"
               aria-live="polite"
             >
               {qty}
@@ -236,7 +236,7 @@ export function ProductCard({ product }: { product: Product }) {
               type="button"
               onClick={() => setQty((q) => q + 1)}
               aria-label="Increase quantity"
-              className="flex h-8 w-7 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text sm:h-9 sm:w-8"
+              className="flex h-9 w-8 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text sm:h-9 sm:w-8"
             >
               +
             </button>
@@ -246,13 +246,13 @@ export function ProductCard({ product }: { product: Product }) {
           {isVariable ? (
             <Link
               href={`/products/${product.slug}`}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 px-3 text-xs font-semibold text-white transition-colors sm:text-sm"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2.5 px-3 text-[11px] font-semibold uppercase tracking-wide text-white transition-colors sm:text-sm sm:normal-case sm:tracking-normal sm:py-2"
               style={{ backgroundColor: MAROON }}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = MAROON_DARK)}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = MAROON)}
             >
-              <ShoppingBag className="h-3.5 w-3.5 shrink-0" />
-              Select Options
+              <ShoppingBag className="h-4 w-4 shrink-0 sm:h-3.5 sm:w-3.5" />
+              <span className="truncate sm:truncate-none">Select</span>
             </Link>
           ) : (
             <button
@@ -260,7 +260,7 @@ export function ProductCard({ product }: { product: Product }) {
               onClick={handleAddToCart}
               disabled={adding || isOutOfStock}
               className={cn(
-                'flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 px-3 text-xs font-semibold text-white transition-opacity sm:text-sm',
+                'flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2.5 px-3 text-[11px] font-semibold uppercase tracking-wide text-white transition-opacity sm:text-sm sm:normal-case sm:tracking-normal sm:py-2',
                 isOutOfStock
                   ? 'cursor-not-allowed bg-zinc-300 text-zinc-500'
                   : 'cursor-pointer',
@@ -276,8 +276,10 @@ export function ProductCard({ product }: { product: Product }) {
                   (e.currentTarget as HTMLButtonElement).style.backgroundColor = adding ? MAROON_DARK : MAROON;
               }}
             >
-              <ShoppingBag className="h-3.5 w-3.5 shrink-0" />
-              {isOutOfStock ? 'Out of Stock' : adding ? 'Adding…' : 'Add to Cart'}
+              <ShoppingBag className="h-4 w-4 shrink-0 sm:h-3.5 sm:w-3.5" />
+              <span className="truncate">
+                {isOutOfStock ? 'Sold Out' : adding ? 'Adding…' : 'Add to Cart'}
+              </span>
             </button>
           )}
         </div>
