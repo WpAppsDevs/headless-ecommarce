@@ -246,12 +246,12 @@ export function ProductCard({ product }: { product: Product }) {
           {isVariable ? (
             <Link
               href={`/products/${product.slug}`}
-              className="flex w-full items-center justify-center gap-2 rounded-lg py-3 text-sm font-semibold uppercase tracking-wide text-white transition-colors sm:w-auto sm:py-2 sm:text-xs sm:normal-case sm:tracking-normal"
+              className="flex w-full items-center justify-center gap-2 rounded-lg py-3 text-xs font-semibold text-white transition-colors sm:flex-1 sm:gap-1.5 sm:py-2 sm:text-sm sm:px-3"
               style={{ backgroundColor: MAROON }}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = MAROON_DARK)}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = MAROON)}
             >
-              <ShoppingBag className="h-4 w-4 shrink-0" />
+              <ShoppingBag className="h-4 w-4 shrink-0 sm:h-3.5 sm:w-3.5" />
               <span>Select Options</span>
             </Link>
           ) : (
@@ -260,7 +260,7 @@ export function ProductCard({ product }: { product: Product }) {
               onClick={handleAddToCart}
               disabled={adding || isOutOfStock}
               className={cn(
-                'flex w-full items-center justify-center gap-2 rounded-lg py-3 text-sm font-semibold uppercase tracking-wide text-white transition-opacity sm:w-auto sm:py-2 sm:text-xs sm:normal-case sm:tracking-normal',
+                'flex w-full items-center justify-center gap-2 rounded-lg py-3 text-xs font-semibold text-white transition-opacity sm:flex-1 sm:gap-1.5 sm:py-2 sm:text-sm sm:px-3',
                 isOutOfStock
                   ? 'cursor-not-allowed bg-zinc-300 text-zinc-500'
                   : 'cursor-pointer',
@@ -276,7 +276,7 @@ export function ProductCard({ product }: { product: Product }) {
                   (e.currentTarget as HTMLButtonElement).style.backgroundColor = adding ? MAROON_DARK : MAROON;
               }}
             >
-              <ShoppingBag className="h-4 w-4 shrink-0" />
+              <ShoppingBag className="h-4 w-4 shrink-0 sm:h-3.5 sm:w-3.5" />
               <span className="truncate">
                 {isOutOfStock ? 'Sold Out' : adding ? 'Adding…' : 'Add to Cart'}
               </span>
