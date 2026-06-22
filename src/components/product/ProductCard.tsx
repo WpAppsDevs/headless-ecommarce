@@ -92,7 +92,7 @@ export function ProductCard({ product }: { product: Product }) {
   }
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-brand-border bg-white shadow-sm transition-shadow duration-300 hover:shadow-lg">
+    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-brand-border bg-white transition-all duration-300 hover:shadow-lg hover:border-brand-wine/30">
 
       {/* ── Image area ─────────────────────────────────────────────────────── */}
       <Link
@@ -110,7 +110,7 @@ export function ProductCard({ product }: { product: Product }) {
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className={cn(
-              'object-cover transition-opacity duration-500',
+              'object-cover transition-all duration-500 group-hover:scale-105',
               i === activeImg ? 'opacity-100' : 'opacity-0',
             )}
             priority={i === 0}
@@ -130,14 +130,14 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="absolute left-3 top-3 flex flex-col gap-1.5">
           {isNew && !isOnSale && (
             <span
-              className="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white"
+              className="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm"
               style={{ backgroundColor: MAROON }}
             >
               NEW
             </span>
           )}
           {isOnSale && discount > 0 && (
-            <span className="rounded-full bg-brand-wine px-3 py-1 text-[10px] font-bold text-white">
+            <span className="rounded-full bg-brand-wine px-3 py-1 text-[10px] font-bold text-white shadow-sm">
               -{discount}%
             </span>
           )}
@@ -146,7 +146,7 @@ export function ProductCard({ product }: { product: Product }) {
         {/* Image carousel dots — clickable, bottom-center */}
         {allImages.length > 1 && (
           <div
-            className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5"
+            className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
             aria-label="Image navigation"
           >
             {allImages.map((_, i) => (
@@ -156,8 +156,8 @@ export function ProductCard({ product }: { product: Product }) {
                 onClick={(e) => { e.preventDefault(); setActiveImg(i); }}
                 aria-label={`Show image ${i + 1}`}
                 className={cn(
-                  'h-1.5 w-1.5 rounded-full transition-colors',
-                  i === activeImg ? 'bg-white' : 'bg-white/50',
+                  'h-1.5 w-1.5 rounded-full transition-all duration-200',
+                  i === activeImg ? 'bg-white scale-125' : 'bg-white/60 hover:bg-white',
                 )}
               />
             ))}
@@ -169,7 +169,7 @@ export function ProductCard({ product }: { product: Product }) {
       <WishlistButton productId={product.id} productName={product.name} variant="card" />
 
       {/* ── Content area ───────────────────────────────────────────────────── */}
-      <div className="flex flex-1 flex-col gap-2 p-3 sm:p-4">
+      <div className="flex flex-1 flex-col gap-2.5 p-3 sm:p-4">
 
         {/* Title */}
         <Link href={`/products/${product.slug}`} className="group/name">

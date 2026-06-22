@@ -152,6 +152,17 @@ export const useAuthStore = create<AuthState>((set, get) => {
     // a page reload (access_token lives in httpOnly cookie, not memory).
     hydrate: async () => {
       try {
+        // Check if there's any indication of prior auth before attempting refresh
+        const hasGuestCart = typeof window !== 'undefined' && localStorage.getItem('cart_token');
+        const hasTokenCache = tokenCache.get();
+        
+        // Only attempt refresh if there's some indication of prior activity
+        // This avoids unnecessary API calls for pure guest users
+        if (!hasGuestCart && !hasTokenCache) {
+          set({ hydrated: true });
+          return;
+        }
+
         // Try to get a fresh access_token via the refresh_token cookie
         const refreshRes = await fetch('/api/auth/refresh', { method: 'POST' });
         if (!refreshRes.ok) return; // Not authenticated — stay logged out

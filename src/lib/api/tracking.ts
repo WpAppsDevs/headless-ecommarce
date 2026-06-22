@@ -52,18 +52,6 @@ export async function searchTracking(payload: TrackingSearchPayload): Promise<Tr
 
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
 
-  if (isClient) {
-    try {
-      const { tokenCache } = await import('./client');
-      const token = tokenCache.get();
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-    } catch {
-      // Not on client — skip token injection
-    }
-  }
-
   const res = await fetch(url, {
     method: 'POST',
     headers,

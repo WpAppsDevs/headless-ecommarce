@@ -19,8 +19,8 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   const brand = params.brand?.trim() || undefined;
 
   const [{ items, meta }, filters] = await Promise.all([
-    getProducts({ page, per_page: 12, category, search, tag, brand }).catch(
-      () => ({ items: [], meta: { page: 1, per_page: 12, total: 0, total_pages: 1 } }),
+    getProducts({ page, per_page: 9, category, search, tag, brand }).catch(
+      () => ({ items: [], meta: { page: 1, per_page: 9, total: 0, total_pages: 1 } }),
     ),
     getProductFilters().catch(() => ({
       categories: [],

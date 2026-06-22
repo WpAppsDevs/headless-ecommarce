@@ -43,9 +43,9 @@ export function HeroSlider() {
             </p>
 
             {/* Headline */}
-            <h1 className="mt-4 font-serif text-[2.2rem] font-bold leading-[1.05] text-brand-text sm:text-[3rem] lg:text-[3rem] xl:text-[3rem]">
-              <span className="block whitespace-nowrap">Premium Pakistani Dresses</span>
-              <span className="block">Stock &amp; Pre-Order Available</span>
+            <h1 className="mt-4 font-serif text-[1.6rem] font-bold leading-[1.15] text-brand-text sm:text-[2.2rem] sm:leading-[1.1] lg:text-[3rem] xl:text-[3.2rem]">
+              <span className="block">Premium Pakistani Dresses</span>
+              <span className="block text-[1.4rem] sm:text-[1.8rem] lg:text-[2.2rem] xl:text-[2.4rem]">Stock &amp; Pre-Order Available</span>
             </h1>
 
             {/* Subtext */}

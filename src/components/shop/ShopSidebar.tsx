@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { ChevronRight, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { FilterTag, FilterBrand, FilterAttributeTerm } from '@/lib/api/filters';
 import { useFormatPrice } from '@/lib/utils/currency';
@@ -27,7 +28,6 @@ interface ShopSidebarProps {
   currentSearch?: string;
 }
 
-/** Maps common WooCommerce color term slugs to CSS hex values. */
 const COLOR_HEX_MAP: Record<string, string> = {
   black:   '#18181b',
   white:   '#ffffff',
@@ -59,8 +59,6 @@ function getColorHex(slug: string): string {
   return COLOR_HEX_MAP[slug.toLowerCase()] ?? '#9ca3af';
 }
 
-const SECTION_TITLE = 'text-[11px] font-semibold uppercase tracking-widest text-zinc-400 mb-3';
-
 function buildHref(params: {
   category?: string | null;
   tag?: string | null;
@@ -74,6 +72,66 @@ function buildHref(params: {
   if (params.search) qs.set('search', params.search);
   const q = qs.toString();
   return `/products${q ? `?${q}` : ''}`;
+}
+
+function FilterSection({
+  title,
+  defaultOpen = true,
+  badge,
+  children,
+}: {
+  title: string;
+  defaultOpen?: boolean;
+  badge?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  return (
+    <div className="border-b border-zinc-100 last:border-b-0">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex w-full items-center justify-between py-3 text-left hover:bg-zinc-50/50 rounded-lg px-2 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold text-zinc-900">{title}</span>
+          {badge}
+        </div>
+        <ChevronDown
+          className={cn(
+            'h-4 w-4 text-zinc-400 transition-transform duration-200',
+            isOpen && 'rotate-180',
+          )}
+        />
+      </button>
+      <div
+        className={cn(
+          'overflow-hidden transition-all duration-200',
+          isOpen ? 'max-h-[600px] pb-4' : 'max-h-0',
+        )}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function ActiveFilterPill({
+  label,
+  onRemove,
+}: {
+  label: string;
+  onRemove: () => void;
+}) {
+  return (
+    <button
+      onClick={onRemove}
+      className="inline-flex items-center gap-1 rounded-full bg-brand-accent-light px-2.5 py-1 text-xs font-medium text-brand-wine hover:bg-brand-accent/20 transition-colors"
+    >
+      {label}
+      <X className="h-3 w-3" />
+    </button>
+  );
 }
 
 export function ShopSidebar({
@@ -97,29 +155,102 @@ export function ShopSidebar({
   currentSearch,
 }: ShopSidebarProps) {
   const fmt = useFormatPrice();
+
   return (
-    <aside className="space-y-7">
+    <div className="space-y-1">
+      {/* Active Filters Summary */}
+      {activeFilterCount > 0 && (
+        <div className="mb-4 p-3 rounded-xl bg-brand-card border border-brand-border">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-zinc-600 uppercase tracking-wider">
+              Active Filters
+            </span>
+            <button
+              onClick={onClearAll}
+              className="text-xs text-brand-wine hover:text-brand-accent-hover font-medium transition-colors"
+            >
+              Clear All
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {selectedCategory && (
+              <ActiveFilterPill
+                label={`Category: ${selectedCategory.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}`}
+                onRemove={() => {
+                  window.location.href = buildHref({
+                    category: null,
+                    tag: selectedTag,
+                    brand: selectedBrand,
+                    search: currentSearch,
+                  });
+                }}
+              />
+            )}
+            {selectedTag && (
+              <ActiveFilterPill
+                label={`Tag: ${selectedTag}`}
+                onRemove={() => {
+                  window.location.href = buildHref({
+                    category: selectedCategory,
+                    tag: null,
+                    brand: selectedBrand,
+                    search: currentSearch,
+                  });
+                }}
+              />
+            )}
+            {selectedBrand && (
+              <ActiveFilterPill
+                label={`Brand: ${selectedBrand}`}
+                onRemove={() => {
+                  window.location.href = buildHref({
+                    category: selectedCategory,
+                    tag: selectedTag,
+                    brand: null,
+                    search: currentSearch,
+                  });
+                }}
+              />
+            )}
+            {selectedColors.map((color) => (
+              <ActiveFilterPill
+                key={color}
+                label={`Color: ${color}`}
+                onRemove={() => onColorToggle(color)}
+              />
+            ))}
+            {selectedSizes.map((size) => (
+              <ActiveFilterPill
+                key={size}
+                label={`Size: ${size}`}
+                onRemove={() => onSizeToggle(size)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Categories */}
-      <div>
-        <p className={SECTION_TITLE}>Categories</p>
-        <ul className="space-y-1.5">
+      <FilterSection
+        title="Categories"
+        defaultOpen={true}
+        badge={selectedCategory ? (
+          <span className="h-2 w-2 rounded-full bg-brand-wine" />
+        ) : null}
+      >
+        <ul className="space-y-0.5">
           <li>
             <Link
               href={buildHref({ tag: selectedTag, brand: selectedBrand, search: currentSearch })}
               className={cn(
-                'flex items-center gap-1.5 text-sm transition-all duration-150',
+                'flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-all duration-150',
                 !selectedCategory
-                  ? 'font-semibold text-zinc-900'
-                  : 'text-zinc-500 hover:text-zinc-800',
+                  ? 'bg-brand-accent-light font-semibold text-brand-wine'
+                  : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50',
               )}
             >
-              <ChevronRight
-                className={cn(
-                  'h-3.5 w-3.5 shrink-0 transition-all duration-150',
-                  !selectedCategory ? 'opacity-100' : 'opacity-0',
-                )}
-              />
-              All
+              {!selectedCategory && <ChevronRight className="h-3 w-3" />}
+              <span className={!selectedCategory ? 'ml-1' : 'ml-5'}>All Products</span>
             </Link>
           </li>
           {categories.map((cat) => {
@@ -129,231 +260,226 @@ export function ShopSidebar({
                 <Link
                   href={buildHref({ category: cat.slug, tag: selectedTag, brand: selectedBrand, search: currentSearch })}
                   className={cn(
-                    'flex items-center gap-1.5 text-sm transition-all duration-150',
-                    isActive ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
+                    'flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-all duration-150',
+                    isActive
+                      ? 'bg-brand-accent-light font-semibold text-brand-wine'
+                      : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50',
                   )}
                 >
-                  <ChevronRight
-                    className={cn(
-                      'h-3.5 w-3.5 shrink-0 transition-all duration-150',
-                      isActive ? 'opacity-100' : 'opacity-0',
-                    )}
-                  />
-                  {cat.name}
+                  {isActive && <ChevronRight className="h-3 w-3" />}
+                  <span className={isActive ? 'ml-1' : 'ml-5'}>{cat.name}</span>
                 </Link>
               </li>
             );
           })}
         </ul>
-      </div>
+      </FilterSection>
 
-      {/* Tags — only rendered when the endpoint is live */}
+      {/* Tags */}
       {tags.length > 0 && (
-        <>
-          <hr className="border-zinc-100" />
-          <div>
-            <p className={SECTION_TITLE}>Tags</p>
-            <ul className="space-y-1.5">
-              <li>
+        <FilterSection
+          title="Tags"
+          defaultOpen={false}
+          badge={selectedTag ? (
+            <span className="h-2 w-2 rounded-full bg-brand-wine" />
+          ) : null}
+        >
+          <div className="flex flex-wrap gap-1.5 px-2">
+            {tags.map(({ name, slug }) => {
+              const isActive = selectedTag === slug;
+              return (
                 <Link
-                  href={buildHref({ category: selectedCategory, brand: selectedBrand, search: currentSearch })}
+                  key={slug}
+                  href={buildHref({ category: selectedCategory, tag: isActive ? null : slug, brand: selectedBrand, search: currentSearch })}
                   className={cn(
-                    'flex items-center gap-1.5 text-sm transition-all duration-150',
-                    !selectedTag ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
+                    'rounded-full px-3 py-1 text-xs font-medium transition-all duration-150',
+                    isActive
+                      ? 'bg-brand-wine text-white'
+                      : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200',
                   )}
                 >
-                  <ChevronRight className={cn('h-3.5 w-3.5 shrink-0', !selectedTag ? 'opacity-100' : 'opacity-0')} />
-                  All
+                  {name}
                 </Link>
-              </li>
-              {tags.map(({ name, slug }) => {
-                const isActive = selectedTag === slug;
-                return (
-                  <li key={slug}>
-                    <Link
-                      href={buildHref({ category: selectedCategory, tag: slug, brand: selectedBrand, search: currentSearch })}
-                      className={cn(
-                        'flex items-center gap-1.5 text-sm transition-all duration-150',
-                        isActive ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
-                      )}
-                    >
-                      <ChevronRight className={cn('h-3.5 w-3.5 shrink-0', isActive ? 'opacity-100' : 'opacity-0')} />
-                      {name}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+              );
+            })}
           </div>
-        </>
+        </FilterSection>
       )}
 
-      {/* Brands — only rendered when the endpoint is live */}
+      {/* Brands */}
       {brands.length > 0 && (
-        <>
-          <hr className="border-zinc-100" />
-          <div>
-            <p className={SECTION_TITLE}>Brands</p>
-            <ul className="space-y-1.5">
-              <li>
-                <Link
-                  href={buildHref({ category: selectedCategory, tag: selectedTag, search: currentSearch })}
-                  className={cn(
-                    'flex items-center gap-1.5 text-sm transition-all duration-150',
-                    !selectedBrand ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
-                  )}
-                >
-                  <ChevronRight className={cn('h-3.5 w-3.5 shrink-0', !selectedBrand ? 'opacity-100' : 'opacity-0')} />
-                  All
-                </Link>
-              </li>
-              {brands.map(({ name, slug }) => {
-                const isActive = selectedBrand === slug;
-                return (
-                  <li key={slug}>
-                    <Link
-                      href={buildHref({ category: selectedCategory, tag: selectedTag, brand: slug, search: currentSearch })}
-                      className={cn(
-                        'flex items-center gap-1.5 text-sm transition-all duration-150',
-                        isActive ? 'font-semibold text-zinc-900' : 'text-zinc-500 hover:text-zinc-800',
-                      )}
-                    >
-                      <ChevronRight className={cn('h-3.5 w-3.5 shrink-0', isActive ? 'opacity-100' : 'opacity-0')} />
-                      {name}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        </>
+        <FilterSection
+          title="Brands"
+          defaultOpen={false}
+          badge={selectedBrand ? (
+            <span className="h-2 w-2 rounded-full bg-brand-wine" />
+          ) : null}
+        >
+          <ul className="space-y-0.5 px-2">
+            {brands.map(({ name, slug }) => {
+              const isActive = selectedBrand === slug;
+              return (
+                <li key={slug}>
+                  <Link
+                    href={buildHref({ category: selectedCategory, tag: selectedTag, brand: isActive ? null : slug, search: currentSearch })}
+                    className={cn(
+                      'flex items-center gap-2 py-1.5 text-sm transition-all duration-150',
+                      isActive
+                        ? 'font-semibold text-brand-wine'
+                        : 'text-zinc-600 hover:text-zinc-900',
+                    )}
+                  >
+                    <span className={cn(
+                      'h-1.5 w-1.5 rounded-full transition-colors',
+                      isActive ? 'bg-brand-wine' : 'bg-zinc-300',
+                    )} />
+                    {name}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </FilterSection>
       )}
 
       {/* Price Range */}
-      <hr className="border-zinc-100" />
-      <div>
-        <p className={SECTION_TITLE}>Price Range</p>
-        <div className="flex items-center gap-2 mb-3">
-          <div className="flex-1">
-            <label className="text-xs text-zinc-400 mb-1 block">Min</label>
-            <input
-              type="number"
-              min={priceRange[0]}
-              max={activePriceRange[1]}
-              value={activePriceRange[0]}
-              onChange={(e) =>
-                onPriceRangeChange([
-                  Math.max(priceRange[0], Number(e.target.value)),
-                  activePriceRange[1],
-                ])
-              }
-              className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 transition-all duration-150"
-            />
+      <FilterSection
+        title="Price Range"
+        defaultOpen={false}
+        badge={activePriceRange && (activePriceRange[0] !== priceRange[0] || activePriceRange[1] !== priceRange[1]) ? (
+          <span className="h-2 w-2 rounded-full bg-brand-wine" />
+        ) : null}
+      >
+        <div className="space-y-3 px-2">
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <label className="text-xs text-zinc-400 mb-1 block">Min Price</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400">
+                  {fmt(0).replace(/[0-9.,\s]/g, '')}
+                </span>
+                <input
+                  type="number"
+                  min={priceRange[0]}
+                  max={activePriceRange[1]}
+                  value={activePriceRange[0]}
+                  onChange={(e) =>
+                    onPriceRangeChange([
+                      Math.max(priceRange[0], Number(e.target.value)),
+                      activePriceRange[1],
+                    ])
+                  }
+                  className="w-full rounded-lg border border-zinc-200 pl-6 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-wine/20 focus:border-brand-wine transition-all"
+                />
+              </div>
+            </div>
+            <div className="flex-1">
+              <label className="text-xs text-zinc-400 mb-1 block">Max Price</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400">
+                  {fmt(0).replace(/[0-9.,\s]/g, '')}
+                </span>
+                <input
+                  type="number"
+                  min={activePriceRange[0]}
+                  max={priceRange[1]}
+                  value={activePriceRange[1]}
+                  onChange={(e) =>
+                    onPriceRangeChange([
+                      activePriceRange[0],
+                      Math.min(priceRange[1], Number(e.target.value)),
+                    ])
+                  }
+                  className="w-full rounded-lg border border-zinc-200 pl-6 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-wine/20 focus:border-brand-wine transition-all"
+                />
+              </div>
+            </div>
           </div>
-          <div className="flex-1">
-            <label className="text-xs text-zinc-400 mb-1 block">Max</label>
-            <input
-              type="number"
-              min={activePriceRange[0]}
-              max={priceRange[1]}
-              value={activePriceRange[1]}
-              onChange={(e) =>
-                onPriceRangeChange([
-                  activePriceRange[0],
-                  Math.min(priceRange[1], Number(e.target.value)),
-                ])
-              }
-              className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 transition-all duration-150"
-            />
+          <div className="flex items-center justify-between text-xs text-zinc-500">
+            <span>{fmt(activePriceRange[0])}</span>
+            <span>—</span>
+            <span>{fmt(activePriceRange[1])}</span>
           </div>
         </div>
-        <p className="text-xs text-zinc-400">
-          {fmt(activePriceRange[0])} – {fmt(activePriceRange[1])}
-        </p>
-      </div>
+      </FilterSection>
 
-      {/* Colors — only rendered when the endpoint is live */}
+      {/* Colors */}
       {colorTerms.length > 0 && (
-        <>
-          <hr className="border-zinc-100" />
-          <div>
-            <p className={SECTION_TITLE}>Color</p>
-            <div className="flex flex-wrap gap-2">
-              {colorTerms.map((color) => {
-                const hex = getColorHex(color.slug);
-                const isActive = selectedColors.includes(color.slug);
-                const isWhite = color.slug === 'white';
-                return (
-                  <button
-                    key={color.slug}
-                    onClick={() => onColorToggle(color.slug)}
-                    title={color.name}
-                    aria-label={`${isActive ? 'Remove' : 'Add'} ${color.name} filter`}
-                    style={{ backgroundColor: hex }}
-                    className={cn(
-                      'h-7 w-7 rounded-full border-2 flex items-center justify-center transition-all duration-150',
-                      isWhite ? 'border-zinc-300' : '',
-                      isActive
-                        ? 'border-zinc-900 scale-110'
-                        : !isWhite
-                        ? 'border-zinc-100 hover:border-zinc-400'
-                        : 'hover:border-zinc-400',
-                    )}
-                  >
-                    {isActive && (
-                      <span className={cn('text-[10px] font-bold leading-none', isWhite ? 'text-zinc-900' : 'text-white')}>
-                        ✓
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* Sizes — only rendered when the endpoint is live */}
-      {sizeTerms.length > 0 && (
-        <>
-          <hr className="border-zinc-100" />
-          <div>
-            <p className={SECTION_TITLE}>Size</p>
-            <div className="flex flex-wrap gap-2">
-              {sizeTerms.map((size) => {
-                const isActive = selectedSizes.includes(size.slug);
-                return (
-                  <button
-                    key={size.slug}
-                    onClick={() => onSizeToggle(size.slug)}
-                    className={cn(
-                      'rounded-md border px-3 py-1.5 text-xs font-medium transition-all duration-150',
-                      isActive
-                        ? 'bg-zinc-900 text-white border-zinc-900'
-                        : 'border-zinc-200 text-zinc-600 hover:border-zinc-400',
-                    )}
-                  >
-                    {size.name}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </>
-      )}
-
-      <hr className="border-zinc-100" />
-
-      {/* Clear All */}
-      {activeFilterCount > 0 && (
-        <button
-          onClick={onClearAll}
-          className="w-full rounded-lg border border-zinc-200 py-2.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition flex items-center justify-center gap-2"
+        <FilterSection
+          title="Colors"
+          defaultOpen={false}
+          badge={selectedColors.length > 0 ? (
+            <span className="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-brand-wine px-1 text-[10px] font-bold text-white">
+              {selectedColors.length}
+            </span>
+          ) : null}
         >
-          <X className="h-4 w-4" />
-          Clear All Filters ({activeFilterCount})
-        </button>
+          <div className="flex flex-wrap gap-2 px-2">
+            {colorTerms.map((color) => {
+              const hex = getColorHex(color.slug);
+              const isActive = selectedColors.includes(color.slug);
+              const isWhite = color.slug === 'white';
+              return (
+                <button
+                  key={color.slug}
+                  onClick={() => onColorToggle(color.slug)}
+                  title={color.name}
+                  aria-label={`${isActive ? 'Remove' : 'Add'} ${color.name} filter`}
+                  className={cn(
+                    'h-8 w-8 rounded-full border-2 flex items-center justify-center transition-all duration-150',
+                    isWhite ? 'border-zinc-300' : 'border-transparent',
+                    isActive
+                      ? 'border-brand-wine ring-2 ring-brand-wine/20 scale-110'
+                      : !isWhite
+                      ? 'border-zinc-100 hover:border-zinc-400'
+                      : 'hover:border-zinc-400',
+                  )}
+                  style={{ backgroundColor: hex }}
+                >
+                  {isActive && (
+                    <span className={cn('text-[10px] font-bold leading-none', isWhite ? 'text-zinc-900' : 'text-white')}>
+                      ✓
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </FilterSection>
       )}
-    </aside>
+
+      {/* Sizes */}
+      {sizeTerms.length > 0 && (
+        <FilterSection
+          title="Sizes"
+          defaultOpen={false}
+          badge={selectedSizes.length > 0 ? (
+            <span className="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-brand-wine px-1 text-[10px] font-bold text-white">
+              {selectedSizes.length}
+            </span>
+          ) : null}
+        >
+          <div className="flex flex-wrap gap-2 px-2">
+            {sizeTerms.map((size) => {
+              const isActive = selectedSizes.includes(size.slug);
+              return (
+                <button
+                  key={size.slug}
+                  onClick={() => onSizeToggle(size.slug)}
+                  className={cn(
+                    'rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-150',
+                    isActive
+                      ? 'bg-brand-wine text-white border-brand-wine'
+                      : 'border-zinc-200 text-zinc-600 hover:border-zinc-400 hover:text-zinc-900',
+                  )}
+                >
+                  {size.name}
+                </button>
+              );
+            })}
+          </div>
+        </FilterSection>
+      )}
+    </div>
   );
 }
