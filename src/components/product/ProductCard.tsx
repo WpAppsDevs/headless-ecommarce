@@ -243,7 +243,11 @@ export function ProductCard({ product }: { product: Product }) {
           </div>
 
           {/* Add to Cart (simple) / Select Options (variable) */}
-          {isVariable ? (
+          {isOutOfStock ? (
+            <span className="flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-200 py-2.5 text-xs font-semibold text-zinc-400 sm:flex-1 sm:py-2 sm:text-sm">
+              Out of Stock
+            </span>
+          ) : isVariable ? (
             <Link
               href={`/products/${product.slug}`}
               className="flex w-full items-center justify-center gap-2 rounded-lg py-3 text-xs font-semibold text-white transition-colors sm:flex-1 sm:gap-1.5 sm:py-2 sm:text-sm sm:px-3"
@@ -258,28 +262,22 @@ export function ProductCard({ product }: { product: Product }) {
             <button
               type="button"
               onClick={handleAddToCart}
-              disabled={adding || isOutOfStock}
+              disabled={adding}
               className={cn(
                 'flex w-full items-center justify-center gap-2 rounded-lg py-3 text-xs font-semibold text-white transition-opacity sm:flex-1 sm:gap-1.5 sm:py-2 sm:text-sm sm:px-3',
-                isOutOfStock
-                  ? 'cursor-not-allowed bg-zinc-300 text-zinc-500'
-                  : 'cursor-pointer',
                 adding && 'opacity-70',
               )}
-              style={isOutOfStock ? {} : { backgroundColor: adding ? MAROON_DARK : MAROON }}
+              style={{ backgroundColor: adding ? MAROON_DARK : MAROON }}
               onMouseEnter={(e) => {
-                if (!isOutOfStock && !adding)
+                if (!adding)
                   (e.currentTarget as HTMLButtonElement).style.backgroundColor = MAROON_DARK;
               }}
               onMouseLeave={(e) => {
-                if (!isOutOfStock)
-                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = adding ? MAROON_DARK : MAROON;
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = MAROON;
               }}
             >
               <ShoppingBag className="h-4 w-4 shrink-0 sm:h-3.5 sm:w-3.5" />
-              <span className="truncate">
-                {isOutOfStock ? 'Sold Out' : adding ? 'Adding…' : 'Add to Cart'}
-              </span>
+              <span className="truncate">{adding ? 'Adding…' : 'Add to Cart'}</span>
             </button>
           )}
         </div>
