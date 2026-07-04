@@ -38,6 +38,15 @@ export interface PlaceOrderPayload {
   payment_data?: Record<string, string>;
   billing: Record<string, string>;
   shipping?: Record<string, string>;
+  shipping_method?: string;
+  shipping_cost?: string;
+}
+
+export interface ShippingMethod {
+  id: string;
+  label: string;
+  cost: string;
+  description?: string;
 }
 
 export interface OrderResult {

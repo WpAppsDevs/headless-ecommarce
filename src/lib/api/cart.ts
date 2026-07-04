@@ -27,6 +27,15 @@ export interface CartData {
   cart_token: string | null;
   /** JWT — only present on the FIRST successful add for a new guest session. */
   guest_token?: string;
+  /** Available shipping methods for the current cart. */
+  shipping_methods?: Array<{
+    id: string;
+    label: string;
+    cost: string;
+    description?: string;
+  }>;
+  /** The currently selected shipping method ID. */
+  chosen_shipping_method?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -98,4 +107,21 @@ export async function apiRemoveCartItem(itemId: number): Promise<CartData> {
     token: getGuestToken(),
     body: JSON.stringify({ item_id: itemId }),
   });
+}
+
+/**
+ * GET /wpadhlwrapi/v1/cart — fetch shipping methods.
+ * Falls back to hardcoded defaults if the endpoint returns no shipping data.
+ */
+export async function apiGetShippingMethods(): Promise<CartData['shipping_methods']> {
+  const cart = await apiGetCart();
+  if (cart.shipping_methods && cart.shipping_methods.length > 0) {
+    return cart.shipping_methods;
+  }
+  // Fallback defaults matching the cart page
+  return [
+    { id: 'free_shipping', label: 'Free Shipping', cost: '0.00' },
+    { id: 'local_pickup', label: 'Local — Local delivery', cost: '35.00' },
+    { id: 'flat_rate', label: 'Flat Rate — Standard shipping', cost: '35.00' },
+  ];
 }

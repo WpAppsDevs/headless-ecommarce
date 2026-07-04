@@ -75,13 +75,13 @@ export default function CheckoutPage() {
         ]}
       />
 
-      <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mb-6 rounded-md border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mb-6 rounded-xl border border-zinc-100 bg-white px-4 py-3 text-sm text-zinc-600">
           {items.reduce((s, i) => s + Number(i.quantity), 0)} item
           {items.reduce((s, i) => s + Number(i.quantity), 0) !== 1 ? 's' : ''} in your cart
         </div>
 
-        <CheckoutForm profile={profile} />
+        <CheckoutForm profile={profile} cartItems={items} />
       </div>
     </>
   );

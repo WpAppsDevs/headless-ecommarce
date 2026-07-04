@@ -58,23 +58,23 @@ const StripeInner = forwardRef<StripeFormHandle, {}>((_, ref) => {
 
   return (
     <div className="space-y-2">
-      <div className="rounded-md border bg-background px-3 py-2.5 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+      <div className="rounded-xl border border-zinc-200 bg-white px-3 py-2.5 focus-within:ring-1 focus-within:ring-zinc-300">
         <CardElement
           options={{
             style: {
               base: {
                 fontSize: '14px',
-                color: 'hsl(var(--foreground))',
+                color: '#18181b',
                 fontFamily: 'inherit',
-                '::placeholder': { color: 'hsl(var(--muted-foreground))' },
+                '::placeholder': { color: '#a1a1aa' },
               },
-              invalid: { color: 'hsl(var(--destructive))' },
+              invalid: { color: '#e11d48' },
             },
           }}
         />
       </div>
       {cardError && (
-        <p className="text-xs text-destructive">{cardError}</p>
+        <p className="text-xs text-rose-500 mt-1">{cardError}</p>
       )}
     </div>
   );
