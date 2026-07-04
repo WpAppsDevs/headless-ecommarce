@@ -11,6 +11,15 @@ import { useFormatPrice } from '@/lib/utils/currency';
 
 type ActionPanel = 'note' | 'shipping' | 'coupon' | null;
 
+// These can be driven from a settings API in the future
+const SETTINGS = {
+  showExpiryBanner: false,
+  showFreeShippingBar: false,
+  showCouponSection: true,
+  cartExpiryMinutes: 30,
+  freeShippingThreshold: 100,
+} as const;
+
 export function CartDrawer() {
   const { items, cartDrawerOpen, setCartDrawerOpen } = useCartStore();
   const [activePanel, setActivePanel] = useState<ActionPanel>(null);
@@ -74,9 +83,11 @@ export function CartDrawer() {
         ) : (
           <>
             {/* ── Free shipping bar ──────────────────────────────────────── */}
-            <div className="shrink-0 border-b bg-zinc-50 px-5 py-3">
-              <FreeShippingBar total={subtotal} threshold={100} />
-            </div>
+            {SETTINGS.showFreeShippingBar && items.length > 0 && (
+              <div className="shrink-0 border-b bg-zinc-50 px-5 py-3">
+                <FreeShippingBar total={subtotal} threshold={SETTINGS.freeShippingThreshold} />
+              </div>
+            )}
 
             {/* ── Items list ─────────────────────────────────────────────── */}
             <div className="flex-1 overflow-y-auto">

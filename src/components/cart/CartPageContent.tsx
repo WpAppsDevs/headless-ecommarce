@@ -11,8 +11,8 @@ import { FreeShippingBar } from '@/components/cart/FreeShippingBar';
 
 // These can be driven from a settings API in the future
 const SETTINGS = {
-  showExpiryBanner: true,
-  showFreeShippingBar: true,
+  showExpiryBanner: false,
+  showFreeShippingBar: false,
   showCouponSection: true,
   cartExpiryMinutes: 30,
   freeShippingThreshold: 100,
