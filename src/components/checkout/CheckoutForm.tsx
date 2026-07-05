@@ -100,6 +100,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
   const stripeRef = useRef<StripeFormHandle>(null);
   const [apiError, setApiError] = useState<string | null>(null);
   const [isPlacing, setIsPlacing] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [countries, setCountries] = useState<Country[]>([]);
   const fmt = useFormatPrice();
 
@@ -238,11 +239,21 @@ export function CheckoutForm({ profile, cartItems }: Props) {
     }
   };
 
+  const onError = () => {
+    setFormError('Please fill in all required fields before placing your order.');
+    setApiError(null);
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate>
+    <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
       {apiError && (
         <div className="mb-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">
           {apiError}
+        </div>
+      )}
+      {!apiError && formError && (
+        <div className="mb-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">
+          {formError}
         </div>
       )}
 
