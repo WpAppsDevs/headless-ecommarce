@@ -48,21 +48,30 @@ const schema = z
       postcode: z.string().min(1, 'Required'),
     }),
     sameAsBilling: z.boolean(),
-    shipping: z
-      .object({
-        first_name: z.string().min(1, 'Required'),
-        address_1: z.string().min(1, 'Required'),
-        country: z.string().min(2, 'Required'),
-        state: z.string().min(1, 'Required'),
-        city: z.string().min(1, 'Required'),
-        postcode: z.string().min(1, 'Required'),
-      })
-      .optional(),
+    shipping: z.object({
+      first_name: z.string(),
+      address_1: z.string(),
+      country: z.string(),
+      state: z.string(),
+      city: z.string(),
+      postcode: z.string(),
+    }),
     gateway: z.enum(['stripe', 'bacs']),
     shipping_method: z.string().min(1, 'Please select a shipping method'),
     terms_accepted: z.boolean().refine((val) => val === true, {
       message: 'You must accept the terms',
     }),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.sameAsBilling && data.shipping) {
+      const s = data.shipping;
+      const required = ['first_name', 'address_1', 'country', 'state', 'city', 'postcode'] as const;
+      for (const key of required) {
+        if (!s[key]) {
+          ctx.addIssue({ code: 'custom', message: 'Required', path: ['shipping', key] });
+        }
+      }
+    }
   });
 
 type FormValues = z.infer<typeof schema>;
@@ -158,8 +167,26 @@ export function CheckoutForm({ profile, cartItems }: Props) {
   const sameAsBilling = watch('sameAsBilling');
   const gateway = watch('gateway');
   const selectedShippingMethod = watch('shipping_method');
+  const billingFirstName = watch('billing.first_name');
+  const billingAddr1 = watch('billing.address_1');
   const billingCountry = watch('billing.country');
+  const billingState = watch('billing.state');
+  const billingCity = watch('billing.city');
+  const billingPostcode = watch('billing.postcode');
   const shippingCountry = watch('shipping.country');
+
+  // Auto-fill shipping from billing when "same as billing" is checked
+  useEffect(() => {
+    if (sameAsBilling) {
+      setValue('shipping.first_name', billingFirstName);
+      setValue('shipping.address_1', billingAddr1);
+      setValue('shipping.country', billingCountry);
+      setValue('shipping.state', billingState);
+      setValue('shipping.city', billingCity);
+      setValue('shipping.postcode', billingPostcode);
+    }
+  }, [sameAsBilling, billingFirstName, billingAddr1, billingCountry, billingState, billingCity, billingPostcode, setValue]);
+
 
   // Calculate totals
   const subtotal = cartItems.reduce((sum, item) => {
