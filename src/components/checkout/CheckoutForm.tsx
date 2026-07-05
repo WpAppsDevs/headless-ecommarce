@@ -133,6 +133,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -141,10 +142,17 @@ export function CheckoutForm({ profile, cartItems }: Props) {
       sameAsBilling: true,
       shipping: defaultShipping,
       gateway: 'bacs',
-      shipping_method: shippingMethods?.[0]?.id ?? '',
+      shipping_method: '',
       terms_accepted: false,
     },
   });
+
+  // Sync shipping_method default once shippingMethods loads from the store
+  useEffect(() => {
+    if (shippingMethods && shippingMethods.length > 0) {
+      setValue('shipping_method', shippingMethods[0].id);
+    }
+  }, [shippingMethods, setValue]);
 
   const sameAsBilling = watch('sameAsBilling');
   const gateway = watch('gateway');

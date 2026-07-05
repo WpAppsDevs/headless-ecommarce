@@ -4,6 +4,7 @@ import {
   apiGetCart,
   apiUpdateCartItem,
   apiRemoveCartItem,
+  getShippingMethods,
   type CartItem,
 } from '@/lib/api/cart';
 import { ApiError } from '@/lib/errors';
@@ -86,7 +87,7 @@ export const useCartStore = create<CartState & CartActions>((set) => ({
       set({ 
         items: data.items, 
         cartToken: data.cart_token,
-        shippingMethods: data.shipping_methods,
+        shippingMethods: getShippingMethods(data),
         chosenShippingMethod: data.chosen_shipping_method,
         loading: false 
       });
@@ -128,7 +129,11 @@ export const useCartStore = create<CartState & CartActions>((set) => ({
         set({ guestToken: data.guest_token });
       }
 
-      set({ items: data.items, cartToken: data.cart_token });
+      set({ 
+        items: data.items, 
+        cartToken: data.cart_token,
+        shippingMethods: getShippingMethods(data),
+      });
     } catch (e) {
       // Revert the optimistic item on failure
       set((state) => ({
@@ -142,7 +147,12 @@ export const useCartStore = create<CartState & CartActions>((set) => ({
     set({ loading: true, error: null });
     try {
       const data = await apiUpdateCartItem(itemId, quantity);
-      set({ items: data.items, cartToken: data.cart_token, loading: false });
+      set({ 
+        items: data.items, 
+        cartToken: data.cart_token, 
+        shippingMethods: getShippingMethods(data),
+        loading: false 
+      });
     } catch (e) {
       set({ error: toErrorMsg(e, 'Failed to update cart'), loading: false });
     }
@@ -152,7 +162,12 @@ export const useCartStore = create<CartState & CartActions>((set) => ({
     set({ loading: true, error: null });
     try {
       const data = await apiRemoveCartItem(itemId);
-      set({ items: data.items, cartToken: data.cart_token, loading: false });
+      set({ 
+        items: data.items, 
+        cartToken: data.cart_token, 
+        shippingMethods: getShippingMethods(data),
+        loading: false 
+      });
     } catch (e) {
       set({ error: toErrorMsg(e, 'Failed to remove item from cart'), loading: false });
     }
