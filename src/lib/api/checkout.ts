@@ -88,6 +88,29 @@ export async function getUser(): Promise<UserProfile> {
 
 /** POST /wp-json/api/checkout — requires user access token */
 export async function placeOrder(payload: PlaceOrderPayload): Promise<OrderResult> {
+  if (typeof window !== 'undefined') {
+    // Browser: proxy through /api/checkout to avoid CORS preflight issues
+    const token = tokenCache.get();
+    if (!token) throw new ApiError('no_token', 'Not authenticated');
+    const res = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    const json = (await res.json()) as {
+      success: boolean;
+      data?: OrderResult;
+      code?: string;
+      message?: string;
+    };
+    if (!json.success) {
+      throw new ApiError(json.code ?? 'api_error', json.message ?? 'Checkout failed');
+    }
+    return json.data as OrderResult;
+  }
   return apiClient<OrderResult>(`${config.apiNs}/checkout`, {
     method: 'POST',
     body: JSON.stringify(payload),
