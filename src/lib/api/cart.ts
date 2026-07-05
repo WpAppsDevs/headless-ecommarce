@@ -110,13 +110,13 @@ export async function apiRemoveCartItem(itemId: number): Promise<CartData> {
 }
 
 /**
- * GET /wpadhlwrapi/v1/cart — fetch shipping methods.
- * Falls back to hardcoded defaults if the endpoint returns no shipping data.
+ * Get shipping methods.
+ * Uses provided cart data if available to avoid duplicate API calls.
+ * Falls back to hardcoded defaults if no shipping data is available.
  */
-export async function apiGetShippingMethods(): Promise<CartData['shipping_methods']> {
-  const cart = await apiGetCart();
-  if (cart.shipping_methods && cart.shipping_methods.length > 0) {
-    return cart.shipping_methods;
+export function getShippingMethods(cartData?: CartData): CartData['shipping_methods'] {
+  if (cartData?.shipping_methods && cartData.shipping_methods.length > 0) {
+    return cartData.shipping_methods;
   }
   // Fallback defaults matching the cart page
   return [

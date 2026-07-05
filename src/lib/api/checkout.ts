@@ -8,10 +8,7 @@ import { ApiError } from '@/lib/errors';
 
 export interface AddressFields {
   first_name: string;
-  last_name: string;
-  company: string;
   address_1: string;
-  address_2: string;
   city: string;
   state: string;
   postcode: string;
@@ -55,6 +52,12 @@ export interface OrderResult {
   transaction_id: string | null;
 }
 
+export interface Country {
+  code: string;
+  name: string;
+  states: Array<{ code: string; name: string }>;
+}
+
 // ---------------------------------------------------------------------------
 // API functions
 // ---------------------------------------------------------------------------
@@ -89,4 +92,9 @@ export async function placeOrder(payload: PlaceOrderPayload): Promise<OrderResul
     method: 'POST',
     body: JSON.stringify(payload),
   });
+}
+
+/** GET /wpadhlwrapi/v1/countries — fetch available countries and states */
+export async function getCountries(): Promise<Country[]> {
+  return apiClient<Country[]>(`${config.productsNs}/countries`);
 }

@@ -34,8 +34,7 @@ export default function CheckoutPage() {
         // Profile fetch failed for another reason — show form unpre-filled
       }
 
-      // 2. Ensure cart has items
-      await fetchCart();
+      // 2. Cart should already be loaded by CartHydrator
       if (useCartStore.getState().items.length === 0) {
         router.replace('/cart');
         return;

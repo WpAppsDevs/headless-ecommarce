@@ -18,6 +18,15 @@ interface CartState {
   cartToken: string | null;
   /** Guest JWT stored in localStorage['cart_token']. Null for logged-in users. */
   guestToken: string | null;
+  /** Available shipping methods for the current cart. */
+  shippingMethods?: Array<{
+    id: string;
+    label: string;
+    cost: string;
+    description?: string;
+  }>;
+  /** The currently selected shipping method ID. */
+  chosenShippingMethod?: string;
   loading: boolean;
   error: string | null;
   cartDrawerOpen: boolean;
@@ -62,6 +71,8 @@ export const useCartStore = create<CartState & CartActions>((set) => ({
   // Restore guestToken from localStorage on first client-side render.
   guestToken:
     typeof window !== 'undefined' ? localStorage.getItem('cart_token') : null,
+  shippingMethods: undefined,
+  chosenShippingMethod: undefined,
   loading: false,
   error: null,
   cartDrawerOpen: false,
@@ -72,7 +83,13 @@ export const useCartStore = create<CartState & CartActions>((set) => ({
     set({ loading: true, error: null });
     try {
       const data = await apiGetCart();
-      set({ items: data.items, cartToken: data.cart_token, loading: false });
+      set({ 
+        items: data.items, 
+        cartToken: data.cart_token,
+        shippingMethods: data.shipping_methods,
+        chosenShippingMethod: data.chosen_shipping_method,
+        loading: false 
+      });
     } catch (e) {
       set({ error: toErrorMsg(e, 'Failed to fetch cart'), loading: false });
     }
@@ -149,7 +166,12 @@ export const useCartStore = create<CartState & CartActions>((set) => ({
   },
 
   clearCart: () => {
-    set({ items: [], cartToken: null });
+    set({ 
+      items: [], 
+      cartToken: null,
+      shippingMethods: undefined,
+      chosenShippingMethod: undefined,
+    });
   },
 
   setCartDrawerOpen: (open) => {
