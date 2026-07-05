@@ -239,9 +239,58 @@ export function CheckoutForm({ profile, cartItems }: Props) {
     }
   };
 
-  const onError = () => {
-    setFormError('Please fill in all required fields before placing your order.');
+  const onError = (formErrors: typeof errors) => {
     setApiError(null);
+
+    // Build list of missing field labels
+    const FIELD_LABELS: Record<string, string> = {
+      'billing.first_name': 'Full Name',
+      'billing.email': 'Email',
+      'billing.phone': 'Phone',
+      'billing.address_1': 'Address',
+      'billing.country': 'Country',
+      'billing.state': 'State / Province',
+      'billing.city': 'City',
+      'billing.postcode': 'Postcode / ZIP',
+      'shipping.first_name': 'Shipping Full Name',
+      'shipping.address_1': 'Shipping Address',
+      'shipping.country': 'Shipping Country',
+      'shipping.state': 'Shipping State / Province',
+      'shipping.city': 'Shipping City',
+      'shipping.postcode': 'Shipping Postcode / ZIP',
+      shipping_method: 'Shipping method',
+      terms_accepted: 'Terms & Conditions',
+    };
+
+    const missing: string[] = [];
+
+    // Walk billing errors
+    const b = formErrors.billing as Record<string, { message?: string }> | undefined;
+    if (b) {
+      for (const key of Object.keys(FIELD_LABELS).filter(k => k.startsWith('billing.'))) {
+        const fieldKey = key.replace('billing.', '');
+        if (b[fieldKey]) missing.push(FIELD_LABELS[key]);
+      }
+    }
+
+    // Walk shipping errors
+    const s = formErrors.shipping as Record<string, { message?: string }> | undefined;
+    if (s) {
+      for (const key of Object.keys(FIELD_LABELS).filter(k => k.startsWith('shipping.'))) {
+        const fieldKey = key.replace('shipping.', '');
+        if (s[fieldKey]) missing.push(FIELD_LABELS[key]);
+      }
+    }
+
+    // Top-level fields
+    if (formErrors.shipping_method) missing.push(FIELD_LABELS.shipping_method);
+    if (formErrors.terms_accepted) missing.push(FIELD_LABELS.terms_accepted);
+
+    if (missing.length === 0) {
+      setFormError('Please fill in all required fields before placing your order.');
+    } else {
+      setFormError(`Missing: ${missing.join(', ')}.`);
+    }
   };
 
   return (
