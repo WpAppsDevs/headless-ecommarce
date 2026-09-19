@@ -175,3 +175,18 @@
     @apply font-sans;
   }
 }
+
+@layer utilities {
+  /* Inter for small UI text — scoped to the product detail section only.
+     The site's global font is left untouched. */
+  .font-ui {
+    font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  }
+
+  /* Force lining (even-height, baseline) numerals for the serif headings and
+     prices so figures don't render as old-style/uneven. */
+  .nums-lining {
+    font-variant-numeric: lining-nums;
+    font-feature-settings: "lnum" 1;
+  }
+}

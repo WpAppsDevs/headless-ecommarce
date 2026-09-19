@@ -108,18 +108,18 @@ export default async function ProductPage({ params }: PageProps) {
         ]}
       />
 
-      <section className="bg-[#FBF7F3]">
+      <section className="font-ui nums-lining bg-[#FBF7F3]">
         <div className="mx-auto max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
           {/* 2-col product section */}
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,48%)_1fr] lg:gap-12">
             {/* Left: image gallery */}
             <ProductImages images={product.images} name={product.name} isOnSale={!!isOnSale} />
 
-            {/* Right: product info */}
-            <div className="flex flex-col gap-5">
+            {/* Right: product info + accordions */}
+            <div className="flex flex-col">
               {/* Category pill links */}
               {product.categories.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
+                <div className="mb-3 flex flex-wrap gap-1.5">
                   {product.categories.map((cat) => (
                     <Link
                       key={cat.id}
@@ -133,12 +133,12 @@ export default async function ProductPage({ params }: PageProps) {
               )}
 
               {/* Name */}
-              <h1 className="font-serif text-2xl uppercase leading-tight tracking-wide text-[#1F2A3C] lg:text-[32px]">
+              <h1 className="mb-3 font-serif text-2xl font-medium uppercase leading-[1.2] tracking-[0.01em] text-[#1F2A3C] lg:text-[32px]">
                 {product.name}
               </h1>
 
               {/* Rating + Product Code */}
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+              <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px]">
                 {(product.rating_count ?? 0) > 0 ? (
                   <>
                     <span className="flex items-center gap-0.5" aria-label={`${product.average_rating} out of 5 stars`}>
@@ -176,30 +176,31 @@ export default async function ProductPage({ params }: PageProps) {
                 )}
               </div>
 
-              {/* Short description */}
+              {/* Short description (kept from API when present) */}
               {product.short_description && (
                 <div
-                  className="font-ui text-sm leading-relaxed text-[#5A5A5A] [&_p]:leading-relaxed"
+                  className="mb-5 text-[15px] leading-relaxed text-[#5A5A5A] [&_p]:leading-relaxed"
                   dangerouslySetInnerHTML={{ __html: product.short_description }}
                 />
               )}
 
-              {/* Variation selector (price, swatches, qty, cart, wishlist) */}
+              {/* Price, options, quantity, action row */}
               <VariationSelector product={product} />
-            </div>
-          </div>
 
-          {/* Below the fold: accordions */}
-          <div className="mt-12">
-            <ProductTabs
-              description={product.description}
-              productDetails={product.product_details}
-              sku={product.sku}
-              categories={product.categories}
-              productId={product.id}
-              productName={product.name}
-              initialAggregate={ratingAggregate}
-            />
+              {/* Divider + accordions (inside the right column) */}
+              <div className="mt-7 border-t border-[#E6DED6]" />
+              <div className="mt-5">
+                <ProductTabs
+                  description={product.description}
+                  productDetails={product.product_details}
+                  sku={product.sku}
+                  categories={product.categories}
+                  productId={product.id}
+                  productName={product.name}
+                  initialAggregate={ratingAggregate}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>

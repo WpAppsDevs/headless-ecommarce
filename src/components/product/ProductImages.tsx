@@ -58,10 +58,10 @@ export function ProductImages({ images, name, isOnSale }: Props) {
   }
 
   return (
-    <div className="flex flex-col-reverse gap-3 lg:flex-row lg:gap-4">
+    <div className="flex flex-col-reverse gap-3 lg:flex-row lg:items-start lg:gap-3">
       {/* Thumbnail strip — horizontal on mobile, vertical on desktop */}
       {total > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-1 lg:max-h-[280px] lg:flex-col lg:overflow-y-auto lg:overflow-x-visible lg:pb-0">
+        <div className="flex gap-3 overflow-x-auto pb-1 lg:max-h-[340px] lg:flex-col lg:overflow-y-auto lg:overflow-x-visible lg:pb-0">
           {validImages.map((img, i) => {
             const thumbSrc = failedIndices.has(i) || !img.src ? PLACEHOLDER : img.src;
             return (
@@ -72,7 +72,7 @@ export function ProductImages({ images, name, isOnSale }: Props) {
                 aria-label={img.alt || `Image ${i + 1}`}
                 aria-current={active === i}
                 className={cn(
-                  'relative h-16 w-16 shrink-0 overflow-hidden rounded-md border-2 transition-all',
+                  'relative h-[76px] w-[76px] shrink-0 overflow-hidden rounded-[6px] border-2 transition-all',
                   active === i
                     ? 'border-[#9E2F45] opacity-100'
                     : 'border-transparent opacity-60 hover:opacity-100',
@@ -83,7 +83,7 @@ export function ProductImages({ images, name, isOnSale }: Props) {
                   alt={img.alt || name}
                   fill
                   className="object-cover"
-                  sizes="64px"
+                  sizes="76px"
                   onError={() => handleError(i)}
                 />
               </button>
@@ -94,7 +94,7 @@ export function ProductImages({ images, name, isOnSale }: Props) {
 
       {/* Main image */}
       <div
-        className="group relative aspect-[4/5] min-w-0 flex-1 overflow-hidden rounded-[12px] bg-[#F1ECE7]"
+        className="group relative aspect-[6/7] min-w-0 flex-1 overflow-hidden rounded-[12px] bg-[#F1ECE7]"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >

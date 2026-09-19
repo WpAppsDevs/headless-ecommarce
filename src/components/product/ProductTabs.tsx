@@ -120,15 +120,15 @@ export function ProductTabs({
               aria-expanded={open}
               aria-controls={`${item.id}-panel`}
               id={`${item.id}-header`}
-              className="flex w-full items-center gap-3 px-4 py-4 text-left focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#9E2F45] sm:px-5"
+              className="flex min-h-14 w-full items-center gap-3 px-5 text-left focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#9E2F45]"
             >
-              <Icon className="h-5 w-5 shrink-0 text-[#9E2F45]" strokeWidth={1.5} />
-              <span className="flex-1 font-serif text-lg font-semibold text-[#1F2A3C]">
+              <Icon className="h-5 w-5 shrink-0 text-[#1F2A3C]" strokeWidth={1.5} />
+              <span className="flex-1 font-serif text-base font-medium text-[#1F2A3C]">
                 {item.title}
               </span>
               <ChevronDown
                 className={cn(
-                  'h-5 w-5 shrink-0 text-[#5A5A5A] transition-transform duration-300',
+                  'h-5 w-5 shrink-0 text-[#1F2A3C] transition-transform duration-300',
                   open && 'rotate-180',
                 )}
                 strokeWidth={1.5}
@@ -145,7 +145,7 @@ export function ProductTabs({
               )}
             >
               <div className="overflow-hidden">
-                <div className="px-4 pb-5 sm:px-5">
+                <div className="px-5 py-4">
                   {item.id === 'product-details' && renderProductDetails()}
 
                   {item.id === 'additional-info' && (

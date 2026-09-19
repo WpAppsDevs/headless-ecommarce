@@ -201,10 +201,10 @@ export function VariationSelector({ product }: { product: Product }) {
 
   return (
     <>
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col">
         {/* 1. Price */}
         <div className="flex items-baseline gap-3">
-          <span className="font-serif text-4xl font-bold leading-none text-[#1F2A3C]">
+          <span className="font-serif text-[30px] font-bold leading-none text-[#1F2A3C] lg:text-[36px]">
             {fmt(displayPrice)}
           </span>
           {isOnSale && displayRegularPrice && (
@@ -212,97 +212,98 @@ export function VariationSelector({ product }: { product: Product }) {
           )}
         </div>
 
-        {/* 2. Color swatches */}
-        {!isSimple &&
-          colorKeys.map((key) => (
-            <div key={key}>
-              <p className="mb-3 text-sm text-[#5A5A5A]">
-                <span className="font-medium text-[#1F2A3C]">Color</span>
-                {selected[key] && <span className="ml-1">: {selected[key]}</span>}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {attrValues[key].map((val) => {
-                  const isActive = selected[key] === val;
-                  const hex = getColorHex(val);
-                  const variationImage =
-                    variations.find((v) => v.attributes[key] === val)?.image || '';
-                  return (
-                    <button
-                      key={val}
-                      type="button"
-                      title={val}
-                      aria-label={`Color ${val}`}
-                      aria-pressed={isActive}
-                      onClick={() => selectOption(key, val)}
-                      className={cn(
-                        'relative h-11 w-11 overflow-hidden rounded-full transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45]',
-                        isActive
-                          ? 'ring-2 ring-[#9E2F45] ring-offset-2 ring-offset-[#FBF7F3]'
-                          : 'ring-1 ring-[#D9D2CB] hover:ring-[#9E2F45]/50',
-                      )}
-                    >
-                      {hex ? (
-                        <span
-                          className="block h-full w-full rounded-full"
-                          style={{ backgroundColor: hex }}
-                        />
-                      ) : variationImage ? (
-                        <Image src={variationImage} alt={val} fill className="object-cover" sizes="44px" />
-                      ) : (
-                        <span className="flex h-full w-full items-center justify-center text-[10px] font-semibold text-[#5A5A5A]">
-                          {val.slice(0, 2).toUpperCase()}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
+        {/* 2 & 3. Color swatches + other attributes (size, etc.) */}
+        {!isSimple && attrKeys.length > 0 && (
+          <div className="mt-6 flex flex-col gap-5">
+            {colorKeys.map((key) => (
+              <div key={key}>
+                <p className="mb-3 text-sm text-[#5A5A5A]">
+                  <span className="font-medium text-[#1F2A3C]">Color</span>
+                  {selected[key] && <span className="ml-1">: {selected[key]}</span>}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {attrValues[key].map((val) => {
+                    const isActive = selected[key] === val;
+                    const hex = getColorHex(val);
+                    const variationImage =
+                      variations.find((v) => v.attributes[key] === val)?.image || '';
+                    return (
+                      <button
+                        key={val}
+                        type="button"
+                        title={val}
+                        aria-label={`Color ${val}`}
+                        aria-pressed={isActive}
+                        onClick={() => selectOption(key, val)}
+                        className={cn(
+                          'relative h-11 w-11 overflow-hidden rounded-full transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45]',
+                          isActive
+                            ? 'ring-2 ring-[#9E2F45] ring-offset-2 ring-offset-[#FBF7F3]'
+                            : 'ring-1 ring-[#D9D2CB] hover:ring-[#9E2F45]/50',
+                        )}
+                      >
+                        {hex ? (
+                          <span
+                            className="block h-full w-full rounded-full"
+                            style={{ backgroundColor: hex }}
+                          />
+                        ) : variationImage ? (
+                          <Image src={variationImage} alt={val} fill className="object-cover" sizes="44px" />
+                        ) : (
+                          <span className="flex h-full w-full items-center justify-center text-[10px] font-semibold text-[#5A5A5A]">
+                            {val.slice(0, 2).toUpperCase()}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
 
-        {/* 3. Other attributes (size, etc.) */}
-        {!isSimple &&
-          otherKeys.map((key) => (
-            <div key={key}>
-              <p className="mb-3 text-sm text-[#5A5A5A]">
-                <span className="font-medium text-[#1F2A3C]">{formatAttrLabel(key)}</span>
-                {selected[key] && <span className="ml-1">: {selected[key]}</span>}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {attrValues[key].map((val) => {
-                  const isActive = selected[key] === val;
-                  const unavailable = isOptionUnavailable(key, val);
-                  return (
-                    <button
-                      key={val}
-                      type="button"
-                      disabled={unavailable}
-                      onClick={() => selectOption(key, val)}
-                      aria-pressed={isActive}
-                      className={cn(
-                        'relative min-h-12 min-w-[48px] overflow-hidden rounded-[8px] border px-4 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45]',
-                        isActive
-                          ? 'border-[#9E2F45] bg-[#FBEAEA] text-[#9E2F45]'
-                          : 'border-[#D9D2CB] bg-white text-[#1F2A3C] hover:border-[#9E2F45]',
-                        unavailable && 'cursor-not-allowed opacity-50 hover:border-[#D9D2CB]',
-                      )}
-                    >
-                      {val}
-                      {unavailable && (
-                        <span
-                          aria-hidden="true"
-                          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top_right,transparent_45%,#D9D2CB_50%,transparent_55%)]"
-                        />
-                      )}
-                    </button>
-                  );
-                })}
+            {otherKeys.map((key) => (
+              <div key={key}>
+                <p className="mb-3 text-sm text-[#5A5A5A]">
+                  <span className="font-medium text-[#1F2A3C]">{formatAttrLabel(key)}</span>
+                  {selected[key] && <span className="ml-1">: {selected[key]}</span>}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {attrValues[key].map((val) => {
+                    const isActive = selected[key] === val;
+                    const unavailable = isOptionUnavailable(key, val);
+                    return (
+                      <button
+                        key={val}
+                        type="button"
+                        disabled={unavailable}
+                        onClick={() => selectOption(key, val)}
+                        aria-pressed={isActive}
+                        className={cn(
+                          'relative min-h-11 min-w-[48px] overflow-hidden rounded-[8px] border px-4 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45]',
+                          isActive
+                            ? 'border-[#9E2F45] bg-[#FBEAEA] text-[#9E2F45]'
+                            : 'border-[#D9D2CB] bg-white text-[#1F2A3C] hover:border-[#9E2F45]',
+                          unavailable && 'cursor-not-allowed opacity-50 hover:border-[#D9D2CB]',
+                        )}
+                      >
+                        {val}
+                        {unavailable && (
+                          <span
+                            aria-hidden="true"
+                            className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top_right,transparent_45%,#D9D2CB_50%,transparent_55%)]"
+                          />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+        )}
 
         {/* 4. Quantity */}
-        <div>
+        <div className="mt-5">
           <p className="mb-3 text-sm font-medium text-[#1F2A3C]">Quantity</p>
           <QuantityStepper
             quantity={quantity}
@@ -311,15 +312,20 @@ export function VariationSelector({ product }: { product: Product }) {
           />
         </div>
 
-        {/* 5. Cart error */}
+        {/* 5. Inline validation / cart errors (between quantity and action row) */}
         {cartError && (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="mt-5 text-[13px] text-[#9E2F45]">
             {cartError}
+          </p>
+        )}
+        {sizeError && !allSelected && (
+          <p role="alert" className="mt-5 text-[13px] font-medium text-[#9E2F45]">
+            {missingLabel}
           </p>
         )}
 
         {/* 6. Add to Cart + Wishlist */}
-        <div ref={actionRef} className="flex gap-3">
+        <div ref={actionRef} className="mt-5 flex gap-3">
           <button
             type="button"
             onClick={handleAddToCart}
@@ -359,13 +365,6 @@ export function VariationSelector({ product }: { product: Product }) {
             variant="detail"
           />
         </div>
-
-        {/* 7. Inline size/option validation message */}
-        {sizeError && !allSelected && (
-          <p role="alert" className="-mt-2 text-sm font-medium text-[#9E2F45]">
-            {missingLabel}
-          </p>
-        )}
       </div>
 
       {/* Mobile sticky bottom bar (visible only after the main CTA scrolls away) */}
