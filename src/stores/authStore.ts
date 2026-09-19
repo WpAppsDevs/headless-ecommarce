@@ -59,10 +59,28 @@ export const useAuthStore = create<AuthState>((set, get) => {
   // Called by apiClient when a 401 persists after a token refresh attempt.
   if (typeof window !== 'undefined') {
     setOnUnauthorized(() => {
+      // A bearer token in the cache means a real user session expired.
+      // Otherwise the 401 came from a guest cart token (no refresh cookie),
+      // which must NOT force a login redirect — that caused an infinite
+      // redirect loop on /login when a stale cart_token lingered in
+      // localStorage and CartHydrator re-fetched it on every page load.
+      const hadSession = !!tokenCache.get();
       tokenCache.set(undefined);
       set({ user: null, isAuthenticated: false });
-      useCartStore.getState().clearCart();
-      window.location.href = '/login';
+
+      const cart = useCartStore.getState();
+      cart.clearCart();
+
+      if (!hadSession) {
+        // Drop the dead guest token so hydration stops retrying it.
+        cart.clearGuestToken();
+        return;
+      }
+
+      // Avoid reloading the login page when we're already there.
+      if (window.location.pathname !== '/login') {
+        window.location.replace('/login');
+      }
     });
   }
 
