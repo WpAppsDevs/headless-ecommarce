@@ -40,14 +40,15 @@ export function WishlistButton({
       <button
         type="button"
         aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+        title={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
         aria-pressed={isWishlisted}
         onClick={handleClick}
         disabled={isPending}
         className={cn(
-          'flex h-[52px] w-[52px] items-center justify-center rounded-xl border-2 transition-colors',
+          'flex h-11 w-11 items-center justify-center rounded-[8px] border-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45]',
           isWishlisted
-            ? 'border-rose-500 bg-rose-50 text-rose-500'
-            : 'border-zinc-200 text-zinc-400 hover:border-zinc-300',
+            ? 'border-[#9E2F45] bg-[#FBEAEA] text-[#9E2F45]'
+            : 'border-[#9E2F45]/40 text-[#9E2F45] hover:border-[#9E2F45]',
           isPending && 'cursor-not-allowed opacity-60',
           className,
         )}

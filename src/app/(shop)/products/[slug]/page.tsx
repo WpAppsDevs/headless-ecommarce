@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Star, Tag, Package } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { getProduct, getAllProductSlugs } from '@/lib/api/products';
 import { getRatingAggregate } from '@/lib/api/reviews';
@@ -108,111 +108,116 @@ export default async function ProductPage({ params }: PageProps) {
         ]}
       />
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* 2-col product section */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
-        {/* Left: image gallery */}
-        <ProductImages images={product.images} name={product.name} isOnSale={!!isOnSale} />
+      <section className="bg-[#FBF7F3]">
+        <div className="mx-auto max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+          {/* 2-col product section */}
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,48%)_1fr] lg:gap-12">
+            {/* Left: image gallery */}
+            <ProductImages images={product.images} name={product.name} isOnSale={!!isOnSale} />
 
-        {/* Right: product info */}
-        <div className="flex flex-col gap-5 lg:sticky lg:top-24 lg:self-start">
-          {/* Category pill links */}
-          {product.categories.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              {product.categories.map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={`/products?category=${cat.slug}`}
-                  className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-200"
-                >
-                  {cat.name}
-                </Link>
-              ))}
-            </div>
-          )}
+            {/* Right: product info */}
+            <div className="flex flex-col gap-5">
+              {/* Category pill links */}
+              {product.categories.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {product.categories.map((cat) => (
+                    <Link
+                      key={cat.id}
+                      href={`/products?category=${cat.slug}`}
+                      className="rounded-full bg-[#F6E4E4] px-3 py-1 text-xs font-medium text-[#7A2E3A] transition-colors hover:bg-[#EFD5D5]"
+                    >
+                      {cat.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
 
-          {/* Name */}
-          <h1 className="text-3xl font-bold leading-tight text-zinc-900">{product.name}</h1>
+              {/* Name */}
+              <h1 className="font-serif text-2xl uppercase leading-tight tracking-wide text-[#1F2A3C] lg:text-[32px]">
+                {product.name}
+              </h1>
 
-          {/* Dynamic star rating from API */}
-          {(product.rating_count ?? 0) > 0 ? (
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-0.5">
-                {[1, 2, 3, 4, 5].map((i) => {
-                  const avg = parseFloat(product.average_rating ?? '0');
-                  const filled = i <= Math.floor(avg);
-                  const half = !filled && i === Math.ceil(avg) && avg % 1 >= 0.5;
-                  return (
-                    <Star
-                      key={i}
-                      className="h-4 w-4"
-                      fill={filled || half ? '#f59e0b' : 'none'}
-                      stroke={filled || half ? '#f59e0b' : '#d1d5db'}
-                    />
-                  );
-                })}
+              {/* Rating + Product Code */}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+                {(product.rating_count ?? 0) > 0 ? (
+                  <>
+                    <span className="flex items-center gap-0.5" aria-label={`${product.average_rating} out of 5 stars`}>
+                      {[1, 2, 3, 4, 5].map((i) => {
+                        const avg = parseFloat(product.average_rating ?? '0');
+                        const filled = i <= Math.floor(avg);
+                        const half = !filled && i === Math.ceil(avg) && avg % 1 >= 0.5;
+                        return (
+                          <Star
+                            key={i}
+                            className="h-4 w-4"
+                            fill={filled || half ? '#9E2F45' : 'none'}
+                            stroke={filled || half ? '#9E2F45' : '#D9D2CB'}
+                          />
+                        );
+                      })}
+                    </span>
+                    <span className="text-[#5A5A5A]">{product.average_rating} / 5</span>
+                    <span className="text-[#5A5A5A]">({product.rating_count} Reviews)</span>
+                  </>
+                ) : (
+                  <a
+                    href="#reviews"
+                    className="font-medium text-[#9E2F45] underline underline-offset-2 hover:text-[#862640]"
+                  >
+                    Be the first to review
+                  </a>
+                )}
+
+                {product.sku && (
+                  <>
+                    <span aria-hidden="true" className="h-4 w-px bg-[#D9D2CB]" />
+                    <span className="text-[#5A5A5A]">Product Code: {product.sku}</span>
+                  </>
+                )}
               </div>
-              <span className="text-sm text-zinc-500">{product.average_rating} / 5</span>
-              <span className="text-sm text-zinc-400">({product.rating_count} Reviews)</span>
-            </div>
-          ) : (
-            <p className="text-sm text-zinc-400">No reviews yet</p>
-          )}
 
-          {/* Short description */}
-          {product.short_description && (
-            <div
-              className="text-sm leading-relaxed text-zinc-500 [&_p]:leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: product.short_description }}
+              {/* Short description */}
+              {product.short_description && (
+                <div
+                  className="font-ui text-sm leading-relaxed text-[#5A5A5A] [&_p]:leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: product.short_description }}
+                />
+              )}
+
+              {/* Variation selector (price, swatches, qty, cart, wishlist) */}
+              <VariationSelector product={product} />
+            </div>
+          </div>
+
+          {/* Below the fold: accordions */}
+          <div className="mt-12">
+            <ProductTabs
+              description={product.description}
+              productDetails={product.product_details}
+              sku={product.sku}
+              categories={product.categories}
+              productId={product.id}
+              productName={product.name}
+              initialAggregate={ratingAggregate}
             />
-          )}
-
-          {/* Variation selector (price, swatches, qty, cart, wishlist, delivery) */}
-          <VariationSelector product={product} />
-
-          {/* Product meta */}
-          <div className="flex flex-col gap-2 border-t border-zinc-100 pt-4 text-xs text-zinc-400">
-            {product.sku && (
-              <div className="flex items-center gap-1.5">
-                <Tag className="h-3.5 w-3.5" />
-                <span>SKU: {product.sku}</span>
-              </div>
-            )}
-            {product.categories.length > 0 && (
-              <div className="flex items-center gap-1.5">
-                <Package className="h-3.5 w-3.5" />
-                <span>{product.categories.map((c) => c.name).join(', ')}</span>
-              </div>
-            )}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Below the fold: tabs */}
-      <div className="mt-16">
-        <ProductTabs
-          description={product.description}
-          sku={product.sku}
-          categories={product.categories}
-          productId={product.id}
-          productName={product.name}
-          initialAggregate={ratingAggregate}
-        />
+      {/* Related products (unchanged) */}
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <Suspense
+          fallback={
+            <div className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))}
+            </div>
+          }
+        >
+          <RelatedProducts />
+        </Suspense>
       </div>
-
-      {/* Related products */}
-      <Suspense
-        fallback={
-          <div className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <ProductCardSkeleton key={i} />
-            ))}
-          </div>
-        }
-      >
-        <RelatedProducts />
-      </Suspense>
-    </div>
     </>
   );
 }

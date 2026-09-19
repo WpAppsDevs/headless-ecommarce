@@ -44,6 +44,26 @@ export interface ProductVariation {
   image: string;
 }
 
+export interface ProductDetailSpec {
+  label: string;
+  value: string;
+}
+
+export interface ProductIncludedItem {
+  qty: number;
+  name: string;
+}
+
+/**
+ * Optional structured product details returned by the backend. When present,
+ * the product detail accordion renders a spec table + "What's Included" card
+ * instead of the raw `description` HTML.
+ */
+export interface ProductDetails {
+  specs?: ProductDetailSpec[];
+  included?: ProductIncludedItem[];
+}
+
 export interface Product {
   id: number;
   name: string;
@@ -68,6 +88,8 @@ export interface Product {
   attributes: ProductAttribute[];
   /** List endpoint returns variation IDs; detail endpoint returns full objects. */
   variations: number[] | ProductVariation[];
+  /** Optional structured product details (specs + included items). */
+  product_details?: ProductDetails;
 }
 
 export interface PaginationMeta {

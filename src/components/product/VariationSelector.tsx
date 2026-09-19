@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { Loader2, ShoppingCart, CheckCircle2, Minus, Plus, Truck, RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
+import { Loader2, ShoppingCart, CheckCircle2, Minus, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cartStore';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
@@ -51,6 +51,44 @@ function getColorHex(name: string): string | null {
 }
 
 // ---------------------------------------------------------------------------
+// Small local control
+// ---------------------------------------------------------------------------
+
+function QuantityStepper({
+  quantity,
+  onDecrease,
+  onIncrease,
+}: {
+  quantity: number;
+  onDecrease: () => void;
+  onIncrease: () => void;
+}) {
+  return (
+    <div className="inline-flex h-11 w-[112px] items-center justify-between overflow-hidden rounded-[8px] border border-[#D9D2CB] bg-white">
+      <button
+        type="button"
+        onClick={onDecrease}
+        aria-label="Decrease quantity"
+        className="flex h-full w-9 items-center justify-center text-[#1F2A3C] transition-colors hover:bg-[#F6E4E4] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#9E2F45]"
+      >
+        <Minus className="h-3.5 w-3.5" />
+      </button>
+      <span className="flex w-8 items-center justify-center text-sm font-semibold text-[#1F2A3C]">
+        {quantity}
+      </span>
+      <button
+        type="button"
+        onClick={onIncrease}
+        aria-label="Increase quantity"
+        className="flex h-full w-9 items-center justify-center text-[#1F2A3C] transition-colors hover:bg-[#F6E4E4] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#9E2F45]"
+      >
+        <Plus className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -66,6 +104,21 @@ export function VariationSelector({ product }: { product: Product }) {
   const [selected, setSelected] = useState<Record<string, string>>({});
   const [added, setAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [sizeError, setSizeError] = useState(false);
+
+  const actionRef = useRef<HTMLDivElement>(null);
+  const [showSticky, setShowSticky] = useState(false);
+
+  useEffect(() => {
+    const el = actionRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowSticky(!entry.isIntersecting),
+      { rootMargin: '0px 0px -1px 0px', threshold: 0 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const attrKeys = useMemo(() => {
     const keys = new Set<string>();
@@ -95,7 +148,7 @@ export function VariationSelector({ product }: { product: Product }) {
     : product.stock_status === 'outofstock';
 
   const allSelected = isSimple || Object.keys(selected).length >= attrKeys.length;
-  const canAdd = allSelected && !isOutOfStock && !loading;
+  const canAdd = !isOutOfStock && !loading;
 
   // Price display
   const displayPrice = selectedVariation
@@ -105,16 +158,37 @@ export function VariationSelector({ product }: { product: Product }) {
     ? selectedVariation.regular_price
     : product.regular_price;
   const isOnSale = selectedVariation ? selectedVariation.on_sale : product.on_sale;
-  const savePercent =
-    isOnSale && displayRegularPrice && displayPrice
-      ? Math.round(
-          ((parseFloat(displayRegularPrice) - parseFloat(displayPrice)) /
-            parseFloat(displayRegularPrice)) *
-            100,
-        )
-      : 0;
+
+  function selectOption(key: string, value: string) {
+    setSelected((prev) => ({ ...prev, [key]: value }));
+    setSizeError(false);
+  }
+
+  function isOptionUnavailable(key: string, value: string): boolean {
+    if (isSimple) return false;
+    const candidates = variations.filter(
+      (v) =>
+        v.attributes[key] === value &&
+        attrKeys.every((k) => k === key || !selected[k] || v.attributes[k] === selected[k]),
+    );
+    return candidates.length > 0 && candidates.every((v) => v.stock_status === 'outofstock');
+  }
+
+  const missingLabel = (() => {
+    if (allSelected) return '';
+    const missing = attrKeys.find((k) => !selected[k]);
+    if (!missing) return 'Select an option';
+    if (isColorAttr(missing)) return 'Select a color';
+    if (missing.toLowerCase().includes('size')) return 'Select a size';
+    return `Select ${formatAttrLabel(missing)}`;
+  })();
 
   async function handleAddToCart() {
+    if (!allSelected) {
+      setSizeError(true);
+      return;
+    }
+    setSizeError(false);
     await addItem(product.id, selectedVariation?.id ?? 0, quantity, selected);
     if (!useCartStore.getState().error) {
       setAdded(true);
@@ -122,178 +196,221 @@ export function VariationSelector({ product }: { product: Product }) {
     }
   }
 
-  return (
-    <div className="flex flex-col gap-6">
-      {/* 1. Price block */}
-      <div className="flex items-baseline gap-3">
-        <span className="text-3xl font-bold text-zinc-900">{fmt(displayPrice)}</span>
-        {isOnSale && displayRegularPrice && (
-          <>
-            <span className="text-lg text-zinc-400 line-through">{fmt(displayRegularPrice)}</span>
-            {savePercent > 0 && (
-              <span className="rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-semibold text-rose-600">
-                Save {savePercent}%
-              </span>
-            )}
-          </>
-        )}
-      </div>
+  const colorKeys = attrKeys.filter(isColorAttr);
+  const otherKeys = attrKeys.filter((k) => !isColorAttr(k));
 
-      {/* 2. Attribute pickers */}
-      {!isSimple &&
-        attrKeys.map((key) => (
-          <div key={key}>
-            <p className="mb-2.5 text-sm font-medium text-zinc-700">
-              {formatAttrLabel(key)}
-              {selected[key] && (
-                <span className="ml-2 font-normal text-zinc-400">{selected[key]}</span>
-              )}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {attrValues[key].map((val) => {
-                const isActive = selected[key] === val;
-                if (isColorAttr(key)) {
+  return (
+    <>
+      <div className="flex flex-col gap-6">
+        {/* 1. Price */}
+        <div className="flex items-baseline gap-3">
+          <span className="font-serif text-4xl font-bold leading-none text-[#1F2A3C]">
+            {fmt(displayPrice)}
+          </span>
+          {isOnSale && displayRegularPrice && (
+            <span className="text-lg text-[#5A5A5A] line-through">{fmt(displayRegularPrice)}</span>
+          )}
+        </div>
+
+        {/* 2. Color swatches */}
+        {!isSimple &&
+          colorKeys.map((key) => (
+            <div key={key}>
+              <p className="mb-3 text-sm text-[#5A5A5A]">
+                <span className="font-medium text-[#1F2A3C]">Color</span>
+                {selected[key] && <span className="ml-1">: {selected[key]}</span>}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {attrValues[key].map((val) => {
+                  const isActive = selected[key] === val;
                   const hex = getColorHex(val);
+                  const variationImage =
+                    variations.find((v) => v.attributes[key] === val)?.image || '';
                   return (
                     <button
                       key={val}
+                      type="button"
                       title={val}
-                      onClick={() => setSelected((prev) => ({ ...prev, [key]: val }))}
+                      aria-label={`Color ${val}`}
+                      aria-pressed={isActive}
+                      onClick={() => selectOption(key, val)}
                       className={cn(
-                        'relative h-9 w-9 rounded-full border-2 transition-all',
+                        'relative h-11 w-11 overflow-hidden rounded-full transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45]',
                         isActive
-                          ? 'border-zinc-900 scale-110 shadow-md'
-                          : 'border-zinc-200 hover:border-zinc-400',
+                          ? 'ring-2 ring-[#9E2F45] ring-offset-2 ring-offset-[#FBF7F3]'
+                          : 'ring-1 ring-[#D9D2CB] hover:ring-[#9E2F45]/50',
                       )}
-                      style={hex ? { backgroundColor: hex } : {}}
                     >
-                      {!hex && (
-                        <span className="text-[10px] font-semibold">
-                          {val.slice(0, 2).toUpperCase()}
-                        </span>
-                      )}
-                      {isActive && (
+                      {hex ? (
                         <span
-                          className="absolute inset-0 flex items-center justify-center text-[13px] font-bold"
-                          style={{ color: hex && hex !== '#ffffff' ? '#fff' : '#000' }}
-                        >
-                          ✓
+                          className="block h-full w-full rounded-full"
+                          style={{ backgroundColor: hex }}
+                        />
+                      ) : variationImage ? (
+                        <Image src={variationImage} alt={val} fill className="object-cover" sizes="44px" />
+                      ) : (
+                        <span className="flex h-full w-full items-center justify-center text-[10px] font-semibold text-[#5A5A5A]">
+                          {val.slice(0, 2).toUpperCase()}
                         </span>
                       )}
                     </button>
                   );
-                }
-                return (
-                  <button
-                    key={val}
-                    onClick={() => setSelected((prev) => ({ ...prev, [key]: val }))}
-                    className={cn(
-                      'rounded-lg border px-4 py-2 text-sm font-medium transition-colors',
-                      isActive
-                        ? 'bg-zinc-900 text-white border-zinc-900'
-                        : 'border-zinc-200 hover:border-zinc-400',
-                    )}
-                  >
-                    {val}
-                  </button>
-                );
-              })}
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
 
-      {/* 3. Quantity selector */}
-      <div>
-        <p className="mb-2.5 text-sm font-medium text-zinc-700">Quantity</p>
-        <div className="inline-flex items-center overflow-hidden rounded-xl border border-zinc-200">
-          <button
-            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-            aria-label="Decrease quantity"
-            className="flex h-10 w-10 items-center justify-center text-zinc-600 hover:bg-zinc-50 transition-colors"
-          >
-            <Minus className="h-3.5 w-3.5" />
-          </button>
-          <span className="flex w-12 items-center justify-center text-sm font-semibold text-zinc-900">
-            {quantity}
-          </span>
-          <button
-            onClick={() => setQuantity((q) => q + 1)}
-            aria-label="Increase quantity"
-            className="flex h-10 w-10 items-center justify-center text-zinc-600 hover:bg-zinc-50 transition-colors"
-          >
-            <Plus className="h-3.5 w-3.5" />
-          </button>
+        {/* 3. Other attributes (size, etc.) */}
+        {!isSimple &&
+          otherKeys.map((key) => (
+            <div key={key}>
+              <p className="mb-3 text-sm text-[#5A5A5A]">
+                <span className="font-medium text-[#1F2A3C]">{formatAttrLabel(key)}</span>
+                {selected[key] && <span className="ml-1">: {selected[key]}</span>}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {attrValues[key].map((val) => {
+                  const isActive = selected[key] === val;
+                  const unavailable = isOptionUnavailable(key, val);
+                  return (
+                    <button
+                      key={val}
+                      type="button"
+                      disabled={unavailable}
+                      onClick={() => selectOption(key, val)}
+                      aria-pressed={isActive}
+                      className={cn(
+                        'relative min-h-12 min-w-[48px] overflow-hidden rounded-[8px] border px-4 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45]',
+                        isActive
+                          ? 'border-[#9E2F45] bg-[#FBEAEA] text-[#9E2F45]'
+                          : 'border-[#D9D2CB] bg-white text-[#1F2A3C] hover:border-[#9E2F45]',
+                        unavailable && 'cursor-not-allowed opacity-50 hover:border-[#D9D2CB]',
+                      )}
+                    >
+                      {val}
+                      {unavailable && (
+                        <span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top_right,transparent_45%,#D9D2CB_50%,transparent_55%)]"
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+
+        {/* 4. Quantity */}
+        <div>
+          <p className="mb-3 text-sm font-medium text-[#1F2A3C]">Quantity</p>
+          <QuantityStepper
+            quantity={quantity}
+            onDecrease={() => setQuantity((q) => Math.max(1, q - 1))}
+            onIncrease={() => setQuantity((q) => q + 1)}
+          />
         </div>
-      </div>
 
-      {/* 4. Cart error */}
-      {cartError && (
-        <p role="alert" className="text-sm text-red-500">
-          {cartError}
-        </p>
-      )}
-
-      {/* 5. Add to Cart + Wishlist row */}
-      <div className="flex gap-3">
-        <Button
-          className={cn(
-            'flex-1 rounded-xl py-3.5 text-sm font-semibold transition-colors',
-            added
-              ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-              : isOutOfStock
-              ? 'bg-zinc-200 text-zinc-400'
-              : 'bg-zinc-900 text-white hover:bg-zinc-700',
-          )}
-          disabled={!canAdd}
-          onClick={handleAddToCart}
-        >
-          {loading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Adding…
-            </>
-          ) : added ? (
-            <>
-              <CheckCircle2 className="mr-2 h-4 w-4" />
-              Added to Cart!
-            </>
-          ) : isOutOfStock ? (
-            'Out of Stock'
-          ) : !allSelected ? (
-            <>
-              <ShoppingCart className="mr-2 h-4 w-4" />
-              Select Options
-            </>
-          ) : (
-            <>
-              <ShoppingCart className="mr-2 h-4 w-4" />
-              Add to Cart
-            </>
-          )}
-        </Button>
-
-        <WishlistButton
-          productId={product.id}
-          productName={product.name}
-          variant="detail"
-        />
-      </div>
-
-      {/* 6. Delivery strip */}
-      <div className="space-y-3 rounded-xl bg-zinc-50 p-4">
-        <div className="flex items-start gap-3">
-          <Truck className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />
-          <p className="text-xs text-zinc-600">
-            Free delivery on orders over $75. Estimated 3–6 business days.
+        {/* 5. Cart error */}
+        {cartError && (
+          <p role="alert" className="text-sm text-red-600">
+            {cartError}
           </p>
+        )}
+
+        {/* 6. Add to Cart + Wishlist */}
+        <div ref={actionRef} className="flex gap-3">
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={!canAdd}
+            className={cn(
+              'flex min-h-11 flex-1 items-center justify-center gap-2 rounded-[8px] px-4 font-serif text-sm font-semibold text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45] disabled:cursor-not-allowed',
+              added
+                ? 'bg-emerald-700 hover:bg-emerald-800'
+                : isOutOfStock
+                ? 'bg-[#D9D2CB] text-[#5A5A5A]'
+                : 'bg-[#9E2F45] hover:bg-[#862640]',
+            )}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                Adding…
+              </>
+            ) : added ? (
+              <>
+                <CheckCircle2 className="mr-1 h-4 w-4" />
+                Added to Cart!
+              </>
+            ) : isOutOfStock ? (
+              'Out of Stock'
+            ) : (
+              <>
+                <ShoppingCart className="mr-1 h-4 w-4" />
+                Add to Cart
+              </>
+            )}
+          </button>
+
+          <WishlistButton
+            productId={product.id}
+            productName={product.name}
+            variant="detail"
+          />
         </div>
-        <div className="flex items-start gap-3">
-          <RotateCcw className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />
-          <p className="text-xs text-zinc-600">
-            45-day returns. Duties &amp; taxes are non-refundable.
+
+        {/* 7. Inline size/option validation message */}
+        {sizeError && !allSelected && (
+          <p role="alert" className="-mt-2 text-sm font-medium text-[#9E2F45]">
+            {missingLabel}
           </p>
+        )}
+      </div>
+
+      {/* Mobile sticky bottom bar (visible only after the main CTA scrolls away) */}
+      <div
+        className={cn(
+          'fixed inset-x-0 bottom-0 z-50 border-t border-[#E6DED6] bg-white px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-4px_16px_rgba(31,42,60,0.08)] transition-transform duration-300 lg:hidden',
+          showSticky ? 'translate-y-0' : 'translate-y-full',
+        )}
+        inert={!showSticky}
+      >
+        {sizeError && !allSelected && (
+          <p role="alert" className="mb-2 text-xs font-medium text-[#9E2F45]">
+            {missingLabel}
+          </p>
+        )}
+        <div className="flex items-center gap-3">
+          <QuantityStepper
+            quantity={quantity}
+            onDecrease={() => setQuantity((q) => Math.max(1, q - 1))}
+            onIncrease={() => setQuantity((q) => q + 1)}
+          />
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={!canAdd}
+            className={cn(
+              'flex min-h-11 flex-1 items-center justify-center gap-2 rounded-[8px] px-4 font-serif text-sm font-semibold text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45] disabled:cursor-not-allowed',
+              added
+                ? 'bg-emerald-700'
+                : isOutOfStock
+                ? 'bg-[#D9D2CB] text-[#5A5A5A]'
+                : 'bg-[#9E2F45] hover:bg-[#862640]',
+            )}
+          >
+            {loading ? (
+              <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+            ) : added ? (
+              <CheckCircle2 className="mr-1 h-4 w-4" />
+            ) : (
+              <ShoppingCart className="mr-1 h-4 w-4" />
+            )}
+            <span>{isOutOfStock ? 'Out of Stock' : added ? 'Added to Cart!' : 'Add to Cart'}</span>
+          </button>
         </div>
       </div>
-    </div>
+    </>
   );
 }
