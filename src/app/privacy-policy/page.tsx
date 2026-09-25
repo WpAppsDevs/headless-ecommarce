@@ -3,13 +3,13 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { Mail, Phone } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy',
+  title: 'প্রাইভেসি পলিসি',
   description: 'আমরা কীভাবে আপনার ব্যক্তিগত তথ্য সংগ্রহ, ব্যবহার এবং সংরক্ষণ করি তা জানুন।',
 };
 
 const BREADCRUMBS = [
-  { label: 'Home', href: '/' },
-  { label: 'Privacy Policy' },
+  { label: 'হোম', href: '/' },
+  { label: 'প্রাইভেসি পলিসি' },
 ];
 
 function Section({ number, title, children }: { number: string; title: string; children: React.ReactNode }) {
@@ -29,7 +29,7 @@ function Section({ number, title, children }: { number: string; title: string; c
 export default function PrivacyPolicyPage() {
   return (
     <div>
-      <PageHeader title="Privacy Policy" breadcrumbs={BREADCRUMBS} />
+      <PageHeader title="প্রাইভেসি পলিসি" breadcrumbs={BREADCRUMBS} />
 
       <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="mb-10 rounded-2xl border border-brand-border bg-brand-section px-6 py-5 text-sm text-zinc-600">

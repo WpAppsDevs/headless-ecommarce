@@ -7,12 +7,12 @@ import { FooterNewsletterForm } from './FooterNewsletterForm';
 
 const HELP_LINKS: { href: string; label: string; Icon: LucideIcon }[] = [
   // { href: '/faq',         label: 'FAQ',                  Icon: HelpCircle  },
-  { href: '/shipping',    label: 'Shipping & Delivery',  Icon: Truck       },
-  { href: '/returns',     label: 'Returns & Exchanges',  Icon: RefreshCcw  },
+  { href: '/shipping',    label: 'শিপিং ও ডেলিভারি',        Icon: Truck       },
+  { href: '/returns',     label: 'রিটার্ন ও এক্সচেঞ্জ',       Icon: RefreshCcw  },
   // { href: '/contact',     label: 'Contact Us',           Icon: PhoneIcon   },
-  { href: '/track-order', label: 'Track Order',          Icon: MapPin      },
-  { href: '/privacy-policy', label: 'Privacy Policy',     Icon: FileText    },
-  { href: '/terms',       label: 'Terms of Service',     Icon: Scale       },
+  { href: '/track-order', label: 'ট্র্যাক অর্ডার',          Icon: MapPin      },
+  { href: '/privacy-policy', label: 'প্রাইভেসি পলিসি',       Icon: FileText    },
+  { href: '/terms',       label: 'টার্মস অফ সার্ভিস',       Icon: Scale       },
 ];
 
 // LEGAL_LINKS commented out — Privacy Policy and Terms of Service moved to HELP_LINKS

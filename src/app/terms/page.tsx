@@ -2,13 +2,13 @@ import type { Metadata } from 'next';
 import { PageHeader } from '@/components/ui/PageHeader';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service',
+  title: 'টার্মস অফ সার্ভিস',
   description: 'আমাদের ওয়েবসাইট ব্যবহারের শর্তাবলী পড়ুন।',
 };
 
 const BREADCRUMBS = [
-  { label: 'Home', href: '/' },
-  { label: 'Terms of Service' },
+  { label: 'হোম', href: '/' },
+  { label: 'টার্মস অফ সার্ভিস' },
 ];
 
 function Section({ number, title, children }: { number: string; title: string; children: React.ReactNode }) {
@@ -28,7 +28,7 @@ function Section({ number, title, children }: { number: string; title: string; c
 export default function TermsPage() {
   return (
     <div>
-      <PageHeader title="Terms of Service" breadcrumbs={BREADCRUMBS} />
+      <PageHeader title="টার্মস অফ সার্ভিস" breadcrumbs={BREADCRUMBS} />
 
       <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="mb-10 rounded-2xl border border-brand-border bg-brand-section px-6 py-5 text-sm text-zinc-600">

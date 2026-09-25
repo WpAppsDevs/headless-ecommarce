@@ -53,10 +53,10 @@ export default function TrackOrderPage() {
   return (
     <>
       <PageHeader
-        title="Track Your Order"
+        title="ট্র্যাক অর্ডার"
         breadcrumbs={[
-          { label: 'Home', href: '/' },
-          { label: 'Track Order' },
+          { label: 'হোম', href: '/' },
+          { label: 'ট্র্যাক অর্ডার' },
         ]}
       />
 
