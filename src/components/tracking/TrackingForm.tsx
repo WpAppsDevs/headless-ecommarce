@@ -68,7 +68,7 @@ export function TrackingForm({ onSubmit, isLoading, isAuthenticated = false }: T
 
           <div className="space-y-2">
             <Label htmlFor="orderId">
-              {isAuthenticated ? 'Order Number' : 'Order Number (optional)'}
+              Order Number
             </Label>
             <Input
               id="orderId"

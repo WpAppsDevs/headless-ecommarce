@@ -68,20 +68,24 @@ export async function searchTracking(payload: TrackingSearchPayload): Promise<Tr
 
   const raw = json.data;
 
-  // API returns a single order object — wrap in array for UI consumption
+  // Backend returns either a single { order, tracking, timeline } object
+  // (when order_id is provided) or an array of them (email-only search).
+  const results = Array.isArray(raw) ? raw : [raw];
+  const fallback = {
+    provider: '',
+    tracking_number: null,
+    tracking_url: null,
+    status: '',
+    estimated_delivery: null,
+    shipped_at: null,
+    delivered_at: null,
+    shipping_events: [],
+  };
+
   return {
-    orders: raw.order ? [raw.order] : [],
-    tracking: raw.tracking ?? {
-      provider: '',
-      tracking_number: null,
-      tracking_url: null,
-      status: '',
-      estimated_delivery: null,
-      shipped_at: null,
-      delivered_at: null,
-      shipping_events: [],
-    },
-    timeline: raw.timeline ?? [],
+    orders: results.filter((r) => r?.order).map((r) => r.order),
+    tracking: results[0]?.tracking ?? fallback,
+    timeline: results[0]?.timeline ?? [],
   };
 }
 
