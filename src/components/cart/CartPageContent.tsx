@@ -13,7 +13,7 @@ import { FreeShippingBar } from '@/components/cart/FreeShippingBar';
 const SETTINGS = {
   showExpiryBanner: false,
   showFreeShippingBar: false,
-  showCouponSection: true,
+  showCouponSection: false,
   cartExpiryMinutes: 30,
   freeShippingThreshold: 100,
 } as const;
