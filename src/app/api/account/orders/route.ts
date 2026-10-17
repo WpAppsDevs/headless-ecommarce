@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { config } from '@/lib/config';
+import { filterCheckoutDrafts } from '@/lib/order-utils';
 
 /** Proxy for GET /wp-json/api/orders — avoids CORS for browser requests */
 export async function GET(req: NextRequest) {
@@ -28,6 +29,21 @@ export async function GET(req: NextRequest) {
     );
 
     const json = await wpRes.json();
+
+    if (json?.success && Array.isArray(json.data)) {
+      const rawOrders = json.data;
+      const orders = filterCheckoutDrafts(rawOrders);
+      const removed = rawOrders.length - orders.length;
+
+      if (json.meta && typeof json.meta.total === 'number') {
+        const perPage = json.meta.per_page || 10;
+        json.meta.total = Math.max(0, json.meta.total - removed);
+        json.meta.total_pages = Math.max(1, Math.ceil(json.meta.total / perPage));
+      }
+
+      json.data = orders;
+    }
+
     return NextResponse.json(json, { status: wpRes.status });
   } catch {
     return NextResponse.json(

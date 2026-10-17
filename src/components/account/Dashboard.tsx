@@ -3,6 +3,7 @@
 import { Hourglass, PackageX, Package } from 'lucide-react';
 import type { Order } from '@/lib/api/orders';
 import type { UserProfile } from '@/lib/api/checkout';
+import { filterCheckoutDrafts } from '@/lib/order-utils';
 import { StatsCard } from './StatsCard';
 import { useFormatPrice } from '@/lib/utils/currency';
 
@@ -27,10 +28,11 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export function Dashboard({ orders }: DashboardProps) {
-  const totalOrders     = orders.length;
-  const awaitingPickup  = orders.filter(o => ['pending', 'processing', 'on-hold'].includes(o.status)).length;
-  const cancelledOrders = orders.filter(o => o.status === 'cancelled').length;
-  const recentOrders    = orders.slice(0, 6);
+  const visibleOrders   = filterCheckoutDrafts(orders);
+  const totalOrders     = visibleOrders.length;
+  const awaitingPickup  = visibleOrders.filter(o => ['pending', 'processing', 'on-hold'].includes(o.status)).length;
+  const cancelledOrders = visibleOrders.filter(o => o.status === 'cancelled').length;
+  const recentOrders    = visibleOrders.slice(0, 6);
   const fmt             = useFormatPrice();
 
   return (

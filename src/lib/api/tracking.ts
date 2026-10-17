@@ -1,5 +1,6 @@
 import { ApiError } from '@/lib/errors';
 import { config } from '@/lib/config';
+import { isCheckoutDraftStatus } from '@/lib/order-utils';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -31,15 +32,138 @@ export interface TrackingOrder {
   billing_email?: string;
 }
 
-export interface TrackingResult {
-  orders: TrackingOrder[];
+export interface TrackingOrderEntry {
+  order: TrackingOrder;
   tracking: TrackingInfo;
   timeline: TrackingEvent[];
+}
+
+export interface TrackingResult {
+  entries: TrackingOrderEntry[];
 }
 
 export interface TrackingSearchPayload {
   email: string;
   order_id?: number;
+}
+
+// ---------------------------------------------------------------------------
+// Normalization
+// ---------------------------------------------------------------------------
+
+const FALLBACK_TRACKING: TrackingInfo = {
+  provider: '',
+  tracking_number: null,
+  tracking_url: null,
+  status: '',
+  estimated_delivery: null,
+  shipped_at: null,
+  delivered_at: null,
+  shipping_events: [],
+};
+
+function isTrackingOrder(value: unknown): value is TrackingOrder {
+  return (
+    !!value &&
+    typeof value === 'object' &&
+    typeof (value as { id?: unknown }).id === 'number'
+  );
+}
+
+function fallbackTimeline(order: TrackingOrder): TrackingEvent[] {
+  return order.created_at ? [{ status: 'Order Placed', date: order.created_at }] : [];
+}
+
+function normalizeTimeline(timeline: TrackingEvent[], order: TrackingOrder): TrackingEvent[] {
+  const events = Array.isArray(timeline) ? timeline.map((event) => ({ ...event })) : [];
+
+  if (!order.created_at) return events;
+
+  const placedIndex = events.findIndex(
+    (event) => event.status.trim().toLowerCase() === 'order placed',
+  );
+
+  if (placedIndex >= 0) {
+    events[placedIndex] = { ...events[placedIndex], date: order.created_at };
+  } else if (events.length === 0) {
+    return fallbackTimeline(order);
+  }
+
+  return events;
+}
+
+function buildEntry(
+  order: TrackingOrder,
+  tracking: TrackingInfo,
+  timeline: TrackingEvent[],
+): TrackingOrderEntry {
+  return {
+    order,
+    tracking,
+    timeline: normalizeTimeline(timeline, order),
+  };
+}
+
+function normalizeTrackingResult(raw: unknown): TrackingResult {
+  // Some deployments return an array of { order, tracking, timeline } objects.
+  if (Array.isArray(raw)) {
+    const entries = raw
+      .map((item) => {
+        if (!item || typeof item !== 'object') return null;
+        const { order, tracking, timeline } = item as {
+          order?: unknown;
+          tracking?: TrackingInfo;
+          timeline?: TrackingEvent[];
+        };
+        if (!isTrackingOrder(order) || isCheckoutDraftStatus(order.status)) return null;
+        return buildEntry(order, tracking ?? FALLBACK_TRACKING, timeline ?? []);
+      })
+      .filter((entry): entry is TrackingOrderEntry => entry !== null);
+
+    return { entries };
+  }
+
+  if (raw && typeof raw === 'object') {
+    const obj = raw as Record<string, unknown>;
+
+    // Single order response from GET /tracking/order/{order_id}.
+    if (isTrackingOrder(obj.order)) {
+      const order = obj.order;
+      if (isCheckoutDraftStatus(order.status)) return { entries: [] };
+      return {
+        entries: [
+          buildEntry(
+            order,
+            (obj.tracking as TrackingInfo) ?? FALLBACK_TRACKING,
+            Array.isArray(obj.timeline) ? (obj.timeline as TrackingEvent[]) : [],
+          ),
+        ],
+      };
+    }
+
+    // Guest search response: { orders: [...], tracking, timeline }. The backend
+    // only attaches tracking/timeline for the most recent order, so older orders
+    // get a minimal timeline built from their own created_at.
+    if (Array.isArray(obj.orders)) {
+      const sharedTracking = (obj.tracking as TrackingInfo) ?? FALLBACK_TRACKING;
+      const sharedTimeline = Array.isArray(obj.timeline) ? (obj.timeline as TrackingEvent[]) : [];
+
+      const entries = obj.orders
+        .filter((order): order is TrackingOrder => {
+          return isTrackingOrder(order) && !isCheckoutDraftStatus(order.status);
+        })
+        .map((order, index) => {
+          if (index === 0) {
+            return buildEntry(order, sharedTracking, sharedTimeline);
+          }
+          return buildEntry(order, FALLBACK_TRACKING, fallbackTimeline(order));
+        });
+
+      return { entries };
+    }
+  }
+
+  return { entries: [] };
 }
 
 // ---------------------------------------------------------------------------
@@ -61,32 +185,15 @@ export async function searchTracking(payload: TrackingSearchPayload): Promise<Tr
   const json = await res.json();
 
   if (!res.ok || json?.success === false) {
+    if (json?.code === 'no_orders_found') {
+      return { entries: [] };
+    }
     throw json?.code && json?.message
       ? new ApiError(json.code, json.message)
       : new ApiError('api_error', `HTTP ${res.status}`);
   }
 
-  const raw = json.data;
-
-  // Backend returns either a single { order, tracking, timeline } object
-  // (when order_id is provided) or an array of them (email-only search).
-  const results = Array.isArray(raw) ? raw : [raw];
-  const fallback = {
-    provider: '',
-    tracking_number: null,
-    tracking_url: null,
-    status: '',
-    estimated_delivery: null,
-    shipped_at: null,
-    delivered_at: null,
-    shipping_events: [],
-  };
-
-  return {
-    orders: results.filter((r) => r?.order).map((r) => r.order),
-    tracking: results[0]?.tracking ?? fallback,
-    timeline: results[0]?.timeline ?? [],
-  };
+  return normalizeTrackingResult(json.data);
 }
 
 /**
@@ -123,24 +230,13 @@ export async function getTrackingByOrderId(orderId: number): Promise<TrackingRes
   const json = await res.json();
 
   if (!res.ok || json?.success === false) {
+    if (json?.code === 'not_found' || json?.code === 'no_orders_found') {
+      return { entries: [] };
+    }
     throw json?.code && json?.message
       ? new ApiError(json.code, json.message)
       : new ApiError('api_error', `HTTP ${res.status}`);
   }
 
-  const raw = json.data;
-  return {
-    orders: raw.order ? [raw.order] : [],
-    tracking: raw.tracking ?? {
-      provider: '',
-      tracking_number: null,
-      tracking_url: null,
-      status: '',
-      estimated_delivery: null,
-      shipped_at: null,
-      delivered_at: null,
-      shipping_events: [],
-    },
-    timeline: raw.timeline ?? [],
-  };
+  return normalizeTrackingResult(json.data);
 }

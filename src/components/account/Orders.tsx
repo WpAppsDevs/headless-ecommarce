@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Order, OrdersMeta } from '@/lib/api/orders';
+import { filterCheckoutDrafts } from '@/lib/order-utils';
 import { OrderCard } from './OrderCard';
 import { OrderDetailsModal } from './OrderDetailsModal';
 
@@ -28,9 +29,11 @@ export function Orders({ orders }: OrdersProps) {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [page, setPage] = useState(1);
 
+  const visibleOrders = filterCheckoutDrafts(orders);
+
   const filtered = activeFilter === 'all'
-    ? orders
-    : orders.filter(o => o.status === activeFilter);
+    ? visibleOrders
+    : visibleOrders.filter(o => o.status === activeFilter);
 
   const totalPages  = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const currentPage = Math.min(page, totalPages);

@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getOrders, type Order, type OrdersMeta } from '@/lib/api/orders';
+import { filterCheckoutDrafts } from '@/lib/order-utils';
 
 // ---------------------------------------------------------------------------
 // Status badge colours
@@ -57,7 +58,7 @@ export function OrdersList({ initialOrders, initialMeta }: Props) {
     setError(null);
     try {
       const result = await getOrders(page, meta.per_page);
-      setOrders(result.orders);
+      setOrders(filterCheckoutDrafts(result.orders));
       setMeta(result.meta);
     } catch {
       setError('Failed to load orders. Please try again.');
@@ -66,7 +67,9 @@ export function OrdersList({ initialOrders, initialMeta }: Props) {
     }
   };
 
-  if (orders.length === 0) {
+  const visibleOrders = filterCheckoutDrafts(orders);
+
+  if (visibleOrders.length === 0) {
     return (
       <p className="py-8 text-center text-sm text-muted-foreground">
         You have no orders yet.
@@ -93,7 +96,7 @@ export function OrdersList({ initialOrders, initialMeta }: Props) {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {orders.map((order) => (
+            {visibleOrders.map((order) => (
               <tr key={order.id} className={loading ? 'opacity-50' : ''}>
                 <td className="px-4 py-3 font-medium">#{order.id}</td>
                 <td className="px-4 py-3 text-muted-foreground">{fmt(order.date_created)}</td>

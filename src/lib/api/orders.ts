@@ -1,6 +1,7 @@
 import { tokenCache } from './client';
 import { ApiError } from '@/lib/errors';
 import { config } from '@/lib/config';
+import { filterCheckoutDrafts } from '@/lib/order-utils';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -117,8 +118,21 @@ export async function getOrders(page = 1, perPage = 10): Promise<OrdersResult> {
     throw new ApiError(json.code ?? 'api_error', json.message ?? 'Failed to load orders');
   }
 
+  const rawOrders = json.data ?? [];
+  const orders = filterCheckoutDrafts(rawOrders);
+  const removed = rawOrders.length - orders.length;
+
+  const rawMeta = json.meta ?? { page, per_page: perPage, total: 0, total_pages: 0 };
+  const total = Math.max(0, rawMeta.total - removed);
+  const perPageValue = rawMeta.per_page || perPage;
+
   return {
-    orders: json.data ?? [],
-    meta: json.meta ?? { page, per_page: perPage, total: 0, total_pages: 0 },
+    orders,
+    meta: {
+      page: rawMeta.page ?? page,
+      per_page: perPageValue,
+      total,
+      total_pages: Math.max(1, Math.ceil(total / perPageValue)),
+    },
   };
 }

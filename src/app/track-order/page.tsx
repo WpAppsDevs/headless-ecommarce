@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { Search, MapPin, Loader2, AlertCircle, PackageX } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { TrackingForm } from '@/components/tracking/TrackingForm';
-import { TrackingCard } from '@/components/tracking/TrackingCard';
-import { TrackingTimeline } from '@/components/tracking/TrackingTimeline';
+import { TrackingAccordion } from '@/components/tracking/TrackingAccordion';
 import { searchTracking, getTrackingByOrderId } from '@/lib/api/tracking';
 import { ApiError } from '@/lib/errors';
 import type { TrackingResult } from '@/lib/api/tracking';
+import { isCheckoutDraftStatus } from '@/lib/order-utils';
 import { useAuthStore } from '@/stores/authStore';
 
 export default function TrackOrderPage() {
@@ -16,11 +16,13 @@ export default function TrackOrderPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<TrackingResult | null>(null);
+  const [showAll, setShowAll] = useState(false);
 
   async function handleTrackOrder(email: string, orderId?: number) {
     setLoading(true);
     setError(null);
     setResult(null);
+    setShowAll(false);
 
     try {
       if (isAuthenticated && orderId) {
@@ -49,6 +51,11 @@ export default function TrackOrderPage() {
       setLoading(false);
     }
   }
+
+  const visibleEntries = result
+    ? result.entries.filter((entry) => !isCheckoutDraftStatus(entry.order.status))
+    : [];
+  const displayedEntries = showAll ? visibleEntries : visibleEntries.slice(0, 5);
 
   return (
     <>
@@ -114,22 +121,29 @@ export default function TrackOrderPage() {
         )}
 
         {/* Results */}
-        {result && !loading && result.orders.length > 0 && (
-          <div className="space-y-6">
-            {result.orders.map((order) => (
-              <div key={order.id} className="space-y-6">
-                <TrackingCard order={order} tracking={result.tracking} />
-                <TrackingTimeline
-                  events={result.timeline}
-                  currentStatus={result.tracking.status ?? order.status}
-                />
-              </div>
+        {result && !loading && visibleEntries.length > 0 && (
+          <div className="space-y-4">
+            {displayedEntries.map((entry, index) => (
+              <TrackingAccordion
+                key={entry.order.id}
+                entry={entry}
+                defaultOpen={index === 0}
+              />
             ))}
+
+            {visibleEntries.length > 5 && !showAll && (
+              <button
+                onClick={() => setShowAll(true)}
+                className="w-full rounded-xl border border-brand-border bg-brand-section px-4 py-3 text-sm font-medium text-brand-accent transition hover:bg-brand-accent/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+              >
+                Show more orders
+              </button>
+            )}
           </div>
         )}
 
         {/* No Orders Found */}
-        {result && !loading && result.orders.length === 0 && (
+        {result && !loading && visibleEntries.length === 0 && (
           <div className="text-center py-16 space-y-4">
             <PackageX className="h-12 w-12 text-zinc-300 mx-auto" />
             <div>
