@@ -76,6 +76,14 @@ export default function ShippingPage() {
               <StatCard label="ঢাকার মধ্যে" value="৳৯০" />
               <StatCard label="ঢাকার বাইরে" value="৳১৫০" />
             </div>
+
+            <NoteCallout icon={Scale} tone="accent" className="mt-4">
+              <p className="font-semibold">অতিরিক্ত ওজনের চার্জ:</p>
+              <p className="mt-1">
+                ১ কেজির বেশি ওজনের পণ্যের ক্ষেত্রে প্রতি অতিরিক্ত কেজি বা কেজির অংশের জন্য ৳২০ অতিরিক্ত
+                চার্জ যোগ হবে। অর্থাৎ, ভগ্নাংশ ওজনকেও পরবর্তী পূর্ণ কেজি হিসেবে গণনা করা হবে।
+              </p>
+            </NoteCallout>
           </TypePanel>
         </section>
 
@@ -147,6 +155,14 @@ export default function ShippingPage() {
                 <StatCard label="ঢাকার বাইরে" value="৳১৫০" className="bg-brand-section" />
               </div>
             </div>
+
+            <NoteCallout icon={Scale} tone="accent" className="mt-4">
+              <p className="font-semibold">অতিরিক্ত ওজনের চার্জ:</p>
+              <p className="mt-1">
+                ১ কেজির বেশি ওজনের পণ্যের ক্ষেত্রে প্রতি অতিরিক্ত কেজি বা কেজির অংশের জন্য ৳২০ অতিরিক্ত
+                চার্জ যোগ হবে। অর্থাৎ, ভগ্নাংশ ওজনকেও পরবর্তী পূর্ণ কেজি হিসেবে গণনা করা হবে।
+              </p>
+            </NoteCallout>
 
             <NoteCallout icon={AlertCircle} tone="accent" className="mt-4">
               <p className="font-semibold">গুরুত্বপূর্ণ</p>
