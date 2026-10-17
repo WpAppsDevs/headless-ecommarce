@@ -44,9 +44,9 @@ const PREORDER_ELIGIBLE = [
 
 const NOT_ELIGIBLE = [
   'পণ্য ব্যবহারের কারণে ক্ষতিগ্রস্ত হলে',
-  'customer-এর কারণে পণ্যের ক্ষতি হলে',
+  'কাস্টমার-এর কারণে পণ্যের ক্ষতি হলে',
   'পণ্য পরিবর্তন বা ব্যবহারের ফলে মূল অবস্থায় না থাকলে',
-  'আমাদের নির্ধারিত exchange conditions পূরণ না করলে',
+  'আমাদের নির্ধারিত এক্সচেঞ্জ নীতি পূরণ না করলে',
 ];
 
 export default function ReturnsPage() {
@@ -80,9 +80,9 @@ export default function ReturnsPage() {
             subtitle="বাংলাদেশে স্টকে থাকা পণ্য"
           >
             <p className="text-sm leading-relaxed text-brand-text-muted">
-              স্টক পণ্য customer-এর কাছে পৌঁছানোর সময় customer-কে কুরিয়ার প্রতিনিধির সামনে পণ্যটি চেক
+              স্টক পণ্য কাস্টমার-এর কাছে পৌঁছানোর সময় কাস্টমার-কে কুরিয়ার প্রতিনিধির সামনে পণ্যটি চেক
               করতে হবে। পণ্য চেক করার সময় যদি এক্সচেঞ্জের জন্য গ্রহণযোগ্য কোনো ত্রুটি পাওয়া যায়,
-              তাহলে customer পণ্যটি কুরিয়ারের কাছেই ফেরত দিতে পারবেন।
+              তাহলে কাস্টমার পণ্যটি কুরিয়ারের কাছেই ফেরত দিতে পারবেন।
             </p>
 
             <h3 className="mb-3 mt-7 text-sm font-semibold text-brand-text">এক্সচেঞ্জের ধাপ</h3>
@@ -154,22 +154,22 @@ export default function ReturnsPage() {
           </Card>
         </section>
 
-        {/* Refund policy */}
+        {/* রিফান্ড policy */}
         <section className="mb-10">
           <SectionHeading icon={Banknote} title="রিফান্ড পলিসি" />
           <Card>
             <p className="text-sm font-medium text-brand-text">
-              সাধারণভাবে আমরা Refund প্রদান করি না।
+              সাধারণভাবে আমরা রিফান্ড প্রদান করি না।
             </p>
             <p className="mt-3 text-sm leading-relaxed text-brand-text-muted">
-              তবে বিশেষ পরিস্থিতিতে আমাদের নীতিমালা অনুযায়ী Refund বিবেচনা করা হতে পারে — যেমন:
+              তবে বিশেষ পরিস্থিতিতে আমাদের নীতিমালা অনুযায়ী রিফান্ড বিবেচনা করা হতে পারে — যেমন:
             </p>
             <BulletList
               className="mt-3"
               items={['অর্ডারকৃত পণ্য স্টকে না থাকলে', 'আমাদের পক্ষ থেকে অর্ডার পূরণ করা সম্ভব না হলে']}
             />
             <p className="mt-4 text-xs leading-relaxed text-brand-text-muted">
-              Refund অনুমোদিত হলে আমাদের নির্ধারিত নীতিমালা অনুযায়ী প্রক্রিয়া সম্পন্ন করা হয়। Refund ও
+              রিফান্ড অনুমোদিত হলে আমাদের নির্ধারিত নীতিমালা অনুযায়ী প্রক্রিয়া সম্পন্ন করা হয়। রিফান্ড ও
               এক্সচেঞ্জ নীতির মধ্যে কোনো পরস্পরবিরোধী সময়সীমা নেই।
             </p>
           </Card>
