@@ -73,8 +73,8 @@ export default function ShippingPage() {
               ডেলিভারি চার্জ
             </h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <StatCard label="ঢাকার মধ্যে" value="৳৮০" />
-              <StatCard label="ঢাকার বাইরে" value="৳১২০" />
+              <StatCard label="ঢাকার মধ্যে" value="৳৯০" />
+              <StatCard label="ঢাকার বাইরে" value="৳১৫০" />
             </div>
           </TypePanel>
         </section>
@@ -143,8 +143,8 @@ export default function ShippingPage() {
                 বাংলাদেশে পণ্য পৌঁছানোর পর customer-এর ঠিকানা অনুযায়ী স্থানীয় ডেলিভারি চার্জ:
               </p>
               <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <StatCard label="ঢাকার মধ্যে" value="৳৮০" className="bg-brand-section" />
-                <StatCard label="ঢাকার বাইরে" value="৳১২০" className="bg-brand-section" />
+                <StatCard label="ঢাকার মধ্যে" value="৳৯০" className="bg-brand-section" />
+                <StatCard label="ঢাকার বাইরে" value="৳১৫০" className="bg-brand-section" />
               </div>
             </div>
 
@@ -153,7 +153,7 @@ export default function ShippingPage() {
               <p className="mt-1">
                 প্রি-অর্ডারের ক্ষেত্রে পাকিস্তান থেকে বাংলাদেশে শিপিং চার্জ{' '}
                 <strong className="font-semibold">৳১,৮৫০ প্রতি কেজি</strong> এবং বাংলাদেশে পৌঁছানোর পর
-                স্থানীয় ডেলিভারি চার্জ <strong className="font-semibold">৳৮০/৳১২০</strong> — এই দুইটি
+                স্থানীয় ডেলিভারি চার্জ <strong className="font-semibold">৳৯০/৳১৫০</strong> — এই দুইটি
                 আলাদাভাবে হিসাব হবে।
               </p>
             </NoteCallout>
