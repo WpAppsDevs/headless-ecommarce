@@ -1,16 +1,13 @@
-# Memory
+## Agent skills
 
-## Project Overview
-See @CodeDocs.md for project overview and @package.json for available npm/pnpm commands for this project.
+### Issue tracker
 
-## Code Style Guidelines
-- Use descriptive variable names
-- Follow existing patterns in the codebase
-- Extract complex conditions into meaningful boolean variables
+Issues and specs live as markdown files under `.scratch/<feature>/` in this repo (local markdown). See `docs/agents/issue-tracker.md`.
 
-## Architecture Notes
-Add important architectural decisions and patterns here.
+### Triage labels
 
-## Common Workflows
-Document frequently used workflows and commands here.
-- Commit and push the latest changes with proper details.
+Five canonical triage roles mapped to their default label strings (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` plus `docs/adr/` at the repo root. See `docs/agents/domain.md`.
