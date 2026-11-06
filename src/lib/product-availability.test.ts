@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Product, ProductTag, ProductVariation } from '@/lib/api/products';
+import type { Product } from '@/lib/api/products';
 import {
   getHeroPrimaryAction,
   getProductBadge,
@@ -9,47 +9,7 @@ import {
   isVariationPurchasable,
   type HeroPrimaryAction,
 } from '@/lib/product-availability';
-
-function tag(slug: string): ProductTag {
-  return { id: 1, name: slug, slug };
-}
-
-function variation(id: number, stock_status: ProductVariation['stock_status']): ProductVariation {
-  return {
-    id,
-    sku: `SKU-${id}`,
-    price: '100',
-    regular_price: '100',
-    sale_price: '',
-    on_sale: false,
-    stock_status,
-    stock_quantity: null,
-    manage_stock: false,
-    attributes: {},
-    image: '',
-  };
-}
-
-function product(overrides: Partial<Product> = {}): Product {
-  return {
-    id: 1,
-    name: 'Test product',
-    slug: 'test-product',
-    type: 'simple',
-    price: '100',
-    regular_price: '100',
-    sale_price: '',
-    on_sale: false,
-    stock_status: 'instock',
-    stock_quantity: null,
-    categories: [],
-    images: [],
-    attributes: [],
-    variations: [],
-    tags: [],
-    ...overrides,
-  };
-}
+import { product, tag, variation } from '@/lib/__fixtures__/product';
 
 describe('product availability', () => {
   const cases: Array<{

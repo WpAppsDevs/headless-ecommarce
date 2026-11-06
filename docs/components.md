@@ -7,7 +7,11 @@ Component conventions live in [coding-standards.md](coding-standards.md). This f
 | Component | Type | Responsibility |
 | --- | --- | --- |
 | `layout/Header.tsx` | Client | Sticky header, logo, desktop/mobile nav, search overlay, account menu, wishlist badge, cart button, mobile sheet. |
-| `layout/HeaderNav.tsx` | Client | Nav items and active styling; `isNavLinkActive()` compares pathname and query string. |
+| `layout/HeaderDesktopNav.tsx` | Client | Desktop nav with the active item resolved after hydration. |
+| `layout/HeaderDesktopNavFallback.tsx` | Client | Desktop nav rendered during Suspense without an active item. |
+| `layout/HeaderMobileNav.tsx` | Client | Mobile nav links inside the sheet, with the same active behaviour. |
+| `layout/HeaderMobileNavFallback.tsx` | Client | Mobile nav rendered during Suspense without an active item. |
+| `layout/HeaderNavItem.tsx` | Client | One nav link with desktop or mobile styling. |
 | `layout/Footer.tsx` | Server | Brand block, Bengali support links, English newsletter form, payment badges. |
 | `layout/FooterNewsletterForm.tsx` | Client | Posts to `/api/newsletter`. |
 | `layout/AuthHydrator.tsx` | Client | Calls `authStore.hydrate()` once. |
@@ -68,6 +72,8 @@ Shop surfaces use the brand tokens from `globals.css` rather than zinc or black.
 `ProductCard` sends `variationId = 0` for simple products. A variable product shows "Select Options" and links to the detail page instead of adding directly. Its quantity selector is local to the card.
 
 Availability comes from the shared product-availability module. A pre-order product shows Pre-Order, a sold-out product shows Sold Out, and the NEW badge is not used. A sold-out card hides the quantity and add controls and offers a View Product link instead.
+
+List responses expose variation IDs, not full variation objects, so WooCommerce's product-level stock status is the aggregate used for collection membership and hero availability. When a detail response includes full variation objects, those are authoritative.
 
 ## Cart
 

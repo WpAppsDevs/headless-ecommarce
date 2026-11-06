@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Mail, MessageCircle, Phone, Clock } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, SectionHeading } from '@/components/policies/PolicyUI';
+import { config } from '@/lib/config';
 
 export const metadata: Metadata = {
   title: 'Contact Us',
@@ -16,7 +17,7 @@ const CHANNELS = [
     icon: MessageCircle,
     title: 'WhatsApp',
     detail: 'Fastest for order updates and styling questions.',
-    href: 'https://wa.me/8801841654663',
+    href: config.whatsappUrl,
     label: 'Chat on WhatsApp',
   },
   {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildShopHref, clearShopFilters, isNavLinkActive } from '@/lib/navigation';
+import { buildShopFilterHref, buildShopHref, clearShopFilters, isNavLinkActive } from '@/lib/navigation';
 
 function search(value = ''): URLSearchParams {
   return new URLSearchParams(value);
@@ -24,6 +24,24 @@ describe('isNavLinkActive', () => {
     ['an external link', '/products', '', 'https://example.com', false],
   ])('%s', (_name, pathname, params, href, expected) => {
     expect(isNavLinkActive(pathname, search(params), href)).toBe(expected);
+  });
+});
+
+describe('buildShopFilterHref', () => {
+  it('omits the first page and empty filters', () => {
+    expect(buildShopFilterHref({ page: 1, category: null, tag: null })).toBe('/products');
+  });
+
+  it('carries the collection filters and the requested page', () => {
+    expect(
+      buildShopFilterHref({
+        page: 2,
+        category: 'women',
+        tag: 'ready-stock',
+        brand: 'najifa',
+        search: 'dress',
+      }),
+    ).toBe('/products?page=2&category=women&tag=ready-stock&brand=najifa&search=dress');
   });
 });
 

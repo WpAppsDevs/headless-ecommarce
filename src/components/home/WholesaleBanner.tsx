@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Phone, ArrowRight } from 'lucide-react';
+import { config } from '@/lib/config';
 
 const STATS = [
   { value: '50+', label: 'Active Resellers' },
@@ -57,7 +58,7 @@ export function WholesaleBanner() {
                 View Catalog <ArrowRight className="h-4 w-4" strokeWidth={2} />
               </Link>
               <a
-                href="https://wa.me/8801841654663"
+                href={config.whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-brand-accent/25 bg-brand-accent/[0.08] px-7 py-3 text-sm font-semibold text-white transition hover:bg-brand-accent/15"

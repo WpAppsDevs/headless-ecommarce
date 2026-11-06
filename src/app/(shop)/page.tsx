@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getAllProducts } from '@/lib/api/products';
+import { MAX_PER_PAGE, getProducts } from '@/lib/api/products';
 import { getHeroPrimaryAction } from '@/lib/product-availability';
 import { ProductCard } from '@/components/product/ProductCard';
 import { HeroSlider } from '@/components/home/HeroSlider';
@@ -15,8 +15,12 @@ import { WhatsAppCTA } from '@/components/home/WhatsAppCTA';
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const catalog = await getAllProducts().catch(() => null);
-  const heroAction = catalog ? getHeroPrimaryAction(catalog) : 'ready-stock';
+  // One bounded request keeps the hero mode and featured cards in sync without
+  // walking every catalogue page.
+  const catalog = await getProducts({ page: 1, per_page: MAX_PER_PAGE })
+    .then((result) => result.items)
+    .catch(() => null);
+  const heroAction = catalog ? getHeroPrimaryAction(catalog) : 'contact';
   const featured = catalog?.slice(0, 4) ?? [];
 
   return (

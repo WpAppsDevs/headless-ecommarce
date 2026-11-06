@@ -10,7 +10,7 @@ import { ShopSidebar } from '@/components/shop/ShopSidebar';
 import { ShopTopBar, type SortOrder } from '@/components/shop/ShopTopBar';
 import { ShopPagination } from '@/components/shop/ShopPagination';
 import { ReadyStockEmptyState } from '@/components/shop/ReadyStockEmptyState';
-import { buildShopHref, clearShopFilters } from '@/lib/navigation';
+import { buildShopFilterHref, buildShopHref, clearShopFilters } from '@/lib/navigation';
 
 interface ShopClientProps {
   initialProducts: Product[];
@@ -34,7 +34,7 @@ function EmptyState({ onClear }: { onClear: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <div className="h-20 w-20 rounded-full bg-brand-card flex items-center justify-center mb-6">
-        <Search className="h-8 w-8 text-brand-accent" />
+        <Search className="h-8 w-8 text-brand-accent-strong" />
       </div>
       <h3 className="text-lg font-semibold text-brand-text mb-2">No products found</h3>
       <p className="text-sm text-brand-text-muted mb-6 max-w-sm">
@@ -168,13 +168,13 @@ export function ShopClient({
   }
 
   function pageHref(p: number) {
-    const qs = new URLSearchParams();
-    if (p > 1) qs.set('page', String(p));
-    if (initialCategory) qs.set('category', initialCategory);
-    if (initialSearch) qs.set('search', initialSearch);
-    if (initialTag) qs.set('tag', initialTag);
-    if (initialBrand) qs.set('brand', initialBrand);
-    return buildShopHref(qs);
+    return buildShopFilterHref({
+      page: p,
+      category: initialCategory,
+      search: initialSearch,
+      tag: initialTag,
+      brand: initialBrand,
+    });
   }
 
   const sidebarProps = {

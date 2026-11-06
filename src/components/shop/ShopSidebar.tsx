@@ -6,7 +6,7 @@ import { ChevronDown, ChevronRight, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { FilterTag, FilterBrand, FilterAttributeTerm } from '@/lib/api/filters';
 import { useFormatPrice } from '@/lib/utils/currency';
-import { buildShopHref } from '@/lib/navigation';
+import { buildShopFilterHref } from '@/lib/navigation';
 
 interface ShopSidebarProps {
   categories: Array<{ id: number; name: string; slug: string }>;
@@ -58,20 +58,6 @@ const COLOR_HEX_MAP: Record<string, string> = {
 
 function getColorHex(slug: string): string {
   return COLOR_HEX_MAP[slug.toLowerCase()] ?? '#9ca3af';
-}
-
-function buildHref(params: {
-  category?: string | null;
-  tag?: string | null;
-  brand?: string | null;
-  search?: string;
-}) {
-  const qs = new URLSearchParams();
-  if (params.category) qs.set('category', params.category);
-  if (params.tag) qs.set('tag', params.tag);
-  if (params.brand) qs.set('brand', params.brand);
-  if (params.search) qs.set('search', params.search);
-  return buildShopHref(qs);
 }
 
 function FilterSection({
@@ -184,7 +170,7 @@ export function ShopSidebar({
               <ActiveFilterPill
                 label={`Search: ${currentSearch}`}
                 onRemove={() => {
-                  window.location.href = buildHref({
+                  window.location.href = buildShopFilterHref({
                     category: selectedCategory,
                     tag: selectedTag,
                     brand: selectedBrand,
@@ -197,7 +183,7 @@ export function ShopSidebar({
               <ActiveFilterPill
                 label={`Category: ${selectedCategory.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}`}
                 onRemove={() => {
-                  window.location.href = buildHref({
+                  window.location.href = buildShopFilterHref({
                     category: null,
                     tag: selectedTag,
                     brand: selectedBrand,
@@ -210,7 +196,7 @@ export function ShopSidebar({
               <ActiveFilterPill
                 label={`Tag: ${selectedTag}`}
                 onRemove={() => {
-                  window.location.href = buildHref({
+                  window.location.href = buildShopFilterHref({
                     category: selectedCategory,
                     tag: null,
                     brand: selectedBrand,
@@ -223,7 +209,7 @@ export function ShopSidebar({
               <ActiveFilterPill
                 label={`Brand: ${selectedBrand}`}
                 onRemove={() => {
-                  window.location.href = buildHref({
+                  window.location.href = buildShopFilterHref({
                     category: selectedCategory,
                     tag: selectedTag,
                     brand: null,
@@ -283,7 +269,7 @@ export function ShopSidebar({
             return (
               <li key={cat.id}>
                 <Link
-                  href={buildHref({ category: cat.slug, tag: selectedTag, brand: selectedBrand, search: currentSearch })}
+                  href={buildShopFilterHref({ category: cat.slug, tag: selectedTag, brand: selectedBrand, search: currentSearch })}
                   className={cn(
                     'flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-all duration-150',
                     isActive
@@ -315,7 +301,7 @@ export function ShopSidebar({
               return (
                 <Link
                   key={slug}
-                  href={buildHref({ category: selectedCategory, tag: isActive ? null : slug, brand: selectedBrand, search: currentSearch })}
+                  href={buildShopFilterHref({ category: selectedCategory, tag: isActive ? null : slug, brand: selectedBrand, search: currentSearch })}
                   className={cn(
                     'rounded-full px-3 py-1 text-xs font-medium transition-all duration-150',
                     isActive
@@ -346,7 +332,7 @@ export function ShopSidebar({
               return (
                 <li key={slug}>
                   <Link
-                    href={buildHref({ category: selectedCategory, tag: selectedTag, brand: isActive ? null : slug, search: currentSearch })}
+                    href={buildShopFilterHref({ category: selectedCategory, tag: selectedTag, brand: isActive ? null : slug, search: currentSearch })}
                     className={cn(
                       'flex items-center gap-2 py-1.5 text-sm transition-all duration-150',
                       isActive
@@ -439,7 +425,7 @@ export function ShopSidebar({
             </span>
           ) : null}
         >
-          <div className="flex flex-wrap gap-4 px-2">
+          <div className="flex flex-wrap gap-2 px-2">
             {colorTerms.map((color) => {
               const hex = getColorHex(color.slug);
               const isActive = selectedColors.includes(color.slug);
@@ -452,7 +438,7 @@ export function ShopSidebar({
                   aria-label={`${isActive ? 'Remove' : 'Add'} ${color.name} filter`}
                   aria-pressed={isActive}
                   className={cn(
-                    'group relative flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all duration-150 focus-brand after:absolute after:-inset-2 after:content-[""]',
+                    'group relative flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all duration-150 focus-brand after:absolute after:-inset-1.5 after:content-[""]',
                     isActive
                       ? 'scale-110 border-brand-wine ring-2 ring-brand-wine/20'
                       : isWhite

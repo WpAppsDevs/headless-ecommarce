@@ -4,6 +4,7 @@ import type { LucideIcon } from 'lucide-react';
 import { ShieldCheck, Info, CheckCircle2, Users, Cookie, Lock, Mail, Phone, MessageCircle } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { SectionHeading, Card, BulletList } from '@/components/policies/PolicyUI';
+import { config } from '@/lib/config';
 
 export const metadata: Metadata = {
   title: 'প্রাইভেসি পলিসি',
@@ -127,7 +128,7 @@ export default function PrivacyPolicyPage() {
               +880 1841-654663
             </a>
             <a
-              href="https://wa.me/8801841654663"
+              href={config.whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2.5 text-sm text-brand-accent-strong transition-colors hover:underline"

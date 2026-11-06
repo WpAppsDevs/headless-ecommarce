@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { config } from '@/lib/config';
 import {
   RefreshCw,
   Package,
@@ -198,7 +199,7 @@ export default function ReturnsPage() {
                 support@najifasshop.com
               </a>
               <a
-                href="https://wa.me/8801841654663"
+                href={config.whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2.5 text-sm text-brand-accent-strong transition-colors hover:underline"

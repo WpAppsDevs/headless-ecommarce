@@ -68,3 +68,22 @@ export function buildShopHref(search: URLSearchParams): string {
   const query = search.toString();
   return `/products${query ? `?${query}` : ''}`;
 }
+
+export interface ShopFilterHref {
+  page?: number | null;
+  category?: string | null;
+  tag?: string | null;
+  brand?: string | null;
+  search?: string | null;
+}
+
+/** Builds a shop URL from the filters a collection control can change. */
+export function buildShopFilterHref(filters: ShopFilterHref = {}): string {
+  const query = new URLSearchParams();
+  if (filters.page && filters.page > 1) query.set('page', String(filters.page));
+  if (filters.category) query.set('category', filters.category);
+  if (filters.tag) query.set('tag', filters.tag);
+  if (filters.brand) query.set('brand', filters.brand);
+  if (filters.search) query.set('search', filters.search);
+  return buildShopHref(query);
+}

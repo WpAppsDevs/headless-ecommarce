@@ -15,17 +15,15 @@ import {
 import { useAuthStore } from '@/stores/authStore';
 import { useCartStore } from '@/stores/cartStore';
 import { useWishlistStore } from '@/stores/wishlistStore';
-import {
-  DesktopNavFallback,
-  DesktopNavLinks,
-  MobileNavFallback,
-  MobileNavLinks,
-} from '@/components/layout/HeaderNav';
+import { HeaderDesktopNav } from '@/components/layout/HeaderDesktopNav';
+import { HeaderDesktopNavFallback } from '@/components/layout/HeaderDesktopNavFallback';
+import { HeaderMobileNav } from '@/components/layout/HeaderMobileNav';
+import { HeaderMobileNavFallback } from '@/components/layout/HeaderMobileNavFallback';
 
 import type { NavLink } from '@/lib/api/menus';
 
 const HEADER_ICON_CLASS =
-  'relative flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900 focus-brand after:absolute after:-inset-1 after:content-[""] xl:after:hidden';
+  'relative flex h-9 w-9 items-center justify-center rounded-lg text-brand-text-muted transition-colors hover:bg-brand-accent-light hover:text-brand-text focus-brand after:absolute after:-inset-1 after:content-[""] xl:after:hidden';
 
 const STATIC_NAV_LINKS: NavLink[] = [
   { href: '/', label: 'HOME', target: '_self' },
@@ -160,8 +158,8 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
         <SiteLogo />
 
         {/* ── Desktop Nav ── */}
-        <Suspense fallback={<DesktopNavFallback links={links} />}>
-          <DesktopNavLinks links={links} />
+        <Suspense fallback={<HeaderDesktopNavFallback links={links} />}>
+          <HeaderDesktopNav links={links} />
         </Suspense>
 
         {/* ── Desktop Right Icons ── */}
@@ -277,10 +275,10 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
                 <nav className="flex flex-col gap-4" aria-label="Mobile navigation">
                   <Suspense
                     fallback={
-                      <MobileNavFallback links={links} onClick={() => setMobileOpen(false)} />
+                      <HeaderMobileNavFallback links={links} onClick={() => setMobileOpen(false)} />
                     }
                   >
-                    <MobileNavLinks links={links} onClick={() => setMobileOpen(false)} />
+                    <HeaderMobileNav links={links} onClick={() => setMobileOpen(false)} />
                   </Suspense>
                 </nav>
                 <hr className="border-zinc-100" />
