@@ -65,6 +65,8 @@ The Ready Stock collection is the exception: its tag matches products whose stoc
 
 Category, tag, brand, and search are server-side filters. Price, color, and size are client-side filters on the current page only. The result count in `ShopTopBar` reflects this difference: it shows the server total and the filtered total separately.
 
+Clear all filters and All Products both reset every server-side filter and the client-side price, colour, and size state, then return to `/products`. The decision is in `clearShopFilters()` so it can be tested without a browser.
+
 Pagination is a full navigation. Client-side filter state resets when the page changes.
 
 ## Product page
@@ -175,7 +177,7 @@ This is a shell guard, not an authorization boundary. WordPress still authorizes
 - Uncaught window errors and unhandled rejections: `src/components/layout/ErrorReporter.tsx`.
 - 404: `src/app/not-found.tsx`.
 - Product 404: `notFound()` for `product_not_found`.
-- Empty shop: `ShopClient` empty state with "Clear all filters".
+- Empty shop: `ShopClient` shows one empty-state message with "Clear all filters".
 - Empty cart: drawer and page have separate empty states.
 - Empty orders, wishlist, reviews, and tracking results all have dedicated states.
 

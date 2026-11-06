@@ -7,6 +7,7 @@ Component conventions live in [coding-standards.md](coding-standards.md). This f
 | Component | Type | Responsibility |
 | --- | --- | --- |
 | `layout/Header.tsx` | Client | Sticky header, logo, desktop/mobile nav, search overlay, account menu, wishlist badge, cart button, mobile sheet. |
+| `layout/HeaderNav.tsx` | Client | Nav items and active styling; `isNavLinkActive()` compares pathname and query string. |
 | `layout/Footer.tsx` | Server | Brand block, help links, newsletter form, payment badges. |
 | `layout/FooterNewsletterForm.tsx` | Client | Posts to `/api/newsletter`. |
 | `layout/AuthHydrator.tsx` | Client | Calls `authStore.hydrate()` once. |
@@ -15,7 +16,7 @@ Component conventions live in [coding-standards.md](coding-standards.md). This f
 | `layout/CurrencyHydrator.tsx` | Client | Fetches store settings once. |
 | `layout/ErrorReporter.tsx` | Client | Reports uncaught window errors and unhandled rejections. |
 
-`Header` takes `navLinks?: NavLink[]`. Empty or missing links fall back to `STATIC_NAV_LINKS`, which includes `/contact`; that static support page exists.
+`Header` takes `navLinks?: NavLink[]`. Empty or missing links fall back to `STATIC_NAV_LINKS`, which includes `/contact`; that static support page exists. The active item is resolved on the client by `isNavLinkActive()`, which compares both pathname and query string, so exactly one collection link is active after hydration and a product detail page activates none of them. The links render immediately; the Suspense fallback shows them without an active state.
 
 The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local component with autofocus and Escape-to-close.
 
@@ -38,10 +39,11 @@ The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local
 
 | Component | Type | Responsibility |
 | --- | --- | --- |
-| `ShopClient.tsx` | Client | Owns sort, price, color, size, grid, mobile filter drawer, pagination links, and the Ready Stock empty fallback. |
-| `ReadyStockEmptyState.tsx` | Server | Ready Stock fallback with Pre-Order and WhatsApp links. |
+| `ShopClient.tsx` | Client | Owns sort, price, color, size, grid, mobile filter drawer, pagination links, the Ready Stock empty fallback, and Clear all filters. |
+| `ReadyStockEmptyState.tsx` | Shared | Ready Stock fallback with Pre-Order and WhatsApp links. |
 | `ShopSidebar.tsx` | Client | Category/tag/brand links plus price, color, and size controls. |
 | `ShopTopBar.tsx` | Client | Result count, sort select, grid density, mobile filter button. |
+| `ShopPagination.tsx` | Shared | Numbered pagination with previous and next links. |
 
 `ShopClient` receives server-rendered products and filters. It does not refetch when filters change; it filters the current page in memory. Server-side filters (category, tag, brand, search) are links, so changing one navigates and reloads the page. When the unfiltered Ready Stock collection is empty it shows a dedicated fallback with Pre-Order and WhatsApp links; a filtered empty result keeps the generic empty state.
 

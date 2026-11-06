@@ -6,6 +6,7 @@ import { ChevronDown, ChevronRight, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { FilterTag, FilterBrand, FilterAttributeTerm } from '@/lib/api/filters';
 import { useFormatPrice } from '@/lib/utils/currency';
+import { buildShopHref } from '@/lib/navigation';
 
 interface ShopSidebarProps {
   categories: Array<{ id: number; name: string; slug: string }>;
@@ -70,8 +71,7 @@ function buildHref(params: {
   if (params.tag) qs.set('tag', params.tag);
   if (params.brand) qs.set('brand', params.brand);
   if (params.search) qs.set('search', params.search);
-  const q = qs.toString();
-  return `/products${q ? `?${q}` : ''}`;
+  return buildShopHref(qs);
 }
 
 function FilterSection({
@@ -155,6 +155,7 @@ export function ShopSidebar({
   currentSearch,
 }: ShopSidebarProps) {
   const fmt = useFormatPrice();
+  const isAllProducts = !selectedCategory && !selectedTag && !selectedBrand && !currentSearch;
 
   return (
     <div className="space-y-1">
@@ -173,6 +174,19 @@ export function ShopSidebar({
             </button>
           </div>
           <div className="flex flex-wrap gap-1.5">
+            {currentSearch && (
+              <ActiveFilterPill
+                label={`Search: ${currentSearch}`}
+                onRemove={() => {
+                  window.location.href = buildHref({
+                    category: selectedCategory,
+                    tag: selectedTag,
+                    brand: selectedBrand,
+                    search: '',
+                  });
+                }}
+              />
+            )}
             {selectedCategory && (
               <ActiveFilterPill
                 label={`Category: ${selectedCategory.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}`}
@@ -241,16 +255,21 @@ export function ShopSidebar({
         <ul className="space-y-0.5">
           <li>
             <Link
-              href={buildHref({ tag: selectedTag, brand: selectedBrand, search: currentSearch })}
+              href="/products"
+              onClick={(event) => {
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                event.preventDefault();
+                onClearAll();
+              }}
               className={cn(
-                'flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-all duration-150',
-                !selectedCategory
+                'flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm transition-all duration-150',
+                isAllProducts
                   ? 'bg-brand-accent-light font-semibold text-brand-wine'
                   : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50',
               )}
             >
-              {!selectedCategory && <ChevronRight className="h-3 w-3" />}
-              <span className={!selectedCategory ? 'ml-1' : 'ml-5'}>All Products</span>
+              {isAllProducts && <ChevronRight className="h-3 w-3" />}
+              <span className={isAllProducts ? 'ml-1' : 'ml-5'}>All Products</span>
             </Link>
           </li>
           {categories.map((cat) => {

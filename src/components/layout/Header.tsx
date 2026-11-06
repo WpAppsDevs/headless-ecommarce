@@ -2,8 +2,8 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Suspense, useState, useRef, useEffect } from 'react';
 import { ShoppingCart, Menu, X, Search, User, Heart } from 'lucide-react';
 import {
   Sheet,
@@ -15,7 +15,12 @@ import {
 import { useAuthStore } from '@/stores/authStore';
 import { useCartStore } from '@/stores/cartStore';
 import { useWishlistStore } from '@/stores/wishlistStore';
-import { cn } from '@/lib/utils';
+import {
+  DesktopNavFallback,
+  DesktopNavLinks,
+  MobileNavFallback,
+  MobileNavLinks,
+} from '@/components/layout/HeaderNav';
 
 import type { NavLink } from '@/lib/api/menus';
 
@@ -79,59 +84,6 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
         </button>
       </form>
     </div>
-  );
-}
-
-// ── Desktop nav links ────────────────────────────────────────────────────────
-function DesktopNavLinks({ links }: { links: NavLink[] }) {
-  const pathname = usePathname();
-  return (
-    <nav className="hidden items-center gap-5 xl:flex" aria-label="Main navigation">
-      {links.map(({ href, label, target }) => {
-        const active = pathname === href || (href !== '/' && pathname.startsWith(href.split('?')[0]));
-        return (
-          <Link
-            key={href}
-            href={href}
-            target={target}
-            rel={target === '_blank' ? 'noopener noreferrer' : undefined}
-            className={cn(
-              'text-[11px] font-semibold tracking-[0.08em] transition-colors whitespace-nowrap',
-              active ? 'text-brand-wine' : 'text-zinc-700 hover:text-brand-wine',
-            )}
-          >
-            {label}
-          </Link>
-        );
-      })}
-    </nav>
-  );
-}
-
-// ── Mobile nav links ─────────────────────────────────────────────────────────
-function MobileNavLinks({ links, onClick }: { links: NavLink[]; onClick?: () => void }) {
-  const pathname = usePathname();
-  return (
-    <>
-      {links.map(({ href, label, target }) => {
-        const active = pathname === href || (href !== '/' && pathname.startsWith(href.split('?')[0]));
-        return (
-          <Link
-            key={href}
-            href={href}
-            target={target}
-            rel={target === '_blank' ? 'noopener noreferrer' : undefined}
-            onClick={onClick}
-            className={cn(
-              'text-sm font-medium transition-colors',
-              active ? 'text-brand-wine' : 'text-zinc-700 hover:text-brand-wine',
-            )}
-          >
-            {label}
-          </Link>
-        );
-      })}
-    </>
   );
 }
 
@@ -205,7 +157,9 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
         <SiteLogo />
 
         {/* ── Desktop Nav ── */}
-        <DesktopNavLinks links={links} />
+        <Suspense fallback={<DesktopNavFallback links={links} />}>
+          <DesktopNavLinks links={links} />
+        </Suspense>
 
         {/* ── Desktop Right Icons ── */}
         <div className="hidden items-center gap-0.5 xl:flex">
@@ -318,7 +272,13 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
               </SheetHeader>
               <div className="flex flex-col gap-6 px-6 py-6">
                 <nav className="flex flex-col gap-4" aria-label="Mobile navigation">
-                  <MobileNavLinks links={links} onClick={() => setMobileOpen(false)} />
+                  <Suspense
+                    fallback={
+                      <MobileNavFallback links={links} onClick={() => setMobileOpen(false)} />
+                    }
+                  >
+                    <MobileNavLinks links={links} onClick={() => setMobileOpen(false)} />
+                  </Suspense>
                 </nav>
                 <hr className="border-zinc-100" />
                 <div>

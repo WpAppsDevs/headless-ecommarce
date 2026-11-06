@@ -1,14 +1,16 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import Link from 'next/link';
-import { X, ChevronLeft, ChevronRight, Search, Filter } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { X, Search, Filter } from 'lucide-react';
 import type { Product, PaginationMeta } from '@/lib/api/products';
 import type { ProductFilters } from '@/lib/api/filters';
 import { ProductCard } from '@/components/product/ProductCard';
 import { ShopSidebar } from '@/components/shop/ShopSidebar';
 import { ShopTopBar, type SortOrder } from '@/components/shop/ShopTopBar';
+import { ShopPagination } from '@/components/shop/ShopPagination';
 import { ReadyStockEmptyState } from '@/components/shop/ReadyStockEmptyState';
+import { buildShopHref, clearShopFilters } from '@/lib/navigation';
 
 interface ShopClientProps {
   initialProducts: Product[];
@@ -60,6 +62,8 @@ export function ShopClient({
   filters,
   showReadyStockFallback,
 }: ShopClientProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [sortOrder, setSortOrder] = useState<SortOrder>('default');
   const [activePriceRange, setActivePriceRange] = useState<[number, number] | null>(null);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -134,17 +138,21 @@ export function ShopClient({
     if (initialCategory) count += 1;
     if (initialTag) count += 1;
     if (initialBrand) count += 1;
+    if (initialSearch) count += 1;
     if (activePriceRange !== null && (activePriceRange[0] !== priceRange[0] || activePriceRange[1] !== priceRange[1])) count += 1;
     count += selectedColors.length;
     count += selectedSizes.length;
     return count;
-  }, [initialCategory, initialTag, initialBrand, activePriceRange, priceRange, selectedColors, selectedSizes]);
+  }, [initialCategory, initialTag, initialBrand, initialSearch, activePriceRange, priceRange, selectedColors, selectedSizes]);
 
-  function handleClearAll() {
+  function handleClearFilters() {
     setActivePriceRange(null);
     setSelectedColors([]);
     setSelectedSizes([]);
     setSortOrder('default');
+
+    const cleared = clearShopFilters(new URLSearchParams(searchParams.toString()));
+    router.push(buildShopHref(cleared));
   }
 
   function handleColorToggle(color: string) {
@@ -166,17 +174,7 @@ export function ShopClient({
     if (initialSearch) qs.set('search', initialSearch);
     if (initialTag) qs.set('tag', initialTag);
     if (initialBrand) qs.set('brand', initialBrand);
-    const q = qs.toString();
-    return `/products${q ? `?${q}` : ''}`;
-  }
-
-  function getPageNumbers(current: number, total: number): number[] {
-    const pages: number[] = [];
-    const delta = 2;
-    const left = Math.max(1, current - delta);
-    const right = Math.min(total, current + delta);
-    for (let i = left; i <= right; i++) pages.push(i);
-    return pages;
+    return buildShopHref(qs);
   }
 
   const sidebarProps = {
@@ -195,7 +193,7 @@ export function ShopClient({
     onColorToggle: handleColorToggle,
     selectedSizes,
     onSizeToggle: handleSizeToggle,
-    onClearAll: handleClearAll,
+    onClearAll: handleClearFilters,
     activeFilterCount,
     currentSearch: initialSearch,
   };
@@ -261,7 +259,7 @@ export function ShopClient({
           {showReadyStockFallback ? (
             <ReadyStockEmptyState />
           ) : filteredProducts.length === 0 ? (
-            <EmptyState onClear={handleClearAll} />
+            <EmptyState onClear={handleClearFilters} />
           ) : (
             <>
               <div className={gridColsClass(viewCols)}>
@@ -270,61 +268,11 @@ export function ShopClient({
                 ))}
               </div>
 
-              {/* Pagination */}
-              {meta.total_pages > 1 && (
-                <nav
-                  aria-label="Pagination"
-                  className="mt-10 flex items-center justify-center gap-1.5"
-                >
-                  {serverPage > 1 ? (
-                    <Link
-                      href={pageHref(serverPage - 1)}
-                      className="h-9 w-9 rounded-lg border border-zinc-200 flex items-center justify-center text-zinc-600 hover:bg-zinc-50 hover:border-zinc-300 transition-all duration-150"
-                      aria-label="Previous page"
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Link>
-                  ) : (
-                    <span className="h-9 w-9 rounded-lg border border-zinc-100 flex items-center justify-center text-zinc-300 cursor-not-allowed">
-                      <ChevronLeft className="h-4 w-4" />
-                    </span>
-                  )}
-
-                  {getPageNumbers(serverPage, meta.total_pages).map((p) =>
-                    p === serverPage ? (
-                      <span
-                        key={p}
-                        className="h-9 min-w-[36px] rounded-lg bg-zinc-900 text-white flex items-center justify-center text-sm font-medium px-2"
-                        aria-current="page"
-                      >
-                        {p}
-                      </span>
-                    ) : (
-                      <Link
-                        key={p}
-                        href={pageHref(p)}
-                        className="h-9 min-w-[36px] rounded-lg border border-zinc-200 flex items-center justify-center text-sm text-zinc-600 hover:bg-zinc-50 hover:border-zinc-300 transition-all duration-150 px-2"
-                      >
-                        {p}
-                      </Link>
-                    ),
-                  )}
-
-                  {serverPage < meta.total_pages ? (
-                    <Link
-                      href={pageHref(serverPage + 1)}
-                      className="h-9 w-9 rounded-lg border border-zinc-200 flex items-center justify-center text-zinc-600 hover:bg-zinc-50 hover:border-zinc-300 transition-all duration-150"
-                      aria-label="Next page"
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Link>
-                  ) : (
-                    <span className="h-9 w-9 rounded-lg border border-zinc-100 flex items-center justify-center text-zinc-300 cursor-not-allowed">
-                      <ChevronRight className="h-4 w-4" />
-                    </span>
-                  )}
-                </nav>
-              )}
+              <ShopPagination
+                page={serverPage}
+                totalPages={meta.total_pages}
+                hrefForPage={pageHref}
+              />
             </>
           )}
         </div>
