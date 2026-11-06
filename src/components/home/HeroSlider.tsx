@@ -5,6 +5,7 @@ import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { HeroPrimaryAction } from '@/lib/product-availability';
 import { config } from '@/lib/config';
+import { cn } from '@/lib/utils';
 
 interface Cta {
   href: string;
@@ -14,9 +15,12 @@ interface Cta {
 }
 
 function CtaButton({ cta, primary }: { cta: Cta; primary: boolean }) {
-  const className = primary
-    ? 'inline-flex items-center justify-center gap-2 rounded-lg bg-brand-dark px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] text-white shadow-md transition hover:bg-brand-dark/85 whitespace-nowrap'
-    : 'inline-flex items-center justify-center gap-2 rounded-lg border-2 border-brand-wine bg-brand-wine/10 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] text-brand-wine transition hover:bg-brand-wine/15 whitespace-nowrap';
+  const className = cn(
+    'inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border-2 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] whitespace-nowrap transition sm:w-auto',
+    primary
+      ? 'border-transparent bg-brand-dark text-white shadow-md hover:bg-brand-dark/85'
+      : 'border-brand-wine bg-brand-wine/10 text-brand-wine hover:bg-brand-wine/15',
+  );
   const Icon = cta.Icon;
   const content = (
     <>

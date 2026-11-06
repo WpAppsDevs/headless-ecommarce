@@ -11,6 +11,7 @@ import { config } from '@/lib/config';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { AUTH_CONTROL_CLASS } from '@/components/auth/styles';
 
 const schema = z
   .object({
@@ -77,6 +78,7 @@ export function ResetPasswordForm() {
       <div className="space-y-1.5">
         <Label htmlFor="new_password">New password</Label>
         <Input
+          className={AUTH_CONTROL_CLASS}
           id="new_password"
           type="password"
           autoComplete="new-password"
@@ -90,6 +92,7 @@ export function ResetPasswordForm() {
       <div className="space-y-1.5">
         <Label htmlFor="confirm_password">Confirm password</Label>
         <Input
+          className={AUTH_CONTROL_CLASS}
           id="confirm_password"
           type="password"
           autoComplete="new-password"
@@ -100,7 +103,7 @@ export function ResetPasswordForm() {
         )}
       </div>
 
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
+      <Button type="submit" className={`${AUTH_CONTROL_CLASS} w-full`} disabled={isSubmitting}>
         {isSubmitting ? 'Saving…' : 'Set New Password'}
       </Button>
     </form>

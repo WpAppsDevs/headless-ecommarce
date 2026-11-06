@@ -24,6 +24,9 @@ import {
 
 import type { NavLink } from '@/lib/api/menus';
 
+const HEADER_ICON_CLASS =
+  'relative flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900 focus-brand after:absolute after:-inset-1 after:content-[""] xl:after:hidden';
+
 const STATIC_NAV_LINKS: NavLink[] = [
   { href: '/', label: 'HOME', target: '_self' },
   { href: '/products?tag=ready-stock', label: 'READY STOCK', target: '_self' },
@@ -167,7 +170,7 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
           <button
             onClick={() => setSearchOpen(true)}
             aria-label="Open search"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900"
+            className={HEADER_ICON_CLASS}
           >
             <Search className="h-[19px] w-[19px]" strokeWidth={1.8} />
           </button>
@@ -178,7 +181,7 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
               aria-label="Account"
               aria-expanded={accountOpen}
               onClick={() => setAccountOpen((v) => !v)}
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900"
+              className={HEADER_ICON_CLASS}
             >
               <User className="h-[19px] w-[19px]" strokeWidth={1.8} />
             </button>
@@ -193,7 +196,7 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
           <Link
             href="/account?tab=wishlist"
             aria-label={`Wishlist — ${wishlistCount} items`}
-            className="relative flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900"
+            className={HEADER_ICON_CLASS}
           >
             <Heart className="h-[19px] w-[19px]" strokeWidth={1.8} />
             {wishlistCount > 0 && (
@@ -207,7 +210,7 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
           <button
             onClick={() => setCartDrawerOpen(true)}
             aria-label={`Cart — ${itemCount} items`}
-            className="relative ml-0.5 flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900"
+            className={`${HEADER_ICON_CLASS} ml-0.5`}
           >
             <ShoppingCart className="h-[19px] w-[19px]" strokeWidth={1.8} />
             <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
@@ -217,11 +220,11 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
         </div>
 
         {/* ── Mobile: search + cart + hamburger ── */}
-        <div className="flex xl:hidden items-center gap-0.5">
+        <div className="flex items-center gap-2 xl:hidden">
           <button
             onClick={() => setSearchOpen(true)}
             aria-label="Open search"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-50"
+            className={HEADER_ICON_CLASS}
           >
             <Search className="h-5 w-5" strokeWidth={1.8} />
           </button>
@@ -229,7 +232,7 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
           <Link
             href="/account?tab=wishlist"
             aria-label={`Wishlist — ${wishlistCount} items`}
-            className="relative flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-50"
+            className={HEADER_ICON_CLASS}
           >
             <Heart className="h-5 w-5" strokeWidth={1.8} />
             {wishlistCount > 0 && (
@@ -242,7 +245,7 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
           <button
             onClick={() => setCartDrawerOpen(true)}
             aria-label={`Cart — ${itemCount} items`}
-            className="relative flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-50"
+            className={HEADER_ICON_CLASS}
           >
             <ShoppingCart className="h-5 w-5" strokeWidth={1.8} />
             <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
@@ -253,7 +256,7 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger
               aria-label="Open menu"
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-50 transition-colors"
+              className={HEADER_ICON_CLASS}
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </SheetTrigger>

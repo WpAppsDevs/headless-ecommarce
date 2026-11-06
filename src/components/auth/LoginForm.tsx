@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuthStore } from '@/stores/authStore';
+import { AUTH_CONTROL_CLASS } from '@/components/auth/styles';
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -81,6 +82,7 @@ export function LoginForm() {
       <div className="space-y-1.5">
         <Label htmlFor="username">Username or Email</Label>
         <Input
+          className={AUTH_CONTROL_CLASS}
           id="username"
           type="text"
           autoComplete="username"
@@ -104,6 +106,7 @@ export function LoginForm() {
           </Link>
         </div>
         <Input
+          className={AUTH_CONTROL_CLASS}
           id="password"
           type="password"
           autoComplete="current-password"
@@ -116,7 +119,7 @@ export function LoginForm() {
       </div>
 
       {/* Submit */}
-      <Button type="submit" className="w-full" disabled={loading}>
+      <Button type="submit" className={`${AUTH_CONTROL_CLASS} w-full`} disabled={loading}>
         {loading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
