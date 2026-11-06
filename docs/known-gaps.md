@@ -2,6 +2,8 @@
 
 These are current behaviors, not aspirations. Each entry says what happens, where, and what a fix would touch. They are ordered by impact.
 
+For concrete change steps, code sketches, and acceptance criteria, see [fix-plan.md](fix-plan.md). Section numbers match.
+
 ## 1. Auth does not rehydrate after a reload for most signed-in users
 
 `authStore.hydrate()` returns early when there is no `localStorage['cart_token']` and no cached access token. A user who logged in after the guest token was cleared has neither. The refresh cookie is never tried, so a full reload logs them out.

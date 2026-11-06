@@ -16,7 +16,7 @@ These docs describe the storefront in this repository. They are written from the
 | Working on UI | [components.md](components.md), [design-system.md](design-system.md) |
 | Reviewing or writing code | [coding-standards.md](coding-standards.md) |
 | Deploying or configuring secrets | [operations.md](operations.md) |
-| Picking up known debt | [known-gaps.md](known-gaps.md) |
+| Picking up known debt | [known-gaps.md](known-gaps.md), then [fix-plan.md](fix-plan.md) |
 
 ## Deeper flows
 

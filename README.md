@@ -68,6 +68,7 @@ Most useful first reads:
 - [Project structure](docs/project-structure.md) — where files live and where new ones go.
 - [Coding standards](docs/coding-standards.md) — conventions and definition of done.
 - [Known gaps](docs/known-gaps.md) — current limitations, including auth reload behavior and the absence of tests.
+- [Fix plan](docs/fix-plan.md) — prioritised remediation steps, code sketches, and acceptance checks.
 - [GLOSSARY.md](GLOSSARY.md) — shared vocabulary.
 
 Architecture decisions are in [docs/adr/](docs/adr/).
