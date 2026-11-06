@@ -148,7 +148,7 @@ The logo is `public/images/Najifa's Shop Logo.png`. The apostrophe and space in 
 1. Use `cn()` for conditional classes.
 2. Use `class-variance-authority` for variants only when a component has three or more variants. Existing `Button` and `Badge` do.
 3. Use the existing spacing scale and color tokens for one-offs.
-4. Keep focus states visible. The stronger components use `focus-visible:outline-2` with the maroon color.
+4. Keep focus states visible. Shop controls use the `focus-brand` utility, which draws a 2px strong-accent outline with an offset; auth and account keep the neutral shadcn ring.
 5. Keep layout decisions in components, not `globals.css`.
 6. When a design calls for a token that does not exist, add it to `:root` and `@theme inline` in the same change.
 

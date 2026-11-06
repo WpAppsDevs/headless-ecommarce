@@ -163,4 +163,11 @@
     font-variant-numeric: lining-nums;
     font-feature-settings: "lnum" 1;
   }
+
+  /* Brand keyboard focus for shop controls. Auth and account keep the
+     neutral shadcn ring. */
+  .focus-brand:focus-visible {
+    outline: 2px solid var(--brand-accent-strong);
+    outline-offset: 2px;
+  }
 }

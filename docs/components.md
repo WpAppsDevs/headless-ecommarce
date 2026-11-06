@@ -47,6 +47,8 @@ The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local
 
 `ShopClient` receives server-rendered products and filters. It does not refetch when filters change; it filters the current page in memory. Server-side filters (category, tag, brand, search) are links, so changing one navigates and reloads the page. When the unfiltered Ready Stock collection is empty it shows a dedicated fallback with Pre-Order and WhatsApp links; a filtered empty result keeps the generic empty state.
 
+Shop surfaces use the brand tokens from `globals.css` rather than zinc or black. Pagination controls and colour swatches keep a 44px hit area, and focus states use the strong accent. Auth and account pages stay on the neutral shadcn surfaces.
+
 ## Product
 
 | Component | Type | Responsibility |
