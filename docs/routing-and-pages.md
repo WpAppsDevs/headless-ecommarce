@@ -51,6 +51,8 @@ The featured grid is an async RSC inside `<Suspense>`. It fetches four products 
 
 It fetches products and filters in parallel with `Promise.all`. Both promises catch and fall back to empty data. A failed API call therefore renders an empty shop, not an error page.
 
+The Ready Stock collection is the exception: its tag matches products whose stock lives per variation, so the page fetches the tagged set in one pass, drops sold-out products through the shared availability module, and paginates the result itself. All Products and category pages keep the server's pagination and still show sold-out products.
+
 `ShopClient` receives the initial data and owns:
 
 - client-side price filtering and sorting over the current server page,

@@ -127,6 +127,27 @@ describe('product availability', () => {
       hero: 'ready-stock',
     },
     {
+      name: 'an out-of-stock pre-order product that is also tagged ready stock',
+      product: product({ stock_status: 'outofstock', tags: [tag('pre-order'), tag('ready-stock')] }),
+      purchasable: true,
+      readyStock: false,
+      badge: 'pre-order',
+      hero: 'pre-order',
+    },
+    {
+      name: 'a variable product in the list shape with variation ids and an in-stock aggregate',
+      product: product({
+        type: 'variable',
+        stock_status: 'instock',
+        variations: [1, 2],
+        tags: [tag('ready-stock')],
+      }),
+      purchasable: true,
+      readyStock: true,
+      badge: null,
+      hero: 'ready-stock',
+    },
+    {
       name: 'a product with missing stock status',
       product: product({ stock_status: undefined as unknown as Product['stock_status'] }),
       purchasable: false,

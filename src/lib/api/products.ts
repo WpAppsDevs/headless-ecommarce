@@ -203,6 +203,8 @@ function normalizeVariation(
 // API functions
 // ---------------------------------------------------------------------------
 
+export const MAX_PER_PAGE = 100;
+
 export async function getProducts(params: {
   page?: number;
   per_page?: number;
@@ -214,7 +216,7 @@ export async function getProducts(params: {
   const { page = 1, per_page = 12, category, brand, tag, search } = params;
   const qs = new URLSearchParams({
     page: String(page),
-    per_page: String(Math.min(per_page, 100)),
+    per_page: String(Math.min(per_page, MAX_PER_PAGE)),
     ...(category ? { category } : {}),
     ...(brand ? { brand } : {}),
     ...(tag ? { tag } : {}),
@@ -284,7 +286,7 @@ export async function getAllProductSlugs(): Promise<string[]> {
   const slugs: string[] = [];
   let page = 1;
   while (true) {
-    const { items, meta } = await getProducts({ page, per_page: 100 });
+    const { items, meta } = await getProducts({ page, per_page: MAX_PER_PAGE });
     slugs.push(...items.map((p) => p.slug));
     if (page >= meta.total_pages) break;
     page++;
