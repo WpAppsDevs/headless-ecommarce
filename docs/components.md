@@ -7,7 +7,12 @@ Component conventions live in [coding-standards.md](coding-standards.md). This f
 | Component | Type | Responsibility |
 | --- | --- | --- |
 | `layout/Header.tsx` | Client | Sticky header, logo, desktop/mobile nav, search overlay, account menu, wishlist badge, cart button, mobile sheet. |
-| `layout/Footer.tsx` | Server | Brand block, help links, newsletter form, payment badges. |
+| `layout/HeaderDesktopNav.tsx` | Client | Desktop nav with the active item resolved after hydration. |
+| `layout/HeaderDesktopNavFallback.tsx` | Client | Desktop nav rendered during Suspense without an active item. |
+| `layout/HeaderMobileNav.tsx` | Client | Mobile nav links inside the sheet, with the same active behaviour. |
+| `layout/HeaderMobileNavFallback.tsx` | Client | Mobile nav rendered during Suspense without an active item. |
+| `layout/HeaderNavItem.tsx` | Client | One nav link with desktop or mobile styling. |
+| `layout/Footer.tsx` | Server | Brand block, Bengali support links, English newsletter form, payment badges. |
 | `layout/FooterNewsletterForm.tsx` | Client | Posts to `/api/newsletter`. |
 | `layout/AuthHydrator.tsx` | Client | Calls `authStore.hydrate()` once. |
 | `layout/CartHydrator.tsx` | Client | Fetches the cart once, after auth hydration, only if there is something to restore. |
@@ -15,7 +20,9 @@ Component conventions live in [coding-standards.md](coding-standards.md). This f
 | `layout/CurrencyHydrator.tsx` | Client | Fetches store settings once. |
 | `layout/ErrorReporter.tsx` | Client | Reports uncaught window errors and unhandled rejections. |
 
-`Header` takes `navLinks?: NavLink[]`. Empty or missing links fall back to `STATIC_NAV_LINKS`, which includes `/contact`; that static support page exists.
+`Header` takes `navLinks?: NavLink[]`. Empty or missing links fall back to `STATIC_NAV_LINKS`, which includes `/contact`; that static support page exists. The active item is resolved on the client by `isNavLinkActive()`, which compares both pathname and query string, so exactly one collection link is active after hydration and a product detail page activates none of them. The links render immediately; the Suspense fallback shows them without an active state.
+
+The footer support block is Bengali, including its heading, and is marked `lang="bn"`. Commerce, contact, and newsletter content stay English. Social destinations come from `config` so the footer and announcement bar cannot drift apart.
 
 The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local component with autofocus and Escape-to-close.
 
@@ -23,7 +30,7 @@ The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local
 
 | Component | Type | Notes |
 | --- | --- | --- |
-| `HeroSlider.tsx` | Server | Despite the name, it does not slide. Static hero with a desktop image and a mobile stacked image. |
+| `HeroSlider.tsx` | Server | Despite the name, it does not slide. Static hero with a desktop image and a mobile stacked image. Its headline and calls to action follow the catalog's Ready Stock, Pre-Order, or contact fallback. |
 | `AnnouncementBar.tsx` | Server | Top strip with shipping copy and social links. |
 | `CategoryBanners.tsx` | Server | Three category image cards linking to `/products?category=…`. |
 | `CategoryGrid.tsx` | Server | Ready stock, pre-order, and catalog entry cards. |
@@ -38,26 +45,35 @@ The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local
 
 | Component | Type | Responsibility |
 | --- | --- | --- |
-| `ShopClient.tsx` | Client | Owns sort, price, color, size, grid, mobile filter drawer, and pagination links. |
+| `ShopClient.tsx` | Client | Owns sort, price, color, size, grid, mobile filter drawer, pagination links, the Ready Stock empty fallback, and Clear all filters. |
+| `ReadyStockEmptyState.tsx` | Shared | Ready Stock fallback with Pre-Order and WhatsApp links. |
 | `ShopSidebar.tsx` | Client | Category/tag/brand links plus price, color, and size controls. |
 | `ShopTopBar.tsx` | Client | Result count, sort select, grid density, mobile filter button. |
+| `ShopPagination.tsx` | Shared | Numbered pagination with previous and next links. |
 
-`ShopClient` receives server-rendered products and filters. It does not refetch when filters change; it filters the current page in memory. Server-side filters (category, tag, brand, search) are links, so changing one navigates and reloads the page.
+`ShopClient` receives server-rendered products and filters. It does not refetch when filters change; it filters the current page in memory. Server-side filters (category, tag, brand, search) are links, so changing one navigates and reloads the page. When the unfiltered Ready Stock collection is empty it shows a dedicated fallback with Pre-Order and WhatsApp links; a filtered empty result keeps the generic empty state.
+
+Shop surfaces use the brand tokens from `globals.css` rather than zinc or black. Pagination controls and colour swatches keep a 44px hit area, and focus states use the strong accent. Auth and account pages stay on the neutral shadcn surfaces.
 
 ## Product
 
 | Component | Type | Responsibility |
 | --- | --- | --- |
-| `ProductCard.tsx` | Client | Image hover swap, badges, price, quantity, add-to-cart or select-options, wishlist heart. |
+| `ProductCard.tsx` | Client | Image hover swap, availability badge, price, quantity, add-to-cart or select-options, wishlist heart. |
+| `AvailabilityBadge.tsx` | Shared | Pre-Order or Sold Out badge shared by cards and the product detail. |
 | `ProductCardSkeleton.tsx` | Server | Loading placeholder. |
 | `ProductGrid.tsx` | Server | Simple grid wrapper. |
 | `ProductImages.tsx` | Client | Gallery, thumbnails, lightbox. |
-| `VariationSelector.tsx` | Client | Price, attribute controls, quantity, add-to-cart, mobile sticky bar. |
+| `VariationSelector.tsx` | Client | Price, availability badge, attribute controls, quantity, add-to-cart or sold-out state, mobile sticky bar. |
 | `ProductTabs.tsx` | Client | Accordion for details, additional info, shipping, reviews. |
 | `RelatedProducts.tsx` | Server | Fetches four products; renders nothing on failure. |
 | `SearchBar.tsx` | Client | Legacy search input. The header has its own overlay. |
 
 `ProductCard` sends `variationId = 0` for simple products. A variable product shows "Select Options" and links to the detail page instead of adding directly. Its quantity selector is local to the card.
+
+Availability comes from the shared product-availability module. A pre-order product shows Pre-Order, a sold-out product shows Sold Out, and the NEW badge is not used. A sold-out card hides the quantity and add controls and offers a View Product link instead.
+
+List responses expose variation IDs, not full variation objects, so WooCommerce's product-level stock status is the aggregate used for collection membership and hero availability. When a detail response includes full variation objects, those are authoritative.
 
 ## Cart
 

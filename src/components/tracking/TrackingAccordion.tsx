@@ -13,7 +13,7 @@ interface TrackingAccordionProps {
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
   completed: { bg: 'bg-green-50', text: 'text-green-700', dot: 'bg-green-500' },
-  processing: { bg: 'bg-brand-accent/10', text: 'text-brand-accent', dot: 'bg-brand-accent' },
+  processing: { bg: 'bg-brand-accent/10', text: 'text-brand-accent-strong', dot: 'bg-brand-accent-strong' },
   pending: { bg: 'bg-zinc-100', text: 'text-zinc-600', dot: 'bg-zinc-400' },
   cancelled: { bg: 'bg-red-50', text: 'text-red-700', dot: 'bg-red-500' },
   refunded: { bg: 'bg-yellow-50', text: 'text-yellow-700', dot: 'bg-yellow-500' },
@@ -34,7 +34,7 @@ function TrackingDetails({ order, tracking }: { order: TrackingOrderEntry['order
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {order.payment_method && (
           <div className="flex items-center gap-3">
-            <CreditCard className="h-4 w-4 text-brand-accent shrink-0" strokeWidth={1.5} />
+            <CreditCard className="h-4 w-4 text-brand-accent-strong shrink-0" strokeWidth={1.5} />
             <div>
               <p className="text-xs text-brand-text-muted">Payment Method</p>
               <p className="text-sm font-medium text-brand-text">{order.payment_method.toUpperCase()}</p>
@@ -44,7 +44,7 @@ function TrackingDetails({ order, tracking }: { order: TrackingOrderEntry['order
 
         {order.billing_email && (
           <div className="flex items-center gap-3">
-            <Mail className="h-4 w-4 text-brand-accent shrink-0" strokeWidth={1.5} />
+            <Mail className="h-4 w-4 text-brand-accent-strong shrink-0" strokeWidth={1.5} />
             <div>
               <p className="text-xs text-brand-text-muted">Billing Email</p>
               <p className="text-sm font-medium text-brand-text truncate max-w-[180px]">{order.billing_email}</p>
@@ -75,7 +75,7 @@ function TrackingDetails({ order, tracking }: { order: TrackingOrderEntry['order
                   href={tracking.tracking_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-brand-accent hover:underline font-medium text-sm"
+                  className="text-brand-accent-strong hover:underline font-medium text-sm"
                 >
                   Track Shipment →
                 </a>
@@ -111,11 +111,11 @@ export function TrackingAccordion({ entry, defaultOpen = false }: TrackingAccord
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-controls={panelId}
-        className="flex min-h-[44px] w-full items-center gap-3 p-5 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 sm:p-6"
+        className="flex min-h-[44px] w-full items-center gap-3 p-5 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent-strong focus-visible:ring-offset-2 sm:p-6"
       >
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2">
           <span className="flex items-center gap-2">
-            <Package className="h-5 w-5 shrink-0 text-brand-accent" strokeWidth={1.5} />
+            <Package className="h-5 w-5 shrink-0 text-brand-accent-strong" strokeWidth={1.5} />
             <span className="text-xs text-brand-text-muted">Order ID</span>
             <span className="text-base font-bold text-brand-text">#{order.id}</span>
           </span>
@@ -126,13 +126,13 @@ export function TrackingAccordion({ entry, defaultOpen = false }: TrackingAccord
           </span>
 
           <span className="flex items-center gap-1.5 text-sm text-brand-text-muted">
-            <Calendar className="h-4 w-4 text-brand-accent" strokeWidth={1.5} />
+            <Calendar className="h-4 w-4 text-brand-accent-strong" strokeWidth={1.5} />
             <span className="font-medium text-brand-text">{formatDate(order.created_at)}</span>
           </span>
 
           <span className="flex items-center gap-1.5 text-sm text-brand-text-muted">
             <span>Order Total:</span>
-            <span className="font-semibold text-brand-accent">
+            <span className="font-semibold text-brand-accent-strong">
               {order.currency} {parseFloat(order.total).toFixed(2)}
             </span>
           </span>

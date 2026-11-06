@@ -16,7 +16,7 @@ export function TrackingTimeline({ events, currentStatus, embedded = false }: Tr
   const content = (
     <>
       <div className="flex items-center gap-2 mb-6">
-        <svg className="h-5 w-5 text-brand-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <svg className="h-5 w-5 text-brand-accent-strong" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
         </svg>
         <h3 className="text-lg font-semibold text-brand-text">Order Timeline</h3>
@@ -41,7 +41,7 @@ export function TrackingTimeline({ events, currentStatus, embedded = false }: Tr
       <div className="mt-4 pt-4 border-t border-brand-border">
         <p className="text-sm text-brand-text-muted">
           Current Status:{' '}
-          <span className="font-semibold text-brand-accent capitalize">{currentStatus}</span>
+          <span className="font-semibold text-brand-accent-strong capitalize">{currentStatus}</span>
         </p>
       </div>
     </>

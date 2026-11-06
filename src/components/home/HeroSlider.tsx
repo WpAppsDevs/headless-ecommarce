@@ -1,8 +1,96 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingBag, Clock, Truck, Plane, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Clock, MessageCircle, Plane, ShieldCheck, ShoppingBag, Truck } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
+import type { HeroPrimaryAction } from '@/lib/product-availability';
+import { config } from '@/lib/config';
+import { cn } from '@/lib/utils';
 
-export function HeroSlider() {
+interface Cta {
+  href: string;
+  label: string;
+  Icon: LucideIcon;
+  external?: boolean;
+}
+
+function CtaButton({ cta, primary }: { cta: Cta; primary: boolean }) {
+  const className = cn(
+    'inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border-2 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] whitespace-nowrap transition sm:w-auto',
+    primary
+      ? 'border-transparent bg-brand-dark text-white shadow-md hover:bg-brand-dark/85'
+      : 'border-brand-wine bg-brand-wine/10 text-brand-wine hover:bg-brand-wine/15',
+  );
+  const Icon = cta.Icon;
+  const content = (
+    <>
+      <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
+      {cta.label}
+    </>
+  );
+
+  return cta.external ? (
+    <a href={cta.href} target="_blank" rel="noopener noreferrer" className={className}>
+      {content}
+    </a>
+  ) : (
+    <Link href={cta.href} className={className}>
+      {content}
+    </Link>
+  );
+}
+
+interface HeroMode {
+  headline: string;
+  body: ReactNode;
+  primary: Cta;
+  secondary: Cta;
+}
+
+const HERO_MODES: Record<HeroPrimaryAction, HeroMode> = {
+  'ready-stock': {
+    headline: 'Stock & Pre-Order Available',
+    body: (
+      <>
+        Shop the latest Pakistani collections in ready stock{' '}
+        <br className="hidden sm:block" />
+        or pre-order your favorite designs directly from Pakistan.
+      </>
+    ),
+    primary: { href: '/products?tag=ready-stock', label: 'Shop Ready Stock', Icon: ShoppingBag },
+    secondary: { href: '/products?tag=pre-order', label: 'Pre-Order Collection', Icon: Clock },
+  },
+  'pre-order': {
+    headline: 'Pre-Order Available',
+    body: (
+      <>
+        Shop the latest Pakistani collections by pre-order, delivered directly from Pakistan in
+        15-25 days.
+      </>
+    ),
+    primary: { href: '/products?tag=pre-order', label: 'Shop Pre-Order', Icon: Clock },
+    secondary: { href: '/products', label: 'View All Products', Icon: ArrowRight },
+  },
+  contact: {
+    headline: 'Contact Us for Availability',
+    body: (
+      <>
+        Our next collection is on its way. Message us for availability and styling help.
+      </>
+    ),
+    primary: {
+      href: config.whatsappUrl,
+      label: 'Contact on WhatsApp',
+      Icon: MessageCircle,
+      external: true,
+    },
+    secondary: { href: '/products', label: 'View All Products', Icon: ArrowRight },
+  },
+};
+
+export function HeroSlider({ primaryAction = 'ready-stock' }: { primaryAction?: HeroPrimaryAction }) {
+  const mode = HERO_MODES[primaryAction];
+
   return (
     <section className="relative min-h-[520px] overflow-hidden bg-[#F7EEE8] lg:min-h-[620px]">
 
@@ -45,41 +133,20 @@ export function HeroSlider() {
             {/* Headline */}
             <h1 className="mt-4 font-serif text-[1.6rem] font-bold leading-[1.15] text-brand-text sm:text-[2.2rem] sm:leading-[1.1] lg:text-[3rem] xl:text-[3.2rem]">
               <span className="block">Premium Pakistani Dresses</span>
-              <span className="block text-[1.4rem] sm:text-[1.8rem] lg:text-[2.2rem] xl:text-[2.4rem]">Stock &amp; Pre-Order Available</span>
+              <span className="block text-[1.4rem] sm:text-[1.8rem] lg:text-[2.2rem] xl:text-[2.4rem]">
+                {mode.headline}
+              </span>
             </h1>
 
             {/* Subtext */}
             <p className="mt-4 text-[15px] leading-relaxed text-brand-text-muted">
-              Shop the latest Pakistani collections in ready stock<br className="hidden sm:block" />
-              or pre-order your favorite designs directly from Pakistan.
+              {mode.body}
             </p>
 
             {/* ── CTA Buttons — wrap naturally, full-width on mobile ── */}
             <div className="mt-8 flex flex-wrap gap-3">
-              {/* Primary — filled dark */}
-              <Link
-                href="/products?tag=ready-stock"
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-dark px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] text-white shadow-md transition hover:bg-brand-dark/85 whitespace-nowrap"
-              >
-                <ShoppingBag className="h-4 w-4 shrink-0" strokeWidth={2} />
-                Shop Ready Stock
-              </Link>
-              {/* Secondary — filled wine */}
-              <Link
-                href="/products?tag=pre-order"
-                className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-brand-wine bg-brand-wine/10 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] text-brand-wine transition hover:bg-brand-wine/15 whitespace-nowrap"
-              >
-                <Clock className="h-4 w-4 shrink-0" strokeWidth={2} />
-                Pre-Order Collection
-              </Link>
-              {/* Tertiary — outlined */}
-              {/* <Link
-                href="/products?tag=catalog"
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-brand-text/30 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] text-brand-text transition hover:border-brand-text/60 whitespace-nowrap"
-              >
-                <BookOpen className="h-4 w-4 shrink-0" strokeWidth={2} />
-                View Catalog
-              </Link> */}
+              <CtaButton cta={mode.primary} primary />
+              <CtaButton cta={mode.secondary} primary={false} />
             </div>
 
             {/* ── Trust bar: white card with vertical dividers ── */}

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Mail, Phone, ShieldCheck, User } from 'lucide-react';
 import type { UserProfile } from '@/lib/api/checkout';
+import { config } from '@/lib/config';
 
 interface SettingsTabProps {
   profile: UserProfile | null;
@@ -62,7 +63,7 @@ export function SettingsTab({ profile }: SettingsTabProps) {
             Profile and password changes are handled by our support team while the
             account API is being completed. Message us on{' '}
             <a
-              href="https://wa.me/8801841654663"
+              href={config.whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium text-zinc-800 underline underline-offset-2"

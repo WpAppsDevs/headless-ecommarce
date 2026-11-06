@@ -36,7 +36,7 @@ export function FooterNewsletterForm() {
   if (submitted) {
     return (
       <div className="flex items-center gap-3 rounded-2xl bg-brand-accent/10 px-5 py-4 text-sm text-brand-text">
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-accent">
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-accent-strong">
           <Check className="h-4 w-4 text-white" />
         </div>
         <span className="font-medium">You&apos;re subscribed! Thank you.</span>
@@ -63,7 +63,7 @@ export function FooterNewsletterForm() {
         <button
           type="submit"
           disabled={loading}
-          className="shrink-0 bg-brand-accent px-5 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-hover disabled:opacity-60"
+          className="shrink-0 bg-brand-accent-strong px-5 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-strong-hover disabled:opacity-60"
           aria-label="Subscribe to newsletter"
         >
           {loading ? (

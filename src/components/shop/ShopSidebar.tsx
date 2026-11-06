@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown, ChevronRight, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { FilterTag, FilterBrand, FilterAttributeTerm } from '@/lib/api/filters';
 import { useFormatPrice } from '@/lib/utils/currency';
+import { buildShopFilterHref } from '@/lib/navigation';
 
 interface ShopSidebarProps {
   categories: Array<{ id: number; name: string; slug: string }>;
@@ -59,21 +60,6 @@ function getColorHex(slug: string): string {
   return COLOR_HEX_MAP[slug.toLowerCase()] ?? '#9ca3af';
 }
 
-function buildHref(params: {
-  category?: string | null;
-  tag?: string | null;
-  brand?: string | null;
-  search?: string;
-}) {
-  const qs = new URLSearchParams();
-  if (params.category) qs.set('category', params.category);
-  if (params.tag) qs.set('tag', params.tag);
-  if (params.brand) qs.set('brand', params.brand);
-  if (params.search) qs.set('search', params.search);
-  const q = qs.toString();
-  return `/products${q ? `?${q}` : ''}`;
-}
-
 function FilterSection({
   title,
   defaultOpen = true,
@@ -86,25 +72,31 @@ function FilterSection({
   children: React.ReactNode;
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const panelId = useId();
 
   return (
-    <div className="border-b border-zinc-100 last:border-b-0">
+    <div className="border-b border-brand-border last:border-b-0">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between py-3 text-left hover:bg-zinc-50/50 rounded-lg px-2 transition-colors"
+        aria-expanded={isOpen}
+        aria-controls={panelId}
+        className="flex min-h-11 w-full items-center justify-between rounded-lg px-2 py-3 text-left transition-colors hover:bg-brand-card/60 focus-brand"
       >
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-zinc-900">{title}</span>
+          <span className="text-sm font-semibold text-brand-text">{title}</span>
           {badge}
         </div>
         <ChevronDown
           className={cn(
-            'h-4 w-4 text-zinc-400 transition-transform duration-200',
+            'h-4 w-4 text-brand-text-muted transition-transform duration-200',
             isOpen && 'rotate-180',
           )}
         />
       </button>
       <div
+        id={panelId}
+        role="region"
+        aria-label={title}
         className={cn(
           'overflow-hidden transition-all duration-200',
           isOpen ? 'max-h-[600px] pb-4' : 'max-h-0',
@@ -155,6 +147,7 @@ export function ShopSidebar({
   currentSearch,
 }: ShopSidebarProps) {
   const fmt = useFormatPrice();
+  const isAllProducts = !selectedCategory && !selectedTag && !selectedBrand && !currentSearch;
 
   return (
     <div className="space-y-1">
@@ -162,22 +155,35 @@ export function ShopSidebar({
       {activeFilterCount > 0 && (
         <div className="mb-4 p-3 rounded-xl bg-brand-card border border-brand-border">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-zinc-600 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">
               Active Filters
             </span>
             <button
               onClick={onClearAll}
-              className="text-xs text-brand-wine hover:text-brand-accent-hover font-medium transition-colors"
+              className="text-xs text-brand-wine hover:text-brand-accent-strong-hover font-medium transition-colors"
             >
               Clear All
             </button>
           </div>
           <div className="flex flex-wrap gap-1.5">
+            {currentSearch && (
+              <ActiveFilterPill
+                label={`Search: ${currentSearch}`}
+                onRemove={() => {
+                  window.location.href = buildShopFilterHref({
+                    category: selectedCategory,
+                    tag: selectedTag,
+                    brand: selectedBrand,
+                    search: '',
+                  });
+                }}
+              />
+            )}
             {selectedCategory && (
               <ActiveFilterPill
                 label={`Category: ${selectedCategory.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}`}
                 onRemove={() => {
-                  window.location.href = buildHref({
+                  window.location.href = buildShopFilterHref({
                     category: null,
                     tag: selectedTag,
                     brand: selectedBrand,
@@ -190,7 +196,7 @@ export function ShopSidebar({
               <ActiveFilterPill
                 label={`Tag: ${selectedTag}`}
                 onRemove={() => {
-                  window.location.href = buildHref({
+                  window.location.href = buildShopFilterHref({
                     category: selectedCategory,
                     tag: null,
                     brand: selectedBrand,
@@ -203,7 +209,7 @@ export function ShopSidebar({
               <ActiveFilterPill
                 label={`Brand: ${selectedBrand}`}
                 onRemove={() => {
-                  window.location.href = buildHref({
+                  window.location.href = buildShopFilterHref({
                     category: selectedCategory,
                     tag: selectedTag,
                     brand: null,
@@ -241,16 +247,21 @@ export function ShopSidebar({
         <ul className="space-y-0.5">
           <li>
             <Link
-              href={buildHref({ tag: selectedTag, brand: selectedBrand, search: currentSearch })}
+              href="/products"
+              onClick={(event) => {
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                event.preventDefault();
+                onClearAll();
+              }}
               className={cn(
-                'flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-all duration-150',
-                !selectedCategory
+                'flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm transition-all duration-150',
+                isAllProducts
                   ? 'bg-brand-accent-light font-semibold text-brand-wine'
-                  : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50',
+                  : 'text-brand-text-muted hover:text-brand-text hover:bg-brand-card',
               )}
             >
-              {!selectedCategory && <ChevronRight className="h-3 w-3" />}
-              <span className={!selectedCategory ? 'ml-1' : 'ml-5'}>All Products</span>
+              {isAllProducts && <ChevronRight className="h-3 w-3" />}
+              <span className={isAllProducts ? 'ml-1' : 'ml-5'}>All Products</span>
             </Link>
           </li>
           {categories.map((cat) => {
@@ -258,12 +269,12 @@ export function ShopSidebar({
             return (
               <li key={cat.id}>
                 <Link
-                  href={buildHref({ category: cat.slug, tag: selectedTag, brand: selectedBrand, search: currentSearch })}
+                  href={buildShopFilterHref({ category: cat.slug, tag: selectedTag, brand: selectedBrand, search: currentSearch })}
                   className={cn(
                     'flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-all duration-150',
                     isActive
                       ? 'bg-brand-accent-light font-semibold text-brand-wine'
-                      : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50',
+                      : 'text-brand-text-muted hover:text-brand-text hover:bg-brand-card',
                   )}
                 >
                   {isActive && <ChevronRight className="h-3 w-3" />}
@@ -290,12 +301,12 @@ export function ShopSidebar({
               return (
                 <Link
                   key={slug}
-                  href={buildHref({ category: selectedCategory, tag: isActive ? null : slug, brand: selectedBrand, search: currentSearch })}
+                  href={buildShopFilterHref({ category: selectedCategory, tag: isActive ? null : slug, brand: selectedBrand, search: currentSearch })}
                   className={cn(
                     'rounded-full px-3 py-1 text-xs font-medium transition-all duration-150',
                     isActive
                       ? 'bg-brand-wine text-white'
-                      : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200',
+                      : 'bg-brand-card text-brand-text-muted hover:bg-brand-accent-light',
                   )}
                 >
                   {name}
@@ -321,17 +332,17 @@ export function ShopSidebar({
               return (
                 <li key={slug}>
                   <Link
-                    href={buildHref({ category: selectedCategory, tag: selectedTag, brand: isActive ? null : slug, search: currentSearch })}
+                    href={buildShopFilterHref({ category: selectedCategory, tag: selectedTag, brand: isActive ? null : slug, search: currentSearch })}
                     className={cn(
                       'flex items-center gap-2 py-1.5 text-sm transition-all duration-150',
                       isActive
                         ? 'font-semibold text-brand-wine'
-                        : 'text-zinc-600 hover:text-zinc-900',
+                        : 'text-brand-text-muted hover:text-brand-text',
                     )}
                   >
                     <span className={cn(
                       'h-1.5 w-1.5 rounded-full transition-colors',
-                      isActive ? 'bg-brand-wine' : 'bg-zinc-300',
+                      isActive ? 'bg-brand-wine' : 'bg-brand-border',
                     )} />
                     {name}
                   </Link>
@@ -353,9 +364,9 @@ export function ShopSidebar({
         <div className="space-y-3 px-2">
           <div className="flex items-center gap-2">
             <div className="flex-1">
-              <label className="text-xs text-zinc-400 mb-1 block">Min Price</label>
+              <label className="text-xs text-brand-text-muted mb-1 block">Min Price</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-brand-text-muted">
                   {fmt(0).replace(/[0-9.,\s]/g, '')}
                 </span>
                 <input
@@ -369,14 +380,14 @@ export function ShopSidebar({
                       activePriceRange[1],
                     ])
                   }
-                  className="w-full rounded-lg border border-zinc-200 pl-6 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-wine/20 focus:border-brand-wine transition-all"
+                  className="w-full rounded-lg border border-brand-border pl-6 pr-3 py-2 text-sm transition-all focus-brand focus:border-brand-accent-strong"
                 />
               </div>
             </div>
             <div className="flex-1">
-              <label className="text-xs text-zinc-400 mb-1 block">Max Price</label>
+              <label className="text-xs text-brand-text-muted mb-1 block">Max Price</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-brand-text-muted">
                   {fmt(0).replace(/[0-9.,\s]/g, '')}
                 </span>
                 <input
@@ -390,12 +401,12 @@ export function ShopSidebar({
                       Math.min(priceRange[1], Number(e.target.value)),
                     ])
                   }
-                  className="w-full rounded-lg border border-zinc-200 pl-6 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-wine/20 focus:border-brand-wine transition-all"
+                  className="w-full rounded-lg border border-brand-border pl-6 pr-3 py-2 text-sm transition-all focus-brand focus:border-brand-accent-strong"
                 />
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-between text-xs text-zinc-500">
+          <div className="flex items-center justify-between text-xs text-brand-text-muted">
             <span>{fmt(activePriceRange[0])}</span>
             <span>—</span>
             <span>{fmt(activePriceRange[1])}</span>
@@ -425,19 +436,24 @@ export function ShopSidebar({
                   onClick={() => onColorToggle(color.slug)}
                   title={color.name}
                   aria-label={`${isActive ? 'Remove' : 'Add'} ${color.name} filter`}
+                  aria-pressed={isActive}
                   className={cn(
-                    'h-8 w-8 rounded-full border-2 flex items-center justify-center transition-all duration-150',
-                    isWhite ? 'border-zinc-300' : 'border-transparent',
+                    'group relative flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all duration-150 focus-brand after:absolute after:-inset-1.5 after:content-[""]',
                     isActive
-                      ? 'border-brand-wine ring-2 ring-brand-wine/20 scale-110'
-                      : !isWhite
-                      ? 'border-zinc-100 hover:border-zinc-400'
-                      : 'hover:border-zinc-400',
+                      ? 'scale-110 border-brand-wine ring-2 ring-brand-wine/20'
+                      : isWhite
+                        ? 'border-brand-border group-hover:border-brand-accent-strong'
+                        : 'border-transparent group-hover:border-brand-accent-strong',
                   )}
                   style={{ backgroundColor: hex }}
                 >
                   {isActive && (
-                    <span className={cn('text-[10px] font-bold leading-none', isWhite ? 'text-zinc-900' : 'text-white')}>
+                    <span
+                      className={cn(
+                        'text-[10px] font-bold leading-none',
+                        isWhite ? 'text-brand-text' : 'text-white',
+                      )}
+                    >
                       ✓
                     </span>
                   )}
@@ -470,7 +486,7 @@ export function ShopSidebar({
                     'rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-150',
                     isActive
                       ? 'bg-brand-wine text-white border-brand-wine'
-                      : 'border-zinc-200 text-zinc-600 hover:border-zinc-400 hover:text-zinc-900',
+                      : 'border-brand-border text-brand-text-muted hover:border-brand-accent-strong hover:text-brand-text',
                   )}
                 >
                   {size.name}

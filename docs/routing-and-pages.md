@@ -43,13 +43,15 @@ The layout is a Server Component but the header is a Client Component. `navLinks
 
 `HeroSlider` → `CategoryBanners` → `CategoryGrid` → `PreOrderSteps` → featured products → `WholesaleBanner` → `TestimonialsSection` → `ComingSoonSection` → `FeaturesStrip` → `WhatsAppCTA`.
 
-The featured grid is an async RSC inside `<Suspense>`. It fetches four products and renders nothing if the request fails. The rest of the page is static markup, so the hero and marketing sections remain visible while products load.
+The home page makes one bounded catalogue request (up to 100 products) and passes the availability mode and featured products down; there is no separate hero or featured fetch. The hero mode is Ready Stock when stock exists, Pre-Order when only pre-order products exist, and contact when both are empty. If the catalogue request fails, the featured grid is empty and the hero switches to contact rather than promising stock it could not verify.
 
 ## Shop page
 
 `src/app/(shop)/products/page.tsx` reads `page`, `category`, `search`, `tag`, and `brand` from `searchParams`. It clamps the page to at least 1 and trims the other values.
 
 It fetches products and filters in parallel with `Promise.all`. Both promises catch and fall back to empty data. A failed API call therefore renders an empty shop, not an error page.
+
+The Ready Stock collection is the exception: its tag matches products whose stock lives per variation, so the page fetches the tagged set in one pass, drops sold-out products through the shared availability module, and paginates the result itself. All Products and category pages keep the server's pagination and still show sold-out products.
 
 `ShopClient` receives the initial data and owns:
 
@@ -60,6 +62,8 @@ It fetches products and filters in parallel with `Promise.all`. Both promises ca
 - pagination links that preserve the query string.
 
 Category, tag, brand, and search are server-side filters. Price, color, and size are client-side filters on the current page only. The result count in `ShopTopBar` reflects this difference: it shows the server total and the filtered total separately.
+
+Clear all filters and All Products both reset every server-side filter and the client-side price, colour, and size state, then return to `/products`. The decision is in `clearShopFilters()` so it can be tested without a browser.
 
 Pagination is a full navigation. Client-side filter state resets when the page changes.
 
@@ -78,7 +82,9 @@ Pagination is a full navigation. Client-side filter state resets when the page c
 
 - Attribute values come from the variation objects, not from `ProductAttribute.options`.
 - Color attributes are detected by name (`color` or `colour`) and rendered as swatches; other attributes render as buttons.
-- An option is disabled when every matching variation is out of stock.
+- An option is disabled when every matching variation is out of stock, unless the product is a pre-order.
+- Pre-Order is a purchase mode, so a pre-order product stays buyable even when its stock status is out of stock.
+- A sold-out product shows Sold Out next to the price and hides the quantity and add controls. The mobile sticky bar is not rendered.
 - Quantity, add-to-cart, error messages, and a mobile sticky bar live here.
 - The sticky bar appears when the main action row scrolls out of view, using `IntersectionObserver`.
 
@@ -169,7 +175,7 @@ This is a shell guard, not an authorization boundary. WordPress still authorizes
 - Uncaught window errors and unhandled rejections: `src/components/layout/ErrorReporter.tsx`.
 - 404: `src/app/not-found.tsx`.
 - Product 404: `notFound()` for `product_not_found`.
-- Empty shop: `ShopClient` empty state with "Clear all filters".
+- Empty shop: `ShopClient` shows one empty-state message with "Clear all filters".
 - Empty cart: drawer and page have separate empty states.
 - Empty orders, wishlist, reviews, and tracking results all have dedicated states.
 

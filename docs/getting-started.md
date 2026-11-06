@@ -82,6 +82,9 @@ If the grid is empty, run the three `curl` checks in [Backend setup](#backend-se
 | `NEXT_PUBLIC_HERO_SUBTITLE` | No | `config.ts` | Hero copy. |
 | `NEXT_PUBLIC_HERO_CTA_TEXT` | No | `config.ts` | Hero button label. |
 | `NEXT_PUBLIC_HERO_CTA_LINK` | No | `config.ts` | Hero button URL. |
+| `NEXT_PUBLIC_WHATSAPP_URL` | No | `config.ts`, footer, hero fallback | Defaults to `https://wa.me/8801841654663`. |
+| `NEXT_PUBLIC_FACEBOOK_URL` | No | `config.ts`, footer, announcement bar | Defaults to the shop's Facebook page. |
+| `NEXT_PUBLIC_INSTAGRAM_URL` | No | `config.ts`, footer, announcement bar | Defaults to the shop's Instagram profile. |
 | `MAILCHIMP_API_KEY` | For newsletter | `src/app/api/newsletter/route.ts` | Must include the datacenter suffix, for example `abc-us21`. |
 | `MAILCHIMP_AUDIENCE_ID` | For newsletter | same route | Without both Mailchimp values the route returns 503. |
 | `ERROR_REPORT_WEBHOOK_URL` | No | `src/app/api/errors/route.ts` | Server-only. Forwards client error reports as JSON. Reports still go to server logs without it. |

@@ -34,22 +34,22 @@ export function ShopTopBar({
 
   const resultText =
     total === 0
-      ? 'No products found'
+      ? '0 products'
       : `Showing ${start}–${end} of ${total} product${total !== 1 ? 's' : ''}`;
 
   const hasActiveFilters = activeFilterCount > 0;
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-100">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-brand-border">
       {/* Left side: result count + mobile filter toggle */}
       <div className="flex items-center gap-3">
         <button
           onClick={onMobileFiltersToggle}
           className={cn(
-            'lg:hidden flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-all duration-150',
+            'lg:hidden flex min-h-11 items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-all duration-150 focus-brand',
             hasActiveFilters
               ? 'border-brand-wine text-brand-wine bg-brand-accent-light/50'
-              : 'border-zinc-200 text-zinc-700 hover:bg-zinc-50',
+              : 'border-brand-border text-brand-text hover:bg-brand-card',
           )}
         >
           <SlidersHorizontal className="h-4 w-4" />
@@ -62,7 +62,7 @@ export function ShopTopBar({
         </button>
 
         <div className="flex flex-col">
-          <p className="text-sm font-medium text-zinc-900">{resultText}</p>
+          <p className="text-sm font-medium text-brand-text">{resultText}</p>
           {hasActiveFilters && (
             <p className="text-xs text-brand-wine mt-0.5">
               {activeFilterCount} filter{activeFilterCount > 1 ? 's' : ''} applied
@@ -76,7 +76,7 @@ export function ShopTopBar({
         <select
           value={sortOrder}
           onChange={(e) => onSortChange(e.target.value as SortOrder)}
-          className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-wine/20 focus:border-brand-wine transition-all duration-150"
+          className="min-h-11 rounded-lg border border-brand-border bg-brand-section px-3 py-2 text-sm text-brand-text cursor-pointer transition-all duration-150 focus-brand focus:border-brand-accent-strong"
         >
           <option value="default">Default sorting</option>
           <option value="price-asc">Price: Low to High</option>
@@ -84,7 +84,7 @@ export function ShopTopBar({
           <option value="latest">Newest first</option>
         </select>
 
-        <div className="hidden sm:flex items-center gap-1 p-1 rounded-lg border border-zinc-200 bg-white">
+        <div className="hidden sm:flex items-center gap-1 p-1 rounded-lg border border-brand-border bg-brand-section">
           {(
             [
               { cols: 2, Icon: List, label: '2 columns' },
@@ -96,11 +96,12 @@ export function ShopTopBar({
               key={cols}
               onClick={() => onViewColsChange(cols)}
               aria-label={label}
+              aria-pressed={viewCols === cols}
               className={cn(
-                'h-8 w-8 rounded-md flex items-center justify-center transition-all duration-150',
+                'h-8 w-8 rounded-md flex items-center justify-center transition-all duration-150 focus-brand',
                 viewCols === cols
-                  ? 'bg-zinc-900 text-white'
-                  : 'text-zinc-400 hover:text-zinc-600',
+                  ? 'bg-brand-wine text-white'
+                  : 'text-brand-text-muted hover:text-brand-text',
               )}
             >
               <Icon className="h-4 w-4" />

@@ -1,13 +1,16 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import Link from 'next/link';
-import { X, ChevronLeft, ChevronRight, Search, Filter } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { X, Search, Filter } from 'lucide-react';
 import type { Product, PaginationMeta } from '@/lib/api/products';
 import type { ProductFilters } from '@/lib/api/filters';
 import { ProductCard } from '@/components/product/ProductCard';
 import { ShopSidebar } from '@/components/shop/ShopSidebar';
 import { ShopTopBar, type SortOrder } from '@/components/shop/ShopTopBar';
+import { ShopPagination } from '@/components/shop/ShopPagination';
+import { ReadyStockEmptyState } from '@/components/shop/ReadyStockEmptyState';
+import { buildShopFilterHref, buildShopHref, clearShopFilters } from '@/lib/navigation';
 
 interface ShopClientProps {
   initialProducts: Product[];
@@ -18,6 +21,7 @@ interface ShopClientProps {
   initialBrand?: string;
   serverPage: number;
   filters: ProductFilters;
+  showReadyStockFallback: boolean;
 }
 
 function gridColsClass(cols: 2 | 3 | 4) {
@@ -29,16 +33,16 @@ function gridColsClass(cols: 2 | 3 | 4) {
 function EmptyState({ onClear }: { onClear: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
-      <div className="h-20 w-20 rounded-full bg-zinc-50 flex items-center justify-center mb-6">
-        <Search className="h-8 w-8 text-zinc-300" />
+      <div className="h-20 w-20 rounded-full bg-brand-card flex items-center justify-center mb-6">
+        <Search className="h-8 w-8 text-brand-accent-strong" />
       </div>
-      <h3 className="text-lg font-semibold text-zinc-900 mb-2">No products found</h3>
-      <p className="text-sm text-zinc-500 mb-6 max-w-sm">
+      <h3 className="text-lg font-semibold text-brand-text mb-2">No products found</h3>
+      <p className="text-sm text-brand-text-muted mb-6 max-w-sm">
         Try adjusting your filters or search terms to find what you&apos;re looking for.
       </p>
       <button
         onClick={onClear}
-        className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 transition-colors"
+        className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-brand-accent-strong px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-accent-strong-hover focus-brand"
       >
         <X className="h-4 w-4" />
         Clear all filters
@@ -56,7 +60,10 @@ export function ShopClient({
   initialBrand,
   serverPage,
   filters,
+  showReadyStockFallback,
 }: ShopClientProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [sortOrder, setSortOrder] = useState<SortOrder>('default');
   const [activePriceRange, setActivePriceRange] = useState<[number, number] | null>(null);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -131,17 +138,21 @@ export function ShopClient({
     if (initialCategory) count += 1;
     if (initialTag) count += 1;
     if (initialBrand) count += 1;
+    if (initialSearch) count += 1;
     if (activePriceRange !== null && (activePriceRange[0] !== priceRange[0] || activePriceRange[1] !== priceRange[1])) count += 1;
     count += selectedColors.length;
     count += selectedSizes.length;
     return count;
-  }, [initialCategory, initialTag, initialBrand, activePriceRange, priceRange, selectedColors, selectedSizes]);
+  }, [initialCategory, initialTag, initialBrand, initialSearch, activePriceRange, priceRange, selectedColors, selectedSizes]);
 
-  function handleClearAll() {
+  function handleClearFilters() {
     setActivePriceRange(null);
     setSelectedColors([]);
     setSelectedSizes([]);
     setSortOrder('default');
+
+    const cleared = clearShopFilters(new URLSearchParams(searchParams.toString()));
+    router.push(buildShopHref(cleared));
   }
 
   function handleColorToggle(color: string) {
@@ -157,23 +168,13 @@ export function ShopClient({
   }
 
   function pageHref(p: number) {
-    const qs = new URLSearchParams();
-    if (p > 1) qs.set('page', String(p));
-    if (initialCategory) qs.set('category', initialCategory);
-    if (initialSearch) qs.set('search', initialSearch);
-    if (initialTag) qs.set('tag', initialTag);
-    if (initialBrand) qs.set('brand', initialBrand);
-    const q = qs.toString();
-    return `/products${q ? `?${q}` : ''}`;
-  }
-
-  function getPageNumbers(current: number, total: number): number[] {
-    const pages: number[] = [];
-    const delta = 2;
-    const left = Math.max(1, current - delta);
-    const right = Math.min(total, current + delta);
-    for (let i = left; i <= right; i++) pages.push(i);
-    return pages;
+    return buildShopFilterHref({
+      page: p,
+      category: initialCategory,
+      search: initialSearch,
+      tag: initialTag,
+      brand: initialBrand,
+    });
   }
 
   const sidebarProps = {
@@ -192,7 +193,7 @@ export function ShopClient({
     onColorToggle: handleColorToggle,
     selectedSizes,
     onSizeToggle: handleSizeToggle,
-    onClearAll: handleClearAll,
+    onClearAll: handleClearFilters,
     activeFilterCount,
     currentSearch: initialSearch,
   };
@@ -202,20 +203,27 @@ export function ShopClient({
       {/* Mobile filter overlay */}
       {mobileFiltersOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          <button
+            type="button"
+            aria-label="Close filters"
+            className="absolute inset-0 bg-brand-dark/40 backdrop-blur-sm"
             onClick={() => setMobileFiltersOpen(false)}
           />
-          <div className="absolute inset-y-0 left-0 w-80 max-w-[85vw] overflow-y-auto bg-white shadow-2xl">
-            <div className="sticky top-0 z-10 bg-white border-b border-zinc-100 px-5 py-4 flex items-center justify-between">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Filters"
+            className="absolute inset-y-0 left-0 w-80 max-w-[85vw] overflow-y-auto bg-brand-section shadow-2xl"
+          >
+            <div className="sticky top-0 z-10 bg-brand-section border-b border-brand-border px-5 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Filter className="h-5 w-5 text-zinc-900" />
-                <h2 className="text-lg font-semibold text-zinc-900">Filters</h2>
+                <Filter className="h-5 w-5 text-brand-text" />
+                <h2 className="text-lg font-semibold text-brand-text">Filters</h2>
               </div>
               <button
                 onClick={() => setMobileFiltersOpen(false)}
                 aria-label="Close filters"
-                className="h-9 w-9 rounded-lg flex items-center justify-center text-zinc-500 hover:bg-zinc-100 transition-colors"
+                className="flex h-11 w-11 items-center justify-center rounded-lg text-brand-text-muted transition-colors hover:bg-brand-card focus-brand"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -232,9 +240,9 @@ export function ShopClient({
         {/* Desktop sidebar */}
         <aside className="hidden lg:block w-72 shrink-0">
           <div className="sticky top-24">
-            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-zinc-100">
-              <Filter className="h-4 w-4 text-zinc-400" />
-              <h2 className="text-sm font-semibold text-zinc-900 uppercase tracking-wider">Filters</h2>
+            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-brand-border">
+              <Filter className="h-4 w-4 text-brand-text-muted" />
+              <h2 className="text-sm font-semibold text-brand-text uppercase tracking-wider">Filters</h2>
             </div>
             <ShopSidebar {...sidebarProps} />
           </div>
@@ -255,8 +263,10 @@ export function ShopClient({
             activeFilterCount={activeFilterCount}
           />
 
-          {filteredProducts.length === 0 ? (
-            <EmptyState onClear={handleClearAll} />
+          {showReadyStockFallback ? (
+            <ReadyStockEmptyState />
+          ) : filteredProducts.length === 0 ? (
+            <EmptyState onClear={handleClearFilters} />
           ) : (
             <>
               <div className={gridColsClass(viewCols)}>
@@ -265,61 +275,11 @@ export function ShopClient({
                 ))}
               </div>
 
-              {/* Pagination */}
-              {meta.total_pages > 1 && (
-                <nav
-                  aria-label="Pagination"
-                  className="mt-10 flex items-center justify-center gap-1.5"
-                >
-                  {serverPage > 1 ? (
-                    <Link
-                      href={pageHref(serverPage - 1)}
-                      className="h-9 w-9 rounded-lg border border-zinc-200 flex items-center justify-center text-zinc-600 hover:bg-zinc-50 hover:border-zinc-300 transition-all duration-150"
-                      aria-label="Previous page"
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Link>
-                  ) : (
-                    <span className="h-9 w-9 rounded-lg border border-zinc-100 flex items-center justify-center text-zinc-300 cursor-not-allowed">
-                      <ChevronLeft className="h-4 w-4" />
-                    </span>
-                  )}
-
-                  {getPageNumbers(serverPage, meta.total_pages).map((p) =>
-                    p === serverPage ? (
-                      <span
-                        key={p}
-                        className="h-9 min-w-[36px] rounded-lg bg-zinc-900 text-white flex items-center justify-center text-sm font-medium px-2"
-                        aria-current="page"
-                      >
-                        {p}
-                      </span>
-                    ) : (
-                      <Link
-                        key={p}
-                        href={pageHref(p)}
-                        className="h-9 min-w-[36px] rounded-lg border border-zinc-200 flex items-center justify-center text-sm text-zinc-600 hover:bg-zinc-50 hover:border-zinc-300 transition-all duration-150 px-2"
-                      >
-                        {p}
-                      </Link>
-                    ),
-                  )}
-
-                  {serverPage < meta.total_pages ? (
-                    <Link
-                      href={pageHref(serverPage + 1)}
-                      className="h-9 w-9 rounded-lg border border-zinc-200 flex items-center justify-center text-zinc-600 hover:bg-zinc-50 hover:border-zinc-300 transition-all duration-150"
-                      aria-label="Next page"
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Link>
-                  ) : (
-                    <span className="h-9 w-9 rounded-lg border border-zinc-100 flex items-center justify-center text-zinc-300 cursor-not-allowed">
-                      <ChevronRight className="h-4 w-4" />
-                    </span>
-                  )}
-                </nav>
-              )}
+              <ShopPagination
+                page={serverPage}
+                totalPages={meta.total_pages}
+                hrefForPage={pageHref}
+              />
             </>
           )}
         </div>

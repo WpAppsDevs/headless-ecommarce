@@ -1,10 +1,14 @@
-import { getProducts } from '@/lib/api/products';
+import { getAllProducts, getProducts } from '@/lib/api/products';
 import { getProductFilters } from '@/lib/api/filters';
 import { ShopClient } from '@/components/shop/ShopClient';
 import { PageHeader } from '@/components/ui/PageHeader';
 import type { BreadcrumbItem } from '@/components/ui/PageHeader';
+import { selectReadyStockPage, shouldShowReadyStockFallback } from '@/lib/ready-stock-page';
+import { READY_STOCK_TAG } from '@/lib/product-availability';
 
 export const revalidate = 60;
+
+const PAGE_SIZE = 9;
 
 interface PageProps {
   searchParams: Promise<{ page?: string; category?: string; search?: string; tag?: string; brand?: string }>;
@@ -18,9 +22,18 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   const tag = params.tag?.trim() || undefined;
   const brand = params.brand?.trim() || undefined;
 
-  const [{ items, meta }, filters] = await Promise.all([
-    getProducts({ page, per_page: 9, category, search, tag, brand }).catch(
-      () => ({ items: [], meta: { page: 1, per_page: 9, total: 0, total_pages: 1 } }),
+  // The Ready Stock collection drops sold-out products after the API has
+  // paginated, so fetch the tagged set in one pass and paginate it here.
+  const isReadyStockCollection = tag === READY_STOCK_TAG;
+  const productRequest = isReadyStockCollection
+    ? getAllProducts({ category, search, tag, brand }).then((products) =>
+        selectReadyStockPage(products, page, PAGE_SIZE),
+      )
+    : getProducts({ page, per_page: PAGE_SIZE, category, search, tag, brand });
+
+  const [result, filters] = await Promise.all([
+    productRequest.catch(
+      () => ({ items: [], meta: { page: 1, per_page: PAGE_SIZE, total: 0, total_pages: 1 } }),
     ),
     getProductFilters().catch(() => ({
       categories: [],
@@ -30,6 +43,12 @@ export default async function ProductsPage({ searchParams }: PageProps) {
       sizeTerms: [],
     })),
   ]);
+
+  const { items, meta } = result;
+  const showReadyStockFallback = shouldShowReadyStockFallback({
+    query: { tag, category, search, brand },
+    productCount: items.length,
+  });
 
   const categoryLabel = category
     ? category.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
@@ -52,8 +71,9 @@ export default async function ProductsPage({ searchParams }: PageProps) {
         initialSearch={search}
         initialTag={tag}
         initialBrand={brand}
-        serverPage={page}
+        serverPage={meta.page}
         filters={filters}
+        showReadyStockFallback={showReadyStockFallback}
       />
     </>
   );

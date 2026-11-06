@@ -29,7 +29,7 @@ export function FeaturesStrip() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="mb-10 text-center">
-          <span className="inline-block rounded-full bg-brand-accent/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-accent">
+          <span className="inline-block rounded-full bg-brand-accent/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-accent-strong">
             Our Promise
           </span>
           <h2 id="why-us-heading" className="mt-4 font-serif text-3xl font-bold text-brand-text sm:text-4xl">
@@ -46,7 +46,7 @@ export function FeaturesStrip() {
             >
               {/* Icon tile */}
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-brand-accent-light">
-                <Icon className="h-6 w-6 text-brand-accent" strokeWidth={1.5} />
+                <Icon className="h-6 w-6 text-brand-accent-strong" strokeWidth={1.5} />
               </div>
 
               {/* Accent rule */}

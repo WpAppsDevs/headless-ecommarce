@@ -50,6 +50,23 @@ Terms used across this storefront, the WordPress wrapper API, and the docs in `d
 
 **Filter set** — the categories, tags, brands, and `pa_color`/`pa_size` terms fetched by `getProductFilters()` for the shop sidebar.
 
+**Purchasable variation** — a variation a customer can add to the cart right now.
+
+**Ready Stock** — a merchandising collection of products tagged `ready-stock` that have at least one purchasable variation. A product that sells out leaves the collection but stays in the general catalog.
+_Avoid_: In stock, available now
+
+**Pre-Order** — a purchase mode for products tagged `pre-order`, bought before the 15–25 day import window.
+_Avoid_: Backorder (unless the API field literally says `onbackorder`), pre-sale
+
+**Sold out** — a product with no purchasable variation right now. It is not Ready Stock, but it stays visible in the general catalog with a sold-out state and its product page stays reachable.
+_Avoid_: Unavailable
+
+**Catalog** — the B2B line sheet or product list used for wholesale buying. It is not a storefront product collection.
+_Avoid_: Wholesale
+
+**Wholesale** — the B2B buying programme — pricing, MOQ, and terms — offered to resellers. It is not the catalog asset.
+_Avoid_: Catalog
+
 **Checkout draft** — a WooCommerce order with status `checkout-draft`. These are incomplete records and are filtered out of every order-facing view by `src/lib/order-utils.ts`.
 
 ## Cart and orders

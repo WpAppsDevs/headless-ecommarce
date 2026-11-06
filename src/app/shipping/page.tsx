@@ -60,7 +60,7 @@ export default function ShippingPage() {
             subtitle="বর্তমানে বাংলাদেশে আমাদের স্টকে থাকা পণ্য"
           >
             <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-brand-text">
-              <Clock className="h-4 w-4 text-brand-accent" />
+              <Clock className="h-4 w-4 text-brand-accent-strong" />
               ডেলিভারি সময়
             </h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -69,7 +69,7 @@ export default function ShippingPage() {
             </div>
 
             <h3 className="mb-3 mt-7 flex items-center gap-2 text-sm font-semibold text-brand-text">
-              <Truck className="h-4 w-4 text-brand-accent" />
+              <Truck className="h-4 w-4 text-brand-accent-strong" />
               ডেলিভারি চার্জ
             </h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -100,7 +100,7 @@ export default function ShippingPage() {
             </p>
 
             <h3 className="mb-3 mt-7 flex items-center gap-2 text-sm font-semibold text-brand-text">
-              <Clock className="h-4 w-4 text-brand-accent" />
+              <Clock className="h-4 w-4 text-brand-accent-strong" />
               আনুমানিক ডেলিভারি সময়
             </h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -110,14 +110,14 @@ export default function ShippingPage() {
                   এই সময়ের মধ্যে পাকিস্তান থেকে বাংলাদেশে পণ্য আসার সময় এবং বাংলাদেশে পৌঁছানোর পর
                   customer-এর কাছে স্থানীয় ডেলিভারি — দুইটি ধাপই অন্তর্ভুক্ত।
                 </p>
-                <p className="mt-3 text-xs font-medium leading-relaxed text-brand-accent">
+                <p className="mt-3 text-xs font-medium leading-relaxed text-brand-accent-strong">
                   এটি একটি আনুমানিক সময়সীমা — নির্দিষ্ট বা গ্যারান্টিযুক্ত সময় নয়।
                 </p>
               </div>
             </div>
 
             <h3 className="mb-3 mt-7 flex items-center gap-2 text-sm font-semibold text-brand-text">
-              <Scale className="h-4 w-4 text-brand-accent" />
+              <Scale className="h-4 w-4 text-brand-accent-strong" />
               শিপিং ও ডেলিভারি চার্জ
             </h3>
 
@@ -125,7 +125,7 @@ export default function ShippingPage() {
             <div className="rounded-2xl border border-brand-accent/25 bg-brand-accent/[0.06] p-5">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <p className="text-sm font-semibold text-brand-text">পাকিস্তান → বাংলাদেশ</p>
-                <p className="font-serif text-2xl font-bold text-brand-accent">৳১,৮৫০</p>
+                <p className="font-serif text-2xl font-bold text-brand-accent-strong">৳১,৮৫০</p>
                 <p className="text-xs text-brand-text-muted">প্রতি কেজি</p>
               </div>
               <p className="mt-3 text-sm leading-relaxed text-brand-text-muted">

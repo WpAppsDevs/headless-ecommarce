@@ -67,7 +67,7 @@ export function PreOrderSteps() {
               {/* Step indicator */}
               <div className="mb-3 flex items-center gap-2">
                 <div className="h-1 w-4 rounded-full bg-brand-accent/60" />
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-brand-accent/70">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-brand-accent">
                   Step {step}
                 </span>
               </div>

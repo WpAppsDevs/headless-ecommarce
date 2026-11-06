@@ -4,6 +4,7 @@ import type { LucideIcon } from 'lucide-react';
 import { ShieldCheck, Info, CheckCircle2, Users, Cookie, Lock, Mail, Phone, MessageCircle } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { SectionHeading, Card, BulletList } from '@/components/policies/PolicyUI';
+import { config } from '@/lib/config';
 
 export const metadata: Metadata = {
   title: 'প্রাইভেসি পলিসি',
@@ -114,23 +115,23 @@ export default function PrivacyPolicyPage() {
           <div className="space-y-3">
             <a
               href="mailto:support@najifasshop.com"
-              className="flex items-center gap-2.5 text-sm text-brand-accent transition-colors hover:underline"
+              className="flex items-center gap-2.5 text-sm text-brand-accent-strong transition-colors hover:underline"
             >
               <Mail className="h-4 w-4 shrink-0" />
               support@najifasshop.com
             </a>
             <a
               href="tel:+8801841654663"
-              className="flex items-center gap-2.5 text-sm text-brand-accent transition-colors hover:underline"
+              className="flex items-center gap-2.5 text-sm text-brand-accent-strong transition-colors hover:underline"
             >
               <Phone className="h-4 w-4 shrink-0" />
               +880 1841-654663
             </a>
             <a
-              href="https://wa.me/8801841654663"
+              href={config.whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2.5 text-sm text-brand-accent transition-colors hover:underline"
+              className="flex items-center gap-2.5 text-sm text-brand-accent-strong transition-colors hover:underline"
             >
               <MessageCircle className="h-4 w-4 shrink-0" />
               WhatsApp-এ মেসেজ করুন

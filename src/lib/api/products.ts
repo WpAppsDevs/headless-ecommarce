@@ -18,6 +18,12 @@ export interface ProductCategory {
   slug: string;
 }
 
+export interface ProductTag {
+  id: number;
+  name: string;
+  slug: string;
+}
+
 export interface ProductAttribute {
   id: number;
   name: string;
@@ -84,6 +90,7 @@ export interface Product {
   average_rating?: string;
   rating_count?: number;
   categories: ProductCategory[];
+  tags: ProductTag[];
   images: ProductImage[];
   attributes: ProductAttribute[];
   /** List endpoint returns variation IDs; detail endpoint returns full objects. */
@@ -196,18 +203,24 @@ function normalizeVariation(
 // API functions
 // ---------------------------------------------------------------------------
 
-export async function getProducts(params: {
+export const MAX_PER_PAGE = 100;
+
+export interface ProductsQuery {
   page?: number;
   per_page?: number;
   category?: string;
   brand?: string;
   tag?: string;
   search?: string;
-}): Promise<{ items: Product[]; meta: PaginationMeta }> {
+}
+
+export type ProductCollectionQuery = Omit<ProductsQuery, 'page' | 'per_page'>;
+
+export async function getProducts(params: ProductsQuery): Promise<{ items: Product[]; meta: PaginationMeta }> {
   const { page = 1, per_page = 12, category, brand, tag, search } = params;
   const qs = new URLSearchParams({
     page: String(page),
-    per_page: String(Math.min(per_page, 100)),
+    per_page: String(Math.min(per_page, MAX_PER_PAGE)),
     ...(category ? { category } : {}),
     ...(brand ? { brand } : {}),
     ...(tag ? { tag } : {}),
@@ -227,10 +240,27 @@ export async function getProducts(params: {
       normalizeImage(img as RawImage),
     ),
     categories: Array.isArray(p.categories) ? p.categories : [],
+    tags: Array.isArray(p.tags) ? p.tags : [],
     attributes: Array.isArray(p.attributes) ? p.attributes : [],
     variations: Array.isArray(p.variations) ? p.variations : [],
   }));
   return { items, meta: json.meta };
+}
+
+/** Fetches every page of a product collection. */
+export async function getAllProducts(
+  params: ProductCollectionQuery = {},
+): Promise<Product[]> {
+  const first = await getProducts({ ...params, page: 1, per_page: MAX_PER_PAGE });
+  if (first.meta.total_pages <= 1) return first.items;
+
+  const remaining = await Promise.all(
+    Array.from({ length: first.meta.total_pages - 1 }, (_, index) =>
+      getProducts({ ...params, page: index + 2, per_page: MAX_PER_PAGE }),
+    ),
+  );
+
+  return [...first.items, ...remaining.flatMap((result) => result.items)];
 }
 
 export async function getProduct(slug: string): Promise<Product> {
@@ -260,6 +290,7 @@ export async function getProduct(slug: string): Promise<Product> {
   return {
     ...raw,
     categories: Array.isArray(raw.categories) ? raw.categories : [],
+    tags: Array.isArray(raw.tags) ? raw.tags : [],
     images: (Array.isArray(raw.images) ? raw.images : []).map((img) =>
       normalizeImage(img as RawImage),
     ),
@@ -275,7 +306,7 @@ export async function getAllProductSlugs(): Promise<string[]> {
   const slugs: string[] = [];
   let page = 1;
   while (true) {
-    const { items, meta } = await getProducts({ page, per_page: 100 });
+    const { items, meta } = await getProducts({ page, per_page: MAX_PER_PAGE });
     slugs.push(...items.map((p) => p.slug));
     if (page >= meta.total_pages) break;
     page++;

@@ -16,7 +16,7 @@ export function TrackingStatus({ status, date, isCompleted, isLast }: TrackingSt
           className={cn(
             'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2',
             isCompleted
-              ? 'bg-brand-accent border-brand-accent'
+              ? 'bg-brand-accent-strong border-brand-accent-strong'
               : 'bg-brand-section border-brand-border',
           )}
         >

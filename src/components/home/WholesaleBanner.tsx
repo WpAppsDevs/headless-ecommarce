@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Phone, ArrowRight } from 'lucide-react';
+import { config } from '@/lib/config';
 
 const STATS = [
   { value: '50+', label: 'Active Resellers' },
@@ -52,12 +53,12 @@ export function WholesaleBanner() {
             <div className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
               <Link
                 href="/products?tag=catalog"
-                className="inline-flex items-center gap-2 rounded-full bg-brand-accent px-7 py-3 text-sm font-semibold text-brand-dark transition hover:bg-brand-accent-hover"
+                className="inline-flex items-center gap-2 rounded-full bg-brand-accent-strong px-7 py-3 text-sm font-semibold text-white ring-1 ring-brand-accent/30 transition hover:bg-brand-accent-strong-hover"
               >
                 View Catalog <ArrowRight className="h-4 w-4" strokeWidth={2} />
               </Link>
               <a
-                href="https://wa.me/8801841654663"
+                href={config.whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-brand-accent/25 bg-brand-accent/[0.08] px-7 py-3 text-sm font-semibold text-white transition hover:bg-brand-accent/15"
@@ -71,7 +72,7 @@ export function WholesaleBanner() {
           {/* Stats card */}
           <div className="lg:w-[400px]">
             <div className="rounded-2xl border border-brand-accent/10 bg-brand-accent/[0.05] p-6">
-              <p className="mb-5 text-center text-xs font-semibold uppercase tracking-widest text-brand-accent/60 lg:text-left">
+              <p className="mb-5 text-center text-xs font-semibold uppercase tracking-widest text-brand-accent lg:text-left">
                 Our Wholesale Network
               </p>
               <div className="grid grid-cols-2 gap-3">

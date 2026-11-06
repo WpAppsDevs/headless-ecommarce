@@ -8,6 +8,14 @@ import { useCartStore } from '@/stores/cartStore';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { useFormatPrice } from '@/lib/utils/currency';
 import type { Product, ProductVariation } from '@/lib/api/products';
+import {
+  asVariationObjects,
+  getProductBadge,
+  isPreOrder,
+  isPurchasable,
+  isVariationPurchasable,
+} from '@/lib/product-availability';
+import { AvailabilityBadge } from './AvailabilityBadge';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -16,10 +24,6 @@ import type { Product, ProductVariation } from '@/lib/api/products';
 function formatAttrLabel(key: string): string {
   const s = key.startsWith('pa_') ? key.slice(3) : key;
   return s.charAt(0).toUpperCase() + s.slice(1).replace(/-/g, ' ');
-}
-
-function asVariationObjects(v: Product['variations']): ProductVariation[] {
-  return (v as ProductVariation[]).filter((x): x is ProductVariation => typeof x === 'object');
 }
 
 const colorMap: Record<string, string> = {
@@ -95,6 +99,9 @@ function QuantityStepper({
 export function VariationSelector({ product }: { product: Product }) {
   const variations = useMemo(() => asVariationObjects(product.variations), [product.variations]);
   const isSimple = product.type === 'simple' || variations.length === 0;
+  const badge = getProductBadge(product);
+  const preOrder = isPreOrder(product);
+  const purchasable = isPurchasable(product);
 
   const addItem = useCartStore((s) => s.addItem);
   const loading = useCartStore((s) => s.loading);
@@ -141,14 +148,14 @@ export function VariationSelector({ product }: { product: Product }) {
     );
   }, [variations, selected, attrKeys, isSimple]);
 
-  const isOutOfStock = selectedVariation
-    ? selectedVariation.stock_status === 'outofstock'
-    : !isSimple
+  const unavailable = preOrder
     ? false
-    : product.stock_status === 'outofstock';
+    : selectedVariation
+      ? !isVariationPurchasable(selectedVariation)
+      : !purchasable;
 
   const allSelected = isSimple || Object.keys(selected).length >= attrKeys.length;
-  const canAdd = !isOutOfStock && !loading;
+  const canAdd = !unavailable && !loading;
 
   // Price display
   const displayPrice = selectedVariation
@@ -165,13 +172,13 @@ export function VariationSelector({ product }: { product: Product }) {
   }
 
   function isOptionUnavailable(key: string, value: string): boolean {
-    if (isSimple) return false;
+    if (isSimple || preOrder) return false;
     const candidates = variations.filter(
       (v) =>
         v.attributes[key] === value &&
         attrKeys.every((k) => k === key || !selected[k] || v.attributes[k] === selected[k]),
     );
-    return candidates.length > 0 && candidates.every((v) => v.stock_status === 'outofstock');
+    return candidates.length > 0 && candidates.every((v) => !isVariationPurchasable(v));
   }
 
   const missingLabel = (() => {
@@ -184,6 +191,7 @@ export function VariationSelector({ product }: { product: Product }) {
   })();
 
   async function handleAddToCart() {
+    if (unavailable || loading) return;
     if (!allSelected) {
       setSizeError(true);
       return;
@@ -211,6 +219,13 @@ export function VariationSelector({ product }: { product: Product }) {
             <span className="text-lg text-[#5A5A5A] line-through">{fmt(displayRegularPrice)}</span>
           )}
         </div>
+
+        {/* Purchase mode and availability */}
+        {badge && (
+          <div className="mt-4">
+            <AvailabilityBadge badge={badge} />
+          </div>
+        )}
 
         {/* 2 & 3. Color swatches + other attributes (size, etc.) */}
         {!isSimple && attrKeys.length > 0 && (
@@ -270,12 +285,12 @@ export function VariationSelector({ product }: { product: Product }) {
                 <div className="flex flex-wrap gap-2">
                   {attrValues[key].map((val) => {
                     const isActive = selected[key] === val;
-                    const unavailable = isOptionUnavailable(key, val);
+                    const optionUnavailable = isOptionUnavailable(key, val);
                     return (
                       <button
                         key={val}
                         type="button"
-                        disabled={unavailable}
+                        disabled={optionUnavailable}
                         onClick={() => selectOption(key, val)}
                         aria-pressed={isActive}
                         className={cn(
@@ -283,11 +298,11 @@ export function VariationSelector({ product }: { product: Product }) {
                           isActive
                             ? 'border-[#9E2F45] bg-[#FBEAEA] text-[#9E2F45]'
                             : 'border-[#D9D2CB] bg-white text-[#1F2A3C] hover:border-[#9E2F45]',
-                          unavailable && 'cursor-not-allowed opacity-50 hover:border-[#D9D2CB]',
+                          optionUnavailable && 'cursor-not-allowed opacity-50 hover:border-[#D9D2CB]',
                         )}
                       >
                         {val}
-                        {unavailable && (
+                        {optionUnavailable && (
                           <span
                             aria-hidden="true"
                             className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top_right,transparent_45%,#D9D2CB_50%,transparent_55%)]"
@@ -303,14 +318,16 @@ export function VariationSelector({ product }: { product: Product }) {
         )}
 
         {/* 4. Quantity */}
-        <div className="mt-5">
-          <p className="mb-3 text-sm font-medium text-[#1F2A3C]">Quantity</p>
-          <QuantityStepper
-            quantity={quantity}
-            onDecrease={() => setQuantity((q) => Math.max(1, q - 1))}
-            onIncrease={() => setQuantity((q) => q + 1)}
-          />
-        </div>
+        {purchasable && (
+          <div className="mt-5">
+            <p className="mb-3 text-sm font-medium text-[#1F2A3C]">Quantity</p>
+            <QuantityStepper
+              quantity={quantity}
+              onDecrease={() => setQuantity((q) => Math.max(1, q - 1))}
+              onIncrease={() => setQuantity((q) => q + 1)}
+            />
+          </div>
+        )}
 
         {/* 5. Inline validation / cart errors (between quantity and action row) */}
         {cartError && (
@@ -334,7 +351,7 @@ export function VariationSelector({ product }: { product: Product }) {
               'flex min-h-11 flex-1 items-center justify-center gap-2 rounded-[8px] px-4 font-serif text-sm font-semibold text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45] disabled:cursor-not-allowed',
               added
                 ? 'bg-emerald-700 hover:bg-emerald-800'
-                : isOutOfStock
+                : unavailable
                 ? 'bg-[#D9D2CB] text-[#5A5A5A]'
                 : 'bg-[#9E2F45] hover:bg-[#862640]',
             )}
@@ -349,8 +366,8 @@ export function VariationSelector({ product }: { product: Product }) {
                 <CheckCircle2 className="mr-1 h-4 w-4" />
                 Added to Cart!
               </>
-            ) : isOutOfStock ? (
-              'Out of Stock'
+            ) : unavailable ? (
+              'Sold Out'
             ) : (
               <>
                 <ShoppingCart className="mr-1 h-4 w-4" />
@@ -368,6 +385,7 @@ export function VariationSelector({ product }: { product: Product }) {
       </div>
 
       {/* Mobile sticky bottom bar (visible only after the main CTA scrolls away) */}
+      {purchasable && (
       <div
         className={cn(
           'fixed inset-x-0 bottom-0 z-50 border-t border-[#E6DED6] bg-white px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-4px_16px_rgba(31,42,60,0.08)] transition-transform duration-300 lg:hidden',
@@ -394,7 +412,7 @@ export function VariationSelector({ product }: { product: Product }) {
               'flex min-h-11 flex-1 items-center justify-center gap-2 rounded-[8px] px-4 font-serif text-sm font-semibold text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45] disabled:cursor-not-allowed',
               added
                 ? 'bg-emerald-700'
-                : isOutOfStock
+                : unavailable
                 ? 'bg-[#D9D2CB] text-[#5A5A5A]'
                 : 'bg-[#9E2F45] hover:bg-[#862640]',
             )}
@@ -406,10 +424,11 @@ export function VariationSelector({ product }: { product: Product }) {
             ) : (
               <ShoppingCart className="mr-1 h-4 w-4" />
             )}
-            <span>{isOutOfStock ? 'Out of Stock' : added ? 'Added to Cart!' : 'Add to Cart'}</span>
+            <span>{unavailable ? 'Sold Out' : added ? 'Added to Cart!' : 'Add to Cart'}</span>
           </button>
         </div>
       </div>
+      )}
     </>
   );
 }

@@ -29,7 +29,7 @@ export function CategoryBanners() {
     <section aria-labelledby="categories-heading" className="mx-auto max-w-screen-2xl px-4 py-14 sm:px-6 lg:px-8">
       {/* Heading */}
       <div className="mb-8 text-center">
-        <span className="inline-block rounded-full bg-brand-accent/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-accent">
+        <span className="inline-block rounded-full bg-brand-accent/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-accent-strong">
           Shop by Category
         </span>
         <h2 id="categories-heading" className="mt-4 font-serif text-3xl font-bold text-brand-text sm:text-4xl">

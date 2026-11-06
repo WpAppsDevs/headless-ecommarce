@@ -89,6 +89,15 @@ Closing this means either deleting those utilities or implementing a real theme 
 
 The root `CodeDocs.md` predates this documentation set. It carries a legacy banner and is kept for history. `docs/` is the maintained reference. `ApiDocs.md` remains an upstream contract reference; verify it against the live API before relying on it.
 
+## 11. Catalog collection is empty by decision
+
+The Catalog / Wholesale navigation item and the home catalog links point at `/products?tag=catalog`, which currently returns no products. A product decision kept the links in place rather than removing them, so the destination remains a dead end until catalog products are tagged.
+
+Closing this means tagging wholesale/catalog products with `catalog`, or pointing the links at a catalog asset once one exists. The navigation, hero, and wholesale section already treat catalog as a first-class purchase type, so the data is the only missing piece.
+
+- Where: `src/components/layout/Header.tsx`, `src/components/home/CategoryGrid.tsx`, `src/components/home/WholesaleBanner.tsx`, `src/components/home/HeroSlider.tsx`, WordPress.
+- Impact: high for wholesale buyers.
+
 ## How to use this list
 
 Pick one item per change. Keep refactors out of feature work unless the feature needs them. When a gap closes, remove it here and update the affected flow doc in the same commit.

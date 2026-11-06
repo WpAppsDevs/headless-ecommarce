@@ -9,6 +9,7 @@ import { config } from '@/lib/config';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { AUTH_CONTROL_CLASS } from '@/components/auth/styles';
 
 const schema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -50,6 +51,7 @@ export function ForgotPasswordForm() {
       <div className="space-y-1.5">
         <Label htmlFor="email">Email address</Label>
         <Input
+          className={AUTH_CONTROL_CLASS}
           id="email"
           type="email"
           autoComplete="email"
@@ -61,7 +63,7 @@ export function ForgotPasswordForm() {
         )}
       </div>
 
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
+      <Button type="submit" className={`${AUTH_CONTROL_CLASS} w-full`} disabled={isSubmitting}>
         {isSubmitting ? 'Sending…' : 'Send Reset Link'}
       </Button>
     </form>

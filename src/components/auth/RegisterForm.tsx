@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuthStore } from '@/stores/authStore';
+import { AUTH_CONTROL_CLASS } from '@/components/auth/styles';
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -74,6 +75,7 @@ export function RegisterForm() {
         <div className="space-y-1.5">
           <Label htmlFor="first_name">First Name</Label>
           <Input
+            className={AUTH_CONTROL_CLASS}
             id="first_name"
             type="text"
             autoComplete="given-name"
@@ -87,6 +89,7 @@ export function RegisterForm() {
         <div className="space-y-1.5">
           <Label htmlFor="last_name">Last Name</Label>
           <Input
+            className={AUTH_CONTROL_CLASS}
             id="last_name"
             type="text"
             autoComplete="family-name"
@@ -103,6 +106,7 @@ export function RegisterForm() {
       <div className="space-y-1.5">
         <Label htmlFor="email">Email</Label>
         <Input
+          className={AUTH_CONTROL_CLASS}
           id="email"
           type="email"
           autoComplete="email"
@@ -118,6 +122,7 @@ export function RegisterForm() {
       <div className="space-y-1.5">
         <Label htmlFor="password">Password</Label>
         <Input
+          className={AUTH_CONTROL_CLASS}
           id="password"
           type="password"
           autoComplete="new-password"
@@ -133,6 +138,7 @@ export function RegisterForm() {
       <div className="space-y-1.5">
         <Label htmlFor="confirm_password">Confirm Password</Label>
         <Input
+          className={AUTH_CONTROL_CLASS}
           id="confirm_password"
           type="password"
           autoComplete="new-password"
@@ -145,7 +151,7 @@ export function RegisterForm() {
       </div>
 
       {/* Submit */}
-      <Button type="submit" className="w-full" disabled={loading}>
+      <Button type="submit" className={`${AUTH_CONTROL_CLASS} w-full`} disabled={loading}>
         {loading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

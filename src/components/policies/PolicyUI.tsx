@@ -17,7 +17,7 @@ export function SectionHeading({
   return (
     <div className={cn('mb-4 flex items-start gap-3', className)}>
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-accent/10">
-        <Icon className="h-5 w-5 text-brand-accent" strokeWidth={1.75} />
+        <Icon className="h-5 w-5 text-brand-accent-strong" strokeWidth={1.75} />
       </div>
       <div>
         <h2 className="font-serif text-xl font-bold text-brand-text">{title}</h2>
@@ -57,7 +57,7 @@ export function StatCard({
   return (
     <div className={cn('rounded-2xl border border-brand-border bg-brand-card p-5 text-center', className)}>
       <p className="text-sm font-semibold text-brand-text-muted">{label}</p>
-      <p className="mt-1 font-serif text-2xl font-bold text-brand-accent">{value}</p>
+      <p className="mt-1 font-serif text-2xl font-bold text-brand-accent-strong">{value}</p>
       {sub && <p className="mt-1 text-xs text-brand-text-muted">{sub}</p>}
     </div>
   );
@@ -66,7 +66,7 @@ export function StatCard({
 /** Bullet list with a small accent dot. */
 export function BulletList({
   items,
-  dotClassName = 'bg-brand-accent',
+  dotClassName = 'bg-brand-accent-strong',
   className,
 }: {
   items: ReactNode[];
@@ -102,7 +102,7 @@ export function NoteCallout({
     amber: 'border-amber-200 bg-amber-50 text-brand-text',
   } as const;
   const iconTones = {
-    accent: 'text-brand-accent',
+    accent: 'text-brand-accent-strong',
     amber: 'text-amber-500',
   } as const;
 
@@ -135,7 +135,7 @@ export function TypePanel({
     <div className={cn('overflow-hidden rounded-2xl border border-brand-border bg-brand-section', className)}>
       <div className="flex items-center gap-3 border-b border-brand-border bg-brand-accent-light/60 px-6 py-4">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-section">
-          <Icon className="h-5 w-5 text-brand-accent" strokeWidth={1.75} />
+          <Icon className="h-5 w-5 text-brand-accent-strong" strokeWidth={1.75} />
         </div>
         <div>
           <h2 className="font-serif text-lg font-bold text-brand-text">{title}</h2>

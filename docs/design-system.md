@@ -16,28 +16,43 @@ The `:root` block defines the palette. The `@theme inline` block maps each varia
 
 | Token | Utility | Typical use |
 | --- | --- | --- |
-| `--brand-text` | `text-brand-text` | Body and headings |
+| `--brand-text` | `text-brand-text` | Body and headings; sold-out badge background |
 | `--brand-text-muted` | `text-brand-text-muted` | Secondary copy |
-| `--brand-accent` | `bg-brand-accent` | Soft rose accent |
-| `--brand-accent-hover` | `bg-brand-accent-hover` | Hover state |
+| `--brand-accent` | `bg-brand-accent` | Soft rose accent, surfaces and tints only |
+| `--brand-accent-hover` | `bg-brand-accent-hover` | Legacy soft hover; new action hovers use the strong hover |
+| `--brand-accent-strong` | `text-brand-accent-strong` | Accent text, icons, links, and filled actions |
+| `--brand-accent-strong-hover` | `bg-brand-accent-strong-hover` | Hover for filled strong actions |
 | `--brand-accent-light` | `bg-brand-accent-light` | Tints, chips |
 | `--brand-bg` | `bg-brand-bg` | Page background |
 | `--brand-section` | `bg-brand-section` | Section surfaces |
 | `--brand-card` | `bg-brand-card` | Cards |
 | `--brand-border` | `border-brand-border` | Hairlines |
 | `--brand-stock` | `text-brand-stock` | In-stock / success |
-| `--brand-preorder` | `text-brand-preorder` | Pre-order |
-| `--brand-wine` | `bg-brand-wine` | Primary action, selected state |
+| `--brand-preorder` | `text-brand-preorder` | Pre-order text and badge background |
+| `--brand-wine` | `bg-brand-wine` | Primary action, selected state, sale badge |
 | `--brand-topbar` | `bg-brand-topbar` | Announcement bar |
-| `--brand-gold` | `text-brand-gold` | Premium accents |
+| `--brand-gold` | `text-brand-gold` | Premium accents on dark surfaces |
+| `--brand-gold-strong` | `text-brand-gold-strong` | Stars and small accents on light surfaces |
+| `--brand-whatsapp` | `bg-brand-whatsapp` | WhatsApp action |
 | `--brand-dark` | `bg-brand-dark` | Dark sections |
 | `--brand-dark-surface` | `bg-brand-dark-surface` | Deep dark panels |
 
 The values live in `src/app/globals.css`; that file is the source for exact colors.
 
-The shadcn/base-ui variables (`--background`, `--foreground`, `--primary`, `--border`, `--ring`, and so on) are wired to these brand values. A stock Button or Input inherits the palette without per-component edits.
+The shadcn/base-ui variables (`--background`, `--foreground`, `--primary`, `--border`, `--ring`, and so on) are wired to these brand values. `--primary` and `--ring` use the strong accent with white foreground. A stock Button or Input inherits the palette without per-component edits.
 
 Change a token here, not in components. A raw hex in a component is either a one-off approved design or debt.
+
+### Contrast
+
+WCAG AA is the bar: 4.5:1 for normal text and 3:1 for non-text indicators. The palette keeps two accents on purpose:
+
+- **Strong accent** (`--brand-accent-strong`) for text, icons, links, and filled actions on light surfaces.
+- **Soft accent** (`--brand-accent`) for tinted surfaces, and for text and icons on the dark surface. Never put white text on the soft accent; it reaches only 3.15:1.
+- The topbar keeps its dusky rose background and uses brand text (`#2B2B2B`) instead of white.
+- The WhatsApp action uses the dark WhatsApp token with white text.
+
+Run `npm run check:contrast` after any palette change. It reads the root tokens and fails when a pair drops below its threshold.
 
 ## Two visual languages
 
@@ -79,6 +94,8 @@ Fonts are loaded in `src/app/layout.tsx` through `next/font/google`:
 
 `font-serif` is mapped to Playfair with a Georgia fallback. `font-ui` is scoped to the product detail section and similar dense UI; it does not change the global font.
 
+The global sans maps to Geist through `--font-geist-sans`. Do not set `--font-sans` to `var(--font-sans)`; that self-reference resolves to nothing and the browser falls back to Times.
+
 Use `font-serif` for marketing headings and product names. Use the default sans for body and controls. Use `font-ui` only where the approved design uses Inter.
 
 ## Layout and spacing
@@ -88,7 +105,7 @@ Use `font-serif` for marketing headings and product names. Use the default sans 
 - Section rhythm: `py-14` to `py-20`.
 - Grid: 2 columns on mobile, 3 at `sm`, 4 at `lg` for product grids.
 - Header height: 68px. Sticky offsets use `top-24` (96px) to clear it.
-- Touch targets: at least 44px for primary mobile actions. Some legacy icon buttons are 36px; new touch controls use 44px.
+- Touch targets: at least 44px for every mobile control, including header icons, pagination, colour swatches, and auth inputs. The visible glyph may be smaller; expand the hit area with padding so layout does not shift.
 
 ## Radii, borders, shadows
 
@@ -112,7 +129,7 @@ There is no `.dark` token block in `globals.css` and no theme toggle. A dormant 
 
 `lucide-react` is the default. Sizes are usually 16-20px in controls and 24-32px in empty states. Stroke width is often 1.5 for decorative icons and 2 for compact actions.
 
-Brand social icons (Facebook, Instagram, WhatsApp, TikTok) are inline SVGs because lucide does not ship brand marks.
+Brand social icons (Facebook, Instagram, WhatsApp) are inline SVGs because lucide does not ship brand marks. TikTok is omitted until the shop has an account.
 
 ## Images
 
@@ -131,13 +148,15 @@ The logo is `public/images/Najifa's Shop Logo.png`. The apostrophe and space in 
 1. Use `cn()` for conditional classes.
 2. Use `class-variance-authority` for variants only when a component has three or more variants. Existing `Button` and `Badge` do.
 3. Use the existing spacing scale and color tokens for one-offs.
-4. Keep focus states visible. The stronger components use `focus-visible:outline-2` with the maroon color.
+4. Keep focus states visible. Shop controls use the `focus-brand` utility, which draws a 2px strong-accent outline with an offset; auth and account keep the neutral shadcn ring.
 5. Keep layout decisions in components, not `globals.css`.
 6. When a design calls for a token that does not exist, add it to `:root` and `@theme inline` in the same change.
 
 ## Changing the theme
 
 **Change a color everywhere.** Edit the `--brand-*` value in `:root`. The shadcn variables follow if they reference the brand token.
+
+After changing a colour, run `npm run check:contrast`. It reads the root tokens and fails when a pair drops below its AA threshold.
 
 **Change a font.** Replace the `next/font` import in `layout.tsx` and the `--font-*` variable. Update `--font-serif` or `--font-ui` in `@theme inline` if the role changes.
 
