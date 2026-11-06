@@ -14,24 +14,26 @@ There is no `tailwind.config.ts`. Tailwind 4 reads CSS. The design tokens live i
 
 The `:root` block defines the palette. The `@theme inline` block maps each variable to a Tailwind utility.
 
-| Token | Value | Utility | Typical use |
-| --- | --- | --- | --- |
-| `--brand-text` | `#2B2B2B` | `text-brand-text` | Body and headings |
-| `--brand-text-muted` | `#6F6F6F` | `text-brand-text-muted` | Secondary copy |
-| `--brand-accent` | `#C97C7C` | `bg-brand-accent` | Soft rose accent |
-| `--brand-accent-hover` | `#B46666` | `bg-brand-accent-hover` | Hover state |
-| `--brand-accent-light` | `#F3E4E4` | `bg-brand-accent-light` | Tints, chips |
-| `--brand-bg` | `#fef7f4` | `bg-brand-bg` | Page background |
-| `--brand-section` | `#FFFFFF` | `bg-brand-section` | Section surfaces |
-| `--brand-card` | `#FBF7F5` | `bg-brand-card` | Cards |
-| `--brand-border` | `#E8E2DD` | `border-brand-border` | Hairlines |
-| `--brand-stock` | `#7BAE7F` | `text-brand-stock` | In-stock / success |
-| `--brand-preorder` | `#D89A6A` | `text-brand-preorder` | Pre-order |
-| `--brand-wine` | `#ba6d74` | `bg-brand-wine` | Primary action, selected state |
-| `--brand-topbar` | `#C2899D` | `bg-brand-topbar` | Announcement bar |
-| `--brand-gold` | `#C5A56A` | `text-brand-gold` | Premium accents |
-| `--brand-dark` | `#2B2B2B` | `bg-brand-dark` | Dark sections |
-| `--brand-dark-surface` | `#180E0A` | `bg-brand-dark-surface` | Deep dark panels |
+| Token | Utility | Typical use |
+| --- | --- | --- |
+| `--brand-text` | `text-brand-text` | Body and headings |
+| `--brand-text-muted` | `text-brand-text-muted` | Secondary copy |
+| `--brand-accent` | `bg-brand-accent` | Soft rose accent |
+| `--brand-accent-hover` | `bg-brand-accent-hover` | Hover state |
+| `--brand-accent-light` | `bg-brand-accent-light` | Tints, chips |
+| `--brand-bg` | `bg-brand-bg` | Page background |
+| `--brand-section` | `bg-brand-section` | Section surfaces |
+| `--brand-card` | `bg-brand-card` | Cards |
+| `--brand-border` | `border-brand-border` | Hairlines |
+| `--brand-stock` | `text-brand-stock` | In-stock / success |
+| `--brand-preorder` | `text-brand-preorder` | Pre-order |
+| `--brand-wine` | `bg-brand-wine` | Primary action, selected state |
+| `--brand-topbar` | `bg-brand-topbar` | Announcement bar |
+| `--brand-gold` | `text-brand-gold` | Premium accents |
+| `--brand-dark` | `bg-brand-dark` | Dark sections |
+| `--brand-dark-surface` | `bg-brand-dark-surface` | Deep dark panels |
+
+The values live in `src/app/globals.css`; that file is the source for exact colors.
 
 The shadcn/base-ui variables (`--background`, `--foreground`, `--primary`, `--border`, `--ring`, and so on) are wired to these brand values. A stock Button or Input inherits the palette without per-component edits.
 
@@ -52,7 +54,7 @@ Used by the home page, shop, product detail, cart, checkout, and order pages.
 - Hairline borders, 8-10px radii, no heavy shadows.
 - Lining numerals (`.nums-lining`) on serif prices and headings.
 
-Several product-detail components hardcode these values (`#9E2F45`, `#1F2A3C`, `#E6DED6`) instead of using brand tokens. That is the current implementation. When editing those files, either keep the hardcoded pair or migrate them to tokens in the same change; do not mix both arbitrarily.
+Several product-detail components hardcode these values (`#9E2F45`, `#1F2A3C`, `#E6DED6`) instead of using brand tokens. That is the current implementation. When editing those files, either keep the hardcoded pair or migrate them to tokens in the same change; use one approach per file.
 
 ### 2. shadcn / base-nova
 
@@ -62,7 +64,7 @@ Used by auth pages, account pages, and some account modals.
 - `Button`, `Input`, `Label`, `Card`, `Badge`.
 - Less editorial, more utilitarian.
 
-The account dashboard and auth pages intentionally look more neutral than the product pages. Do not "unify" them without a product decision.
+The account dashboard and auth pages intentionally look more neutral than the product pages. Keep them separate unless a product decision changes that.
 
 ## Typography
 
@@ -86,13 +88,13 @@ Use `font-serif` for marketing headings and product names. Use the default sans 
 - Section rhythm: `py-14` to `py-20`.
 - Grid: 2 columns on mobile, 3 at `sm`, 4 at `lg` for product grids.
 - Header height: 68px. Sticky offsets use `top-24` (96px) to clear it.
-- Touch targets: at least 44px for primary mobile actions. Some icon buttons are 36px; do not copy that for new touch controls.
+- Touch targets: at least 44px for primary mobile actions. Some legacy icon buttons are 36px; new touch controls use 44px.
 
 ## Radii, borders, shadows
 
 The product style uses 8-12px radii, 1px borders, and minimal shadows. The shadcn style uses `--radius: 0.625rem` with derived `radius-sm` through `radius-4xl`.
 
-Avoid large drop shadows. The design uses borders and surface tints for separation. Existing `shadow-sm` and `shadow-md` usages are acceptable; do not add new heavy shadows.
+The design uses borders and surface tints for separation. Existing `shadow-sm` and `shadow-md` usages are acceptable; new surfaces use borders and tints.
 
 ## Dark mode
 
@@ -128,9 +130,9 @@ The logo is `public/images/Najifa's Shop Logo.png`. The apostrophe and space in 
 
 1. Use `cn()` for conditional classes.
 2. Use `class-variance-authority` for variants only when a component has three or more variants. Existing `Button` and `Badge` do.
-3. Do not introduce a second spacing scale or a new color literal for a one-off.
+3. Use the existing spacing scale and color tokens for one-offs.
 4. Keep focus states visible. The stronger components use `focus-visible:outline-2` with the maroon color.
-5. Do not put layout decisions in `globals.css`; keep them in components.
+5. Keep layout decisions in components, not `globals.css`.
 6. When a design calls for a token that does not exist, add it to `:root` and `@theme inline` in the same change.
 
 ## Changing the theme

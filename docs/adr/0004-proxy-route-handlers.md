@@ -18,7 +18,7 @@ Add explicit Next.js route handlers under `src/app/api/` for endpoints that need
 - multipart forwarding,
 - a secret that must not reach the client (Mailchimp).
 
-The handlers forward the caller's `Authorization` header and body. They do not invent authorization. WordPress remains the authority.
+The handlers forward the caller's `Authorization` header and body. Authorization stays with WordPress.
 
 Some public calls stay direct:
 

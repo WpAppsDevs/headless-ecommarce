@@ -30,7 +30,7 @@ Define brand tokens in `src/app/globals.css` and expose them to Tailwind through
 - A new token must be added in both `:root` and `@theme inline` to become a utility.
 - The product-detail style has hardcoded maroon, navy, and cream values that do not all use tokens yet. Migrate them when touching those files.
 - Dark mode has no token block and no toggle. Only dormant `dark:` utilities remain from shadcn defaults, so it is not a supported theme today.
-- The two visual languages are intentional. Do not unify them without a product decision.
+- The two visual languages are intentional. Keep them separate unless a product decision changes that.
 
 ## Related
 

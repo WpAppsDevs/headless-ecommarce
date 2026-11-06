@@ -28,7 +28,7 @@ Terms used across this storefront, the WordPress wrapper API, and the docs in `d
 
 **Refresh token** — 14-day token stored in the httpOnly `refresh_token` cookie. `POST /api/auth/refresh` exchanges it for a new access token.
 
-**Token cache** — the module-scoped variable behind `tokenCache`. It is not persisted. On a reload, `authStore.hydrate()` can recover an access token through the refresh flow, but only when it sees a guest cart token or a cached token first; see [known-gaps.md](docs/known-gaps.md).
+**Token cache** — the module-scoped variable behind `tokenCache`. It is not persisted. On a reload, `authStore.hydrate()` can recover an access token through the refresh flow when it sees a guest cart token, a cached token, or the `session_hint` cookie.
 
 **Guest cart token** — a JWT returned only on the first successful add for a new guest session. It is stored in `localStorage['cart_token']` and sent as the bearer token for guest cart calls. It is not the same thing as the **cart token**.
 
@@ -36,7 +36,7 @@ Terms used across this storefront, the WordPress wrapper API, and the docs in `d
 
 **`cart_token`** — the localStorage key that holds the guest cart JWT. The name collides with the cart UUID above; read the context.
 
-**Session expiry** — a 401 that survives one refresh attempt. The API client calls the callback registered by `authStore`, clears both stores, and redirects to `/login` only if a real user session existed.
+**Session expiry** — a 401 that survives one refresh attempt. The API client calls the callback registered by `authStore`, clears auth, cart, and wishlist state, and redirects to `/login` only if a real user session existed.
 
 ## Catalog
 
@@ -64,7 +64,7 @@ Terms used across this storefront, the WordPress wrapper API, and the docs in `d
 
 **Stripe gateway** — card payment. `StripeForm` creates a PaymentMethod in the browser; `CheckoutForm` sends its ID to `/api/checkout` as `payment_data.payment_method_id`.
 
-**Order confirmation** — `/order-confirmation/[id]`. It reads a small `OrderResult` from `sessionStorage` (`order_<id>`) because the order page does not fetch the order again.
+**Order confirmation** — `/order-confirmation/[id]`. It reads a small `OrderResult` from `sessionStorage` (`order_<id>`) and, when that is missing, looks up a recent order for a signed-in user.
 
 ## Reviews
 

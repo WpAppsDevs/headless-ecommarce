@@ -1,13 +1,6 @@
 # Components
 
-## Conventions
-
-- One exported component per file, PascalCase filename.
-- Server Components by default. Add `'use client'` only when the component uses state, effects, browser APIs, event handlers, or a client-only library.
-- Import directly from the file. There are no barrel files.
-- Class names go through `cn()` from `src/lib/utils.ts` when conditional. Static class strings stay inline.
-- Domain components live under their domain folder. `src/components/ui/` is for primitives that have no commerce meaning.
-- Props are local interfaces, not exported unless another file needs them.
+Component conventions live in [coding-standards.md](coding-standards.md). This file is the inventory: what exists, what it does, and how the pieces compose.
 
 ## Layout
 
@@ -173,7 +166,9 @@ Known weak spots: the image carousel dots rely on hover for visibility, and some
 
 1. Decide server or client.
 2. Put it in the domain folder, or `ui/` if it has no domain meaning.
-3. Pass data in as props; do not fetch the same data in two sibling components.
+3. Pass data in as props; fetch once and share the result.
 4. If it needs the cart, wishlist, auth, or currency, read the store directly.
 5. If it needs a new endpoint, add the API function first.
 6. Use brand tokens, not raw hex values, unless you are matching a one-off approved design.
+
+Done when the component renders its empty, loading, and error states and the change passes the definition of done.

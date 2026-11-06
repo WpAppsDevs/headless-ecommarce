@@ -9,48 +9,29 @@
 
 There is no separate staging deployment in this repository. The local checkout doubles as the staging copy. A production deploy needs its own WordPress URL and Stripe key.
 
-## Required configuration
+## Production configuration
 
-Set runtime values in the host's environment settings. `.env.production` is tracked because it contains only public `NEXT_PUBLIC_*` values used at build time; never put a secret in it.
+The full variable list, including local values, is in [getting-started.md](getting-started.md#environment-variables). `package.json` and the route handlers are the code-level source.
 
-```dotenv
-NEXT_PUBLIC_WP_URL=https://api.example.com
-NEXT_PUBLIC_STRIPE_PK=pk_live_...
-NEXT_PUBLIC_SITE_NAME=Najifa's Shop
-```
+For production:
 
-Optional:
+- Public `NEXT_PUBLIC_*` values live in `.env.production`, which is tracked because it contains no secrets. Next.js loads `.env.local` first, then `.env.<NODE_ENV>`, then `.env`; a local override wins.
+- Server-only values belong in the host environment: `MAILCHIMP_API_KEY`, `MAILCHIMP_AUDIENCE_ID`, and `ERROR_REPORT_WEBHOOK_URL`.
+- `ERROR_REPORT_WEBHOOK_URL` is optional. `/api/errors` forwards client reports there after writing them to the server log. Without it, reports stay in the hosting provider's function logs.
 
-```dotenv
-NEXT_PUBLIC_HERO_TITLE=...
-NEXT_PUBLIC_HERO_SUBTITLE=...
-NEXT_PUBLIC_HERO_CTA_TEXT=...
-NEXT_PUBLIC_HERO_CTA_LINK=/products
-MAILCHIMP_API_KEY=...
-MAILCHIMP_AUDIENCE_ID=...
-ERROR_REPORT_WEBHOOK_URL=...
-```
-
-`ERROR_REPORT_WEBHOOK_URL` is optional and server-only. When set, `/api/errors` forwards client error reports to it as JSON after writing them to the server log. Any collector or chat webhook that accepts JSON works. Without it, reports still appear in the hosting provider's function logs.
-
-Next.js loads `.env.local` first, then `.env.<NODE_ENV>`, then `.env`; a local override wins over `.env.production`. `.env.production` in this repo holds only public production values. Server-only values such as `ERROR_REPORT_WEBHOOK_URL` belong in the host environment, not in a tracked file.
-
-`NEXT_PUBLIC_*` values are compiled into the client bundle. After changing one, rebuild and redeploy; changing it at runtime does not update an existing build.
+After changing a `NEXT_PUBLIC_*` value, rebuild and redeploy. Runtime changes do not update an existing build.
 
 ## Build and release
 
 ```bash
 npm ci
-npm test
-npx tsc --noEmit
-npm run lint
 npm run build
 npm run start
 ```
 
-`npm run build` also performs type checking and collects page data. It calls WordPress while generating static params and product pages. If WordPress is down, the build can still succeed with fewer pre-rendered pages, but the output will be thin. Check the build log for failed fetches.
+Run the gates in [coding-standards.md](coding-standards.md#definition-of-done) before the build. `npm run build` also performs type checking and collects page data. It calls WordPress while generating static params and product pages. If WordPress is down, the build can still succeed with fewer pre-rendered pages, but the output will be thin. Check the build log for failed fetches.
 
-The repository does not include CI configuration. Treat the commands above as the release gate.
+CI is not configured in this repository; treat the definition of done plus this build as the release gate.
 
 ## Vercel
 
@@ -65,12 +46,10 @@ The repository does not include CI configuration. Treat the commands above as th
 
 ## Cookies and HTTPS
 
-Auth cookies are `httpOnly`, `sameSite=lax`, `path=/`, and `secure` when `NODE_ENV=production`.
+Cookie names, lifetimes, and flags are documented in [flows/authentication.md](flows/authentication.md). Production consequences:
 
-Consequences:
-
-- Production must be served over HTTPS. A `secure` cookie on plain HTTP is rejected, and login will appear to succeed but the session will not persist.
-- The frontend and WordPress can be on different hosts. The cookies belong to the frontend host.
+- Serve over HTTPS; a `secure` cookie on plain HTTP is rejected, so login appears to succeed but does not persist.
+- The frontend and WordPress can be on different hosts. Cookies belong to the frontend host.
 - A custom domain change invalidates existing sessions.
 
 ## WordPress requirements
@@ -91,7 +70,7 @@ If direct cart calls fail with CORS while proxied calls work, the WordPress CORS
 ## Stripe
 
 - Publishable key: `NEXT_PUBLIC_STRIPE_PK`.
-- Secret key: WordPress, never this repository.
+- Secret key: WordPress, outside this repository.
 - The browser creates a PaymentMethod; WordPress charges it.
 - Test with `pk_test_...` and Stripe test cards before switching to live keys.
 
@@ -107,14 +86,7 @@ The route treats "Member Exists" as success. It does not double opt-in; the memb
 
 ## Caching and revalidation
 
-| Layer | What | TTL |
-| --- | --- | --- |
-| Next.js fetch cache | products, filters, menus, reviews aggregate/random | 60 s to 6 h |
-| Route handler cache | store settings | 1 h |
-| CDN headers | store settings | `s-maxage` + stale-while-revalidate |
-| Browser | most authenticated data | no-store |
-
-After a WordPress content change, expect up to the TTL before the storefront reflects it. To force a refresh, redeploy (clears the build cache) or wait. There is no on-demand revalidation webhook.
+Cache layers and TTLs live in [architecture.md](architecture.md#caching). After a WordPress content change, expect up to the TTL before the storefront reflects it. To force a refresh, redeploy or wait; there is no on-demand revalidation webhook.
 
 ## Monitoring
 

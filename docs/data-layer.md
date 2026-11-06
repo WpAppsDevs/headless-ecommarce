@@ -57,7 +57,7 @@ const url = isClient
 
 This pattern exists because:
 
-- The browser must avoid CORS on authenticated endpoints.
+- The browser uses proxies for authenticated endpoints to avoid CORS.
 - The server can call WordPress directly, and can use Next.js caching.
 - The same function is imported by both server pages and client components.
 
@@ -173,12 +173,12 @@ Some endpoints return a bare array or wrap the array at the top level. `menus.ts
 
 ## Invariants
 
-- Never trust array fields. The API may return `{}` where an array is expected. Normalizers guard this for products, wishlist, reviews, and tracking.
-- Never trust an image field name. Accept `src` or `url`.
-- Never assume a variation is an object. List endpoints return IDs.
-- Never expose the refresh token to JavaScript. Only the access token leaves the auth route.
+- Treat array fields as untrusted. The API may return `{}` where an array is expected; normalizers guard products, wishlist, reviews, and tracking.
+- Accept either image field name, `src` or `url`.
+- Expect variation IDs in list responses and objects in detail responses.
+- Keep the refresh token server-side; only the access token leaves the auth route.
 - A guest cart failure must not force a login redirect.
-- `checkout-draft` is never shown to a customer.
+- Hide `checkout-draft` from every customer view.
 
 ## Related
 

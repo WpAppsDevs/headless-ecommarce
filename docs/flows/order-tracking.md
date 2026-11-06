@@ -22,7 +22,7 @@ TrackingForm
   → { entries }
 ```
 
-The route is a pure proxy. It reads an `Authorization` header but does not forward it, so guest search has no session. The backend decides whether an email plus ID is enough to return an order. The front end must not add an ID-only lookup.
+The route is a pure proxy. It forwards the JSON body without an auth header, so guest search has no session. The backend decides whether an email plus ID is enough to return an order. Keep the email in the lookup; an ID alone is not enough.
 
 ## Signed-in lookup
 
@@ -94,7 +94,7 @@ The backend attaches carrier info and timeline only to the newest order. The nor
 
 ## Privacy
 
-The backend is responsible for matching email to order. Do not change the client to look up an order by ID alone. The coding standards in `.commandcode/taste/coding/taste.md` record the same rule: verify both the identifier and the customer email before returning order data.
+The backend is responsible for matching email to order. Keep the email in every guest lookup; an ID alone is not enough. The coding standards in `.commandcode/taste/coding/taste.md` record the same rule: verify both the identifier and the customer email before returning order data.
 
 ## Failure states
 

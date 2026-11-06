@@ -106,7 +106,7 @@ The form reads `err.code` first, then falls back to a bracketed code in the mess
 - shows previews through `URL.createObjectURL`,
 - reports validation failures with `alert()`.
 
-The upload route reads `formData()` and forwards it to WordPress without a `Content-Type` header, so the multipart boundary survives. Do not "simplify" this by setting JSON headers.
+The upload route reads `formData()` and forwards it to WordPress without a `Content-Type` header, so the multipart boundary survives. Forward the multipart body untouched.
 
 Review media is displayed in `ReviewCard` with a thumbnail grid and a lightbox. Images use `unoptimized` because the source is a remote URL that may not be in the image optimizer's allowlist at build time.
 

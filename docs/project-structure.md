@@ -19,34 +19,27 @@
 
 ## `src/app`
 
-The App Router tree. Folders in parentheses are route groups: they organize files without changing the URL.
+The App Router tree. Folders in parentheses are route groups that organize files without changing the URL.
 
-| Path | Route | Kind |
-| --- | --- | --- |
-| `(shop)/page.tsx` | `/` | Server page, ISR |
-| `(shop)/products/page.tsx` | `/products` | Server page, ISR |
-| `(shop)/products/[slug]/page.tsx` | `/products/:slug` | Server page, ISR |
-| `(shop)/wishlist/page.tsx` | `/wishlist` | Redirects to `/account?tab=wishlist` |
-| `account/page.tsx` | `/account` | Client page |
-| `cart/page.tsx` | `/cart` | Static shell, client content |
-| `checkout/page.tsx` | `/checkout` | Client page |
-| `login/page.tsx` | `/login` | Static shell, client form |
-| `register/page.tsx` | `/register` | Static shell, client form |
-| `forgot-password/page.tsx` | `/forgot-password` | Static shell |
-| `reset-password/page.tsx` | `/reset-password` | Static shell |
-| `order-confirmation/[id]/page.tsx` | `/order-confirmation/:id` | Client page |
-| `track-order/page.tsx` | `/track-order` | Client page |
-| `shipping/page.tsx` | `/shipping` | Static policy page, Bengali |
-| `returns/page.tsx` | `/returns` | Static policy page, Bengali |
-| `privacy-policy/page.tsx` | `/privacy-policy` | Static policy page, Bengali |
-| `terms/page.tsx` | `/terms` | Static policy page, Bengali |
-| `api/**/route.ts` | `/api/*` | Route handlers |
-| `layout.tsx` | — | Root layout: fonts, metadata, hydrators, chrome |
-| `globals.css` | — | Tailwind import, brand tokens, base styles |
-| `error.tsx` | — | Global error boundary |
-| `not-found.tsx` | — | 404 page |
+```
+app/
+├── (shop)/          home, products, product detail, wishlist
+├── account/         dashboard and order history
+├── api/             route handlers (see below)
+├── cart/            cart page
+├── checkout/        checkout page
+├── contact/         static support page
+├── order-confirmation/[id]/
+├── track-order/
+├── shipping/, returns/, privacy-policy/, terms/
+├── login/, register/, forgot-password/, reset-password/
+├── layout.tsx       fonts, metadata, hydrators, chrome
+├── globals.css      Tailwind import, brand tokens, base styles
+├── error.tsx        global error boundary
+└── not-found.tsx    404 page
+```
 
-`layout.tsx` is an async Server Component because it fetches the primary menu. Every page renders inside it, so the header, footer, announcement bar, cart drawer, and toaster are global.
+The route inventory, rendering mode, and auth requirement for each URL live in [routing-and-pages.md](routing-and-pages.md). `layout.tsx` is an async Server Component because it fetches the primary menu; every page renders inside it.
 
 ## `src/components`
 
@@ -94,7 +87,7 @@ Naming: PascalCase files for components, one exported component per file. Hooks 
 | `api/menus.ts` | WordPress menu location → `NavLink[]`. |
 | `api/cart.test.ts`, `api/tracking.test.ts` | Colocated Vitest tests for normalizers and fallbacks. |
 
-Files in `api/` may run on the server, the client, or both. The `typeof window !== 'undefined'` checks are deliberate: the same function chooses a proxy in the browser and a direct URL on the server. Do not remove them without replacing the CORS strategy.
+Files in `api/` may run on the server, the client, or both. The `typeof window !== 'undefined'` checks are deliberate: the same function chooses a proxy in the browser and a direct URL on the server. Keep both branches unless the CORS strategy changes.
 
 ## `src/stores`
 
@@ -139,7 +132,7 @@ The route guard is `src/proxy.ts` at the project root, not under `src/app/api/`.
 - `.design/` — reference screenshots and design targets.
 - `.commandcode/` — agent taste and permission settings.
 - `.gemini/`, `.taskmaster/` — tooling configuration. Not imported by the app.
-- `.next/`, `node_modules/`, `tsconfig.tsbuildinfo` — generated. Never edit.
+- `.next/`, `node_modules/`, `tsconfig.tsbuildinfo` — generated; treat them as read-only.
 
 ## Where to put a new file
 

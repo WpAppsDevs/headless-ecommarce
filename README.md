@@ -38,15 +38,7 @@ Open <http://localhost:3000>.
 
 ## Scripts
 
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | Development server |
-| `npm run build` | Production build, including type checking |
-| `npm run start` | Serve the production build |
-| `npm run lint` | ESLint |
-| `npm test` | Vitest unit tests |
-| `npm run test:watch` | Vitest in watch mode |
-| `npx tsc --noEmit` | Type check only |
+Run `npm run dev` for local work. `package.json` is the full command list; [getting-started.md](docs/getting-started.md#scripts) explains the build, lint, and test gates.
 
 ## What is in the app
 
@@ -64,15 +56,7 @@ Open <http://localhost:3000>.
 
 Start at [docs/README.md](docs/README.md).
 
-Most useful first reads:
-
-- [Getting started](docs/getting-started.md) — environment, scripts, troubleshooting.
-- [Architecture](docs/architecture.md) — how the browser, Next.js, and WordPress fit together.
-- [Project structure](docs/project-structure.md) — where files live and where new ones go.
-- [Coding standards](docs/coding-standards.md) — conventions and definition of done.
-- [Known gaps](docs/known-gaps.md) — current limitations, including the WordPress endpoints still missing.
-- [Fix plan](docs/fix-plan.md) — a closed archive of completed frontend fixes.
-- [GLOSSARY.md](GLOSSARY.md) — shared vocabulary.
+The index maps tasks to docs. For a first pass, read [getting-started.md](docs/getting-started.md) and [architecture.md](docs/architecture.md). Shared vocabulary is in [GLOSSARY.md](GLOSSARY.md).
 
 Architecture decisions are in [docs/adr/](docs/adr/).
 

@@ -23,36 +23,12 @@ The trade-off is visible in the code: stores import each other, hydration is man
 State: `user`, `isAuthenticated`, `loading`, `hydrated`.
 Actions: `login`, `register`, `logout`, `refreshToken`, `hydrate`.
 
-`login(username, password, guestToken?)`:
+The end-to-end sequence for login, hydration, refresh failure, and logout lives in [flows/authentication.md](flows/authentication.md). This section records what the store itself owns.
 
-1. Posts to `/api/auth/login` with `guest_cart_token` when the caller has one.
-2. Stores `data.access_token` in `tokenCache`.
-3. Removes the guest cart token.
-4. Sets the user.
-5. Starts `cartStore.fetchCart()` and `wishlistStore.syncGuestWishlist()` without awaiting them.
-
-`register` follows the same shape and also merges the guest cart and wishlist.
-
-`logout`:
-
-1. Clears `tokenCache`.
-2. Calls `/api/auth/logout` to expire cookies (fire and forget, errors ignored).
-3. Clears user and auth flags.
-4. Clears the cart, wishlist, and review-session state.
-
-The header wishlist badge drops to zero without a reload.
-
-`hydrate()`:
-
-1. Returns immediately only when there is no guest cart token, no cached access token, and no `session_hint` cookie.
-2. Calls `/api/auth/refresh`.
-3. Stores the new token and fetches `/api/auth/me`.
-4. Sets the user.
-5. Always sets `hydrated: true` in `finally`.
-
-`session_hint` is a readable, non-secret cookie set on login, registration, and successful refresh. It exists because the httpOnly refresh cookie cannot be inspected by JavaScript. The predicate lives in `src/lib/auth-session.ts` and has unit tests.
-
-The unauthorized callback is registered inside the store factory. It is the only place that decides whether a 401 becomes a redirect.
+- `login` and `register` run the auth flow, then start `cartStore.fetchCart()` and `wishlistStore.syncGuestWishlist()` without awaiting them.
+- `logout` clears the token cache, user state, cart, wishlist, and review-session state. The `/api/auth/logout` route expires the cookies.
+- `hydrate` runs once on mount and always ends with `hydrated: true`. It refreshes only when a guest cart token, cached access token, or `session_hint` cookie exists. The predicate is `shouldAttemptAuthHydration()` in `src/lib/auth-session.ts`.
+- The unauthorized callback is registered inside the store factory. It is the only place that decides whether a 401 becomes a redirect.
 
 ## `cartStore`
 
@@ -60,13 +36,7 @@ State: `items`, `cartToken`, `guestToken`, `shippingMethods`, `chosenShippingMet
 
 `fetchCart()` loads the cart and also refreshes shipping methods. It returns early while another fetch is in flight, so the layout hydrator and cart page do not duplicate the request. A successful fetch records `lastFetchedAt`.
 
-`addItem(productId, variationId, quantity, attributes?)`:
-
-1. Creates a temporary item with `id: temp-<timestamp>` and appends it immediately.
-2. Calls the API.
-3. On the first guest add, saves `data.guest_token` to `localStorage['cart_token']`. It never overwrites an existing token.
-4. Replaces the item list with the server response.
-5. On failure, removes the temporary item and stores a message.
+`addItem` is optimistic: it appends a `temp-<timestamp>` item, calls the API, replaces the list with the server response, and removes the placeholder on failure. On the first guest add it saves `data.guest_token` to `localStorage['cart_token']` without overwriting an existing token. The full sequence is in [flows/cart-and-checkout.md](flows/cart-and-checkout.md).
 
 `updateItem` and `removeItem` are not optimistic. They set `loading`, call the API, and replace the list.
 
@@ -119,28 +89,16 @@ State: `code`, `symbol`, `position`, `decimals`, `decimalSep`, `thousandsSep`, `
 
 `useFormatPrice()` in `src/lib/utils/currency.ts` subscribes to the store and returns a bound formatter. The formatter supports four symbol positions: `left`, `right`, `left_space`, `right_space`.
 
-Do not use `toLocaleString` for prices. The store settings define separators and decimals, and the custom formatter is the only implementation that honors them.
+Use the custom formatter for prices. Store settings define separators and decimals, and the formatter is the only implementation that honors them.
 
 ## Hydration order
 
-`src/app/layout.tsx` mounts four hydrators before the header:
+`src/app/layout.tsx` mounts the hydrators before the header. The dependency that matters is explicit:
 
-```tsx
-<AuthHydrator />
-<CartHydrator />
-<WishlistHydrator />
-<CurrencyHydrator />
-```
-
-They all render `null`. Mount order is render order; effect order follows it, but the real dependency is explicit:
-
-- `CartHydrator` waits for `authStore.hydrated`.
-- `WishlistHydrator` waits for `authStore.hydrated`.
+- `CartHydrator` and `WishlistHydrator` wait for `authStore.hydrated`.
 - `CurrencyHydrator` is independent.
-
-`CartHydrator` also skips the fetch when the visitor has neither a session nor a guest token. That skip prevents a guest 401 from triggering a login redirect.
-
-`CartHydrator` and `WishlistHydrator` use a `useRef` guard so React Strict Mode does not double-fetch. Keep that guard when editing them.
+- `CartHydrator` skips the fetch when the visitor has neither a session nor a guest token, which prevents a guest 401 from becoming a login redirect.
+- Cart and wishlist hydrators use a `useRef` guard so React Strict Mode does not double-fetch.
 
 ## Optimistic update rules
 
@@ -152,24 +110,21 @@ They all render `null`. Mount order is render order; effect order follows it, bu
 | Wishlist guest | Yes | localStorage is the source of truth |
 | Reviews | No | Modal closes; list refetches next time |
 
-When adding an optimistic action, always keep a copy of the previous state for rollback. Do not leave a pending flag set on an exception; use `finally`.
+When adding an optimistic action, keep a copy of the previous state for rollback and clear pending flags in `finally`.
 
 ## Guest-to-user merge
 
-Two guest artifacts are merged on login or registration:
-
-- **Cart** — `login()` passes `guest_cart_token` to the auth route; WordPress merges the guest cart server-side; the client then clears its guest token and fetches the merged cart.
-- **Wishlist** — `syncGuestWishlist()` runs in the browser after login and toggles each missing product.
-
-The cart merge is server-side. The wishlist merge is client-side and best effort; a failed toggle is ignored.
+Login merges two guest artifacts. The cart merge is server-side: `login()` passes `guest_cart_token` to the auth route, WordPress merges it, then the client clears its guest token and fetches the result. The wishlist merge is client-side: `syncGuestWishlist()` toggles each missing product and clears guest storage. The wishlist merge is best effort; a failed toggle is ignored. The flow details are in [flows/authentication.md](flows/authentication.md) and [flows/cart-and-checkout.md](flows/cart-and-checkout.md).
 
 ## Adding a new store
 
 1. Create `src/stores/<domain>Store.ts` with a state interface and an action interface.
 2. Put network calls in `src/lib/api/<domain>.ts`.
-3. Keep errors in state or throw `ApiError`; do not mix styles within one store.
+3. Keep errors in state or throw `ApiError`; use one style per store.
 4. Add a hydrator only if the state must survive a page load.
-5. Import the store where needed; do not create a provider.
+5. Import the store where needed; Zustand needs no provider.
+
+Done when pure logic has a colocated test and the store hydrates once per page load.
 
 ## Related
 

@@ -37,17 +37,9 @@ The diagram marks the public cart path as a direct browser call and the authenti
 
 ## Rendering strategy
 
-| Page | Mode | Details |
-| --- | --- | --- |
-| `/` | ISR, 60 s | Section components are static; the featured grid waits for `getProducts`. |
-| `/products` | ISR, 60 s | Products and filters fetched in parallel on the server. |
-| `/products/[slug]` | ISR, 60 s; `dynamicParams = true` | Slugs pre-built from `getAllProductSlugs()`; unknown slugs render on demand and `notFound()` on `product_not_found`. |
-| `/cart` | Client page | Cart state comes from the store, not the URL. |
-| `/checkout` | Client page | Verifies auth and a non-empty cart before rendering the form. |
-| `/account` | Client page | Waits for auth hydration, then fetches profile and orders. |
-| `/track-order` | Client page | Form-driven lookup. |
-| `/order-confirmation/[id]` | Client page | Reads a result written to `sessionStorage` by checkout. |
-| `/login`, `/register`, `/forgot-password` | Static | Interactive forms are client components inside a static shell. |
+Catalog routes (`/`, `/products`, and product detail) are Server Components with 60-second ISR. Cart, checkout, account, tracking, and order confirmation are client pages because they depend on store state or browser storage. Login, registration, and password routes are static shells around client forms.
+
+The route-by-route map, including auth requirements, is in [routing-and-pages.md](routing-and-pages.md).
 
 Server Components never receive the access token from `cookies()` in the current code. Authenticated pages are client pages. This is a deliberate simplification; see [ADR-0003](adr/0003-cookie-backed-auth.md) and [known-gaps.md](known-gaps.md).
 

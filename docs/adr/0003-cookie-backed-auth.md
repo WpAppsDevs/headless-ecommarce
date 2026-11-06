@@ -13,7 +13,7 @@ The WordPress wrapper returns an access token and a refresh token. Keeping both 
 Split the tokens by lifetime and exposure.
 
 - **Access token** — 1 hour. Returned in the login/register/refresh JSON and stored in module memory (`tokenCache`). Also set as an httpOnly `access_token` cookie for completeness.
-- **Refresh token** — 14 days. httpOnly `refresh_token` cookie only. Never returned to client JavaScript.
+- **Refresh token** — 14 days. httpOnly `refresh_token` cookie only. Stays server-side; client JavaScript cannot read it.
 - **Hydration** — on page load, the client calls `POST /api/auth/refresh`, which reads the refresh cookie and returns a new access token.
 - **401 handling** — `apiClient` refreshes once, retries, and then calls the unauthorized handler.
 - **Cookies** — `httpOnly`, `sameSite=lax`, `secure` in production, `path=/`.
@@ -31,7 +31,7 @@ The Next.js auth route handlers are the only place that touches the refresh toke
 
 - A page reload loses the in-memory access token and must refresh.
 - Hydration checks for a guest cart token, a cached access token, or the `session_hint` cookie before calling refresh. The hint is readable and carries no credential; the refresh token stays httpOnly.
-- A 401 from a guest cart token must not redirect to login. The unauthorized handler distinguishes the two cases to avoid a redirect loop.
+- A guest cart 401 clears the dead token and stays on the page. The unauthorized handler treats it separately from a real session to avoid a redirect loop.
 - Production must use HTTPS, or `secure` cookies are rejected.
 - Changing domains invalidates sessions.
 

@@ -67,7 +67,9 @@ Then:
 npm run dev
 ```
 
-Open <http://localhost:3000>. The home page, shop, and product pages are the fastest way to confirm that WordPress is reachable. If the page renders with an empty product grid, run the three `curl` checks in [Backend setup](#backend-setup) before changing code. A missing URL makes `getAllProductSlugs()` return `[]` by design, so the build succeeds while the catalog is empty.
+Open <http://localhost:3000>. The first run is done when `/products` shows at least one product, a product detail page opens, and the browser console has no CORS errors.
+
+If the grid is empty, run the three `curl` checks in [Backend setup](#backend-setup) before changing code. A missing URL makes `getAllProductSlugs()` return `[]` by design, so the build succeeds while the catalog is empty.
 
 ## Environment variables
 
@@ -86,7 +88,7 @@ Open <http://localhost:3000>. The home page, shop, and product pages are the fas
 
 `.env.local.example` is the storefront example. The root `.env.example` is a leftover Taskmaster template full of AI provider keys; it is not used by this app.
 
-`NEXT_PUBLIC_*` values are embedded in the client bundle. Never put a secret in one.
+`NEXT_PUBLIC_*` values are embedded in the client bundle. Keep secrets in server-only variables.
 
 ## Scripts
 
@@ -99,7 +101,7 @@ Open <http://localhost:3000>. The home page, shop, and product pages are the fas
 | `npm test` | Run the Vitest unit suite once. |
 | `npm run test:watch` | Run Vitest in watch mode while editing. |
 
-The default gates are `npx tsc --noEmit`, `npm run lint`, `npm test`, and `npm run build`. Browser flows are still checked manually against the staging WordPress site; see [coding-standards.md](coding-standards.md#tests).
+The default gates live in [coding-standards.md](coding-standards.md#definition-of-done); run them before a pull request. Browser flows are still checked manually against the staging WordPress site; see [coding-standards.md](coding-standards.md#tests).
 
 ## A five-minute tour
 
@@ -114,13 +116,15 @@ The default gates are `npx tsc --noEmit`, `npm run lint`, `npm test`, and `npm r
 
 **Change copy or layout on a static page.** Edit the page or section component. Policy pages live in `src/app/shipping`, `returns`, `privacy-policy`, and `terms`; they share `src/components/policies/PolicyUI.tsx`.
 
-**Add a product field.** Add it to the API type and normalizer in `src/lib/api/products.ts`, then consume it in the component. Keep the normalization in the API layer; do not teach components about raw API shapes.
+**Add a product field.** Add it to the API type and normalizer in `src/lib/api/products.ts`, then consume it in the component. Keep raw API shapes in the API layer; components consume normalized types.
 
-**Add an authenticated endpoint.** Add a route handler under `src/app/api/<domain>/route.ts` that forwards the `Authorization` header, then call that route from `src/lib/api/<domain>.ts`. Do not call WordPress directly from a client component for a protected endpoint; that is what causes the CORS problems the proxies exist to avoid.
+**Add an authenticated endpoint.** Add a route handler under `src/app/api/<domain>/route.ts` that forwards the `Authorization` header, then call that route from `src/lib/api/<domain>.ts`. Call protected endpoints through the route handler; direct browser calls cause the CORS problems the proxies exist to avoid.
 
 **Add a client store action.** Put the network call in `src/lib/api/`, keep Zustand for state and orchestration, and let the store return errors through its `error` field or a thrown `ApiError`.
 
 **Change brand colors or fonts.** Edit the tokens in `src/app/globals.css`. Components use `bg-brand-*`, `text-brand-*`, and `font-serif`. See [design-system.md](design-system.md).
+
+A change is complete when the gates in [coding-standards.md](coding-standards.md#definition-of-done) pass and the affected doc is updated.
 
 ## Troubleshooting
 

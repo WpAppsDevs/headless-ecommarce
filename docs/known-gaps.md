@@ -2,13 +2,11 @@
 
 These are current behaviors, not aspirations. Each entry says what happens, where, and what would close it. Backend gaps need WordPress work; the frontend should not pretend they work.
 
-For the completed remediation history and the exact changes, see [fix-plan.md](fix-plan.md).
-
 ## 1. Guest checkout needs WordPress support
 
 Guest checkout is not implemented. `/checkout` requires a signed-in user and `src/proxy.ts` sends visitors without a session to `/login`. The old `config.features.guestCheckout` flag was removed because no code implemented it.
 
-Closing this needs a WordPress endpoint that creates an order without a user and returns a confirmation key that can be looked up without an account. Do not implement it only in the client; unattributed orders cannot be supported.
+Closing this needs a WordPress endpoint that creates an order without a user and returns a confirmation key that can be looked up without an account. Implement it in WordPress so every order stays attributable.
 
 - Where: `src/app/checkout/page.tsx`, `src/app/api/checkout/route.ts`, WordPress.
 - Impact: medium. The store is account-only by design today.
@@ -55,7 +53,7 @@ Closing this needs `GET /api/orders/:id` (or a signed guest confirmation endpoin
 
 `filterCheckoutDrafts` runs at the orders API boundary and again in `Dashboard` and `Orders`. Tracking has its own draft check in `normalizeTrackingResult`. The duplication is intentional so a new order surface cannot leak a draft, but only the pure filter has a unit test.
 
-Closing this means either documenting the backstop as policy and adding a test per surface, or trusting the API boundary and removing the UI filters. Do not remove them without a test that the boundary still filters after pagination adjustment.
+Closing this means either documenting the backstop as policy and adding a test per surface, or trusting the API boundary and removing the UI filters. Keep them until a boundary test proves drafts stay filtered after pagination adjustment.
 
 - Where: `src/lib/api/orders.ts`, `src/lib/order-utils.ts` consumers, `src/lib/api/tracking.ts`.
 - Impact: low.
@@ -82,7 +80,7 @@ Closing this needs an end-to-end runner against a seeded staging WordPress site.
 
 The `.dark` token block was removed and no toggle applies the class. Some shadcn primitives still carry `dark:` utilities, which only activate under a `.dark` ancestor, so they are inert.
 
-Closing this means either deleting those utilities or implementing a real theme toggle and auditing contrast. Do not re-add the token block without the toggle.
+Closing this means either deleting those utilities or implementing a real theme toggle and auditing contrast. Re-add the token block only with the toggle.
 
 - Where: `src/app/globals.css`, `src/components/ui/*`.
 - Impact: low.
@@ -93,4 +91,4 @@ The root `CodeDocs.md` predates this documentation set. It carries a legacy bann
 
 ## How to use this list
 
-Pick one item per change. Do not fold a refactor into a feature unless the feature requires it. When a gap closes, remove it here and update the affected flow doc in the same commit.
+Pick one item per change. Keep refactors out of feature work unless the feature needs them. When a gap closes, remove it here and update the affected flow doc in the same commit.

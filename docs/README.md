@@ -12,11 +12,12 @@ These docs describe the storefront in this repository. They are written from the
 | Looking for a file | [project-structure.md](project-structure.md) |
 | Working on a page or route | [routing-and-pages.md](routing-and-pages.md) |
 | Working on data fetching | [data-layer.md](data-layer.md) |
-| Working on cart, auth, or client state | [state-management.md](state-management.md) |
+| Working on auth | [flows/authentication.md](flows/authentication.md) |
+| Working on client state | [state-management.md](state-management.md) |
 | Working on UI | [components.md](components.md), [design-system.md](design-system.md) |
 | Reviewing or writing code | [coding-standards.md](coding-standards.md) |
 | Deploying or configuring secrets | [operations.md](operations.md) |
-| Picking up known debt | [known-gaps.md](known-gaps.md); [fix-plan.md](fix-plan.md) is a closed archive of frontend fixes |
+| Picking up known debt | [known-gaps.md](known-gaps.md) |
 
 ## Deeper flows
 
