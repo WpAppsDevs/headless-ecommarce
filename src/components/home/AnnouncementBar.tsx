@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { config } from '@/lib/config';
 
 function FacebookIcon() {
   return (
@@ -16,14 +17,6 @@ function InstagramIcon() {
   );
 }
 
-function TikTokIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5" aria-hidden="true">
-      <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.21 8.21 0 004.79 1.53V6.83a4.85 4.85 0 01-1.02-.14z" />
-    </svg>
-  );
-}
-
 export function AnnouncementBar() {
   return (
     <div className="bg-brand-topbar text-brand-text">
@@ -34,26 +27,32 @@ export function AnnouncementBar() {
         {/* Center: 3 items with pipe separators */}
         <div className="flex flex-1 items-center justify-center gap-2 text-[12px] font-medium sm:gap-4 lg:gap-6">
           <span className="hidden sm:inline">Pre-Order from Pakistan 🇵🇰</span>
-          <span className="inline sm:hidden text-[11px]">Pre-Order 🇵🇰| 15-25 Days | Original</span>
-          <span className="hidden sm:inline text-brand-text">|</span>
+          <span className="inline text-[11px] sm:hidden">Pre-Order 🇵🇰| 15-25 Days | Original</span>
+          <span className="hidden text-brand-text sm:inline">|</span>
           <span className="hidden sm:inline">Delivery in 15-25 Days</span>
-          <span className="hidden sm:inline text-brand-text">|</span>
+          <span className="hidden text-brand-text sm:inline">|</span>
           <span className="hidden sm:inline">Authentic Pakistani Collections</span>
         </div>
 
         {/* Right: Social icons */}
         <div className="hidden items-center gap-3 lg:flex">
-          <Link href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook"
-            className="opacity-80 transition hover:opacity-100">
+          <Link
+            href={config.facebookUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook"
+            className="opacity-80 transition hover:opacity-100"
+          >
             <FacebookIcon />
           </Link>
-          <Link href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram"
-            className="opacity-80 transition hover:opacity-100">
+          <Link
+            href={config.instagramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            className="opacity-80 transition hover:opacity-100"
+          >
             <InstagramIcon />
-          </Link>
-          <Link href="https://tiktok.com" target="_blank" rel="noopener noreferrer" aria-label="TikTok"
-            className="opacity-80 transition hover:opacity-100">
-            <TikTokIcon />
           </Link>
         </div>
       </div>

@@ -129,7 +129,7 @@ There is no `.dark` token block in `globals.css` and no theme toggle. A dormant 
 
 `lucide-react` is the default. Sizes are usually 16-20px in controls and 24-32px in empty states. Stroke width is often 1.5 for decorative icons and 2 for compact actions.
 
-Brand social icons (Facebook, Instagram, WhatsApp, TikTok) are inline SVGs because lucide does not ship brand marks.
+Brand social icons (Facebook, Instagram, WhatsApp) are inline SVGs because lucide does not ship brand marks. TikTok is omitted until the shop has an account.
 
 ## Images
 

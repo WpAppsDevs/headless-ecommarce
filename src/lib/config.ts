@@ -13,6 +13,10 @@ export const config = {
   apiNs: 'api',
   siteName: process.env.NEXT_PUBLIC_SITE_NAME ?? "Najifa's Shop",
   whatsappUrl: process.env.NEXT_PUBLIC_WHATSAPP_URL ?? 'https://wa.me/8801841654663',
+  facebookUrl:
+    process.env.NEXT_PUBLIC_FACEBOOK_URL ?? 'https://www.facebook.com/najifasshop/',
+  instagramUrl:
+    process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? 'https://instagram.com/najifasshop/',
   hero: {
     title: process.env.NEXT_PUBLIC_HERO_TITLE ?? 'Shop the Latest Collection',
     subtitle:
