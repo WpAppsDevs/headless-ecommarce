@@ -23,7 +23,7 @@ The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local
 
 | Component | Type | Notes |
 | --- | --- | --- |
-| `HeroSlider.tsx` | Server | Despite the name, it does not slide. Static hero with a desktop image and a mobile stacked image. |
+| `HeroSlider.tsx` | Server | Despite the name, it does not slide. Static hero with a desktop image and a mobile stacked image. Its headline and calls to action follow the catalog's Ready Stock, Pre-Order, or contact fallback. |
 | `AnnouncementBar.tsx` | Server | Top strip with shipping copy and social links. |
 | `CategoryBanners.tsx` | Server | Three category image cards linking to `/products?category=…`. |
 | `CategoryGrid.tsx` | Server | Ready stock, pre-order, and catalog entry cards. |
@@ -38,11 +38,12 @@ The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local
 
 | Component | Type | Responsibility |
 | --- | --- | --- |
-| `ShopClient.tsx` | Client | Owns sort, price, color, size, grid, mobile filter drawer, and pagination links. |
+| `ShopClient.tsx` | Client | Owns sort, price, color, size, grid, mobile filter drawer, pagination links, and the Ready Stock empty fallback. |
+| `ReadyStockEmptyState.tsx` | Server | Ready Stock fallback with Pre-Order and WhatsApp links. |
 | `ShopSidebar.tsx` | Client | Category/tag/brand links plus price, color, and size controls. |
 | `ShopTopBar.tsx` | Client | Result count, sort select, grid density, mobile filter button. |
 
-`ShopClient` receives server-rendered products and filters. It does not refetch when filters change; it filters the current page in memory. Server-side filters (category, tag, brand, search) are links, so changing one navigates and reloads the page.
+`ShopClient` receives server-rendered products and filters. It does not refetch when filters change; it filters the current page in memory. Server-side filters (category, tag, brand, search) are links, so changing one navigates and reloads the page. When the unfiltered Ready Stock collection is empty it shows a dedicated fallback with Pre-Order and WhatsApp links; a filtered empty result keeps the generic empty state.
 
 ## Product
 

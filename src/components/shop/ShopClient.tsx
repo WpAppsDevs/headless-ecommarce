@@ -8,6 +8,7 @@ import type { ProductFilters } from '@/lib/api/filters';
 import { ProductCard } from '@/components/product/ProductCard';
 import { ShopSidebar } from '@/components/shop/ShopSidebar';
 import { ShopTopBar, type SortOrder } from '@/components/shop/ShopTopBar';
+import { ReadyStockEmptyState } from '@/components/shop/ReadyStockEmptyState';
 
 interface ShopClientProps {
   initialProducts: Product[];
@@ -18,6 +19,7 @@ interface ShopClientProps {
   initialBrand?: string;
   serverPage: number;
   filters: ProductFilters;
+  showReadyStockFallback: boolean;
 }
 
 function gridColsClass(cols: 2 | 3 | 4) {
@@ -56,6 +58,7 @@ export function ShopClient({
   initialBrand,
   serverPage,
   filters,
+  showReadyStockFallback,
 }: ShopClientProps) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('default');
   const [activePriceRange, setActivePriceRange] = useState<[number, number] | null>(null);
@@ -255,7 +258,9 @@ export function ShopClient({
             activeFilterCount={activeFilterCount}
           />
 
-          {filteredProducts.length === 0 ? (
+          {showReadyStockFallback ? (
+            <ReadyStockEmptyState />
+          ) : filteredProducts.length === 0 ? (
             <EmptyState onClear={handleClearAll} />
           ) : (
             <>

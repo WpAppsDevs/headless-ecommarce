@@ -205,14 +205,18 @@ function normalizeVariation(
 
 export const MAX_PER_PAGE = 100;
 
-export async function getProducts(params: {
+export interface ProductsQuery {
   page?: number;
   per_page?: number;
   category?: string;
   brand?: string;
   tag?: string;
   search?: string;
-}): Promise<{ items: Product[]; meta: PaginationMeta }> {
+}
+
+export type ProductCollectionQuery = Omit<ProductsQuery, 'page' | 'per_page'>;
+
+export async function getProducts(params: ProductsQuery): Promise<{ items: Product[]; meta: PaginationMeta }> {
   const { page = 1, per_page = 12, category, brand, tag, search } = params;
   const qs = new URLSearchParams({
     page: String(page),
@@ -241,6 +245,22 @@ export async function getProducts(params: {
     variations: Array.isArray(p.variations) ? p.variations : [],
   }));
   return { items, meta: json.meta };
+}
+
+/** Fetches every page of a product collection. */
+export async function getAllProducts(
+  params: ProductCollectionQuery = {},
+): Promise<Product[]> {
+  const first = await getProducts({ ...params, page: 1, per_page: MAX_PER_PAGE });
+  if (first.meta.total_pages <= 1) return first.items;
+
+  const remaining = await Promise.all(
+    Array.from({ length: first.meta.total_pages - 1 }, (_, index) =>
+      getProducts({ ...params, page: index + 2, per_page: MAX_PER_PAGE }),
+    ),
+  );
+
+  return [...first.items, ...remaining.flatMap((result) => result.items)];
 }
 
 export async function getProduct(slug: string): Promise<Product> {

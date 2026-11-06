@@ -45,6 +45,8 @@ The layout is a Server Component but the header is a Client Component. `navLinks
 
 The featured grid is an async RSC inside `<Suspense>`. It fetches four products and renders nothing if the request fails. The rest of the page is static markup, so the hero and marketing sections remain visible while products load.
 
+The home page fetches the whole catalog once through `getAllProducts()` and passes the availability mode and featured products down; there is no separate hero or featured fetch. The hero mode is Ready Stock when stock exists, Pre-Order when only pre-order products exist, and contact when both are empty. If the catalog request fails, the featured grid is empty and the hero keeps its default Ready Stock presentation rather than treating the error as an empty collection.
+
 ## Shop page
 
 `src/app/(shop)/products/page.tsx` reads `page`, `category`, `search`, `tag`, and `brand` from `searchParams`. It clamps the page to at least 1 and trims the other values.

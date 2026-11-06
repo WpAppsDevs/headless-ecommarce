@@ -1,5 +1,5 @@
-import type { PaginationMeta, Product } from '@/lib/api/products';
-import { isReadyStock } from '@/lib/product-availability';
+import type { PaginationMeta, Product, ProductCollectionQuery } from '@/lib/api/products';
+import { isReadyStock, READY_STOCK_TAG } from '@/lib/product-availability';
 
 /**
  * Selects one page of the stock-backed Ready Stock collection.
@@ -28,4 +28,25 @@ export function selectReadyStockPage(
       total_pages: totalPages,
     },
   };
+}
+
+/**
+ * The collection-wide fallback is only right for the unfiltered Ready Stock
+ * page. A search or category with no matches is a normal empty result.
+ */
+export function shouldShowReadyStockFallback({
+  query,
+  productCount,
+}: {
+  query: ProductCollectionQuery;
+  productCount: number;
+}): boolean {
+  const { tag, category, search, brand } = query;
+  return (
+    tag === READY_STOCK_TAG &&
+    !category &&
+    !search &&
+    !brand &&
+    productCount === 0
+  );
 }

@@ -1,8 +1,7 @@
-import { Suspense } from 'react';
 import Link from 'next/link';
-import { getProducts } from '@/lib/api/products';
+import { getAllProducts } from '@/lib/api/products';
+import { getHeroPrimaryAction } from '@/lib/product-availability';
 import { ProductCard } from '@/components/product/ProductCard';
-import { ProductCardSkeleton } from '@/components/product/ProductCardSkeleton';
 import { HeroSlider } from '@/components/home/HeroSlider';
 import { CategoryGrid } from '@/components/home/CategoryGrid';
 import { PreOrderSteps } from '@/components/home/PreOrderSteps';
@@ -15,30 +14,14 @@ import { WhatsAppCTA } from '@/components/home/WhatsAppCTA';
 
 export const revalidate = 60;
 
-function ProductGridSkeleton({ count = 8 }: { count?: number }) {
-  return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-      {Array.from({ length: count }).map((_, i) => (
-        <ProductCardSkeleton key={i} />
-      ))}
-    </div>
-  );
-}
+export default async function HomePage() {
+  const catalog = await getAllProducts().catch(() => null);
+  const heroAction = catalog ? getHeroPrimaryAction(catalog) : 'ready-stock';
+  const featured = catalog?.slice(0, 4) ?? [];
 
-async function FeaturedProductsSection() {
-  const { items } = await getProducts({ per_page: 4 }).catch(() => ({ items: [] }));
-  if (items.length === 0) return null;
-  return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-      {items.map((p) => <ProductCard key={p.id} product={p} />)}
-    </div>
-  );
-}
-
-export default function HomePage() {
   return (
     <div className="flex flex-col">
-      <HeroSlider />
+      <HeroSlider primaryAction={heroAction} />
       <CategoryBanners />
       <CategoryGrid />
       <PreOrderSteps />
@@ -55,9 +38,11 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <Suspense fallback={<ProductGridSkeleton count={8} />}>
-            <FeaturedProductsSection />
-          </Suspense>
+          {featured.length > 0 && (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {featured.map((p) => <ProductCard key={p.id} product={p} />)}
+            </div>
+          )}
 
           {/* View all — after grid */}
           <div className="mt-10 flex justify-center">

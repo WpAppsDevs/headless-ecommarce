@@ -1,10 +1,9 @@
-import { getProducts, MAX_PER_PAGE } from '@/lib/api/products';
-import type { Product } from '@/lib/api/products';
+import { getAllProducts, getProducts } from '@/lib/api/products';
 import { getProductFilters } from '@/lib/api/filters';
 import { ShopClient } from '@/components/shop/ShopClient';
 import { PageHeader } from '@/components/ui/PageHeader';
 import type { BreadcrumbItem } from '@/components/ui/PageHeader';
-import { selectReadyStockPage } from '@/lib/ready-stock-page';
+import { selectReadyStockPage, shouldShowReadyStockFallback } from '@/lib/ready-stock-page';
 import { READY_STOCK_TAG } from '@/lib/product-availability';
 
 export const revalidate = 60;
@@ -13,27 +12,6 @@ const PAGE_SIZE = 9;
 
 interface PageProps {
   searchParams: Promise<{ page?: string; category?: string; search?: string; tag?: string; brand?: string }>;
-}
-
-interface CollectionQuery {
-  category?: string;
-  search?: string;
-  tag?: string;
-  brand?: string;
-}
-
-/** Fetch every page of the tagged set so sold-out products cannot hide a page. */
-async function fetchReadyStockProducts(query: CollectionQuery): Promise<Product[]> {
-  const first = await getProducts({ ...query, page: 1, per_page: MAX_PER_PAGE });
-  if (first.meta.total_pages <= 1) return first.items;
-
-  const remaining = await Promise.all(
-    Array.from({ length: first.meta.total_pages - 1 }, (_, index) =>
-      getProducts({ ...query, page: index + 2, per_page: MAX_PER_PAGE }),
-    ),
-  );
-
-  return [...first.items, ...remaining.flatMap((result) => result.items)];
 }
 
 export default async function ProductsPage({ searchParams }: PageProps) {
@@ -48,7 +26,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   // paginated, so fetch the tagged set in one pass and paginate it here.
   const isReadyStockCollection = tag === READY_STOCK_TAG;
   const productRequest = isReadyStockCollection
-    ? fetchReadyStockProducts({ category, search, tag, brand }).then((products) =>
+    ? getAllProducts({ category, search, tag, brand }).then((products) =>
         selectReadyStockPage(products, page, PAGE_SIZE),
       )
     : getProducts({ page, per_page: PAGE_SIZE, category, search, tag, brand });
@@ -67,6 +45,10 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   ]);
 
   const { items, meta } = result;
+  const showReadyStockFallback = shouldShowReadyStockFallback({
+    query: { tag, category, search, brand },
+    productCount: items.length,
+  });
 
   const categoryLabel = category
     ? category.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
@@ -91,6 +73,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
         initialBrand={brand}
         serverPage={meta.page}
         filters={filters}
+        showReadyStockFallback={showReadyStockFallback}
       />
     </>
   );

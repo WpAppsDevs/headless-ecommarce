@@ -12,6 +12,7 @@ export const config = {
   productsNs: 'wpadhlwrapi/v1',
   apiNs: 'api',
   siteName: process.env.NEXT_PUBLIC_SITE_NAME ?? "Najifa's Shop",
+  whatsappUrl: process.env.NEXT_PUBLIC_WHATSAPP_URL ?? 'https://wa.me/8801841654663',
   hero: {
     title: process.env.NEXT_PUBLIC_HERO_TITLE ?? 'Shop the Latest Collection',
     subtitle:

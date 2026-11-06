@@ -34,7 +34,7 @@ export function ShopTopBar({
 
   const resultText =
     total === 0
-      ? 'No products found'
+      ? '0 products'
       : `Showing ${start}–${end} of ${total} product${total !== 1 ? 's' : ''}`;
 
   const hasActiveFilters = activeFilterCount > 0;

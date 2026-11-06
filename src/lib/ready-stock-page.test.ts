@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Product, ProductTag, ProductVariation } from '@/lib/api/products';
-import { selectReadyStockPage } from '@/lib/ready-stock-page';
+import { selectReadyStockPage, shouldShowReadyStockFallback } from '@/lib/ready-stock-page';
 
 function tag(slug: string): ProductTag {
   return { id: 1, name: slug, slug };
@@ -102,5 +102,43 @@ describe('ready stock collection page', () => {
     const result = selectReadyStockPage(products, 99, 9);
     expect(result.meta.page).toBe(2);
     expect(result.items).toHaveLength(1);
+  });
+});
+
+describe('ready stock empty fallback', () => {
+  it('shows only for the unfiltered Ready Stock collection with no products', () => {
+    expect(
+      shouldShowReadyStockFallback({ query: { tag: 'ready-stock' }, productCount: 0 }),
+    ).toBe(true);
+  });
+
+  it('does not show for a filtered empty result', () => {
+    expect(
+      shouldShowReadyStockFallback({
+        query: { tag: 'ready-stock', search: 'nothing' },
+        productCount: 0,
+      }),
+    ).toBe(false);
+    expect(
+      shouldShowReadyStockFallback({
+        query: { tag: 'ready-stock', category: 'women' },
+        productCount: 0,
+      }),
+    ).toBe(false);
+    expect(
+      shouldShowReadyStockFallback({
+        query: { tag: 'ready-stock', brand: 'najifa' },
+        productCount: 0,
+      }),
+    ).toBe(false);
+  });
+
+  it('does not show for another collection or a non-empty result', () => {
+    expect(
+      shouldShowReadyStockFallback({ query: { tag: 'pre-order' }, productCount: 0 }),
+    ).toBe(false);
+    expect(
+      shouldShowReadyStockFallback({ query: { tag: 'ready-stock' }, productCount: 1 }),
+    ).toBe(false);
   });
 });
