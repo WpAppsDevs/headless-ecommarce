@@ -13,8 +13,8 @@ function Stars({ rating }: { rating: number }) {
         <Star
           key={i}
           className="h-4 w-4"
-          fill={i <= rating ? '#d4a853' : 'none'}
-          stroke={i <= rating ? '#d4a853' : '#78716c'}
+          fill={i <= rating ? 'var(--brand-gold-strong)' : 'none'}
+          stroke={i <= rating ? 'var(--brand-gold-strong)' : 'var(--brand-text-muted)'}
           strokeWidth={1.5}
         />
       ))}
@@ -156,7 +156,7 @@ export function TestimonialsSection() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="mb-10 text-center">
-          <span className="inline-block rounded-full bg-brand-accent/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-accent">
+          <span className="inline-block rounded-full bg-brand-accent/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-accent-strong">
             Customer Reviews
           </span>
           <h2 id="testimonials-heading" className="mt-4 font-serif text-3xl font-bold text-brand-text sm:text-4xl">

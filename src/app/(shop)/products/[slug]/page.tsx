@@ -150,8 +150,8 @@ export default async function ProductPage({ params }: PageProps) {
                           <Star
                             key={i}
                             className="h-4 w-4"
-                            fill={filled || half ? '#9E2F45' : 'none'}
-                            stroke={filled || half ? '#9E2F45' : '#D9D2CB'}
+                            fill={filled || half ? 'var(--brand-gold-strong)' : 'none'}
+                            stroke={filled || half ? 'var(--brand-gold-strong)' : 'var(--brand-text-muted)'}
                           />
                         );
                       })}

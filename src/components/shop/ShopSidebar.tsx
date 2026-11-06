@@ -167,7 +167,7 @@ export function ShopSidebar({
             </span>
             <button
               onClick={onClearAll}
-              className="text-xs text-brand-wine hover:text-brand-accent-hover font-medium transition-colors"
+              className="text-xs text-brand-wine hover:text-brand-accent-strong-hover font-medium transition-colors"
             >
               Clear All
             </button>

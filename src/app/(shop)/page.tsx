@@ -47,7 +47,7 @@ export default function HomePage() {
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Heading — matches other section headings */}
           <div className="mb-10 text-center">
-            <span className="inline-block rounded-full bg-brand-accent/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-accent">
+            <span className="inline-block rounded-full bg-brand-accent/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-accent-strong">
               New Arrivals
             </span>
             <h2 id="featured-heading" className="mt-4 font-serif text-3xl font-bold text-brand-text sm:text-4xl">
@@ -63,7 +63,7 @@ export default function HomePage() {
           <div className="mt-10 flex justify-center">
             <Link
               href="/products"
-              className="inline-flex items-center gap-2 rounded-full border border-brand-border bg-brand-bg px-8 py-3 text-sm font-medium text-brand-text transition hover:border-brand-accent/40 hover:text-brand-accent"
+              className="inline-flex items-center gap-2 rounded-full border border-brand-border bg-brand-bg px-8 py-3 text-sm font-medium text-brand-text transition hover:border-brand-accent/40 hover:text-brand-accent-strong"
             >
               View all products <span aria-hidden="true">→</span>
             </Link>

@@ -28,8 +28,8 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
     <div className="mb-8">
       <h3 className="font-serif text-2xl font-bold text-brand-text">{children}</h3>
       <div className="mt-3 flex items-center gap-1.5">
-        <div className="h-[3px] w-8 rounded-full bg-brand-accent" />
-        <div className="h-2 w-2 rounded-full bg-brand-accent" />
+        <div className="h-[3px] w-8 rounded-full bg-brand-accent-strong" />
+        <div className="h-2 w-2 rounded-full bg-brand-accent-strong" />
       </div>
     </div>
   );
@@ -42,7 +42,7 @@ function SocialLink({ href, label, children }: { href: string; label: string; ch
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-accent-light text-brand-text transition-all hover:bg-brand-accent hover:text-white"
+      className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-accent-light text-brand-text transition-all hover:bg-brand-accent-strong hover:text-white"
     >
       {children}
     </a>
@@ -144,11 +144,11 @@ export function Footer() {
 
               <div className="space-y-2.5">
                 <p className="flex items-center gap-2.5 text-sm text-brand-text-muted">
-                  <Mail className="h-4 w-4 shrink-0 text-brand-accent" />
+                  <Mail className="h-4 w-4 shrink-0 text-brand-accent-strong" />
                   support@najifasshop.com
                 </p>
                 <p className="flex items-center gap-2.5 text-sm text-brand-text-muted">
-                  <Phone className="h-4 w-4 shrink-0 text-brand-accent" />
+                  <Phone className="h-4 w-4 shrink-0 text-brand-accent-strong" />
                   +880 1841-654663
                 </p>
               </div>
@@ -165,9 +165,9 @@ export function Footer() {
                   >
                     <Link
                       href={href}
-                      className="flex items-center gap-3.5 py-3.5 text-sm font-medium text-brand-text transition-colors hover:text-brand-accent"
+                      className="flex items-center gap-3.5 py-3.5 text-sm font-medium text-brand-text transition-colors hover:text-brand-accent-strong"
                     >
-                      <Icon className="h-5 w-5 shrink-0 text-brand-accent" />
+                      <Icon className="h-5 w-5 shrink-0 text-brand-accent-strong" />
                       {label}
                     </Link>
                   </li>

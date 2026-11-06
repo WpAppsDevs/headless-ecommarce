@@ -76,7 +76,7 @@ export default function TrackOrderPage() {
         {/* Loading State */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-16 space-y-4">
-            <Loader2 className="h-8 w-8 animate-spin text-brand-accent" />
+            <Loader2 className="h-8 w-8 animate-spin text-brand-accent-strong" />
             <p className="text-sm text-brand-text-muted">Searching for your order...</p>
           </div>
         )}
@@ -134,7 +134,7 @@ export default function TrackOrderPage() {
             {visibleEntries.length > 5 && !showAll && (
               <button
                 onClick={() => setShowAll(true)}
-                className="w-full rounded-xl border border-brand-border bg-brand-section px-4 py-3 text-sm font-medium text-brand-accent transition hover:bg-brand-accent/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+                className="w-full rounded-xl border border-brand-border bg-brand-section px-4 py-3 text-sm font-medium text-brand-accent-strong transition hover:bg-brand-accent/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent-strong"
               >
                 Show more orders
               </button>

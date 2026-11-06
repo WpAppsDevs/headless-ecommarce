@@ -75,7 +75,7 @@ export function ComingSoonSection() {
             {/* Notify me form */}
             {submitted ? (
               <div className="mx-auto mt-8 flex max-w-md items-center justify-center gap-3 rounded-2xl bg-white/[0.08] px-6 py-4 text-sm text-white ring-1 ring-white/15">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-accent">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-accent-strong ring-1 ring-brand-accent/30">
                   <Check className="h-4 w-4 text-white" />
                 </div>
                 <span className="font-medium">You&apos;re on the list! We&apos;ll notify you at launch.</span>
@@ -98,7 +98,7 @@ export function ComingSoonSection() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="rounded-2xl bg-brand-accent px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-accent/20 transition hover:bg-brand-accent-hover disabled:opacity-60 sm:rounded-l-none sm:rounded-r-2xl"
+                  className="rounded-2xl bg-brand-accent-strong px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-accent/20 ring-1 ring-brand-accent/30 transition hover:bg-brand-accent-strong-hover disabled:opacity-60 sm:rounded-l-none sm:rounded-r-2xl"
                 >
                   {loading ? (
                     <span className="block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white mx-auto" />

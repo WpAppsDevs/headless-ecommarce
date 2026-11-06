@@ -92,7 +92,7 @@ export default function ReturnsPage() {
                   key={step}
                   className="rounded-2xl border border-brand-border bg-brand-card p-4"
                 >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-accent/15 text-xs font-bold text-brand-accent">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-accent/15 text-xs font-bold text-brand-accent-strong">
                     {i + 1}
                   </span>
                   <p className="mt-3 text-sm font-medium leading-snug text-brand-text">{step}</p>
@@ -185,14 +185,14 @@ export default function ReturnsPage() {
             <div className="mt-4 space-y-3">
               <a
                 href="tel:+8801841654663"
-                className="flex items-center gap-2.5 text-sm text-brand-accent transition-colors hover:underline"
+                className="flex items-center gap-2.5 text-sm text-brand-accent-strong transition-colors hover:underline"
               >
                 <Phone className="h-4 w-4 shrink-0" />
                 +880 1841-654663
               </a>
               <a
                 href="mailto:support@najifasshop.com"
-                className="flex items-center gap-2.5 text-sm text-brand-accent transition-colors hover:underline"
+                className="flex items-center gap-2.5 text-sm text-brand-accent-strong transition-colors hover:underline"
               >
                 <Mail className="h-4 w-4 shrink-0" />
                 support@najifasshop.com
@@ -201,7 +201,7 @@ export default function ReturnsPage() {
                 href="https://wa.me/8801841654663"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2.5 text-sm text-brand-accent transition-colors hover:underline"
+                className="flex items-center gap-2.5 text-sm text-brand-accent-strong transition-colors hover:underline"
               >
                 <MessageCircle className="h-4 w-4 shrink-0" />
                 WhatsApp-এ মেসেজ করুন

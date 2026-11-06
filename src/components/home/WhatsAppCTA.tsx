@@ -6,7 +6,7 @@ export function WhatsAppCTA() {
           href="https://wa.me/8801841654663"
           target="_blank"
           rel="noopener noreferrer"
-          className="group flex flex-col items-center justify-between gap-4 rounded-2xl bg-[#25D366] px-8 py-6 transition hover:bg-[#1fb855] sm:flex-row"
+          className="group flex flex-col items-center justify-between gap-4 rounded-2xl bg-brand-whatsapp px-8 py-6 transition hover:bg-brand-whatsapp/90 sm:flex-row"
         >
           {/* Left side */}
           <div className="flex items-center gap-4">
@@ -23,7 +23,7 @@ export function WhatsAppCTA() {
           </div>
 
           {/* Right side */}
-          <span className="shrink-0 rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-[#25D366] transition group-hover:bg-white/90">
+          <span className="shrink-0 rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-brand-whatsapp transition group-hover:bg-white/90">
             Start Chat →
           </span>
         </a>
