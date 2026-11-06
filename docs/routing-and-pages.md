@@ -78,7 +78,9 @@ Pagination is a full navigation. Client-side filter state resets when the page c
 
 - Attribute values come from the variation objects, not from `ProductAttribute.options`.
 - Color attributes are detected by name (`color` or `colour`) and rendered as swatches; other attributes render as buttons.
-- An option is disabled when every matching variation is out of stock.
+- An option is disabled when every matching variation is out of stock, unless the product is a pre-order.
+- Pre-Order is a purchase mode, so a pre-order product stays buyable even when its stock status is out of stock.
+- A sold-out product shows Sold Out next to the price and hides the quantity and add controls. The mobile sticky bar is not rendered.
 - Quantity, add-to-cart, error messages, and a mobile sticky bar live here.
 - The sticky bar appears when the main action row scrolls out of view, using `IntersectionObserver`.
 

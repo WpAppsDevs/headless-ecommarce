@@ -18,6 +18,12 @@ export interface ProductCategory {
   slug: string;
 }
 
+export interface ProductTag {
+  id: number;
+  name: string;
+  slug: string;
+}
+
 export interface ProductAttribute {
   id: number;
   name: string;
@@ -84,6 +90,7 @@ export interface Product {
   average_rating?: string;
   rating_count?: number;
   categories: ProductCategory[];
+  tags: ProductTag[];
   images: ProductImage[];
   attributes: ProductAttribute[];
   /** List endpoint returns variation IDs; detail endpoint returns full objects. */
@@ -227,6 +234,7 @@ export async function getProducts(params: {
       normalizeImage(img as RawImage),
     ),
     categories: Array.isArray(p.categories) ? p.categories : [],
+    tags: Array.isArray(p.tags) ? p.tags : [],
     attributes: Array.isArray(p.attributes) ? p.attributes : [],
     variations: Array.isArray(p.variations) ? p.variations : [],
   }));
@@ -260,6 +268,7 @@ export async function getProduct(slug: string): Promise<Product> {
   return {
     ...raw,
     categories: Array.isArray(raw.categories) ? raw.categories : [],
+    tags: Array.isArray(raw.tags) ? raw.tags : [],
     images: (Array.isArray(raw.images) ? raw.images : []).map((img) =>
       normalizeImage(img as RawImage),
     ),

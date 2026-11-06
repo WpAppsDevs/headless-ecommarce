@@ -129,6 +129,7 @@ export async function apiGetWishlist(page = 1, per_page = 50): Promise<WishlistL
         normalizeImage,
       ),
       categories: Array.isArray(p.categories) ? p.categories : [],
+      tags: Array.isArray(p.tags) ? p.tags : [],
       attributes: Array.isArray(p.attributes) ? p.attributes : [],
       variations: Array.isArray(p.variations) ? p.variations : [],
     }),

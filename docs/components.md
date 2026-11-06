@@ -48,16 +48,19 @@ The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local
 
 | Component | Type | Responsibility |
 | --- | --- | --- |
-| `ProductCard.tsx` | Client | Image hover swap, badges, price, quantity, add-to-cart or select-options, wishlist heart. |
+| `ProductCard.tsx` | Client | Image hover swap, availability badge, price, quantity, add-to-cart or select-options, wishlist heart. |
+| `AvailabilityBadge.tsx` | Shared | Pre-Order or Sold Out badge shared by cards and the product detail. |
 | `ProductCardSkeleton.tsx` | Server | Loading placeholder. |
 | `ProductGrid.tsx` | Server | Simple grid wrapper. |
 | `ProductImages.tsx` | Client | Gallery, thumbnails, lightbox. |
-| `VariationSelector.tsx` | Client | Price, attribute controls, quantity, add-to-cart, mobile sticky bar. |
+| `VariationSelector.tsx` | Client | Price, availability badge, attribute controls, quantity, add-to-cart or sold-out state, mobile sticky bar. |
 | `ProductTabs.tsx` | Client | Accordion for details, additional info, shipping, reviews. |
 | `RelatedProducts.tsx` | Server | Fetches four products; renders nothing on failure. |
 | `SearchBar.tsx` | Client | Legacy search input. The header has its own overlay. |
 
 `ProductCard` sends `variationId = 0` for simple products. A variable product shows "Select Options" and links to the detail page instead of adding directly. Its quantity selector is local to the card.
+
+Availability comes from the shared product-availability module. A pre-order product shows Pre-Order, a sold-out product shows Sold Out, and the NEW badge is not used. A sold-out card hides the quantity and add controls and offers a View Product link instead.
 
 ## Cart
 

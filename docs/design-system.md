@@ -16,7 +16,7 @@ The `:root` block defines the palette. The `@theme inline` block maps each varia
 
 | Token | Utility | Typical use |
 | --- | --- | --- |
-| `--brand-text` | `text-brand-text` | Body and headings |
+| `--brand-text` | `text-brand-text` | Body and headings; sold-out badge background |
 | `--brand-text-muted` | `text-brand-text-muted` | Secondary copy |
 | `--brand-accent` | `bg-brand-accent` | Soft rose accent, surfaces and tints only |
 | `--brand-accent-hover` | `bg-brand-accent-hover` | Legacy soft hover; new action hovers use the strong hover |
@@ -28,8 +28,8 @@ The `:root` block defines the palette. The `@theme inline` block maps each varia
 | `--brand-card` | `bg-brand-card` | Cards |
 | `--brand-border` | `border-brand-border` | Hairlines |
 | `--brand-stock` | `text-brand-stock` | In-stock / success |
-| `--brand-preorder` | `text-brand-preorder` | Pre-order |
-| `--brand-wine` | `bg-brand-wine` | Primary action, selected state |
+| `--brand-preorder` | `text-brand-preorder` | Pre-order text and badge background |
+| `--brand-wine` | `bg-brand-wine` | Primary action, selected state, sale badge |
 | `--brand-topbar` | `bg-brand-topbar` | Announcement bar |
 | `--brand-gold` | `text-brand-gold` | Premium accents on dark surfaces |
 | `--brand-gold-strong` | `text-brand-gold-strong` | Stars and small accents on light surfaces |
