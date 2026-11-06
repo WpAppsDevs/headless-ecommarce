@@ -1,0 +1,103 @@
+# Getting started
+
+## What you need
+
+- Node.js 20.9 or newer. Next.js 16 requires it.
+- npm. The lockfile is `package-lock.json`.
+- A WordPress site running the WPAppsDev Headless Wrapper API, reachable over HTTP or HTTPS.
+- Optional: a Stripe test publishable key and a Mailchimp audience, if you work on those paths.
+
+The WordPress site is a separate repository. For local development it is usually the Local site at `Local Sites/headlessecf`, served at a host such as `http://headlessecf.local`. Only this front end is documented here.
+
+## First run
+
+```bash
+npm install
+cp .env.local.example .env.local
+```
+
+Edit `.env.local` and set at least:
+
+```dotenv
+NEXT_PUBLIC_WP_URL=http://headlessecf.local
+```
+
+Then:
+
+```bash
+npm run dev
+```
+
+Open <http://localhost:3000>. The home page, shop, and product pages are the fastest way to confirm that WordPress is reachable. If the page renders with an empty product grid, check `NEXT_PUBLIC_WP_URL` and the WordPress permalink settings before changing code.
+
+## Environment variables
+
+| Variable | Required | Used by | Notes |
+| --- | --- | --- | --- |
+| `NEXT_PUBLIC_WP_URL` | Yes | `src/lib/config.ts` | WordPress origin, no trailing slash. `config.apiBase` appends `/wp-json`. |
+| `NEXT_PUBLIC_STRIPE_PK` | For card checkout | `StripeForm.tsx` | Stripe publishable key. Without it, the card element cannot tokenize. |
+| `NEXT_PUBLIC_SITE_NAME` | No | `config.ts`, footer, metadata | Defaults to `Najifa's Shop`. |
+| `NEXT_PUBLIC_HERO_TITLE` | No | `config.ts` | Hero copy. |
+| `NEXT_PUBLIC_HERO_SUBTITLE` | No | `config.ts` | Hero copy. |
+| `NEXT_PUBLIC_HERO_CTA_TEXT` | No | `config.ts` | Hero button label. |
+| `NEXT_PUBLIC_HERO_CTA_LINK` | No | `config.ts` | Hero button URL. |
+| `MAILCHIMP_API_KEY` | For newsletter | `src/app/api/newsletter/route.ts` | Must include the datacenter suffix, for example `abc-us21`. |
+| `MAILCHIMP_AUDIENCE_ID` | For newsletter | same route | Without both Mailchimp values the route returns 503. |
+
+`.env.local.example` is the storefront example. The root `.env.example` is a leftover Taskmaster template full of AI provider keys; it is not used by this app.
+
+`NEXT_PUBLIC_*` values are embedded in the client bundle. Never put a secret in one.
+
+## Scripts
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Next.js dev server with fast refresh. |
+| `npm run build` | Production build. Also runs type checking and page data collection. |
+| `npm run start` | Serve a completed production build. |
+| `npm run lint` | ESLint with the Next core-web-vitals and TypeScript configs. |
+
+There is no test runner in the repository. The current gates are `npx tsc --noEmit` and `npm run build`; see [known-gaps.md](known-gaps.md) for the lint errors that exist today.
+
+## A five-minute tour
+
+1. `src/app/layout.tsx` — fonts, metadata, hydrators, header, cart drawer, footer.
+2. `src/app/(shop)/page.tsx` — home page composition; most sections are static components, products come from `getProducts`.
+3. `src/app/(shop)/products/page.tsx` — server page that loads products and filters, then hands them to `ShopClient`.
+4. `src/lib/api/products.ts` — the best example of the API layer: raw types, normalization, and ISR.
+5. `src/stores/cartStore.ts` — the best example of client state: optimistic add, guest token handling, error messages.
+6. `src/app/api/` — every server-side proxy. Read `auth/login/route.ts`, `checkout/route.ts`, and `wishlist/route.ts` to see the three patterns.
+
+## How to make a change
+
+**Change copy or layout on a static page.** Edit the page or section component. Policy pages live in `src/app/shipping`, `returns`, `privacy-policy`, and `terms`; they share `src/components/policies/PolicyUI.tsx`.
+
+**Add a product field.** Add it to the API type and normalizer in `src/lib/api/products.ts`, then consume it in the component. Keep the normalization in the API layer; do not teach components about raw API shapes.
+
+**Add an authenticated endpoint.** Add a route handler under `src/app/api/<domain>/route.ts` that forwards the `Authorization` header, then call that route from `src/lib/api/<domain>.ts`. Do not call WordPress directly from a client component for a protected endpoint; that is what causes the CORS problems the proxies exist to avoid.
+
+**Add a client store action.** Put the network call in `src/lib/api/`, keep Zustand for state and orchestration, and let the store return errors through its `error` field or a thrown `ApiError`.
+
+**Change brand colors or fonts.** Edit the tokens in `src/app/globals.css`. Components use `bg-brand-*`, `text-brand-*`, and `font-serif`. See [design-system.md](design-system.md).
+
+## Troubleshooting
+
+**Products are empty and the server log shows a fetch failure.** `NEXT_PUBLIC_WP_URL` is unset or wrong. `getAllProductSlugs()` returns `[]` when the variable is missing, so a deployment can build successfully with no pre-rendered products.
+
+**The browser console shows CORS errors.** The endpoint you are calling is not proxied. Use the matching route under `/api` or add one. Existing proxies strip nothing: they forward the bearer token and response body as-is.
+
+**Every page redirects to `/login`.** A stale guest cart token is being retried. The auth store handles this case, but an old token can still sit in `localStorage['cart_token']`. Clear site data and reload.
+
+**Login succeeds but the account page bounces back.** The refresh cookie is blocked. Cookies are `httpOnly`, `sameSite=lax`, and `secure` in production. On plain HTTP, `secure` cookies are rejected; use HTTPS or run in development mode.
+
+**Card form never appears.** `NEXT_PUBLIC_STRIPE_PK` is missing. `StripeForm` is dynamically imported with `ssr: false`, so the failure is client-side.
+
+**Newsletter form returns 503.** `MAILCHIMP_API_KEY` or `MAILCHIMP_AUDIENCE_ID` is unset. This is an intentional configuration error, not a Mailchimp outage.
+
+**Images from WordPress do not render.** `next.config.ts` allows all HTTPS and HTTP hosts, so the usual causes are a broken image URL or the API returning `url` where the client expects `src`. The product normalizer already accepts both fields; check the raw response before editing it again.
+
+## Next
+
+- [architecture.md](architecture.md) for how the pieces fit.
+- [project-structure.md](project-structure.md) for where things live.
+- [coding-standards.md](coding-standards.md) before opening a pull request.

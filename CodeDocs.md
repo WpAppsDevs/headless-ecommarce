@@ -1,5 +1,7 @@
 # Code Documentation
 
+> **Legacy reference.** The maintained documentation is in [`docs/`](docs/README.md). This file predates the current review, tracking, account, and policy work and is kept for history. Where it disagrees with the code, the code wins.
+
 **Next.js Headless eCommerce Frontend** — Complete Developer Guide
 
 ## Table of Contents

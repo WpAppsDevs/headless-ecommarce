@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout flow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:  #fbf7f3;
+      --color-ink:    #1f2a3c;
+      --color-muted:  #6f6f6f;
+      --color-soft:   #8a7a72;
+      --color-accent: #9e2f45;
+      --font-sans:    'Geist', system-ui, sans-serif;
+      --font-serif:   'Instrument Serif', Georgia, serif;
+      --font-mono:    'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1200px; width: 100%; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+    svg { width: 100%; min-width: 960px; display: block; }
+    @media print {
+      .diagram-container { overflow-x: visible; }
+      svg { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Flowchart · Storefront</p>
+    <h1>What happens when a customer checks out</h1>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 960 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="checkout-flow-title checkout-flow-desc">
+        <title id="checkout-flow-title">Checkout flow</title>
+        <desc id="checkout-flow-desc">A customer must be signed in and have a non-empty cart before filling checkout details, choosing a gateway, and placing an order. Success shows the confirmation page; failure shows an inline error and re-enables submit.</desc>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#6f6f6f"/></marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#9e2f45"/></marker>
+        </defs>
+
+        <rect width="960" height="600" fill="#fbf7f3"/>
+
+        <!-- Arrows first -->
+        <path d="M480,104 V144" fill="none" stroke="#6f6f6f" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <path d="M480,224 V256" fill="none" stroke="#6f6f6f" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <path d="M480,336 V376" fill="none" stroke="#6f6f6f" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <path d="M480,440 V472" fill="none" stroke="#9e2f45" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+        <path d="M384,184 H320" fill="none" stroke="#6f6f6f" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <path d="M384,296 H320" fill="none" stroke="#6f6f6f" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <path d="M576,512 H640" fill="none" stroke="#9e2f45" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+        <path d="M384,512 H320" fill="none" stroke="#6f6f6f" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+        <!-- Branch labels, masks keep them off the strokes -->
+        <rect x="344" y="166" width="20" height="12" rx="2" fill="#fbf7f3"/>
+        <text x="354" y="175" fill="#6f6f6f" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">NO</text>
+        <rect x="344" y="278" width="20" height="12" rx="2" fill="#fbf7f3"/>
+        <text x="354" y="287" fill="#6f6f6f" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">NO</text>
+        <rect x="486" y="234" width="28" height="12" rx="2" fill="#fbf7f3"/>
+        <text x="500" y="243" fill="#6f6f6f" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">YES</text>
+        <rect x="486" y="348" width="28" height="12" rx="2" fill="#fbf7f3"/>
+        <text x="500" y="357" fill="#6f6f6f" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">YES</text>
+        <rect x="592" y="494" width="28" height="12" rx="2" fill="#fbf7f3"/>
+        <text x="606" y="503" fill="#6f6f6f" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">YES</text>
+        <rect x="336" y="494" width="20" height="12" rx="2" fill="#fbf7f3"/>
+        <text x="346" y="503" fill="#6f6f6f" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">NO</text>
+
+        <!-- Start -->
+        <rect x="384" y="56" width="192" height="48" rx="24" fill="rgba(158,47,69,0.08)" stroke="#9e2f45" stroke-width="1.2"/>
+        <text x="480" y="76" fill="#1f2a3c" font-size="12" font-family="'Geist', system-ui, sans-serif" font-weight="600" text-anchor="middle">Checkout requested</text>
+        <text x="480" y="92" fill="#6f6f6f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">from /cart</text>
+
+        <!-- Decision: signed in -->
+        <polygon points="480,144 576,184 480,224 384,184" fill="#ffffff" stroke="#1f2a3c" stroke-width="1"/>
+        <text x="480" y="181" fill="#1f2a3c" font-size="12" font-family="'Geist', system-ui, sans-serif" font-weight="600" text-anchor="middle">Signed in?</text>
+        <text x="480" y="197" fill="#6f6f6f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">getUser()</text>
+
+        <!-- Redirect to login -->
+        <rect x="120" y="160" width="200" height="48" rx="6" fill="rgba(31,42,60,0.03)" stroke="rgba(31,42,60,0.30)" stroke-width="1"/>
+        <text x="220" y="180" fill="#1f2a3c" font-size="12" font-family="'Geist', system-ui, sans-serif" font-weight="600" text-anchor="middle">Redirect to /login</text>
+        <text x="220" y="196" fill="#6f6f6f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">?redirect=/checkout</text>
+
+        <!-- Decision: cart -->
+        <polygon points="480,256 580,296 480,336 380,296" fill="#ffffff" stroke="#1f2a3c" stroke-width="1"/>
+        <text x="480" y="293" fill="#1f2a3c" font-size="12" font-family="'Geist', system-ui, sans-serif" font-weight="600" text-anchor="middle">Cart has items?</text>
+        <text x="480" y="309" fill="#6f6f6f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">cartStore.items</text>
+
+        <!-- Redirect to cart -->
+        <rect x="120" y="272" width="200" height="48" rx="6" fill="rgba(31,42,60,0.03)" stroke="rgba(31,42,60,0.30)" stroke-width="1"/>
+        <text x="220" y="292" fill="#1f2a3c" font-size="12" font-family="'Geist', system-ui, sans-serif" font-weight="600" text-anchor="middle">Redirect to /cart</text>
+        <text x="220" y="308" fill="#6f6f6f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">empty cart</text>
+
+        <!-- Step -->
+        <rect x="324" y="376" width="312" height="64" rx="6" fill="#ffffff" stroke="#1f2a3c" stroke-width="1"/>
+        <text x="480" y="402" fill="#1f2a3c" font-size="12" font-family="'Geist', system-ui, sans-serif" font-weight="600" text-anchor="middle">Fill address, shipping, gateway</text>
+        <text x="480" y="419" fill="#6f6f6f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">BACS or Stripe · 30 s request timeout</text>
+
+        <!-- Decision: result -->
+        <polygon points="480,472 576,512 480,552 384,512" fill="#ffffff" stroke="#1f2a3c" stroke-width="1"/>
+        <text x="480" y="509" fill="#1f2a3c" font-size="12" font-family="'Geist', system-ui, sans-serif" font-weight="600" text-anchor="middle">Order created?</text>
+        <text x="480" y="525" fill="#6f6f6f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">/api/checkout</text>
+
+        <!-- Success -->
+        <rect x="640" y="488" width="200" height="48" rx="24" fill="rgba(158,47,69,0.08)" stroke="#9e2f45" stroke-width="1.2"/>
+        <text x="740" y="508" fill="#1f2a3c" font-size="12" font-family="'Geist', system-ui, sans-serif" font-weight="600" text-anchor="middle">Order confirmation</text>
+        <text x="740" y="524" fill="#6f6f6f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">clear cart · sessionStorage</text>
+
+        <!-- Failure -->
+        <rect x="120" y="488" width="200" height="48" rx="6" fill="rgba(31,42,60,0.03)" stroke="rgba(31,42,60,0.30)" stroke-width="1"/>
+        <text x="220" y="508" fill="#1f2a3c" font-size="12" font-family="'Geist', system-ui, sans-serif" font-weight="600" text-anchor="middle">Show inline error</text>
+        <text x="220" y="524" fill="#6f6f6f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">submit re-enabled</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>

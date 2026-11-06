@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Storefront architecture</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:  #fbf7f3;
+      --color-ink:    #1f2a3c;
+      --color-muted:  #6f6f6f;
+      --color-soft:   #8a7a72;
+      --color-accent: #9e2f45;
+      --color-link:   #2e5aa8;
+      --font-sans:    'Geist', system-ui, sans-serif;
+      --font-serif:   'Instrument Serif', Georgia, serif;
+      --font-mono:    'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1200px; width: 100%; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+    svg { width: 100%; min-width: 960px; display: block; }
+    @media print {
+      .diagram-container { overflow-x: visible; }
+      svg { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Architecture · Headless ECF</p>
+    <h1>Where each request goes</h1>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 960 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="storefront-architecture-title storefront-architecture-desc">
+        <title id="storefront-architecture-title">Storefront architecture</title>
+        <desc id="storefront-architecture-desc">Browser components and Zustand stores reach WordPress through Next.js server components and route handlers, with some public calls made directly and third-party APIs called from both the browser and the proxy.</desc>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#6f6f6f"/></marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#9e2f45"/></marker>
+          <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+        </defs>
+
+        <rect width="960" height="600" fill="#fbf7f3"/>
+
+        <!-- Zones -->
+        <rect x="20" y="80" width="220" height="236" rx="8" fill="rgba(31,42,60,0.02)" stroke="rgba(31,42,60,0.10)" stroke-width="0.8"/>
+        <rect x="104" y="84" width="52" height="12" rx="2" fill="#fbf7f3"/>
+        <text x="130" y="93" fill="#8a7a72" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">BROWSER</text>
+
+        <rect x="260" y="80" width="260" height="316" rx="8" fill="rgba(31,42,60,0.02)" stroke="rgba(31,42,60,0.10)" stroke-width="0.8"/>
+        <rect x="336" y="84" width="108" height="12" rx="2" fill="#fbf7f3"/>
+        <text x="390" y="93" fill="#8a7a72" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">NEXT.JS · SERVER</text>
+
+        <rect x="540" y="80" width="236" height="220" rx="8" fill="rgba(31,42,60,0.02)" stroke="rgba(31,42,60,0.10)" stroke-width="0.8"/>
+        <rect x="620" y="84" width="76" height="12" rx="2" fill="#fbf7f3"/>
+        <text x="658" y="93" fill="#8a7a72" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">WORDPRESS</text>
+
+        <!-- Arrows drawn before nodes -->
+        <path d="M220,144 H280" fill="none" stroke="#6f6f6f" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <path d="M220,248 H240 V300 H280" fill="none" stroke="#6f6f6f" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <path d="M500,144 H560" fill="none" stroke="#6f6f6f" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <path d="M500,300 H520 V180 H560" fill="none" stroke="#9e2f45" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+        <path d="M500,340 H640 V420" fill="none" stroke="#6f6f6f" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+        <!-- Store to WP: direct public cart calls, hopping over the proxied path -->
+        <path d="M220,260 H512 a8,8 0 0,1 16,0 H584 V216" fill="none" stroke="#2e5aa8" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow-link)"/>
+
+        <!-- Browser to third-party: Stripe.js runs in the browser -->
+        <path d="M40,144 H12 V452 H540" fill="none" stroke="#2e5aa8" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow-link)"/>
+
+        <!-- Browser nodes -->
+        <rect x="40" y="112" width="180" height="64" rx="6" fill="#ffffff" stroke="#1f2a3c" stroke-width="1"/>
+        <text x="130" y="139" fill="#1f2a3c" font-size="12" font-family="'Geist', system-ui, sans-serif" font-weight="600" text-anchor="middle">Storefront UI</text>
+        <text x="130" y="156" fill="#6f6f6f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">React 19 · client components</text>
+
+        <rect x="40" y="216" width="180" height="64" rx="6" fill="#ffffff" stroke="#1f2a3c" stroke-width="1"/>
+        <text x="130" y="243" fill="#1f2a3c" font-size="12" font-family="'Geist', system-ui, sans-serif" font-weight="600" text-anchor="middle">Zustand stores</text>
+        <text x="130" y="260" fill="#6f6f6f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">auth · cart · wishlist · currency</text>
+
+        <!-- Next.js nodes -->
+        <rect x="280" y="112" width="220" height="64" rx="6" fill="#ffffff" stroke="#1f2a3c" stroke-width="1"/>
+        <text x="390" y="139" fill="#1f2a3c" font-size="12" font-family="'Geist', system-ui, sans-serif" font-weight="600" text-anchor="middle">Server Components</text>
+        <text x="390" y="156" fill="#6f6f6f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">ISR pages · metadata · layout</text>
+
+        <rect x="280" y="268" width="220" height="88" rx="6" fill="#ffffff" stroke="#1f2a3c" stroke-width="1"/>
+        <text x="390" y="300" fill="#1f2a3c" font-size="12" font-family="'Geist', system-ui, sans-serif" font-weight="600" text-anchor="middle">Route handlers</text>
+        <text x="390" y="317" fill="#6f6f6f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">/api/* · CORS + token proxy</text>
+        <text x="390" y="334" fill="#6f6f6f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">cookies · revalidation cache</text>
+
+        <!-- WordPress node -->
+        <rect x="560" y="128" width="192" height="88" rx="6" fill="rgba(158,47,69,0.08)" stroke="#9e2f45" stroke-width="1.2"/>
+        <text x="656" y="162" fill="#1f2a3c" font-size="12" font-family="'Geist', system-ui, sans-serif" font-weight="600" text-anchor="middle">Wrapper API</text>
+        <text x="656" y="179" fill="#6f6f6f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">WordPress · WooCommerce</text>
+        <text x="656" y="196" fill="#6f6f6f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">wpadhlwrapi/v1 · api</text>
+
+        <!-- Third-party node -->
+        <rect x="540" y="420" width="192" height="64" rx="6" fill="rgba(31,42,60,0.03)" stroke="rgba(31,42,60,0.30)" stroke-width="1"/>
+        <text x="636" y="447" fill="#1f2a3c" font-size="12" font-family="'Geist', system-ui, sans-serif" font-weight="600" text-anchor="middle">Third-party APIs</text>
+        <text x="636" y="464" fill="#6f6f6f" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">Stripe.js · Mailchimp</text>
+
+        <!-- Legend -->
+        <line x1="40" y1="548" x2="72" y2="548" stroke="#6f6f6f" stroke-width="1.2"/>
+        <text x="80" y="551" fill="#6f6f6f" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">PROXIED</text>
+        <line x1="164" y1="548" x2="196" y2="548" stroke="#2e5aa8" stroke-width="1" stroke-dasharray="4,3"/>
+        <text x="204" y="551" fill="#6f6f6f" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">DIRECT FROM BROWSER</text>
+        <rect x="388" y="541" width="14" height="14" rx="2" fill="rgba(158,47,69,0.08)" stroke="#9e2f45" stroke-width="1"/>
+        <text x="410" y="551" fill="#6f6f6f" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">SOURCE OF TRUTH</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>

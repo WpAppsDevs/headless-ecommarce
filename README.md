@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Headless ECF Storefront
 
-## Getting Started
+A Next.js storefront for a WooCommerce catalog, built for Najifa's Shop. WordPress owns products, carts, orders, users, reviews, and shipping data. This app owns the interface and the client-side commerce state.
 
-First, run the development server:
+## Stack
+
+- Next.js 16, App Router, React 19, TypeScript strict
+- Tailwind CSS 4 with shadcn/base-nova components
+- Zustand for auth, cart, wishlist, review-session, and currency state
+- react-hook-form and zod for forms
+- Stripe.js for card tokenization
+- WordPress WPAppsDev Headless Wrapper API as the backend
+
+## Quick start
+
+```bash
+npm install
+cp .env.local.example .env.local
+```
+
+Set the WordPress origin in `.env.local`:
+
+```dotenv
+NEXT_PUBLIC_WP_URL=http://headlessecf.local
+NEXT_PUBLIC_STRIPE_PK=pk_test_...
+```
+
+Then:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000>.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Development server |
+| `npm run build` | Production build, including type checking |
+| `npm run start` | Serve the production build |
+| `npm run lint` | ESLint |
+| `npx tsc --noEmit` | Type check only |
 
-## Learn More
+There is no test runner yet.
 
-To learn more about Next.js, take a look at the following resources:
+## What is in the app
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Home page with merchandising sections and a server-rendered featured grid.
+- Shop with server-side category/tag/brand/search filters and client-side price/color/size filters.
+- Product detail with image gallery, variations, stock state, tabs, reviews, and related products.
+- Guest cart with a local guest token, merged into the user cart on login.
+- Checkout with BACS and Stripe gateways, country/state selects, and shipping methods.
+- Account dashboard, order history, wishlist, addresses, and settings.
+- Guest and authenticated order tracking.
+- Bengali shipping, returns, privacy, and terms pages.
+- Newsletter signup through Mailchimp.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Documentation
 
-## Deploy on Vercel
+Start at [docs/README.md](docs/README.md).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Most useful first reads:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Getting started](docs/getting-started.md) — environment, scripts, troubleshooting.
+- [Architecture](docs/architecture.md) — how the browser, Next.js, and WordPress fit together.
+- [Project structure](docs/project-structure.md) — where files live and where new ones go.
+- [Coding standards](docs/coding-standards.md) — conventions and definition of done.
+- [Known gaps](docs/known-gaps.md) — current limitations, including auth reload behavior and the absence of tests.
+- [GLOSSARY.md](GLOSSARY.md) — shared vocabulary.
+
+Architecture decisions are in [docs/adr/](docs/adr/).
+
+## Repository scope
+
+This repository is the staging checkout at `Local Sites/headlessecf/app/public`. It contains the front end only. The WordPress site and its plugins live outside this repository. `ApiDocs.md` and `CodeDocs.md` are older references; `docs/` is the maintained documentation.
+
+## Status
+
+Type checking passes. The production build path is the release gate. Lint has five errors and a set of warnings, listed in [known-gaps.md](docs/known-gaps.md). The highest-impact open issue is that signed-in users can lose their session after a full reload because `authStore.hydrate()` skips the refresh attempt when no guest cart token or cached token exists.
