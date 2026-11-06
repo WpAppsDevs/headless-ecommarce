@@ -20,8 +20,9 @@
 | `layout/CartHydrator.tsx` | Client | Fetches the cart once, after auth hydration, only if there is something to restore. |
 | `layout/WishlistHydrator.tsx` | Client | Hydrates guest or server wishlist once. |
 | `layout/CurrencyHydrator.tsx` | Client | Fetches store settings once. |
+| `layout/ErrorReporter.tsx` | Client | Reports uncaught window errors and unhandled rejections. |
 
-`Header` takes `navLinks?: NavLink[]`. Empty or missing links fall back to `STATIC_NAV_LINKS`, which includes `/contact` even though that page does not exist.
+`Header` takes `navLinks?: NavLink[]`. Empty or missing links fall back to `STATIC_NAV_LINKS`, which includes `/contact`; that static support page exists.
 
 The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local component with autofocus and Escape-to-close.
 

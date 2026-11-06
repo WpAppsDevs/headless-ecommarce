@@ -4,14 +4,14 @@
 
 | Environment | Front end | WordPress |
 | --- | --- | --- |
-| Local | `npm run dev`, usually `http://localhost:3000` | Local site, e.g. `http://headlessecf.local` |
+| Local | `npm run dev`, usually `http://localhost:3000` | Local site, e.g. `http://headlessec.local` |
 | Production | Vercel or another Next.js host | Public wrapper API, e.g. `https://api.example.com` |
 
 There is no separate staging deployment in this repository. The local checkout doubles as the staging copy. A production deploy needs its own WordPress URL and Stripe key.
 
 ## Required configuration
 
-Set these in the host's environment settings, not in a committed file.
+Set runtime values in the host's environment settings. `.env.production` is tracked because it contains only public `NEXT_PUBLIC_*` values used at build time; never put a secret in it.
 
 ```dotenv
 NEXT_PUBLIC_WP_URL=https://api.example.com
@@ -32,6 +32,8 @@ ERROR_REPORT_WEBHOOK_URL=...
 ```
 
 `ERROR_REPORT_WEBHOOK_URL` is optional and server-only. When set, `/api/errors` forwards client error reports to it as JSON after writing them to the server log. Any collector or chat webhook that accepts JSON works. Without it, reports still appear in the hosting provider's function logs.
+
+Next.js loads `.env.local` first, then `.env.<NODE_ENV>`, then `.env`; a local override wins over `.env.production`. `.env.production` in this repo holds only public production values. Server-only values such as `ERROR_REPORT_WEBHOOK_URL` belong in the host environment, not in a tracked file.
 
 `NEXT_PUBLIC_*` values are compiled into the client bundle. After changing one, rebuild and redeploy; changing it at runtime does not update an existing build.
 
@@ -109,14 +111,14 @@ The route treats "Member Exists" as success. It does not double opt-in; the memb
 | --- | --- | --- |
 | Next.js fetch cache | products, filters, menus, reviews aggregate/random | 60 s to 6 h |
 | Route handler cache | store settings | 1 h |
-| CDN headers | store settings, product filters | `s-maxage` + stale-while-revalidate |
+| CDN headers | store settings | `s-maxage` + stale-while-revalidate |
 | Browser | most authenticated data | no-store |
 
 After a WordPress content change, expect up to the TTL before the storefront reflects it. To force a refresh, redeploy (clears the build cache) or wait. There is no on-demand revalidation webhook.
 
 ## Monitoring
 
-There is no error reporting service wired in. `error.tsx` logs to the console and shows a digest when Next.js provides one.
+There is no third-party error service wired in. `error.tsx` and `ErrorReporter` send reports to `/api/errors`, which writes them to the server log and forwards to `ERROR_REPORT_WEBHOOK_URL` when set. Next.js digests are included when present.
 
 Minimum checks after a deploy:
 

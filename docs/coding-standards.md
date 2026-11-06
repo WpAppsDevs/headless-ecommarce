@@ -7,7 +7,7 @@ These rules describe how the codebase is written today and where it is going. Fo
 - `strict` is on. Do not weaken `tsconfig.json`.
 - Path alias: `@/*` maps to `src/*`. Use it for cross-folder imports.
 - Prefer explicit return types on exported API functions and store actions. Small components can infer.
-- Do not add `any`. The one existing `any` is in `Address.tsx`; do not copy it. Use `unknown` plus a type guard at the boundary, or define a narrow interface.
+- Do not add `any`. Use `unknown` plus a type guard at the boundary, or define a narrow interface.
 - API payloads are untrusted. Type the expected shape, then normalize; do not cast a raw response straight into a domain type.
 - String IDs and numbers are not interchangeable. The cart API returns string IDs and quantities; update and remove calls take numbers. Convert at the call site.
 

@@ -38,26 +38,27 @@ Actions: `login`, `register`, `logout`, `refreshToken`, `hydrate`.
 1. Clears `tokenCache`.
 2. Calls `/api/auth/logout` to expire cookies (fire and forget, errors ignored).
 3. Clears user and auth flags.
-4. Clears the cart and review-session state.
-5. Does **not** clear the wishlist store. The header badge can keep the previous user's count until reload.
+4. Clears the cart, wishlist, and review-session state.
+
+The header wishlist badge drops to zero without a reload.
 
 `hydrate()`:
 
-1. Returns immediately if there is neither a guest cart token nor a cached access token.
+1. Returns immediately only when there is no guest cart token, no cached access token, and no `session_hint` cookie.
 2. Calls `/api/auth/refresh`.
 3. Stores the new token and fetches `/api/auth/me`.
 4. Sets the user.
 5. Always sets `hydrated: true` in `finally`.
 
-The early return is a real limitation. A signed-in user with no guest cart token and no cached token after a full reload is treated as a fresh visitor, so the refresh flow never runs. See [known-gaps.md](known-gaps.md).
+`session_hint` is a readable, non-secret cookie set on login, registration, and successful refresh. It exists because the httpOnly refresh cookie cannot be inspected by JavaScript. The predicate lives in `src/lib/auth-session.ts` and has unit tests.
 
 The unauthorized callback is registered inside the store factory. It is the only place that decides whether a 401 becomes a redirect.
 
 ## `cartStore`
 
-State: `items`, `cartToken`, `guestToken`, `shippingMethods`, `chosenShippingMethod`, `loading`, `error`, `cartDrawerOpen`.
+State: `items`, `cartToken`, `guestToken`, `shippingMethods`, `chosenShippingMethod`, `loading`, `error`, `cartDrawerOpen`, `lastFetchedAt`.
 
-`fetchCart()` loads the cart and also refreshes shipping methods.
+`fetchCart()` loads the cart and also refreshes shipping methods. It returns early while another fetch is in flight, so the layout hydrator and cart page do not duplicate the request. A successful fetch records `lastFetchedAt`.
 
 `addItem(productId, variationId, quantity, attributes?)`:
 

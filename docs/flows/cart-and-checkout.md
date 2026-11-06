@@ -127,7 +127,7 @@ If the Stripe key is missing, the card element cannot initialize. If the dynamic
 - transaction ID when present,
 - BACS instructions for a pending order with no transaction.
 
-A direct visit or a cleared session shows the heading but no status details. The page does not fetch the order, so it cannot recover them.
+A direct visit or a cleared session falls back to `getOrders(1, 100)` for a signed-in user and finds the order by ID. If neither the stored result nor a recent order matches, the page shows a "could not load" message with a link to the account orders instead of an empty heading.
 
 ## Failure states to preserve
 

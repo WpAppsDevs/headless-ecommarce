@@ -124,7 +124,7 @@ The WordPress plugin builds the reset link. Its configured reset URL must point 
 - `/account` waits for `hydrated`. If `isAuthenticated` is false, it redirects to `/login`. It then fetches profile and orders. Auth errors call `logout()` and redirect.
 - `/checkout` calls `getUser()` immediately. `session_expired` and `invalid_token` redirect to `/login?redirect=/checkout`. Other profile errors let the form render without prefill.
 
-There is no middleware and no server-side route guard. Protection is a client redirect plus WordPress rejecting the token.
+`src/proxy.ts` (Next.js 16's middleware replacement) also guards both paths. It checks for `refresh_token` or `session_hint` and redirects to `/login?redirect=<path>` when both are absent. The check is presence-only; it is not an authorization boundary. WordPress still authorizes every data request, and the client redirect remains the fallback for expired sessions.
 
 ## Where to change auth
 

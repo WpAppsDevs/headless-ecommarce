@@ -13,15 +13,18 @@ A Next.js storefront for a WooCommerce catalog, built for Najifa's Shop. WordPre
 
 ## Quick start
 
+You need a WordPress site running the [WPAppsDev Headless Wrapper API](https://github.com/WpAppsDevs/wpappsdev-headless-wrapper-api). If you do not already have one, follow [Backend setup](docs/getting-started.md#backend-setup).
+
 ```bash
 npm install
-cp .env.local.example .env.local
+# Copy only if the file does not exist; a working checkout may already have it.
+test -f .env.local || cp .env.local.example .env.local
 ```
 
 Set the WordPress origin in `.env.local`:
 
 ```dotenv
-NEXT_PUBLIC_WP_URL=http://headlessecf.local
+NEXT_PUBLIC_WP_URL=http://headlessec.local
 NEXT_PUBLIC_STRIPE_PK=pk_test_...
 ```
 
@@ -68,7 +71,7 @@ Most useful first reads:
 - [Project structure](docs/project-structure.md) — where files live and where new ones go.
 - [Coding standards](docs/coding-standards.md) — conventions and definition of done.
 - [Known gaps](docs/known-gaps.md) — current limitations, including the WordPress endpoints still missing.
-- [Fix plan](docs/fix-plan.md) — the remediation work already applied, kept as a reference for the backend items.
+- [Fix plan](docs/fix-plan.md) — a closed archive of completed frontend fixes.
 - [GLOSSARY.md](GLOSSARY.md) — shared vocabulary.
 
 Architecture decisions are in [docs/adr/](docs/adr/).

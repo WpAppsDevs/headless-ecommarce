@@ -131,18 +131,14 @@ Raw API images may use `src` or `url`. Always run them through `normalizeImage()
 - Keeps top-level items only, sorts by `order`, converts absolute WordPress URLs to relative paths.
 - Caches for 5 minutes and returns `[]` on any failure.
 
-### `user.ts`
-
-Empty placeholder. Do not import it expecting user functions; use `checkout.ts` (`getUser`) instead.
-
 ## Route handlers
 
 | Route | Upstream | Notes |
 | --- | --- | --- |
-| `POST /api/auth/login` | `api/auth/login` | Sets `access_token` (1 h) and `refresh_token` (14 d) cookies; returns user and access token. |
+| `POST /api/auth/login` | `api/auth/login` | Sets `access_token` (1 h), `refresh_token` (14 d), and readable `session_hint` cookies; returns user and access token. |
 | `POST /api/auth/register` | `api/auth/register` | Same cookies; returns 201. |
 | `POST /api/auth/refresh` | `api/auth/refresh` | Reads the refresh cookie; accepts `access_token` or `token` in the response; rotates the refresh cookie if the plugin returns one; expires cookies on failure. |
-| `POST /api/auth/logout` | none | Expires both cookies. Does not call WordPress. |
+| `POST /api/auth/logout` | none | Expires the access, refresh, and session hint cookies. Does not call WordPress. |
 | `GET /api/auth/me` | `api/user` | Requires an `Authorization` header. |
 | `POST /api/auth/forgot-password` | `api/auth/forgot-password` | Pure proxy. |
 | `POST /api/auth/reset-password` | `api/auth/reset-password` | Pure proxy. |
@@ -157,10 +153,11 @@ Empty placeholder. Do not import it expecting user functions; use `checkout.ts` 
 | `GET /api/reviews/product/:id` | `wpadhlwrapi/v1/reviews/product/:id` | No cache. |
 | `GET /api/reviews/aggregate/:id` | `wpadhlwrapi/v1/reviews/aggregate/:id` | 5-minute server cache. |
 | `GET /api/reviews/random` | `wpadhlwrapi/v1/reviews/random` | 10-minute server cache. |
-| `POST /api/tracking/search` | `api/tracking/search` | Public. The handler reads an auth header but does not forward it. |
+| `POST /api/tracking/search` | `api/tracking/search` | Public. Forwards the JSON body without an auth header. |
 | `GET /api/tracking/order/:id` | `api/tracking/order/:id` | Requires a token. |
 | `GET /api/store-settings` | `wpadhlwrapi/v1/store-settings` | 1-hour server cache and CDN headers. |
 | `POST /api/newsletter` | Mailchimp | Secret stays server-side. Returns 503 when unconfigured, 422 on invalid email, and succeeds for an existing member. |
+| `POST /api/errors` | optional webhook | Logs client error reports; caps the body at 16 KB; forwards to `ERROR_REPORT_WEBHOOK_URL` when set. |
 
 Most handlers catch every error and return `{ success: false, code: 'server_error', message }` with status 500. They do not distinguish a WordPress timeout from a parse failure.
 

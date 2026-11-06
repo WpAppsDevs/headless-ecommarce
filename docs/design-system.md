@@ -96,7 +96,7 @@ Avoid large drop shadows. The design uses borders and surface tints for separati
 
 ## Dark mode
 
-`globals.css` defines a `.dark` block, but the app never adds the class and has no toggle. Treat dark mode as unwired. Components that include `dark:` classes are leftovers from shadcn defaults.
+There is no `.dark` token block in `globals.css` and no theme toggle. A dormant `@custom-variant dark` and some `dark:` classes remain from shadcn defaults; they activate only under a `.dark` ancestor, which nothing sets. Treat dark mode as unimplemented.
 
 ## Motion
 
@@ -141,7 +141,7 @@ The logo is `public/images/Najifa's Shop Logo.png`. The apostrophe and space in 
 
 **Change the radius.** Edit `--radius`. shadcn's derived radii follow.
 
-**Add a dark theme.** Add a theme toggle that sets `.dark` on `<html>`, verify contrast, and remove or wire the existing `.dark` block. Do not assume it works because the block exists.
+**Add a dark theme.** Add the `.dark` token block, a toggle that sets the class on `<html>`, persisted preference, and a contrast audit. Then remove or wire the dormant `dark:` utilities.
 
 ## Related
 

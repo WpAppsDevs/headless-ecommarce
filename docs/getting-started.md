@@ -4,22 +4,61 @@
 
 - Node.js 20.9 or newer. Next.js 16 requires it.
 - npm. The lockfile is `package-lock.json`.
-- A WordPress site running the WPAppsDev Headless Wrapper API, reachable over HTTP or HTTPS.
+- A WordPress site running the WPAppsDev Headless Wrapper API, reachable over HTTP or HTTPS. Installing the plugin needs Composer and WP-CLI, or the Local app's terminal.
 - Optional: a Stripe test publishable key and a Mailchimp audience, if you work on those paths.
 
-The WordPress site is a separate repository. For local development it is usually the Local site at `Local Sites/headlessecf`, served at a host such as `http://headlessecf.local`. Only this front end is documented here.
+The WordPress site and plugin are separate repositories. Only this front end is documented here.
+
+## Backend setup
+
+If someone already gave you a working WordPress URL, skip to [First run](#first-run) and set `NEXT_PUBLIC_WP_URL` to it. Otherwise install the wrapper plugin:
+
+```bash
+cd <wordpress-root>/wp-content/plugins
+git clone https://github.com/WpAppsDevs/wpappsdev-headless-wrapper-api.git wpappsdev-headless-wrapper-api
+cd wpappsdev-headless-wrapper-api
+composer install --no-dev
+wp plugin activate wpappsdev-headless-wrapper-api
+```
+
+The plugin requires WordPress 5.0+, an active WooCommerce plugin, PHP 8.0+, and pretty permalinks. With plain permalinks the REST routes are not reachable at `/wp-json`, which this app assumes.
+
+On this machine the paired Local site is `Local Sites/headlessec` (WordPress) while the front end is `Local Sites/headlessecf/app/public`. The plugin checkout is `Local Sites/headlessec/app/public/wp-content/plugins/wpappsdev-headless-wrapper-api`.
+
+Verify the API before starting the front end. Use the same origin you will put in `NEXT_PUBLIC_WP_URL`:
+
+```bash
+export WP_URL=http://headlessec.local
+curl -s "$WP_URL/wp-json/wpadhlwrapi/v1/products?per_page=1"
+curl -s "$WP_URL/wp-json/wpadhlwrapi/v1/store-settings"
+curl -s -o /dev/null -w '%{http_code}\n' "$WP_URL/wp-json/api/user"   # expect 401
+```
+
+- A product JSON object means the plugin and WooCommerce are working.
+- `404` on `/wp-json/...` usually means permalinks are set to Plain. Choose Settings → Permalinks → Post name.
+- `401` on `/wp-json/api/user` is correct without a token; it proves the private namespace is registered.
+- `rest_no_route` means the plugin is inactive or its namespace failed to register.
+
+Before production, set a dedicated JWT secret in `wp-config.php`:
+
+```php
+define( 'HL_WRAPI_JWT_SECRET', 'a-long-random-string' );
+```
+
+The plugin documentation lives in its own repository: <https://github.com/WpAppsDevs/wpappsdev-headless-wrapper-api>.
 
 ## First run
 
 ```bash
 npm install
-cp .env.local.example .env.local
+# Copy only if the file does not exist; a working checkout may already have it.
+test -f .env.local || cp .env.local.example .env.local
 ```
 
 Edit `.env.local` and set at least:
 
 ```dotenv
-NEXT_PUBLIC_WP_URL=http://headlessecf.local
+NEXT_PUBLIC_WP_URL=http://headlessec.local
 ```
 
 Then:
@@ -28,7 +67,7 @@ Then:
 npm run dev
 ```
 
-Open <http://localhost:3000>. The home page, shop, and product pages are the fastest way to confirm that WordPress is reachable. If the page renders with an empty product grid, check `NEXT_PUBLIC_WP_URL` and the WordPress permalink settings before changing code.
+Open <http://localhost:3000>. The home page, shop, and product pages are the fastest way to confirm that WordPress is reachable. If the page renders with an empty product grid, run the three `curl` checks in [Backend setup](#backend-setup) before changing code. A missing URL makes `getAllProductSlugs()` return `[]` by design, so the build succeeds while the catalog is empty.
 
 ## Environment variables
 
@@ -43,6 +82,7 @@ Open <http://localhost:3000>. The home page, shop, and product pages are the fas
 | `NEXT_PUBLIC_HERO_CTA_LINK` | No | `config.ts` | Hero button URL. |
 | `MAILCHIMP_API_KEY` | For newsletter | `src/app/api/newsletter/route.ts` | Must include the datacenter suffix, for example `abc-us21`. |
 | `MAILCHIMP_AUDIENCE_ID` | For newsletter | same route | Without both Mailchimp values the route returns 503. |
+| `ERROR_REPORT_WEBHOOK_URL` | No | `src/app/api/errors/route.ts` | Server-only. Forwards client error reports as JSON. Reports still go to server logs without it. |
 
 `.env.local.example` is the storefront example. The root `.env.example` is a leftover Taskmaster template full of AI provider keys; it is not used by this app.
 

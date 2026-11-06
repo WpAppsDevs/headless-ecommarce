@@ -8,6 +8,7 @@
 | `/products` | `src/app/(shop)/products/page.tsx` | Server, ISR 60 s | Public |
 | `/products/[slug]` | `src/app/(shop)/products/[slug]/page.tsx` | Server, ISR 60 s | Public |
 | `/cart` | `src/app/cart/page.tsx` | Static shell + client content | Public |
+| `/contact` | `src/app/contact/page.tsx` | Static | Public |
 | `/checkout` | `src/app/checkout/page.tsx` | Client | Required |
 | `/account` | `src/app/account/page.tsx` | Client | Required |
 | `/login` | `src/app/login/page.tsx` | Static shell + client form | Public |
@@ -22,7 +23,7 @@
 | `/privacy-policy` | `src/app/privacy-policy/page.tsx` | Static | Public |
 | `/terms` | `src/app/terms/page.tsx` | Static | Public |
 
-There are no `/contact`, `/about`, `/faq`, or `/collections` pages. The header fallback links to `/contact`, but the route does not exist. The WordPress menu can replace the fallback links at runtime.
+There are no `/about`, `/faq`, or `/collections` pages. The header fallback includes `/contact`, which resolves to the static support page. The WordPress menu can replace the fallback links at runtime.
 
 ## Root layout
 
@@ -30,7 +31,7 @@ There are no `/contact`, `/about`, `/faq`, or `/collections` pages. The header f
 
 1. Loads Geist, Geist Mono, Playfair Display, and Inter through `next/font/google`.
 2. Fetches the `primary` WordPress menu with `getMenuByLocation`.
-3. Renders, in order: `AuthHydrator`, `CartHydrator`, `WishlistHydrator`, `CurrencyHydrator`, `AnnouncementBar`, `Header`, `CartDrawer`, `Toaster`, `main`, `Footer`.
+3. Renders, in order: `AuthHydrator`, `CartHydrator`, `WishlistHydrator`, `CurrencyHydrator`, `ErrorReporter`, `AnnouncementBar`, `Header`, `CartDrawer`, `Toaster`, `main`, `Footer`.
 
 `getMenuByLocation` never throws and returns `[]` on failure. The header then uses its static links. That means a WordPress outage degrades navigation instead of breaking the layout.
 
@@ -69,7 +70,7 @@ Pagination is a full navigation. Client-side filter state resets when the page c
 1. `generateStaticParams()` fetches every product slug. It returns `[]` when `NEXT_PUBLIC_WP_URL` is missing.
 2. `generateMetadata()` fetches the product and uses its name and stripped short description.
 3. The page fetches the product. `product_not_found` becomes `notFound()`; every other error is rethrown to the global error boundary.
-4. It then fetches the rating aggregate. The comment says "in parallel", but the code awaits the product first. Treat it as sequential unless you refactor it.
+4. It then fetches the rating aggregate. This necessarily follows the product fetch because the aggregate needs the product ID.
 5. If the aggregate has reviews, it emits Product JSON-LD with `aggregateRating`.
 6. It renders `PageHeader`, a two-column gallery and info block, `ProductTabs`, and `RelatedProducts` inside `<Suspense>`.
 
@@ -81,7 +82,7 @@ Pagination is a full navigation. Client-side filter state resets when the page c
 - Quantity, add-to-cart, error messages, and a mobile sticky bar live here.
 - The sticky bar appears when the main action row scrolls out of view, using `IntersectionObserver`.
 
-`ProductTabs` is an accordion, not tabs: Product Details, Additional Info, Shipping & Returns, Reviews. The `#reviews` hash opens the reviews panel. Shipping copy in this accordion is hardcoded and does not match the Bengali shipping policy page.
+`ProductTabs` is an accordion, not tabs: Product Details, Additional Info, Shipping & Returns, Reviews. The `#reviews` hash opens the reviews panel. The Shipping & Returns panel summarizes the rules and links to `/shipping` and `/returns`, which are the source of truth.
 
 ## Cart
 

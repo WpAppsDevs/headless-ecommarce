@@ -30,7 +30,7 @@ The Next.js auth route handlers are the only place that touches the refresh toke
 ## Consequences
 
 - A page reload loses the in-memory access token and must refresh.
-- The current hydrate function skips refresh when there is no guest cart token and no cached token, which breaks reload persistence for many signed-in users. The intended behavior is documented in [flows/authentication.md](../flows/authentication.md); the gap is in [known-gaps.md](../known-gaps.md).
+- Hydration checks for a guest cart token, a cached access token, or the `session_hint` cookie before calling refresh. The hint is readable and carries no credential; the refresh token stays httpOnly.
 - A 401 from a guest cart token must not redirect to login. The unauthorized handler distinguishes the two cases to avoid a redirect loop.
 - Production must use HTTPS, or `secure` cookies are rejected.
 - Changing domains invalidates sessions.

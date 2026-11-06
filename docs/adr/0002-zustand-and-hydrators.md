@@ -31,9 +31,9 @@ Hydration is explicit. Four client components in the root layout call one hydrat
 
 - Stores can import each other. `authStore` calls into cart, wishlist, and review stores on login and logout. The dependency is one-way.
 - Hydration order matters. Cart and wishlist wait for auth to finish, even when auth does nothing.
-- There is no request cache. Two components can fetch the same data; the cart page already does.
+- There is no general request cache. The cart store guards its own in-flight request and records `lastFetchedAt`, so the layout hydrator and cart page do not issue duplicate GETs.
 - Guest state uses localStorage (`cart_token`, `wishlist_ids`), so it must be cleared on login and handled when stale.
-- Auth rehydration currently has an early-return limitation; see [known-gaps.md](../known-gaps.md).
+- Auth rehydration uses three signals before refreshing: a guest cart token, a cached access token, or the readable `session_hint` cookie. Anonymous visitors make no auth request.
 
 ## Related
 

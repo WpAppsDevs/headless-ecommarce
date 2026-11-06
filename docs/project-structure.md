@@ -5,7 +5,6 @@
 ├── src/
 │   ├── app/                  routes, layouts, and route handlers
 │   ├── components/           UI grouped by domain
-│   ├── hooks/                one generic hook
 │   ├── lib/                  API clients, config, formatting, utilities
 │   └── stores/               Zustand stores
 ├── public/images/            local marketing imagery
@@ -59,7 +58,7 @@ Components are grouped by the domain they serve, not by atomic-design level.
 | `home/` | Home page sections | Most are static; `HeroSlider` and `TestimonialsSection` have behavior. |
 | `shop/` | Shop shell, sidebar, sort bar | `ShopClient` owns client-side filtering and view state. |
 | `product/` | Product card, gallery, variation selector, tabs, related grid | `ProductTabs` contains the review tab. |
-| `cart/` | Drawer, page content, line items, summary, coupon UI | `CartDrawer` and `CartPageContent` duplicate some chrome intentionally. |
+| `cart/` | Drawer, page content, line items, summary | `CartDrawer` and `CartPageContent` duplicate some chrome intentionally. |
 | `checkout/` | Checkout form, Stripe element, BACS instructions | `CheckoutForm` is the largest component in the repo. |
 | `account/` | Account shell, dashboard, orders, address, settings, wishlist | `AccountLayout` switches tabs. |
 | `auth/` | Login, register, forgot, reset forms | Forms use react-hook-form and zod. |
@@ -80,6 +79,8 @@ Naming: PascalCase files for components, one exported component per file. Hooks 
 | `errors.ts` | `ApiError`. |
 | `utils.ts` | `cn()` for class merging. |
 | `order-utils.ts` | `checkout-draft` filtering. |
+| `auth-session.ts` | Session-hint predicate used by auth hydration. |
+| `report-error.ts` | Client error reporter used by the error boundary and window listeners. |
 | `utils/currency.ts` | `useFormatPrice()` and the formatter behind it. |
 | `api/client.ts` | Shared fetch client, token cache, refresh, 401 handling. |
 | `api/products.ts` | Product types and normalization. |
@@ -91,6 +92,7 @@ Naming: PascalCase files for components, one exported component per file. Hooks 
 | `api/wishlist.ts` | Wishlist proxy calls and product normalization. |
 | `api/filters.ts` | Shop filter data, parallel fetch, safe fallbacks. |
 | `api/menus.ts` | WordPress menu location → `NavLink[]`. |
+| `api/cart.test.ts`, `api/tracking.test.ts` | Colocated Vitest tests for normalizers and fallbacks. |
 
 Files in `api/` may run on the server, the client, or both. The `typeof window !== 'undefined'` checks are deliberate: the same function chooses a proxy in the browser and a direct URL on the server. Do not remove them without replacing the CORS strategy.
 
@@ -115,8 +117,9 @@ api/
 ├── account/orders/
 ├── auth/{login,logout,me,refresh,register,forgot-password,reset-password}/
 ├── checkout/
+├── errors/
 ├── newsletter/
-├── reviews/{create,media/upload,product/[id],aggregate/[id],random,[id]}/
+├── reviews/{create,media/upload,product/[product_id],aggregate/[product_id],random,[review_id]}/
 ├── store-settings/
 ├── tracking/{search,order/[orderId]}/
 └── wishlist/{,[id],check/[id]}/
@@ -125,8 +128,10 @@ api/
 Three handler patterns:
 
 1. **Pure proxy** — forward method, body, auth header, and response. Most handlers.
-2. **Cookie handler** — stores tokens in httpOnly cookies and reshapes the response. Auth routes.
+2. **Cookie handler** — stores tokens in httpOnly cookies and reshapes the response. Auth routes. This includes the readable `session_hint` companion cookie.
 3. **Normalizing proxy** — filters or repairs data before returning it. `/api/account/orders` is the one example.
+
+The route guard is `src/proxy.ts` at the project root, not under `src/app/api/`. It is Next.js 16's middleware replacement.
 
 ## Non-runtime directories
 
@@ -147,4 +152,4 @@ Three handler patterns:
 | A remote call | `src/lib/api/<domain>.ts` |
 | Cross-component client state | `src/stores/<domain>Store.ts` |
 | A pure helper | `src/lib/` |
-| A hook used by more than one component | `src/hooks/` |
+| A hook used by more than one component | `src/hooks/` (create it when the first shared hook appears) |

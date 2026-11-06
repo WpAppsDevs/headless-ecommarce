@@ -27,7 +27,7 @@ The route tree uses a `(shop)` group for the home, products, and wishlist redire
 - Client pages need proxy routes for authenticated endpoints.
 - `searchParams` and `params` are promises and must be awaited.
 - Build-time data collection depends on WordPress being reachable; `getAllProductSlugs()` deliberately returns `[]` when the URL is missing so a deploy does not fail.
-- The app has no middleware and no server-side auth guard. Protection is client redirects plus WordPress authorization.
+- `src/proxy.ts` guards `/account` and `/checkout` by cookie presence. The check is not an authorization boundary; client redirects and WordPress authorization still decide access.
 
 ## Related
 

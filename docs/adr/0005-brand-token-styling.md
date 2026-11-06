@@ -29,7 +29,7 @@ Define brand tokens in `src/app/globals.css` and expose them to Tailwind through
 - A palette change is one edit in `:root`.
 - A new token must be added in both `:root` and `@theme inline` to become a utility.
 - The product-detail style has hardcoded maroon, navy, and cream values that do not all use tokens yet. Migrate them when touching those files.
-- Dark mode is defined in CSS but not wired to a toggle. It is not a supported theme today.
+- Dark mode has no token block and no toggle. Only dormant `dark:` utilities remain from shadcn defaults, so it is not a supported theme today.
 - The two visual languages are intentional. Do not unify them without a product decision.
 
 ## Related
