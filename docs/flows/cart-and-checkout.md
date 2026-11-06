@@ -24,17 +24,11 @@ The API serializes attributes into `meta` as `{ "attributes": { "pa_color": "Red
 
 The header cart button opens `CartDrawer`. The drawer reads the same store as the page. Both show the same items; the markup differs.
 
-The cart page calls `fetchCart()` on mount. `CartHydrator` may already have fetched it on layout mount, so a signed-in user can trigger two GETs. This is harmless but wasteful. A ref or a store-level `lastFetchedAt` would remove it.
+`CartHydrator` fetches the cart on layout mount. `CartPageContent` only retries when the store has no items, no `lastFetchedAt`, and no request in flight, so opening `/cart` does not duplicate the GET.
 
-Three features are disabled by `SETTINGS` in `CartPageContent` and `CartDrawer`:
+Coupons, free shipping, and cart expiry are not implemented. Their UI was removed rather than left behind a flag that does nothing. Any of them needs a server contract first: coupon validation and discount lines, a server-owned free-shipping threshold, or a server-owned cart TTL.
 
-- cart expiry countdown,
-- free-shipping progress bar,
-- coupon section.
-
-The code exists. Turning a flag on does not connect it to an API. The coupon component only logs the code; the free-shipping threshold is a local constant; the expiry timer is not tied to the server.
-
-`CartSummary` (cart page) owns its own shipping radio state and hardcoded prices: free, local 35, flat 35. Checkout ignores that state and uses `cartStore.shippingMethods`, which come from the cart API or fall back to the same three IDs.
+`CartSummary` reads `cartStore.shippingMethods`, which come from the cart API or the shared `DEFAULT_SHIPPING_METHODS` in `src/lib/api/cart.ts`. It lists methods with their prices and tells the customer that checkout owns the selection. Checkout uses the same store, so the two surfaces cannot disagree.
 
 ## Checkout initialization
 
@@ -126,7 +120,7 @@ If the Stripe key is missing, the card element cannot initialize. If the dynamic
 
 ## Confirmation
 
-`/order-confirmation/[id]` reads `sessionStorage['order_<id>']`, clears the cart again as a safety measure, and shows:
+`/order-confirmation/[id]` reads `sessionStorage['order_<id>']`, keeps it for refreshes, clears the cart again as a safety measure, and shows:
 
 - completed icon and "Payment Completed" when `status === 'completed'`,
 - pending icon and "Pending Payment" otherwise,

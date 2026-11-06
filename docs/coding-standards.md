@@ -17,7 +17,7 @@ These rules describe how the codebase is written today and where it is going. Fo
 | --- | --- | --- |
 | Component file | PascalCase | `ProductCard.tsx` |
 | Component export | Named, same name | `export function ProductCard()` |
-| Hook | `use` prefix, camelCase file | `useDebounce.ts` |
+| Hook | `use` prefix, camelCase file | `useFormatPrice.ts` |
 | Store | `<domain>Store.ts` | `cartStore.ts` |
 | API module | `<domain>.ts` | `wishlist.ts` |
 | Route handler | `route.ts` in the URL folder | `api/auth/login/route.ts` |
@@ -129,7 +129,6 @@ throw new ApiError('out_of_stock', 'This item is out of stock');
 - Code-split heavy client-only libraries. Stripe already uses `dynamic(..., { ssr: false })`.
 - Prefer ISR over client fetches for catalog data.
 - Do not add a dependency for something the platform or an existing package already does. The project has a deliberately small dependency set.
-- `useDebounce` exists for search-as-you-type; use it if you add that behavior.
 
 ## Security
 
@@ -139,6 +138,15 @@ throw new ApiError('out_of_stock', 'This item is out of stock');
 - Order lookup must require more than an order ID. The tracking endpoint is designed around email plus optional ID. Do not add a "lookup by ID only" shortcut on the client.
 - Do not trust client-computed totals. The checkout sends the selected method and cost for convenience; WordPress owns the final amount.
 - Do not delete or mutate WordPress records from a display-only feature.
+
+## Tests
+
+- The runner is Vitest, configured in `vitest.config.ts` with a Node environment and the `@` alias.
+- Tests live beside the code as `*.test.ts`. `src/**/*.test.ts` is the include pattern.
+- Test pure logic first: normalizers, formatters, filters, and fallback selection. These need no browser and no WordPress instance.
+- `npm test` runs once; `npm run test:watch` watches.
+- Do not encode a known bug as expected behavior. Fix the bug, then add the test that keeps it fixed.
+- Browser flows (add to cart, login reload, checkout, tracking, reviews) are still verified manually against the staging WordPress site. When you add an end-to-end runner, keep it out of the unit suite and document how to seed the backend.
 
 ## Git
 
@@ -153,12 +161,13 @@ Before calling a change complete:
 
 1. `npx tsc --noEmit` passes.
 2. `npm run build` succeeds if the change touches routing, data fetching, or dependencies.
-3. `npm run lint` does not add new errors. The repository currently has five errors and a set of warnings; see [known-gaps.md](known-gaps.md).
-4. Empty, loading, and error states still render.
-5. The change works on a narrow viewport, not only desktop.
-6. Auth changes are tested signed out, signed in, after reload, and with an expired token.
-7. Cart changes are tested as a guest, after login, and with an empty cart.
-8. The relevant docs in this folder are updated if behavior changed.
+3. `npm run lint` passes with no errors.
+4. `npm test` passes, and new pure logic has a colocated test.
+5. Empty, loading, and error states still render.
+6. The change works on a narrow viewport, not only desktop.
+7. Auth changes are tested signed out, signed in, after reload, and with an expired token.
+8. Cart changes are tested as a guest, after login, and with an empty cart.
+9. The relevant docs in this folder are updated if behavior changed.
 
 ## Review checklist
 

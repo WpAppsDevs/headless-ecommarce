@@ -31,6 +31,8 @@ interface CartState {
   loading: boolean;
   error: string | null;
   cartDrawerOpen: boolean;
+  /** Timestamp of the last successful cart read, used to avoid double fetches. */
+  lastFetchedAt: number | null;
 }
 
 interface CartActions {
@@ -65,7 +67,7 @@ function toErrorMsg(e: unknown, fallback: string): string {
 // Store
 // ---------------------------------------------------------------------------
 
-export const useCartStore = create<CartState & CartActions>((set) => ({
+export const useCartStore = create<CartState & CartActions>((set, get) => ({
   // ── Initial state ─────────────────────────────────────────────────────────
   items: [],
   cartToken: null,
@@ -77,10 +79,15 @@ export const useCartStore = create<CartState & CartActions>((set) => ({
   loading: false,
   error: null,
   cartDrawerOpen: false,
+  lastFetchedAt: null,
 
   // ── Actions ───────────────────────────────────────────────────────────────
 
   fetchCart: async () => {
+    // CartHydrator and the cart page can mount in the same tick. Let the
+    // in-flight request stand in for both instead of issuing a second GET.
+    if (get().loading) return;
+
     set({ loading: true, error: null });
     try {
       const data = await apiGetCart();
@@ -89,7 +96,8 @@ export const useCartStore = create<CartState & CartActions>((set) => ({
         cartToken: data.cart_token,
         shippingMethods: getShippingMethods(data),
         chosenShippingMethod: data.chosen_shipping_method,
-        loading: false 
+        loading: false,
+        lastFetchedAt: Date.now(),
       });
     } catch (e) {
       set({ error: toErrorMsg(e, 'Failed to fetch cart'), loading: false });
@@ -186,6 +194,7 @@ export const useCartStore = create<CartState & CartActions>((set) => ({
       cartToken: null,
       shippingMethods: undefined,
       chosenShippingMethod: undefined,
+      lastFetchedAt: null,
     });
   },
 

@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { X, ChevronLeft, ChevronRight, Search, Filter } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import type { Product, PaginationMeta } from '@/lib/api/products';
 import type { ProductFilters } from '@/lib/api/filters';
 import { ProductCard } from '@/components/product/ProductCard';
@@ -35,7 +34,7 @@ function EmptyState({ onClear }: { onClear: () => void }) {
       </div>
       <h3 className="text-lg font-semibold text-zinc-900 mb-2">No products found</h3>
       <p className="text-sm text-zinc-500 mb-6 max-w-sm">
-        Try adjusting your filters or search terms to find what you're looking for.
+        Try adjusting your filters or search terms to find what you&apos;re looking for.
       </p>
       <button
         onClick={onClear}
@@ -245,7 +244,6 @@ export function ShopClient({
         <div className="flex-1 min-w-0">
           <ShopTopBar
             total={meta.total}
-            filteredTotal={filteredProducts.length}
             page={serverPage}
             perPage={meta.per_page}
             sortOrder={sortOrder}

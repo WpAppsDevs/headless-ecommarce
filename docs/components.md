@@ -36,13 +36,9 @@ The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local
 | `PreOrderSteps.tsx` | Server | Four-step explainer. |
 | `WholesaleBanner.tsx` | Server | Wholesale value proposition and stats. |
 | `TestimonialsSection.tsx` | Client | Fetches random reviews; falls back gracefully. |
-| `TestimonialCarousel.tsx` | Client | Auto-advancing carousel; pauses on hover. Currently not used by the home page. |
 | `ComingSoonSection.tsx` | Client | Newsletter capture for a future collection. |
 | `FeaturesStrip.tsx` | Server | Four trust points. |
 | `WhatsAppCTA.tsx` | Server | WhatsApp link block. |
-| `NewsletterSection.tsx` | Client | Alternative newsletter block. Not used by the home page. |
-| `InstagramSection.tsx` | Server | Instagram grid. Not used by the home page. |
-| `PromoBanners.tsx` | Server | Collection cards. Imported but commented out. |
 
 ## Shop
 
@@ -73,13 +69,11 @@ The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local
 
 | Component | Type | Responsibility |
 | --- | --- | --- |
-| `CartDrawer.tsx` | Client | Right sheet, item list, note/shipping/coupon panels, subtotal, terms, checkout links. |
-| `CartPageContent.tsx` | Client | Fetches on mount, renders table, summary, and feature-flagged blocks. |
+| `CartDrawer.tsx` | Client | Right sheet, item list, shipping note, subtotal, checkout links. |
+| `CartPageContent.tsx` | Client | Renders table and summary, retrying the cart fetch only when needed. |
 | `CartItem.tsx` | Client | Drawer row with quantity stepper and remove. |
 | `CartItemRow.tsx` | Client | Page table row. |
-| `CartSummary.tsx` | Client | Hardcoded shipping options, total, terms, checkout button. |
-| `CouponSection.tsx` | Client | Demo coupons; applying logs to the console. |
-| `FreeShippingBar.tsx` | Client | Progress toward a threshold. Off by default. |
+| `CartSummary.tsx` | Client | Store shipping methods, estimated total, checkout button. |
 
 The drawer and the cart page are separate implementations with different markup. Change both when changing cart behavior or copy.
 
@@ -103,11 +97,10 @@ The drawer and the cart page are separate implementations with different markup.
 | `Dashboard.tsx` | Client | Stats and recent orders. |
 | `StatsCard.tsx` | Client | Label, value, icon. |
 | `Orders.tsx` | Client | Filter tabs, five per page, details modal. |
-| `OrderCard.tsx` | Client | Order summary, cancel button (no handler), review action. |
+| `OrderCard.tsx` | Client | Order summary, status, and review action. |
 | `OrderDetailsModal.tsx` | Client | Products, addresses, and a seven-step status timeline. |
-| `OrdersList.tsx` | Client | Paginated table. Not used by `AccountLayout`; it is a parallel implementation. |
-| `Address.tsx` | Client | Billing and shipping cards. Edit has no handler. |
-| `Settings.tsx` | Client | Profile/password form with a simulated save. |
+| `Address.tsx` | Client | Read-only billing and shipping cards. |
+| `Settings.tsx` | Client | Read-only account summary with support channels. |
 | `Wishlist.tsx` | Client | Server wishlist grid with remove. |
 
 Review eligibility lives in `OrderCard`: paid status (`completed` or `processing`), not fully refunded, and not already reviewed in this session.
@@ -161,8 +154,6 @@ The project uses `@base-ui/react` through shadcn's `base-nova` style. `class-var
 
 **Client shell, server section.** `CartPageContent` is client; `PageHeader` is server. Both can render in the same page.
 
-**Feature flag in a client file.** The cart page and drawer define a `SETTINGS` object at module scope. It is not connected to an API.
-
 **Error boundary around a risky section.** Reviews are wrapped in `ReviewsErrorBoundary` so a review failure does not take down the product page.
 
 ## Accessibility notes
@@ -175,7 +166,7 @@ The codebase is mixed. Follow the stronger patterns already present:
 - The star rating input is a `radiogroup` with radio buttons and descriptive labels.
 - Product and wishlist buttons have `aria-label`; icon-only buttons in the header do too.
 
-Known weak spots: the cart drawer's terms checkbox is a `div` with `role="checkbox"`, the image carousel dots rely on hover for visibility, and some modal focus trapping is incomplete. Improve these when touching the component.
+Known weak spots: the image carousel dots rely on hover for visibility, and some modal focus trapping is incomplete. Improve these when touching the component.
 
 ## Adding a component
 

@@ -56,8 +56,10 @@ Open <http://localhost:3000>. The home page, shop, and product pages are the fas
 | `npm run build` | Production build. Also runs type checking and page data collection. |
 | `npm run start` | Serve a completed production build. |
 | `npm run lint` | ESLint with the Next core-web-vitals and TypeScript configs. |
+| `npm test` | Run the Vitest unit suite once. |
+| `npm run test:watch` | Run Vitest in watch mode while editing. |
 
-There is no test runner in the repository. The current gates are `npx tsc --noEmit` and `npm run build`; see [known-gaps.md](known-gaps.md) for the lint errors that exist today.
+The default gates are `npx tsc --noEmit`, `npm run lint`, `npm test`, and `npm run build`. Browser flows are still checked manually against the staging WordPress site; see [coding-standards.md](coding-standards.md#tests).
 
 ## A five-minute tour
 

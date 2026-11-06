@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ReviewCard } from './ReviewCard';
 import { ReviewListSkeleton } from './ReviewListSkeleton';
@@ -22,30 +22,39 @@ export function ReviewList({ productId }: ReviewListProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(
-    async (nextPage: number, nextSort: ReviewSortOption) => {
-      setLoading(true);
-      setError(null);
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
       try {
-        const result = await getProductReviews(productId, nextPage, PER_PAGE, nextSort);
+        const result = await getProductReviews(productId, page, PER_PAGE, sort);
+        if (cancelled) return;
         setReviews(result.reviews);
         setMeta(result.meta);
+        setError(null);
       } catch {
-        setError('Could not load reviews. Please refresh the page.');
+        if (!cancelled) {
+          setError('Could not load reviews. Please refresh the page.');
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
-    },
-    [productId],
-  );
+    })();
 
-  useEffect(() => {
-    void load(page, sort);
-  }, [load, page, sort]);
+    return () => {
+      cancelled = true;
+    };
+  }, [productId, page, sort]);
 
   const handleSortChange = (newSort: ReviewSortOption) => {
+    setLoading(true);
     setSort(newSort);
     setPage(1);
+  };
+
+  const handlePageChange = (nextPage: number) => {
+    setLoading(true);
+    setPage(nextPage);
   };
 
   if (error) {
@@ -74,7 +83,7 @@ export function ReviewList({ productId }: ReviewListProps) {
           {meta && meta.total_pages > 1 && (
             <div className="flex items-center justify-between border-t border-zinc-100 pt-4">
               <button
-                onClick={() => setPage((p) => p - 1)}
+                onClick={() => handlePageChange(page - 1)}
                 disabled={page <= 1}
                 className="flex items-center gap-1 rounded-lg border border-zinc-200 px-3 py-1.5 text-sm text-zinc-600 transition hover:bg-zinc-50 disabled:opacity-40"
               >
@@ -85,7 +94,7 @@ export function ReviewList({ productId }: ReviewListProps) {
                 Page {page} of {meta.total_pages}
               </span>
               <button
-                onClick={() => setPage((p) => p + 1)}
+                onClick={() => handlePageChange(page + 1)}
                 disabled={page >= meta.total_pages}
                 className="flex items-center gap-1 rounded-lg border border-zinc-200 px-3 py-1.5 text-sm text-zinc-600 transition hover:bg-zinc-50 disabled:opacity-40"
               >

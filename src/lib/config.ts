@@ -20,10 +20,6 @@ export const config = {
     ctaText: process.env.NEXT_PUBLIC_HERO_CTA_TEXT ?? 'Shop All Products',
     ctaLink: process.env.NEXT_PUBLIC_HERO_CTA_LINK ?? '/products',
   },
-  features: {
-    registration: true,
-    guestCheckout: true,
-  },
 } as const;
 
 export type Config = typeof config;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { CheckCircle2, ChevronDown, FileText, Info, Star, Truck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ProductReviewsSection } from '@/components/reviews/ProductReviewsSection';
@@ -177,20 +178,25 @@ export function ProductTabs({
                   )}
 
                   {item.id === 'shipping-returns' && (
-                    <ul className="max-w-xl space-y-3 text-sm text-[#5A5A5A]">
-                      {[
-                        'Standard delivery: 3–6 business days.',
-                        'Express delivery: 1–2 business days (additional charge).',
-                        'Free shipping on orders over $75.',
-                        'Returns accepted within 45 days of purchase.',
-                        'Import duties and taxes are non-refundable.',
-                      ].map((line) => (
-                        <li key={line} className="flex items-start gap-2">
-                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#9E2F45]" />
-                          {line}
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="max-w-xl space-y-3 text-sm text-[#5A5A5A]">
+                      <p>
+                        Delivery times and charges depend on whether the item is in
+                        stock or pre-order. Returns are accepted only for eligible
+                        defects under the policy below.
+                      </p>
+                      <Link
+                        href="/shipping"
+                        className="block font-medium text-[#9E2F45] underline underline-offset-2"
+                      >
+                        Read the shipping and delivery policy
+                      </Link>
+                      <Link
+                        href="/returns"
+                        className="block font-medium text-[#9E2F45] underline underline-offset-2"
+                      >
+                        Read the returns and exchange policy
+                      </Link>
+                    </div>
                   )}
 
                   {item.id === 'reviews' && (

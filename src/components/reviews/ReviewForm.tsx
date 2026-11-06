@@ -67,6 +67,7 @@ export function ReviewForm({ productId, productName, orderId, onSuccess, onCance
     defaultValues: { rating: 0, title: '', content: '' },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- react-hook-form watch is used intentionally for the rating control
   const rating = watch('rating');
 
   const onRatingChange = useCallback(

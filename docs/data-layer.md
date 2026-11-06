@@ -27,12 +27,12 @@ What it does:
 2. Resolves relative paths against `config.apiBase`.
 3. Retries once after 500 ms on a network failure (not on an HTTP error).
 4. On a browser 401, runs one shared refresh promise, retries with the new token, and calls the unauthorized callback if the retry is still 401.
-5. Parses JSON. `{ success: false }` becomes an `ApiError`. Otherwise returns `json.data` when present, or the whole body.
+5. Parses JSON. `{ success: false }` becomes an `ApiError` with the server code and message. A non-2xx response without that shape throws `http_error` with the status. A body-less response also throws. Otherwise returns `json.data` when present, or the whole body.
 
 What it does not do:
 
-- It does not check `res.ok`. A non-2xx response with a body that is not `{ success: false }` can be returned as data. Use raw `fetch` when the status code matters.
 - It does not refresh on the server. Server callers pass a token or let the request fail.
+- It does not retry idempotently. The 500 ms retry is for network failure only; a failed HTTP request is returned or thrown immediately.
 
 `tokenCache` is module memory. In the browser it survives route changes but not a reload. It is populated by `authStore.login()`, `authStore.register()`, and the refresh flow.
 
@@ -160,7 +160,6 @@ Empty placeholder. Do not import it expecting user functions; use `checkout.ts` 
 | `POST /api/tracking/search` | `api/tracking/search` | Public. The handler reads an auth header but does not forward it. |
 | `GET /api/tracking/order/:id` | `api/tracking/order/:id` | Requires a token. |
 | `GET /api/store-settings` | `wpadhlwrapi/v1/store-settings` | 1-hour server cache and CDN headers. |
-| `GET /api/product-filters` | Local `getProductFilters()` | Cached 6 h. No current client calls it. |
 | `POST /api/newsletter` | Mailchimp | Secret stays server-side. Returns 503 when unconfigured, 422 on invalid email, and succeeds for an existing member. |
 
 Most handlers catch every error and return `{ success: false, code: 'server_error', message }` with status 500. They do not distinguish a WordPress timeout from a parse failure.

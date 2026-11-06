@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, MapPin, Loader2, AlertCircle, PackageX } from 'lucide-react';
+import { MapPin, Loader2, AlertCircle, PackageX } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { TrackingForm } from '@/components/tracking/TrackingForm';
 import { TrackingAccordion } from '@/components/tracking/TrackingAccordion';

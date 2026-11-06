@@ -1,83 +1,27 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { ShoppingCart } from 'lucide-react';
 import { useCartStore } from '@/stores/cartStore';
 import { CartItemRow } from '@/components/cart/CartItemRow';
 import { CartSummary } from '@/components/cart/CartSummary';
-import { CouponSection } from '@/components/cart/CouponSection';
-import { FreeShippingBar } from '@/components/cart/FreeShippingBar';
-
-// These can be driven from a settings API in the future
-const SETTINGS = {
-  showExpiryBanner: false,
-  showFreeShippingBar: false,
-  showCouponSection: false,
-  cartExpiryMinutes: 30,
-  freeShippingThreshold: 100,
-} as const;
-
-function CartExpiryBanner({ minutes }: { minutes: number }) {
-  const [secondsLeft, setSecondsLeft] = useState(minutes * 60);
-
-  useEffect(() => {
-    if (secondsLeft <= 0) return;
-    const id = setInterval(() => setSecondsLeft((s) => Math.max(s - 1, 0)), 1000);
-    return () => clearInterval(id);
-  }, [secondsLeft]);
-
-  const mins = Math.floor(secondsLeft / 60);
-  const secs = secondsLeft % 60;
-  const timeStr =
-    secondsLeft > 0
-      ? `${mins}:${secs.toString().padStart(2, '0')}`
-      : "Time's up!";
-  const isUrgent = secondsLeft <= 60;
-
-  return (
-    <div className="flex items-center gap-3 rounded-xl border border-orange-100 bg-orange-50 px-4 py-3">
-      <span className="text-xl shrink-0">🔥</span>
-      <p className="text-sm text-zinc-700">
-        Your cart will expire in{' '}
-        <span
-          className={`font-bold tabular-nums ${isUrgent ? 'text-rose-600' : 'text-orange-500'}`}
-        >
-          {timeStr}
-        </span>{' '}
-        minutes! Please checkout now before your items sell out!
-      </p>
-    </div>
-  );
-}
 
 export function CartPageContent() {
   const { items, loading, error, fetchCart } = useCartStore();
-  const subtotal = items.reduce(
-    (sum, item) => sum + parseFloat(item.price || '0') * Number(item.quantity),
-    0,
-  );
 
   useEffect(() => {
-    fetchCart();
+    // CartHydrator already fetches on layout mount. Only retry when nothing
+    // has been loaded yet and no request is in flight.
+    const { items: currentItems, lastFetchedAt, loading: isLoading } =
+      useCartStore.getState();
+    if (currentItems.length === 0 && !lastFetchedAt && !isLoading) {
+      void fetchCart();
+    }
   }, [fetchCart]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Expiry banner — shown only when cart has items */}
-      {SETTINGS.showExpiryBanner && items.length > 0 && (
-        <div className="mb-4">
-          <CartExpiryBanner minutes={SETTINGS.cartExpiryMinutes} />
-        </div>
-      )}
-
-      {/* Free shipping progress */}
-      {SETTINGS.showFreeShippingBar && items.length > 0 && (
-        <div className="mb-6 rounded-xl border border-zinc-100 bg-white px-5 py-4">
-          <FreeShippingBar total={subtotal} threshold={SETTINGS.freeShippingThreshold} />
-        </div>
-      )}
-
       {/* API error */}
       {error && (
         <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">
@@ -114,7 +58,7 @@ export function CartPageContent() {
       {/* Main layout — items + summary */}
       {items.length > 0 && (
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
-          {/* Left: cart items table + coupon */}
+          {/* Left: cart items table */}
           <div className="space-y-6">
             <div className="overflow-x-auto rounded-2xl border border-zinc-100 bg-white">
               <table className="w-full min-w-[560px]">
@@ -142,8 +86,6 @@ export function CartPageContent() {
                 </tbody>
               </table>
             </div>
-
-            {SETTINGS.showCouponSection && <CouponSection />}
           </div>
 
           {/* Right: order summary */}

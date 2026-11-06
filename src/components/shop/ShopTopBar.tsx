@@ -7,7 +7,6 @@ export type SortOrder = 'default' | 'price-asc' | 'price-desc' | 'latest';
 
 interface ShopTopBarProps {
   total: number;
-  filteredTotal?: number;
   page: number;
   perPage: number;
   sortOrder: SortOrder;
@@ -21,7 +20,6 @@ interface ShopTopBarProps {
 
 export function ShopTopBar({
   total,
-  filteredTotal,
   page,
   perPage,
   sortOrder,
@@ -34,7 +32,6 @@ export function ShopTopBar({
   const start = total === 0 ? 0 : (page - 1) * perPage + 1;
   const end = Math.min(page * perPage, total);
 
-  const hasClientFilter = filteredTotal !== undefined && filteredTotal !== total;
   const resultText =
     total === 0
       ? 'No products found'

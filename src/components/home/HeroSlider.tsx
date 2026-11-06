@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingBag, Clock, BookOpen, Truck, Plane, ShieldCheck } from 'lucide-react';
+import { ShoppingBag, Clock, Truck, Plane, ShieldCheck } from 'lucide-react';
 
 export function HeroSlider() {
   return (

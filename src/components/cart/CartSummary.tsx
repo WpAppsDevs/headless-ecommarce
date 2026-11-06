@@ -1,31 +1,26 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/stores/cartStore';
+import { DEFAULT_SHIPPING_METHODS } from '@/lib/api/cart';
 import { useFormatPrice } from '@/lib/utils/currency';
-
-type ShippingOption = 'free' | 'local' | 'flat';
-
-const SHIPPING_OPTIONS: { id: ShippingOption; label: string; sublabel?: string; price: number }[] = [
-  { id: 'free', label: 'Free Shipping', price: 0 },
-  { id: 'local', label: 'Local:', sublabel: 'Local delivery', price: 35 },
-  { id: 'flat', label: 'Flat Rate:', sublabel: 'Standard shipping', price: 35 },
-];
 
 export function CartSummary() {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
+  const shippingMethods =
+    useCartStore((s) => s.shippingMethods) ?? DEFAULT_SHIPPING_METHODS;
+  const chosenShippingMethod = useCartStore((s) => s.chosenShippingMethod);
+
   const subtotal = items.reduce(
     (sum, item) => sum + parseFloat(item.price || '0') * Number(item.quantity),
     0,
   );
-  const [shipping, setShipping] = useState<ShippingOption>('free');
-  const [agreed, setAgreed] = useState(false);
   const fmt = useFormatPrice();
 
-  const shippingCost = SHIPPING_OPTIONS.find((o) => o.id === shipping)?.price ?? 0;
+  const chosen = shippingMethods.find((method) => method.id === chosenShippingMethod);
+  const shippingCost = chosen ? parseFloat(chosen.cost || '0') : 0;
 
   return (
     <div className="sticky top-24 rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm space-y-5">
@@ -45,62 +40,33 @@ export function CartSummary() {
 
       <div className="border-t border-zinc-100" />
 
-      {/* Shipping */}
+      {/* Shipping options are shown for reference; checkout owns the selection */}
       <div className="space-y-3">
         <p className="text-sm font-medium text-zinc-600">Shipping</p>
-        <div className="space-y-2.5">
-          {SHIPPING_OPTIONS.map((opt) => (
-            <label
-              key={opt.id}
-              className="flex cursor-pointer items-center justify-between gap-3"
-            >
-              <div className="flex items-center gap-2.5">
-                <input
-                  type="radio"
-                  name="shipping"
-                  value={opt.id}
-                  checked={shipping === opt.id}
-                  onChange={() => setShipping(opt.id)}
-                  className="h-4 w-4 accent-zinc-900"
-                />
-                <span className="text-sm text-zinc-700">{opt.label}</span>
-              </div>
-              <span className="text-sm font-semibold text-zinc-900">
-                {fmt(opt.price)}
-              </span>
-            </label>
+        <div className="space-y-2">
+          {shippingMethods.map((method) => (
+            <div key={method.id} className="flex items-center justify-between gap-3 text-sm">
+              <span className="text-zinc-700">{method.label}</span>
+              <span className="font-semibold text-zinc-900">{fmt(method.cost)}</span>
+            </div>
           ))}
         </div>
+        <p className="text-xs leading-snug text-zinc-400">
+          Shipping is selected at checkout based on your delivery address.
+        </p>
       </div>
 
       <div className="border-t border-zinc-100" />
 
       {/* Total */}
       <div className="flex items-center justify-between">
-        <span className="text-base font-bold text-zinc-900">Total</span>
+        <span className="text-base font-bold text-zinc-900">
+          {chosen ? 'Total' : 'Estimated total'}
+        </span>
         <span className="text-base font-bold text-zinc-900">
           {fmt(subtotal + shippingCost)}
         </span>
       </div>
-
-      {/* Terms & Conditions */}
-      <label className="flex cursor-pointer items-start gap-2.5">
-        <input
-          type="checkbox"
-          checked={agreed}
-          onChange={(e) => setAgreed(e.target.checked)}
-          className="mt-0.5 h-4 w-4 rounded border-zinc-300 accent-zinc-900"
-        />
-        <span className="text-xs leading-snug text-zinc-500">
-          I agree with the{' '}
-          <Link
-            href="/terms"
-            className="text-zinc-800 underline underline-offset-2 hover:text-zinc-600"
-          >
-            Terms And Conditions
-          </Link>
-        </span>
-      </label>
 
       {/* CTA */}
       <button

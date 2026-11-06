@@ -74,7 +74,7 @@ function fallbackTimeline(order: TrackingOrder): TrackingEvent[] {
   return order.created_at ? [{ status: 'Order Placed', date: order.created_at }] : [];
 }
 
-function normalizeTimeline(timeline: TrackingEvent[], order: TrackingOrder): TrackingEvent[] {
+export function normalizeTimeline(timeline: TrackingEvent[], order: TrackingOrder): TrackingEvent[] {
   const events = Array.isArray(timeline) ? timeline.map((event) => ({ ...event })) : [];
 
   if (!order.created_at) return events;
@@ -104,7 +104,7 @@ function buildEntry(
   };
 }
 
-function normalizeTrackingResult(raw: unknown): TrackingResult {
+export function normalizeTrackingResult(raw: unknown): TrackingResult {
   // Some deployments return an array of { order, tracking, timeline } objects.
   if (Array.isArray(raw)) {
     const entries = raw

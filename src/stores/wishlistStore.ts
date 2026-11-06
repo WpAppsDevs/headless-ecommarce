@@ -67,6 +67,8 @@ interface WishlistActions {
    * Call this immediately after a successful login or registration.
    */
   syncGuestWishlist: () => Promise<void>;
+  /** Reset all wishlist state (called on logout and session expiry). */
+  clear: () => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -222,5 +224,10 @@ export const useWishlistStore = create<WishlistState & WishlistActions>((set, ge
       const finalIds = Array.from(new Set([...serverIds, ...idsToAdd]));
       set({ ids: finalIds, count: finalIds.length, hydrated: true });
     }
+  },
+
+  // ── clear ────────────────────────────────────────────────────────────────────
+  clear: () => {
+    set({ ids: [], count: 0, pendingIds: new Set(), hydrated: false });
   },
 }));

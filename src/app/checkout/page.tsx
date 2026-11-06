@@ -11,7 +11,7 @@ import { ApiError } from '@/lib/errors';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, fetchCart } = useCartStore();
+  const { items } = useCartStore();
 
   const [profile, setProfile] = useState<UserProfile | undefined>();
   const [ready, setReady] = useState(false);

@@ -62,7 +62,6 @@ export function ProductCard({ product }: { product: Product }) {
   const fmt = useFormatPrice();
 
   const allImages = (Array.isArray(product.images) ? product.images : []).slice(0, 3);
-  const image = allImages[0];
   const isOnSale =
     product.on_sale && product.sale_price && product.sale_price !== product.regular_price;
   const isNew = !product.on_sale;

@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { config } from '@/lib/config';
-import { Mail, Phone, HelpCircle, Truck, RefreshCcw, Phone as PhoneIcon, MapPin, FileText, Scale } from 'lucide-react';
+import { Mail, Phone, Truck, RefreshCcw, MapPin, FileText, Scale } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { FooterNewsletterForm } from './FooterNewsletterForm';
 

@@ -5,7 +5,6 @@ import { ProductCard } from '@/components/product/ProductCard';
 import { ProductCardSkeleton } from '@/components/product/ProductCardSkeleton';
 import { HeroSlider } from '@/components/home/HeroSlider';
 import { CategoryGrid } from '@/components/home/CategoryGrid';
-import { PromoBanners } from '@/components/home/PromoBanners';
 import { PreOrderSteps } from '@/components/home/PreOrderSteps';
 import { WholesaleBanner } from '@/components/home/WholesaleBanner';
 import { CategoryBanners } from '@/components/home/CategoryBanners';
@@ -42,7 +41,6 @@ export default function HomePage() {
       <HeroSlider />
       <CategoryBanners />
       <CategoryGrid />
-      {/* <PromoBanners /> */}
       <PreOrderSteps />
       {/* Featured Products */}
       <section aria-labelledby="featured-heading" className="bg-brand-section py-16">

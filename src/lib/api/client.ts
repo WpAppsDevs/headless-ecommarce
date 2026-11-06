@@ -84,7 +84,13 @@ async function execute(url: string, opts: RequestInit): Promise<Response> {
  * Returns `data` when present, otherwise the full body.
  */
 async function parseBody<T>(res: Response): Promise<T> {
-  const json: unknown = await res.json();
+  let json: unknown;
+  try {
+    json = await res.json();
+  } catch {
+    throw new ApiError('http_error', `HTTP ${res.status}`);
+  }
+
   if (
     json !== null &&
     typeof json === 'object' &&
@@ -94,6 +100,12 @@ async function parseBody<T>(res: Response): Promise<T> {
     const err = json as { code?: string; message?: string };
     throw new ApiError(err.code ?? 'api_error', err.message ?? 'Request failed');
   }
+
+  // A body shaped `{ success: true }` does not make an HTTP failure a success.
+  if (!res.ok) {
+    throw new ApiError('http_error', `HTTP ${res.status}`);
+  }
+
   const body = json as Record<string, unknown>;
   return (body?.data ?? body) as T;
 }

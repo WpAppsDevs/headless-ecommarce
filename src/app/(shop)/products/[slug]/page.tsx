@@ -64,7 +64,7 @@ export default async function ProductPage({ params }: PageProps) {
     throw e;
   }
 
-  // Fetch rating aggregate in parallel with product; used for JSON-LD + Reviews tab
+  // The aggregate needs the product ID, so this necessarily follows the product fetch.
   const ratingAggregate = await getRatingAggregate(product.id);
 
   const isOnSale =

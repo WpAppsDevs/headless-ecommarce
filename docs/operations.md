@@ -28,7 +28,10 @@ NEXT_PUBLIC_HERO_CTA_TEXT=...
 NEXT_PUBLIC_HERO_CTA_LINK=/products
 MAILCHIMP_API_KEY=...
 MAILCHIMP_AUDIENCE_ID=...
+ERROR_REPORT_WEBHOOK_URL=...
 ```
+
+`ERROR_REPORT_WEBHOOK_URL` is optional and server-only. When set, `/api/errors` forwards client error reports to it as JSON after writing them to the server log. Any collector or chat webhook that accepts JSON works. Without it, reports still appear in the hosting provider's function logs.
 
 `NEXT_PUBLIC_*` values are compiled into the client bundle. After changing one, rebuild and redeploy; changing it at runtime does not update an existing build.
 
@@ -36,7 +39,9 @@ MAILCHIMP_AUDIENCE_ID=...
 
 ```bash
 npm ci
+npm test
 npx tsc --noEmit
+npm run lint
 npm run build
 npm run start
 ```

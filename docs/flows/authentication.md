@@ -6,13 +6,14 @@
 | --- | --- | --- | --- |
 | Access token | `tokenCache` in memory; httpOnly `access_token` cookie | 1 hour | `Authorization: Bearer` on API calls |
 | Refresh token | httpOnly `refresh_token` cookie | 14 days | `POST /api/auth/refresh` |
+| Session hint | readable `session_hint=1` cookie | 14 days | Tells the client a refresh token may exist; carries no credential |
 | Guest cart token | `localStorage['cart_token']` | Issued per guest session | Cart calls before login |
 
 The access token is readable by JavaScript because it is returned in the login response. The refresh token is never returned to JavaScript.
 
 ## Guest visit
 
-1. No auth call runs unless the visitor has a guest cart token or a cached access token.
+1. No auth call runs unless the visitor has a guest cart token, a cached access token, or a `session_hint` cookie.
 2. The first cart add may return `guest_token`. `cartStore.addItem()` writes it to `localStorage['cart_token']` only if no token is already stored.
 3. Later cart calls pass that token explicitly; `apiClient` falls back to `tokenCache` only when no explicit token is given.
 4. `CartHydrator` refuses to fetch for a visitor with no session and no guest token. That avoids a guaranteed 401 and the redirect loop that used to follow it.
@@ -25,7 +26,7 @@ LoginForm
   → POST /api/auth/login
   → WordPress POST /wp-json/api/auth/login
   → WordPress merges the guest cart when guest_cart_token is present
-  → route sets access_token + refresh_token cookies
+  → route sets access_token, refresh_token, and session_hint cookies
   → route returns { user, access_token }
   → tokenCache.set(access_token)
   → clearGuestToken()
@@ -50,7 +51,7 @@ Registration requires a password of at least eight characters in the form. The s
 
 ```
 hydrate()
-  if no guest cart token and no cached access token → hydrated = true, stop
+  if no guest cart, no cached access token, and no session_hint → hydrated = true, stop
   POST /api/auth/refresh
   if not ok → stop (stay logged out)
   tokenCache.set(new token)
@@ -59,7 +60,7 @@ hydrate()
   finally → hydrated = true
 ```
 
-The early stop is the current weak point. After a full reload the in-memory token is gone, and a user who logged in after clearing the guest cart has no `cart_token`. Hydration then treats them as a fresh visitor and never tries the refresh cookie. See [known-gaps.md](../known-gaps.md).
+`session_hint` exists because the refresh cookie is httpOnly and JavaScript cannot read it. The hint is set on login, registration, and every successful refresh, and cleared on logout and refresh failure. A signed-in user with no guest cart token therefore still rehydrates after a reload, while a fresh visitor makes no auth request.
 
 `CartHydrator` and `WishlistHydrator` wait for `hydrated` before they run. That ordering is why auth must finish first even when it does nothing.
 
@@ -77,7 +78,7 @@ The unauthorized handler in `authStore`:
 
 - records whether a real access token existed,
 - clears `tokenCache` and user state,
-- clears the cart,
+- clears the cart and wishlist,
 - for a guest token failure, removes the dead guest token and does not redirect,
 - for a real session, redirects to `/login` unless already there.
 
@@ -88,7 +89,7 @@ Server-side `apiClient` does not refresh. A server page that receives a 401 must
 If the refresh token is missing, expired, or rejected:
 
 - `/api/auth/refresh` returns a non-2xx response,
-- the route expires both auth cookies,
+- the route expires the access, refresh, and session hint cookies,
 - `authStore.hydrate()` leaves the user logged out,
 - `apiClient` calls the unauthorized handler.
 
@@ -99,12 +100,11 @@ Expiring the cookies is important. Without it, every page load retries a doomed 
 `authStore.logout()`:
 
 1. Clears the token cache.
-2. Calls `/api/auth/logout`, which expires both cookies.
+2. Calls `/api/auth/logout`, which expires the access, refresh, and session hint cookies.
 3. Clears user and auth flags.
 4. Clears the cart.
 5. Clears the review-session store.
-
-It does not clear the wishlist store. The wishlist is fetched per hydration and the badge can retain the previous count until reload. Fix this if you work on logout state.
+6. Clears the wishlist store, so the header badge cannot show the previous user's list.
 
 ## Forgot and reset password
 
@@ -140,8 +140,8 @@ There is no middleware and no server-side route guard. Protection is a client re
 
 - Guest adds to cart, logs in, cart survives.
 - Guest wishlist merges on login without duplicating server items.
-- Reload keeps a signed-in user signed in (currently fails for users without a guest token).
+- Reload keeps a signed-in user signed in, including users with no guest cart token.
 - Expired access token refreshes once and retries.
 - Expired refresh token logs out without a redirect loop.
 - Stale guest cart token clears itself instead of forcing `/login`.
-- Logout clears the cart and review state.
+- Logout clears the cart, wishlist, and review state.

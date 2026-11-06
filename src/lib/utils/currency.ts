@@ -15,7 +15,7 @@ export function useFormatPrice(): (amount: number | string) => string {
   return formatPrice.bind(null, { symbol, position, decimals, decimalSep, thousandsSep });
 }
 
-interface FormatOptions {
+export interface FormatOptions {
   symbol: string;
   position: string;
   decimals: number;
@@ -23,7 +23,7 @@ interface FormatOptions {
   thousandsSep: string;
 }
 
-function formatPrice(opts: FormatOptions, amount: number | string): string {
+export function formatPrice(opts: FormatOptions, amount: number | string): string {
   const num = Number(amount);
   if (isNaN(num)) return String(amount);
 

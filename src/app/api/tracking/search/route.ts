@@ -4,7 +4,6 @@ import { config } from '@/lib/config';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const authHeader = req.headers.get('Authorization');
 
     const wpRes = await fetch(
       `${config.apiBase}/${config.apiNs}/tracking/search`,

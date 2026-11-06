@@ -23,7 +23,6 @@ const STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
   failed:     { label: 'Failed',     cls: 'bg-[#E57373]/15 text-[#E57373] border border-[#E57373]/40' },
 };
 
-const CANCELLABLE = ['pending', 'processing', 'on-hold', 'delivery'];
 const PAID_STATUSES = ['completed', 'processing'];
 
 function fmtDate(dateStr: string | null) {
@@ -33,7 +32,6 @@ function fmtDate(dateStr: string | null) {
 
 export function OrderCard({ order, onViewDetails }: OrderCardProps) {
   const sc        = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
-  const canCancel = CANCELLABLE.includes(order.status);
   const isPaid    = PAID_STATUSES.includes(order.status);
 
   const isReviewed = useReviewStore((s) => s.isReviewed);
@@ -124,11 +122,6 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
           </span>
         </div>
         <div className="flex items-center gap-2">
-          {canCancel && (
-            <button className="rounded-lg border border-[#E57373]/60 px-4 py-2 text-[12px] font-semibold text-[#E57373] transition hover:bg-[#E57373]/5">
-              Cancel Order
-            </button>
-          )}
           {hasReviewableItems && (
             <button
               onClick={() => setReviewModalOpen(true)}

@@ -109,19 +109,20 @@ export async function apiRemoveCartItem(itemId: number): Promise<CartData> {
   });
 }
 
+export const DEFAULT_SHIPPING_METHODS = [
+  { id: 'free_shipping', label: 'Free Shipping', cost: '0.00' },
+  { id: 'local_pickup', label: 'Local — Local delivery', cost: '35.00' },
+  { id: 'flat_rate', label: 'Flat Rate — Standard shipping', cost: '35.00' },
+];
+
 /**
  * Get shipping methods.
  * Uses provided cart data if available to avoid duplicate API calls.
- * Falls back to hardcoded defaults if no shipping data is available.
+ * Falls back to the shared defaults when the API returns none.
  */
 export function getShippingMethods(cartData?: CartData): CartData['shipping_methods'] {
   if (cartData?.shipping_methods && cartData.shipping_methods.length > 0) {
     return cartData.shipping_methods;
   }
-  // Fallback defaults matching the cart page
-  return [
-    { id: 'free_shipping', label: 'Free Shipping', cost: '0.00' },
-    { id: 'local_pickup', label: 'Local — Local delivery', cost: '35.00' },
-    { id: 'flat_rate', label: 'Flat Rate — Standard shipping', cost: '35.00' },
-  ];
+  return DEFAULT_SHIPPING_METHODS;
 }

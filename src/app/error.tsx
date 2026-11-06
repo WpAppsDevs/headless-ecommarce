@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
+import { reportError } from '@/lib/report-error';
 
 export default function GlobalError({
   error,
@@ -14,8 +15,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log to an error reporting service in production
-    console.error(error);
+    reportError(error, { scope: 'app-error' });
   }, [error]);
 
   return (

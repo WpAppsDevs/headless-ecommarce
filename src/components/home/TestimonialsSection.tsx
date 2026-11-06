@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Star, Loader2 } from 'lucide-react';
+import { Star } from 'lucide-react';
 import Image from 'next/image';
 import { getRandomReviews } from '@/lib/api/reviews';
 import type { Review } from '@/lib/api/reviews';

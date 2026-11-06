@@ -14,6 +14,7 @@ export async function POST() {
 
   response.cookies.set('access_token', '', expireOpts);
   response.cookies.set('refresh_token', '', expireOpts);
+  response.cookies.set('session_hint', '', { ...expireOpts, httpOnly: false });
 
   return response;
 }

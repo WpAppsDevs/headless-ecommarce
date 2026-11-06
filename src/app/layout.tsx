@@ -7,6 +7,7 @@ import { AuthHydrator } from "@/components/layout/AuthHydrator";
 import { CartHydrator } from "@/components/layout/CartHydrator";
 import { WishlistHydrator } from "@/components/layout/WishlistHydrator";
 import { CurrencyHydrator } from "@/components/layout/CurrencyHydrator";
+import { ErrorReporter } from "@/components/layout/ErrorReporter";
 import { Toaster } from "sonner";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { config } from "@/lib/config";
@@ -57,6 +58,7 @@ export default async function RootLayout({
         <CartHydrator />
         <WishlistHydrator />
         <CurrencyHydrator />
+        <ErrorReporter />
         <AnnouncementBar />
         <Header navLinks={navLinks} />
         <CartDrawer />

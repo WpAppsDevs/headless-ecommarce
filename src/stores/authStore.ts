@@ -3,6 +3,7 @@ import { tokenCache, setOnUnauthorized } from '@/lib/api/client';
 import { useCartStore } from '@/stores/cartStore';
 import { useWishlistStore } from '@/stores/wishlistStore';
 import { useReviewStore } from '@/stores/reviewStore';
+import { shouldAttemptAuthHydration } from '@/lib/auth-session';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -54,7 +55,7 @@ async function postJson(url: string, body: Record<string, unknown>) {
 // Store
 // ---------------------------------------------------------------------------
 
-export const useAuthStore = create<AuthState>((set, get) => {
+export const useAuthStore = create<AuthState>((set) => {
   // Register the onUnauthorized handler (browser only).
   // Called by apiClient when a 401 persists after a token refresh attempt.
   if (typeof window !== 'undefined') {
@@ -70,6 +71,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
 
       const cart = useCartStore.getState();
       cart.clearCart();
+      useWishlistStore.getState().clear();
 
       if (!hadSession) {
         // Drop the dead guest token so hydration stops retrying it.
@@ -148,6 +150,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
       await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
       set({ user: null, isAuthenticated: false });
       useCartStore.getState().clearCart();
+      useWishlistStore.getState().clear();
       useReviewStore.getState().clear();
     },
 
@@ -170,13 +173,21 @@ export const useAuthStore = create<AuthState>((set, get) => {
     // a page reload (access_token lives in httpOnly cookie, not memory).
     hydrate: async () => {
       try {
-        // Check if there's any indication of prior auth before attempting refresh
-        const hasGuestCart = typeof window !== 'undefined' && localStorage.getItem('cart_token');
+        // The refresh token is httpOnly, so the client cannot inspect it.
+        // `session_hint` is a readable, non-secret companion cookie set on
+        // login/register/refresh. It answers only "is a session worth trying?"
+        const hasGuestCart =
+          typeof window !== 'undefined' && localStorage.getItem('cart_token');
         const hasTokenCache = tokenCache.get();
-        
-        // Only attempt refresh if there's some indication of prior activity
-        // This avoids unnecessary API calls for pure guest users
-        if (!hasGuestCart && !hasTokenCache) {
+        const cookieString = typeof document !== 'undefined' ? document.cookie : '';
+
+        if (
+          !shouldAttemptAuthHydration({
+            hasGuestCart: !!hasGuestCart,
+            hasTokenCache: !!hasTokenCache,
+            cookieString,
+          })
+        ) {
           set({ hydrated: true });
           return;
         }

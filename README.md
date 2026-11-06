@@ -41,9 +41,9 @@ Open <http://localhost:3000>.
 | `npm run build` | Production build, including type checking |
 | `npm run start` | Serve the production build |
 | `npm run lint` | ESLint |
+| `npm test` | Vitest unit tests |
+| `npm run test:watch` | Vitest in watch mode |
 | `npx tsc --noEmit` | Type check only |
-
-There is no test runner yet.
 
 ## What is in the app
 
@@ -67,8 +67,8 @@ Most useful first reads:
 - [Architecture](docs/architecture.md) — how the browser, Next.js, and WordPress fit together.
 - [Project structure](docs/project-structure.md) — where files live and where new ones go.
 - [Coding standards](docs/coding-standards.md) — conventions and definition of done.
-- [Known gaps](docs/known-gaps.md) — current limitations, including auth reload behavior and the absence of tests.
-- [Fix plan](docs/fix-plan.md) — prioritised remediation steps, code sketches, and acceptance checks.
+- [Known gaps](docs/known-gaps.md) — current limitations, including the WordPress endpoints still missing.
+- [Fix plan](docs/fix-plan.md) — the remediation work already applied, kept as a reference for the backend items.
 - [GLOSSARY.md](GLOSSARY.md) — shared vocabulary.
 
 Architecture decisions are in [docs/adr/](docs/adr/).
@@ -79,4 +79,4 @@ This repository is the staging checkout at `Local Sites/headlessecf/app/public`.
 
 ## Status
 
-Type checking passes. The production build path is the release gate. Lint has five errors and a set of warnings, listed in [known-gaps.md](docs/known-gaps.md). The highest-impact open issue is that signed-in users can lose their session after a full reload because `authStore.hydrate()` skips the refresh attempt when no guest cart token or cached token exists.
+Type checking, lint, the unit suite, and the production build pass. Signed-in sessions survive a full reload through the `session_hint` cookie and refresh flow. The remaining open work is mostly WordPress API gaps; see [known-gaps.md](docs/known-gaps.md).

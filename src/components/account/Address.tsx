@@ -1,12 +1,26 @@
 'use client';
 
-import { UserProfile } from '@/lib/api/checkout';
+import type { UserProfile } from '@/lib/api/checkout';
 
 interface AddressProps {
   profile: UserProfile | null;
 }
 
-function AddressBlock({ title, address }: { title: string; address: any }) {
+type DisplayAddress = Partial<{
+  first_name: string;
+  last_name: string;
+  company: string;
+  address_1: string;
+  address_2: string;
+  city: string;
+  state: string;
+  postcode: string;
+  country: string;
+  email: string;
+  phone: string;
+}> | null | undefined;
+
+function AddressBlock({ title, address }: { title: string; address: DisplayAddress }) {
   const isEmpty =
     !address ||
     (!address.first_name &&
@@ -17,11 +31,8 @@ function AddressBlock({ title, address }: { title: string; address: any }) {
 
   return (
     <div className="rounded-2xl border border-zinc-200 bg-white p-6">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4">
         <h3 className="text-lg font-semibold text-zinc-900">{title}</h3>
-        <button className="text-sm font-medium text-zinc-600 underline underline-offset-2 hover:text-zinc-900">
-          Edit
-        </button>
       </div>
 
       {isEmpty ? (
@@ -58,7 +69,13 @@ function AddressBlock({ title, address }: { title: string; address: any }) {
 export function Address({ profile }: AddressProps) {
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-zinc-900">My Address</h2>
+      <div>
+        <h2 className="text-2xl font-bold text-zinc-900">My Address</h2>
+        <p className="mt-1 text-sm text-zinc-500">
+          Addresses are saved with your orders. Contact support to change your
+          default billing or shipping address.
+        </p>
+      </div>
       <div className="grid gap-6 sm:grid-cols-2">
         <AddressBlock title="Billing Address" address={profile?.billing} />
         <AddressBlock title="Shipping Address" address={profile?.shipping} />

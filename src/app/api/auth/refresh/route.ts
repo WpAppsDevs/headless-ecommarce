@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { config } from '@/lib/config';
 
@@ -11,22 +11,29 @@ const COOKIE_BASE = {
   path: '/',
 };
 
-/** Expire both auth cookies — called when refresh token is invalid/expired. */
+/** Expire auth cookies — called when refresh token is invalid/expired. */
 function expireAuthCookies(response: NextResponse): void {
   response.cookies.set('access_token', '', { ...COOKIE_BASE, maxAge: 0 });
   response.cookies.set('refresh_token', '', { ...COOKIE_BASE, maxAge: 0 });
+  response.cookies.set('session_hint', '', {
+    ...COOKIE_BASE,
+    httpOnly: false,
+    maxAge: 0,
+  });
 }
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
     const cookieStore = await cookies();
     const refreshToken = cookieStore.get('refresh_token')?.value;
 
     if (!refreshToken) {
-      return NextResponse.json(
+      const errResponse = NextResponse.json(
         { success: false, code: 'no_refresh_token', message: 'No refresh token' },
         { status: 401 },
       );
+      expireAuthCookies(errResponse);
+      return errResponse;
     }
 
     const wpRes = await fetch(
@@ -68,6 +75,11 @@ export async function POST(req: NextRequest) {
     );
 
     response.cookies.set('access_token', newToken, { ...COOKIE_BASE, maxAge: 3600 });
+    response.cookies.set('session_hint', '1', {
+      ...COOKIE_BASE,
+      httpOnly: false,
+      maxAge: 14 * 24 * 60 * 60,
+    });
 
     // Persist a new refresh_token when the WP plugin uses rotating tokens.
     const newRefreshToken: string | undefined = json.data?.refresh_token;

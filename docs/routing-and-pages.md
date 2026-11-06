@@ -42,8 +42,6 @@ The layout is a Server Component but the header is a Client Component. `navLinks
 
 `HeroSlider` → `CategoryBanners` → `CategoryGrid` → `PreOrderSteps` → featured products → `WholesaleBanner` → `TestimonialsSection` → `ComingSoonSection` → `FeaturesStrip` → `WhatsAppCTA`.
 
-`PromoBanners` is imported and commented out. Remove the import when you touch this file; it currently produces a lint warning.
-
 The featured grid is an async RSC inside `<Suspense>`. It fetches four products and renders nothing if the request fails. The rest of the page is static markup, so the hero and marketing sections remain visible while products load.
 
 ## Shop page
@@ -89,17 +87,9 @@ Pagination is a full navigation. Client-side filter state resets when the page c
 
 `src/app/cart/page.tsx` renders `PageHeader` and `CartPageContent`.
 
-`CartPageContent` calls `fetchCart()` on mount. `CartHydrator` may have already fetched it on layout mount, so a signed-in user can trigger two requests. The page tolerates that; it has no request de-duplication.
+`CartHydrator` fetches on layout mount. `CartPageContent` retries only when the store has no items, no `lastFetchedAt`, and no request in flight, so opening `/cart` does not duplicate the GET.
 
-The cart page has three feature flags hardcoded in `SETTINGS`:
-
-```ts
-showExpiryBanner: false,
-showFreeShippingBar: false,
-showCouponSection: false,
-```
-
-The components exist but are off. `CouponSection` is a demo UI that logs a code and does not call an API. `CartSummary` uses hardcoded shipping prices (free, local 35, flat 35) and its own radio state, separate from the store's shipping methods. These values are display-only until checkout.
+Coupons, free shipping, and cart expiry are not implemented. Their UI was removed instead of leaving controls that do nothing. `CartSummary` reads the store's shipping methods and shows the same prices checkout uses; the customer picks a method at checkout.
 
 ## Checkout
 
@@ -122,13 +112,15 @@ The components exist but are off. `CouponSection` is a demo UI that logs a code 
 - races the order request against a 30-second timeout,
 - on success clears the cart, writes `order_<id>` to `sessionStorage`, and navigates to the confirmation page.
 
-Guest checkout is not implemented. `config.features.guestCheckout` is `true`, but the page requires a user token. Treat the flag as unused until the flow changes.
+Guest checkout is not implemented. The page requires a user token, and `src/proxy.ts` redirects visitors without a session to `/login`. The old feature flag was removed; treat the flow as account-only until WordPress supports guest orders.
 
 ## Order confirmation
 
-`src/app/order-confirmation/[id]/page.tsx` reads `sessionStorage['order_<id>']`, which only exists in the tab that completed checkout. It shows a completed or pending state, the transaction ID when present, and BACS instructions when the order is pending without a transaction ID.
+`src/app/order-confirmation/[id]/page.tsx` reads `sessionStorage['order_<id>']`, which the checkout form writes before redirecting. The value stays in the tab, so a refresh keeps the status and payment reference.
 
-Direct navigation or a refresh after `sessionStorage` has been cleared shows the heading but no status badge, payment reference, or bank instructions. The page does not fetch the order.
+When the stored result is missing, the page waits for auth hydration and, for a signed-in user, loads recent orders and finds the matching ID. WordPress remains the source of truth. If neither path finds the order, the page shows a next step instead of an empty heading.
+
+The page shows a completed or pending state, the transaction ID when present, and BACS instructions when the order is pending without a transaction ID.
 
 ## Account
 
@@ -141,8 +133,8 @@ Tab behavior:
 - **Dashboard** — counts pending/processing/on-hold, cancelled, and total visible orders. Recent orders table.
 - **Your Orders** — client-side filter tabs, five orders per page, order details modal, review action.
 - **Wishlist** — fetches up to 100 products, shows removal and product links.
-- **My Address** — displays billing and shipping from the profile. The Edit button has no handler.
-- **Setting** — profile and password form. Save is a 600 ms timeout with a success message; no API call exists.
+- **My Address** — displays billing and shipping from the profile, read-only until WordPress exposes an address update endpoint.
+- **Setting** — read-only account summary (name, email, phone, account ID) with support channels for changes. No fake save action.
 
 ## Tracking
 
@@ -162,11 +154,18 @@ For older orders in the third shape, the timeline is reduced to an "Order Placed
 
 `/shipping`, `/returns`, `/privacy-policy`, and `/terms` are static Bengali pages. They share `SectionHeading`, `Card`, `StatCard`, `NoteCallout`, `TypePanel`, and `BulletList` from `src/components/policies/PolicyUI.tsx`.
 
-The product page's Shipping & Returns accordion is still English and lists different numbers. If policy changes, update both places or make the accordion read from one source.
+The product page's Shipping & Returns accordion summarizes the rules and links to `/shipping` and `/returns`, so the policy pages remain the single source of truth.
+
+## Route protection
+
+`src/proxy.ts` (Next.js 16's middleware replacement) guards `/account/:path*` and `/checkout`. It checks for the presence of `refresh_token` or `session_hint` and redirects to `/login?redirect=<path>` when both are absent.
+
+This is a shell guard, not an authorization boundary. WordPress still authorizes every data request. Because the check is presence-only, a user with an expired refresh token reaches the page and is redirected by the client after the refresh attempt fails.
 
 ## Error and empty states
 
-- Global error boundary: `src/app/error.tsx`.
+- Global error boundary: `src/app/error.tsx`, which reports through `reportError()` to `/api/errors`.
+- Uncaught window errors and unhandled rejections: `src/components/layout/ErrorReporter.tsx`.
 - 404: `src/app/not-found.tsx`.
 - Product 404: `notFound()` for `product_not_found`.
 - Empty shop: `ShopClient` empty state with "Clear all filters".

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { X, ChevronLeft } from 'lucide-react';
 import { ReviewForm } from '@/components/reviews/ReviewForm';
 import type { Review } from '@/lib/api/reviews';
@@ -29,27 +29,29 @@ interface ReviewModalProps {
 // ---------------------------------------------------------------------------
 
 export function ReviewModal({ isOpen, onClose, orderId, items, onSuccess }: ReviewModalProps) {
-  const [selectedItem, setSelectedItem] = useState<ReviewableItem | null>(
-    items.length === 1 ? items[0] : null,
-  );
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
 
-  // Reset selection when modal opens/items change
-  useEffect(() => {
-    if (isOpen) {
-      setSelectedItem(items.length === 1 ? items[0] : null);
-    }
-  }, [isOpen, items]);
+  // Derive the selection instead of resetting it in an effect. A single-item
+  // order needs no selection step; multiple items wait for a click.
+  const selectedItem =
+    items.find((item) => item.product_id === selectedId) ??
+    (items.length === 1 ? items[0] : null);
+
+  const handleClose = useCallback(() => {
+    setSelectedId(null);
+    onClose();
+  }, [onClose]);
 
   // Trap focus — close on Escape
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') handleClose();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   // Prevent body scroll while open
   useEffect(() => {
@@ -62,7 +64,7 @@ export function ReviewModal({ isOpen, onClose, orderId, items, onSuccess }: Revi
 
   const handleSuccess = (review: Review) => {
     onSuccess?.(review);
-    onClose();
+    handleClose();
   };
 
   return (
@@ -71,7 +73,7 @@ export function ReviewModal({ isOpen, onClose, orderId, items, onSuccess }: Revi
       ref={backdropRef}
       className="fixed inset-0 z-50 overflow-y-auto bg-black/50 px-4 py-8"
       onClick={(e) => {
-        if (e.target === backdropRef.current) onClose();
+        if (e.target === backdropRef.current) handleClose();
       }}
     >
       {/* Panel */}
@@ -81,7 +83,7 @@ export function ReviewModal({ isOpen, onClose, orderId, items, onSuccess }: Revi
           <div className="flex items-center gap-2">
             {selectedItem && items.length > 1 && (
               <button
-                onClick={() => setSelectedItem(null)}
+                onClick={() => setSelectedId(null)}
                 className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100"
                 aria-label="Back to product selection"
               >
@@ -96,7 +98,7 @@ export function ReviewModal({ isOpen, onClose, orderId, items, onSuccess }: Revi
             </div>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-600"
             aria-label="Close review modal"
           >
@@ -114,7 +116,7 @@ export function ReviewModal({ isOpen, onClose, orderId, items, onSuccess }: Revi
                 {items.map((item) => (
                   <li key={item.product_id}>
                     <button
-                      onClick={() => setSelectedItem(item)}
+                      onClick={() => setSelectedId(item.product_id)}
                       className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-zinc-50"
                     >
                       {item.image && (
@@ -141,7 +143,7 @@ export function ReviewModal({ isOpen, onClose, orderId, items, onSuccess }: Revi
               productName={selectedItem.name}
               orderId={orderId}
               onSuccess={handleSuccess}
-              onCancel={items.length > 1 ? () => setSelectedItem(null) : onClose}
+              onCancel={items.length > 1 ? () => setSelectedId(null) : handleClose}
             />
           )}
         </div>

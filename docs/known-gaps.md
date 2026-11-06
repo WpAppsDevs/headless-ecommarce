@@ -1,160 +1,96 @@
 # Known gaps
 
-These are current behaviors, not aspirations. Each entry says what happens, where, and what a fix would touch. They are ordered by impact.
+These are current behaviors, not aspirations. Each entry says what happens, where, and what would close it. Backend gaps need WordPress work; the frontend should not pretend they work.
 
-For concrete change steps, code sketches, and acceptance criteria, see [fix-plan.md](fix-plan.md). Section numbers match.
+For the completed remediation history and the exact changes, see [fix-plan.md](fix-plan.md).
 
-## 1. Auth does not rehydrate after a reload for most signed-in users
+## 1. Guest checkout needs WordPress support
 
-`authStore.hydrate()` returns early when there is no `localStorage['cart_token']` and no cached access token. A user who logged in after the guest token was cleared has neither. The refresh cookie is never tried, so a full reload logs them out.
+Guest checkout is not implemented. `/checkout` requires a signed-in user and `src/proxy.ts` sends visitors without a session to `/login`. The old `config.features.guestCheckout` flag was removed because no code implemented it.
 
-- Where: `src/stores/authStore.ts`, `hydrate()`.
-- Fix direction: attempt refresh whenever the refresh cookie may exist. A lightweight `GET /api/auth/me` probe or a server-set hint cookie would distinguish a fresh visitor from a signed-in one without a doomed request per visitor.
-- Impact: high. Account and checkout are client-guarded and will redirect to login.
+Closing this needs a WordPress endpoint that creates an order without a user and returns a confirmation key that can be looked up without an account. Do not implement it only in the client; unattributed orders cannot be supported.
 
-## 2. Lint is not clean
+- Where: `src/app/checkout/page.tsx`, `src/app/api/checkout/route.ts`, WordPress.
+- Impact: medium. The store is account-only by design today.
 
-`npm run lint` reports five errors and twenty-one warnings.
+## 2. Profile, password, and address changes are read-only
 
-Errors:
+The account Setting tab shows name, email, phone, and account ID. The address tab shows billing and shipping. Neither can save changes.
 
-- `src/app/order-confirmation/[id]/page.tsx:28` — `setState` synchronously in an effect.
-- `src/components/account/Address.tsx:9` — explicit `any`.
-- `src/components/review-modal/ReviewModal.tsx:40` — `setState` in an effect.
-- `src/components/reviews/ReviewList.tsx:43` — `setState` in an effect.
-- `src/components/shop/ShopClient.tsx:38` — unescaped apostrophe.
+WordPress exposes `GET /api/user` but the client has no update endpoint. Editing was removed rather than leaving a form that fakes a save.
 
-Warnings are mostly unused imports and variables. `npx tsc --noEmit` passes.
+Closing this needs WordPress endpoints for profile update and password change, plus a client route and `updateProfile` function. Address editing can use the same profile update payload.
 
-- Impact: medium. CI has no lint gate, but new code should not add errors.
-- Fix direction: handle one file at a time; do not mix a lint cleanup with a feature change.
+- Where: `src/components/account/Settings.tsx`, `src/components/account/Address.tsx`, WordPress.
+- Impact: medium. Customers contact support for changes.
 
-## 3. There is no test suite
+## 3. Order cancellation has no endpoint
 
-No unit, integration, or end-to-end tests exist. There is no runner configured.
+The Cancel Order button was removed. No WordPress endpoint accepts a cancellation, and the client cannot change an order status safely.
 
-- Impact: high for regressions in checkout, auth, and cart.
-- Fix direction: start with the flows that carry money or identity. Playwright against a seeded WordPress environment would cover checkout, guest cart merge, login reload, and tracking. Pure normalizers (`normalizeTrackingResult`, `filterCheckoutDrafts`, currency formatting) are cheap unit tests.
+Closing this needs `POST /api/orders/:id/cancel` with ownership and status checks, a client proxy, and a confirmation dialog. Only show the action for cancellable statuses returned by the server.
 
-## 4. Guest checkout is advertised but not implemented
+- Where: `src/components/account/OrderCard.tsx`, WordPress.
+- Impact: medium.
 
-`config.features.guestCheckout` is `true`. `/checkout` calls `getUser()` and redirects to login when it fails with an auth error.
+## 4. Review deletion has no ownership flag
 
-- Where: `src/lib/config.ts`, `src/app/checkout/page.tsx`.
-- Impact: medium. The flag misleads anyone reading config as behavior.
-- Fix direction: either implement guest orders in WordPress and the page, or remove the flag.
+`DELETE /api/reviews/:id` exists in the client layer, but the review payload does not say whether the current user owns the review. No delete control is shown, so there is no broken button.
 
-## 5. Cart page fetches twice
+Closing this needs a `can_delete` boolean or author user ID in the review response, then a delete action gated on that flag.
 
-`CartHydrator` fetches on layout mount, and `CartPageContent` fetches again on mount. There is no request de-duplication.
+- Where: `src/lib/api/reviews.ts`, `src/components/reviews/ReviewCard.tsx`, WordPress.
+- Impact: low.
 
-- Where: `src/components/layout/CartHydrator.tsx`, `src/components/cart/CartPageContent.tsx`.
-- Impact: low, extra requests.
-- Fix direction: a store-level `lastFetchedAt` or remove the page-level fetch and rely on the hydrator.
+## 5. Confirmation has no single-order endpoint
 
-## 6. Coupon, free shipping, and cart expiry are UI-only
+Order confirmation now keeps the checkout result in `sessionStorage` and falls back to scanning the 100 most recent orders for a signed-in user. An order older than that, viewed in a new tab, still cannot be recovered.
 
-All three are behind `SETTINGS` flags that are off. Turning one on does not connect it to an API.
+Closing this needs `GET /api/orders/:id` (or a signed guest confirmation endpoint) and a client proxy. The page would then fetch by ID first and use `sessionStorage` only for the payment reference.
 
-- Coupon: logs the code to the console.
-- Free shipping: local threshold constant.
-- Expiry: local countdown, not tied to the server cart.
-- Where: `src/components/cart/CartPageContent.tsx`, `src/components/cart/CartDrawer.tsx`, `src/components/cart/CouponSection.tsx`.
-- Impact: low while off, high if someone turns a flag on without knowing.
+- Where: `src/app/order-confirmation/[id]/page.tsx`, WordPress.
+- Impact: low to medium. Direct visits to old confirmations lose status details.
 
-## 7. Two shipping price sources
+## 6. Checkout-draft filtering is a backstop in the UI
 
-`CartSummary` uses hardcoded prices (free, 35, 35) and its own state. Checkout uses `cartStore.shippingMethods` from the cart API, with the same values as fallback.
+`filterCheckoutDrafts` runs at the orders API boundary and again in `Dashboard` and `Orders`. Tracking has its own draft check in `normalizeTrackingResult`. The duplication is intentional so a new order surface cannot leak a draft, but only the pure filter has a unit test.
 
-- Where: `src/components/cart/CartSummary.tsx`, `src/components/checkout/CheckoutForm.tsx`, `src/lib/api/cart.ts`.
-- Impact: medium if WordPress shipping rates change. The cart summary can disagree with checkout.
-- Fix direction: one source, preferably the cart API, with a shared fallback constant.
+Closing this means either documenting the backstop as policy and adding a test per surface, or trusting the API boundary and removing the UI filters. Do not remove them without a test that the boundary still filters after pagination adjustment.
 
-## 8. Policy copy is duplicated and inconsistent
+- Where: `src/lib/api/orders.ts`, `src/lib/order-utils.ts` consumers, `src/lib/api/tracking.ts`.
+- Impact: low.
 
-The shipping and returns policy pages are Bengali. The product page's "Shipping & Returns" accordion is English, hardcoded, and lists different delivery windows and thresholds.
+## 7. Error reports need a destination
 
-- Where: `src/components/product/ProductTabs.tsx`, `src/app/shipping/page.tsx`, `src/app/returns/page.tsx`.
-- Impact: medium, customer-facing contradiction.
-- Fix direction: make the accordion read from a shared content module or link to the policy page.
+Client errors go to `/api/errors`, which writes them to the server log and optionally forwards them to `ERROR_REPORT_WEBHOOK_URL`. Without that variable, reports are only as visible as the hosting provider's function logs.
 
-## 9. Account actions are placeholders
+Closing this operationally means setting the webhook to a collector or chat channel. A dedicated service such as Sentry would add release tracking and source maps, but is not required to see errors.
 
-- Settings save waits 600 ms and shows success; no API call.
-- Address edit has no handler.
-- Cancel order has no handler.
-- Review delete exists in the API layer but has no UI.
-- Where: `src/components/account/Settings.tsx`, `Address.tsx`, `OrderCard.tsx`, `src/lib/api/reviews.ts`.
+- Where: `src/app/api/errors/route.ts`, `docs/operations.md`.
+- Impact: low.
 
-## 10. Wishlist survives logout
+## 8. Browser flows have no automated test
 
-`authStore.logout()` clears cart and review state but not the wishlist store. The header count can show the previous user's wishlist until reload.
+Vitest covers pure logic: order filtering, tracking normalization, currency formatting, shipping fallback, and the session-hint predicate. Checkout, auth reload, cart merge, tracking, and reviews are still verified manually.
 
-- Where: `src/stores/authStore.ts`.
-- Fix direction: add `wishlistStore.clear()` or re-hydrate as a guest after logout.
+Closing this needs an end-to-end runner against a seeded staging WordPress site. Keep it separate from the unit suite.
 
-## 11. Order confirmation depends on `sessionStorage`
+- Where: `vitest.config.ts`, `src/**/*.test.ts`.
+- Impact: medium for regressions in money and identity flows.
 
-A refresh or direct visit to `/order-confirmation/[id]` shows the heading but no status or payment details. The page does not fetch the order.
+## 9. Dark-mode utilities remain dormant
 
-- Where: `src/app/order-confirmation/[id]/page.tsx`.
-- Impact: medium. Customers often refresh or bookmark this page.
-- Fix direction: fetch the order by ID with the auth token, or add a public confirmation endpoint keyed by order key.
+The `.dark` token block was removed and no toggle applies the class. Some shadcn primitives still carry `dark:` utilities, which only activate under a `.dark` ancestor, so they are inert.
 
-## 12. Header fallback links to a missing page
+Closing this means either deleting those utilities or implementing a real theme toggle and auditing contrast. Do not re-add the token block without the toggle.
 
-`STATIC_NAV_LINKS` includes `/contact`, but no `src/app/contact` route exists. If the WordPress `primary` menu is empty or unreachable, the fallback renders a 404 link.
+- Where: `src/app/globals.css`, `src/components/ui/*`.
+- Impact: low.
 
-- Where: `src/components/layout/Header.tsx`.
-- Fix direction: add the page or remove the link from the fallback.
+## 10. `CodeDocs.md` is historical
 
-## 13. Order-draft filtering lives in several places
-
-`filterCheckoutDrafts` is called in `orders.ts`, the account orders proxy, `Dashboard`, `Orders`, and `OrdersList`; tracking has its own `isCheckoutDraftStatus` checks.
-
-- Impact: low, but a new order surface can forget the filter.
-- Fix direction: filter once at the API boundary and remove redundant UI filters, or keep the UI filters as documented backstops.
-
-## 14. `apiClient` does not check `res.ok`
-
-A non-2xx response whose body is not `{ success: false }` can be returned as data. Modules that need the status use raw `fetch`.
-
-- Where: `src/lib/api/client.ts`.
-- Impact: low for the current wrapper contract, medium for new endpoints.
-- Fix direction: throw on non-2xx unless a caller opts out.
-
-## 15. Unused or parallel code
-
-- `/api/product-filters` is not called by the client.
-- `src/lib/api/user.ts` is empty.
-- `useDebounce` is unused.
-- `OrdersList` duplicates the orders table inside `AccountLayout`, which uses `Orders`.
-- `NewsletterSection`, `InstagramSection`, and `TestimonialCarousel` are not used by the home page.
-- `PromoBanners` is imported but commented out.
-- `Price` and rating aggregate fetches on the product page run sequentially despite a comment saying parallel.
-
-## 16. Dark mode is defined but unwired
-
-`globals.css` has a `.dark` block. No class is applied, no toggle exists, and many components are not audited for dark contrast.
-
-## 17. No server-side route protection
-
-There is no middleware. `/account` and `/checkout` redirect on the client. A user can load the shell before the redirect, and the server sends the page HTML. WordPress still rejects data requests, but the page is not protected at the edge.
-
-- Fix direction: middleware that checks the refresh/access cookie for those routes, or server pages that read cookies. Weigh the auth rehydration fix in item 1 first.
-
-## 18. `CodeDocs.md` is stale
-
-The root `CodeDocs.md` predates the current review, tracking, policy, and account work. `docs/` supersedes it. Keep `ApiDocs.md` as an upstream contract reference, but verify against the code before relying on it.
-
-## 19. Duplicate empty directories
-
-`src/app/\(shop\)` and `src/app/order-confirmation/\[id\]` exist as empty, escaped-name directories from an earlier move. They are untracked and do not affect the build. Remove them from the working copy if they confuse tooling.
-
-## 20. No error reporting
-
-Errors go to `console.error` in `error.tsx`. There is no Sentry or equivalent, so production failures are invisible unless someone checks logs.
+The root `CodeDocs.md` predates this documentation set. It carries a legacy banner and is kept for history. `docs/` is the maintained reference. `ApiDocs.md` remains an upstream contract reference; verify it against the live API before relying on it.
 
 ## How to use this list
 
-Pick one item per change. Do not fold a refactor into a feature unless the feature requires it. When you fix an item, update this file and the affected flow doc in the same commit.
+Pick one item per change. Do not fold a refactor into a feature unless the feature requires it. When a gap closes, remove it here and update the affected flow doc in the same commit.

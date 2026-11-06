@@ -164,6 +164,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
     }
   }, [shippingMethods, setValue]);
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- react-hook-form watch is used intentionally for live form state
   const sameAsBilling = watch('sameAsBilling');
   const gateway = watch('gateway');
   const selectedShippingMethod = watch('shipping_method');

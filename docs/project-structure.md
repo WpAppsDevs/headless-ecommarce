@@ -91,7 +91,6 @@ Naming: PascalCase files for components, one exported component per file. Hooks 
 | `api/wishlist.ts` | Wishlist proxy calls and product normalization. |
 | `api/filters.ts` | Shop filter data, parallel fetch, safe fallbacks. |
 | `api/menus.ts` | WordPress menu location → `NavLink[]`. |
-| `api/user.ts` | Empty placeholder. No exports. |
 
 Files in `api/` may run on the server, the client, or both. The `typeof window !== 'undefined'` checks are deliberate: the same function chooses a proxy in the browser and a direct URL on the server. Do not remove them without replacing the CORS strategy.
 
@@ -107,10 +106,6 @@ Files in `api/` may run on the server, the client, or both. The `typeof window !
 
 Stores import API functions and other stores. `authStore` calls into cart, wishlist, and review stores on login and logout. That dependency direction is one-way: cart and wishlist do not import auth.
 
-## `src/hooks`
-
-`useDebounce.ts` is currently unused. It is a generic utility, not domain code.
-
 ## Route handlers
 
 `src/app/api/` mirrors the remote namespaces but does not copy every endpoint.
@@ -121,7 +116,6 @@ api/
 ├── auth/{login,logout,me,refresh,register,forgot-password,reset-password}/
 ├── checkout/
 ├── newsletter/
-├── product-filters/
 ├── reviews/{create,media/upload,product/[id],aggregate/[id],random,[id]}/
 ├── store-settings/
 ├── tracking/{search,order/[orderId]}/
@@ -133,8 +127,6 @@ Three handler patterns:
 1. **Pure proxy** — forward method, body, auth header, and response. Most handlers.
 2. **Cookie handler** — stores tokens in httpOnly cookies and reshapes the response. Auth routes.
 3. **Normalizing proxy** — filters or repairs data before returning it. `/api/account/orders` is the one example.
-
-`/api/product-filters` exists but no client calls it. The shop page calls `getProductFilters()` directly on the server. Keep the route only if an external consumer needs it.
 
 ## Non-runtime directories
 

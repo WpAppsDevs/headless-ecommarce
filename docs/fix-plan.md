@@ -2,6 +2,8 @@
 
 A sequenced remediation plan for [known-gaps.md](known-gaps.md). Section numbers match the gap numbers. Each entry says what to change, where, how to verify it, and whether it needs WordPress work.
 
+> **Status:** implemented. The frontend changes in sections 1–20 are in place: session-hint rehydration, route guard, lint cleanup, unit tests, cart and shipping cleanup, read-only account surfaces, wishlist reset, confirmation fallback, contact page, `apiClient` status checks, dead-code removal, and error reporting. Backend-dependent work remains where WordPress has no endpoint; see [known-gaps.md](known-gaps.md) for the current list.
+
 ## Priority overview
 
 | # | Gap | Priority | Effort | Backend needed |

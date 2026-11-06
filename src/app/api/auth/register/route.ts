@@ -46,6 +46,13 @@ export async function POST(req: NextRequest) {
       maxAge: 14 * 24 * 60 * 60,
     });
 
+    // Readable, non-secret hint so the client knows a refresh token may exist.
+    response.cookies.set('session_hint', '1', {
+      ...COOKIE_BASE,
+      httpOnly: false,
+      maxAge: 14 * 24 * 60 * 60,
+    });
+
     return response;
   } catch {
     return NextResponse.json(

@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Home, Package, MapPin, Settings, Heart, LogOut } from 'lucide-react';
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { useWishlistStore } from '@/stores/wishlistStore';
