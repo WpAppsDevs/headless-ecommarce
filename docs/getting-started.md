@@ -7,6 +7,8 @@
 - A WordPress site running the WPAppsDev Headless Wrapper API, reachable over HTTP or HTTPS. Installing the plugin needs Composer and WP-CLI, or the Local app's terminal.
 - Optional: a Stripe test publishable key and a Mailchimp audience, if you work on those paths.
 
+`shadcn` is a devDependency: it contributes CSS at build time and is not imported by the running server. Install dev dependencies when building; only production-only installs at runtime can use `--omit=dev`.
+
 The WordPress site and plugin are separate repositories. Only this front end is documented here.
 
 ## Backend setup
