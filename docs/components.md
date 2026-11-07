@@ -146,7 +146,12 @@ Review eligibility lives in `OrderCard`: paid status (`completed` or `processing
 | Component | Type | Responsibility |
 | --- | --- | --- |
 | `WishlistButton.tsx` | Client | Heart toggle in `card` or `detail` variant. |
-| `PolicyUI.tsx` | Server | `SectionHeading`, `Card`, `StatCard`, `BulletList`, `NoteCallout`, `TypePanel`. |
+| `SectionHeading.tsx` | Server | Policy heading with an accent icon tile. |
+| `Card.tsx` | Server | Rounded policy card. |
+| `StatCard.tsx` | Server | Centred label/value tile. |
+| `BulletList.tsx` | Server | Policy bullet list with an accent dot. |
+| `NoteCallout.tsx` | Server | Highlighted policy callout. |
+| `TypePanel.tsx` | Server | Product-type panel with an accent header band. |
 
 ## UI primitives
 

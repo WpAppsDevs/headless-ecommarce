@@ -117,7 +117,7 @@ The default gates live in [coding-standards.md](coding-standards.md#definition-o
 
 ## How to make a change
 
-**Change copy or layout on a static page.** Edit the page or section component. Policy pages live in `src/app/shipping`, `returns`, `privacy-policy`, and `terms`; they share `src/components/policies/PolicyUI.tsx`.
+**Change copy or layout on a static page.** Edit the page or section component. Policy pages live in `src/app/shipping`, `returns`, `privacy-policy`, and `terms`; they share the components under `src/components/policies/`.
 
 **Add a product field.** Add it to the API type and normalizer in `src/lib/api/products.ts`, then consume it in the component. Keep raw API shapes in the API layer; components consume normalized types.
 

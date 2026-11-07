@@ -13,13 +13,11 @@ import {
   Mail,
   MessageCircle,
 } from 'lucide-react';
-import {
-  SectionHeading,
-  Card,
-  BulletList,
-  NoteCallout,
-  TypePanel,
-} from '@/components/policies/PolicyUI';
+import { BulletList } from '@/components/policies/BulletList';
+import { Card } from '@/components/policies/Card';
+import { NoteCallout } from '@/components/policies/NoteCallout';
+import { SectionHeading } from '@/components/policies/SectionHeading';
+import { TypePanel } from '@/components/policies/TypePanel';
 
 export const metadata: Metadata = {
   title: 'রিটার্ন ও এক্সচেঞ্জ',

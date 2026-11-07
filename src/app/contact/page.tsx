@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Mail, MessageCircle, Phone, Clock } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { Card, SectionHeading } from '@/components/policies/PolicyUI';
+import { Card } from '@/components/policies/Card';
+import { SectionHeading } from '@/components/policies/SectionHeading';
 import { config } from '@/lib/config';
 
 export const metadata: Metadata = {

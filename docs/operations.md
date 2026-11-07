@@ -29,9 +29,9 @@ npm run build
 npm run start
 ```
 
-Run the gates in [coding-standards.md](coding-standards.md#definition-of-done) before the build. `npm run build` also performs type checking and collects page data. It calls WordPress while generating static params and product pages. If WordPress is down, the build can still succeed with fewer pre-rendered pages, but the output will be thin. Check the build log for failed fetches.
+Run `npm run verify` before the build. `npm run build` also performs type checking and collects page data. It calls WordPress while generating static params and product pages. If WordPress is down, the build can still succeed with fewer pre-rendered pages, but the output will be thin. Check the build log for failed fetches.
 
-CI is not configured in this repository; treat the definition of done plus this build as the release gate.
+GitHub Actions runs `npm run verify` and `npm run build` on every pull request and on pushes to `master`. Vercel provides the preview deployment; CI is the merge gate.
 
 ## Vercel
 

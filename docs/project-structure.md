@@ -58,7 +58,7 @@ Components are grouped by the domain they serve, not by atomic-design level.
 | `reviews/` | Review list, card, summary, form, upload, filters | `ProductReviewsSection` is the entry point. |
 | `review-modal/` | Review modal wrapper | Used by both product page and order card. |
 | `tracking/` | Track form, accordion, timeline, status | Accordion and timeline are separate for reuse. |
-| `policies/` | Shared policy-page primitives | `PolicyUI.tsx` is the only file. |
+| `policies/` | Shared policy-page primitives | One component per file: `SectionHeading`, `Card`, `StatCard`, `BulletList`, `NoteCallout`, `TypePanel`. |
 | `wishlist/` | Heart toggle | Used on cards and product detail. |
 | `ui/` | shadcn/base-nova primitives | Button, card, input, label, badge, sheet, skeleton, PageHeader. |
 
