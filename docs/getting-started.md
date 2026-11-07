@@ -2,7 +2,7 @@
 
 ## What you need
 
-- Node.js 20.9 or newer. Next.js 16 requires it.
+- Node.js 20.18.1 or newer. Next.js 16 requires Node 20.9; `shadcn` 4.23 requires 20.18.1.
 - npm. The lockfile is `package-lock.json`.
 - A WordPress site running the WPAppsDev Headless Wrapper API, reachable over HTTP or HTTPS. Installing the plugin needs Composer and WP-CLI, or the Local app's terminal.
 - Optional: a Stripe test publishable key and a Mailchimp audience, if you work on those paths.
