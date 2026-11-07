@@ -10,13 +10,11 @@ import {
   Phone,
   Scale,
 } from 'lucide-react';
-import {
-  SectionHeading,
-  Card,
-  StatCard,
-  NoteCallout,
-  TypePanel,
-} from '@/components/policies/PolicyUI';
+import { Card } from '@/components/policies/Card';
+import { NoteCallout } from '@/components/policies/NoteCallout';
+import { SectionHeading } from '@/components/policies/SectionHeading';
+import { StatCard } from '@/components/policies/StatCard';
+import { TypePanel } from '@/components/policies/TypePanel';
 
 export const metadata: Metadata = {
   title: 'শিপিং ও ডেলিভারি',

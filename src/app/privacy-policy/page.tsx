@@ -3,7 +3,9 @@ import type { ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { ShieldCheck, Info, CheckCircle2, Users, Cookie, Lock, Mail, Phone, MessageCircle } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { SectionHeading, Card, BulletList } from '@/components/policies/PolicyUI';
+import { BulletList } from '@/components/policies/BulletList';
+import { Card } from '@/components/policies/Card';
+import { SectionHeading } from '@/components/policies/SectionHeading';
 import { config } from '@/lib/config';
 
 export const metadata: Metadata = {

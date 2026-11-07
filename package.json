@@ -7,9 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check:contrast": "node scripts/check-contrast.mjs"
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check:components": "node scripts/check-component-exports.mjs",
+    "verify": "npm run typecheck && npm run lint && npm test && npm run check:contrast && npm run check:components",
+    "verify:full": "npm run verify && npm run build"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.0",

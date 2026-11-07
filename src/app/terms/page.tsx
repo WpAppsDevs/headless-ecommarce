@@ -3,7 +3,9 @@ import type { ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { CheckCircle2, Package, Banknote, ShoppingCart, FileText, Scale, RefreshCw } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { SectionHeading, Card, BulletList } from '@/components/policies/PolicyUI';
+import { BulletList } from '@/components/policies/BulletList';
+import { Card } from '@/components/policies/Card';
+import { SectionHeading } from '@/components/policies/SectionHeading';
 
 export const metadata: Metadata = {
   title: 'টার্মস অফ সার্ভিস',

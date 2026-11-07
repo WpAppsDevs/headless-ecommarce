@@ -159,7 +159,7 @@ For older orders in the third shape, the timeline is reduced to an "Order Placed
 
 ## Policy pages
 
-`/shipping`, `/returns`, `/privacy-policy`, and `/terms` are static Bengali pages. They share `SectionHeading`, `Card`, `StatCard`, `NoteCallout`, `TypePanel`, and `BulletList` from `src/components/policies/PolicyUI.tsx`.
+`/shipping`, `/returns`, `/privacy-policy`, and `/terms` are static Bengali pages. They share `SectionHeading`, `Card`, `StatCard`, `NoteCallout`, `TypePanel`, and `BulletList` from one file each under `src/components/policies/`.
 
 The product page's Shipping & Returns accordion summarizes the rules and links to `/shipping` and `/returns`, so the policy pages remain the single source of truth.
 
