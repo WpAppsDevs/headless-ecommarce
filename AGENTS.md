@@ -14,4 +14,8 @@ Single-context: one `GLOSSARY.md` plus `docs/adr/` at the repo root. See `docs/a
 
 ### Codebase docs
 
-Read `docs/coding-standards.md` before changing code and `docs/architecture.md` before changing data flow, auth, or routing. The maintained documentation index is `docs/README.md`. The code is the source of truth; update the docs in the same change when behavior moves.
+Read `docs/coding-standards.md` before changing code and `docs/architecture.md` before changing data flow, auth, or routing. Read `docs/operations.md` before opening a pull request or changing CI. The maintained documentation index is `docs/README.md`. The code is the source of truth; update the docs in the same change when behavior moves.
+
+### Working style
+
+Run long commands (`npm run build`, `npm run verify:full`) in the background and continue with other work; the harness reports completion, so read the final output once.
