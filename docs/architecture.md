@@ -86,5 +86,6 @@ A 401 in the browser triggers one refresh attempt. If the retry is also 401, `au
 - [ADR-0002: Zustand stores and hydrators](adr/0002-zustand-and-hydrators.md)
 - [ADR-0003: Cookie-backed authentication](adr/0003-cookie-backed-auth.md)
 - [ADR-0004: Next.js route handlers as proxies](adr/0004-proxy-route-handlers.md)
+- [ADR-0007: shadcn is a build-time dependency](adr/0007-shadcn-is-a-build-dependency.md)
 - [flows/authentication.md](flows/authentication.md)
 - [data-layer.md](data-layer.md)
