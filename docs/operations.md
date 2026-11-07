@@ -33,6 +33,15 @@ Run `npm run verify` before the build. `npm run build` also performs type checki
 
 GitHub Actions runs `npm run verify` and `npm run build` on every pull request and on pushes to `master`. Vercel provides the preview deployment; CI is the merge gate.
 
+## Pull requests and merge gate
+
+Open pull requests against `master`. Vercel is the preview, not the gate; the required check is the `verify` job.
+
+- The active ruleset is **Main Branch Rule**. It requires `verify` with strict up-to-date checks, and blocks force pushes and branch deletion. Renaming the CI job requires updating the ruleset.
+- Editing `.github/workflows/*` needs the `workflow` token scope. Refresh it with `gh auth refresh -s workflow`.
+- For a stacked pull request, retarget the base to `master` and rebase after the parent merges. Otherwise the child PR still contains the parent's commits.
+- Put a long PR body in a file and pass it with `--body-file`; the repository template is `.github/pull_request_template.md`.
+
 ## Vercel
 
 1. Import the repository.

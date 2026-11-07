@@ -148,7 +148,7 @@ throw new ApiError('out_of_stock', 'This item is out of stock');
 - Test pure logic first: normalizers, formatters, filters, and fallback selection. These need no browser and no WordPress instance.
 - `npm test` runs once; `npm run test:watch` watches.
 - Fix the bug first, then add the test that keeps it fixed.
-- Browser flows (add to cart, login reload, checkout, tracking, reviews) are still verified manually against the staging WordPress site. When you add an end-to-end runner, keep it out of the unit suite and document how to seed the backend.
+- Browser flows (add to cart, login reload, checkout, tracking, reviews) are still verified manually against the local WordPress site that serves as staging. When you add an end-to-end runner, keep it out of the unit suite and document how to seed the backend.
 
 ## Git
 
