@@ -12,6 +12,8 @@ import type { Product } from '@/lib/api/products';
 import { getProductBadge, isPurchasable } from '@/lib/product-availability';
 import { useFormatPrice } from '@/lib/utils/currency';
 
+// The placeholder is an inline SVG data URI, which cannot read CSS variables;
+// keep its fill in step with --brand-card. The card itself sets bg-brand-card.
 const PLACEHOLDER =
   'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22%3E%3Crect width=%22400%22 height=%22500%22 fill=%22%23F2F2EE%22/%3E%3C/svg%3E';
 

@@ -108,7 +108,7 @@ Use `font-serif` for marketing headings and product names. Use the default sans 
 - Max width: `max-w-7xl` for most pages, `max-w-[1200px]` for product detail, `max-w-3xl` for policies and auth.
 - Page padding: `px-4 sm:px-6 lg:px-8`.
 - Section rhythm: `py-14` to `py-20`.
-- Section headings: `SectionHeading` from `src/components/home/SectionHeading.tsx` — left-aligned eyebrow, serif title, hairline of space, optional action link. Do not reintroduce the centred pill badge plus centred `h2` pattern; it made every section look the same.
+- Section headings: `EditorialHeading` from `src/components/home/EditorialHeading.tsx` — left-aligned eyebrow, serif title, hairline of space, optional action link. Do not reintroduce the centred pill badge plus centred `h2` pattern; it made every section look the same.
 - Grid: 2 columns on mobile, 3 at `sm`, 4 at `lg` for product grids.
 - Header height: 68px. Sticky offsets use `top-24` (96px) to clear it.
 - Touch targets: at least 44px for every mobile control, including header icons, pagination, colour swatches, and auth inputs. The visible glyph may be smaller; expand the hit area with padding so layout does not shift.

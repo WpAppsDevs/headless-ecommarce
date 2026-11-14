@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Star } from 'lucide-react';
 import Image from 'next/image';
 import { getRandomReviews } from '@/lib/api/reviews';
-import { SectionHeading } from '@/components/home/SectionHeading';
+import { EditorialHeading } from '@/components/home/EditorialHeading';
 import type { Review } from '@/lib/api/reviews';
 
 function Stars({ rating }: { rating: number }) {
@@ -156,7 +156,7 @@ export function TestimonialsSection() {
     <section aria-labelledby="testimonials-heading" className="bg-brand-bg py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
-        <SectionHeading
+        <EditorialHeading
           id="testimonials-heading"
           eyebrow="Customer Reviews"
           title="What Our Customers Say"

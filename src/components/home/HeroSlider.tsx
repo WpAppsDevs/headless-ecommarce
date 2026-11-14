@@ -18,7 +18,7 @@ function CtaButton({ cta, primary }: { cta: Cta; primary: boolean }) {
   const className = cn(
     'inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border-2 px-7 py-3.5 text-sm font-bold uppercase tracking-[0.08em] whitespace-nowrap transition sm:w-auto',
     primary
-      ? 'border-transparent bg-brand-dark text-white shadow-md hover:bg-brand-dark/85'
+      ? 'border-transparent bg-brand-accent-strong text-white hover:bg-brand-accent-strong-hover'
       : 'border-brand-wine bg-brand-wine/10 text-brand-wine hover:bg-brand-wine/15',
   );
   const Icon = cta.Icon;
@@ -69,7 +69,12 @@ const HERO_MODES: Record<HeroPrimaryAction, HeroMode> = {
       </>
     ),
     primary: { href: '/products?tag=pre-order', label: 'Shop Pre-Order', Icon: Clock },
-    secondary: { href: '/products', label: 'View All Products', Icon: ArrowRight },
+    secondary: {
+      href: config.whatsappUrl,
+      label: 'Ask on WhatsApp',
+      Icon: MessageCircle,
+      external: true,
+    },
   },
   contact: {
     headline: 'Contact Us for Availability',

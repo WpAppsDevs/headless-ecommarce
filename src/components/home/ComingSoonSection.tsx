@@ -51,7 +51,7 @@ export function ComingSoonSection() {
 
             {/* Icon + badge grouped */}
             <div className="mb-6 flex flex-col items-center gap-3">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full border border-brand-gold/30 bg-brand-gold/10 shadow-lg shadow-brand-gold/10">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full border border-brand-gold/30 bg-brand-gold/10">
                 <Gem className="h-7 w-7 text-brand-gold" strokeWidth={1.5} />
               </div>
               <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/60">
@@ -74,7 +74,7 @@ export function ComingSoonSection() {
 
             {/* Notify me form */}
             {submitted ? (
-              <div className="mx-auto mt-8 flex max-w-md items-center justify-center gap-3 rounded-2xl bg-white/[0.08] px-6 py-4 text-sm text-white ring-1 ring-white/15">
+              <div className="mx-auto mt-8 flex max-w-md items-center justify-center gap-3 rounded-xl bg-white/[0.08] px-6 py-4 text-sm text-white ring-1 ring-white/15">
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-accent-strong ring-1 ring-brand-accent/30">
                   <Check className="h-4 w-4 text-white" />
                 </div>
@@ -93,12 +93,12 @@ export function ComingSoonSection() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Your email for launch notification"
-                  className="flex-1 rounded-2xl bg-white/[0.08] px-5 py-3.5 text-sm text-white placeholder:text-white/35 outline-none ring-1 ring-white/15 transition focus:ring-2 focus:ring-brand-accent sm:rounded-r-none sm:rounded-l-2xl"
+                  className="flex-1 rounded-xl bg-white/[0.08] px-5 py-3.5 text-sm text-white placeholder:text-white/35 outline-none ring-1 ring-white/15 transition focus:ring-2 focus:ring-brand-accent sm:rounded-r-none sm:rounded-l-xl"
                 />
                 <button
                   type="submit"
                   disabled={loading}
-                  className="rounded-2xl bg-brand-accent-strong px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-accent/20 ring-1 ring-brand-accent/30 transition hover:bg-brand-accent-strong-hover disabled:opacity-60 sm:rounded-l-none sm:rounded-r-2xl"
+                  className="rounded-xl bg-brand-accent-strong px-6 py-3.5 text-sm font-semibold text-white ring-1 ring-brand-accent/30 transition hover:bg-brand-accent-strong-hover disabled:opacity-60 sm:rounded-l-none sm:rounded-r-xl"
                 >
                   {loading ? (
                     <span className="block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white mx-auto" />

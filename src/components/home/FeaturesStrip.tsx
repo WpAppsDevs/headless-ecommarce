@@ -1,5 +1,5 @@
 import { ShieldCheck, Truck, Star, HeadphonesIcon } from 'lucide-react';
-import { SectionHeading } from '@/components/home/SectionHeading';
+import { EditorialHeading } from '@/components/home/EditorialHeading';
 
 const FEATURES = [
   {
@@ -29,7 +29,7 @@ export function FeaturesStrip() {
     <section aria-labelledby="why-us-heading" className="bg-brand-bg py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
-        <SectionHeading
+        <EditorialHeading
           id="why-us-heading"
           eyebrow="Our Promise"
           title="Why Choose Us"

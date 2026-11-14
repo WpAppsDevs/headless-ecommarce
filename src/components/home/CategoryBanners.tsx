@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { SectionHeading } from '@/components/home/SectionHeading';
+import { EditorialHeading } from '@/components/home/EditorialHeading';
 
 const BANNERS = [
   {
@@ -33,7 +33,7 @@ export function CategoryBanners() {
       className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:px-8"
     >
       {/* Heading */}
-      <SectionHeading
+      <EditorialHeading
         id="categories-heading"
         eyebrow="Shop by Category"
         title="For the Whole Family"

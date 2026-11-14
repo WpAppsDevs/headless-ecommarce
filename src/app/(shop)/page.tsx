@@ -10,7 +10,7 @@ import { TestimonialsSection } from '@/components/home/TestimonialsSection';
 import { FeaturesStrip } from '@/components/home/FeaturesStrip';
 import { ComingSoonSection } from '@/components/home/ComingSoonSection';
 import { WhatsAppCTA } from '@/components/home/WhatsAppCTA';
-import { SectionHeading } from '@/components/home/SectionHeading';
+import { EditorialHeading } from '@/components/home/EditorialHeading';
 
 export const revalidate = 60;
 
@@ -33,7 +33,7 @@ export default async function HomePage() {
       <section aria-labelledby="featured-heading" className="bg-brand-section py-16">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Heading — matches other section headings */}
-          <SectionHeading
+          <EditorialHeading
             id="featured-heading"
             eyebrow="New Arrivals"
             title="Latest Collection"

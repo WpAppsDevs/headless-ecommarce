@@ -34,7 +34,7 @@ The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local
 | `AnnouncementBar.tsx` | Server | Top strip with shipping copy and social links. |
 | `CategoryBanners.tsx` | Server | Three category image cards linking to `/products?category=…`. |
 | `CategoryGrid.tsx` | Server | Ready stock and pre-order entry cards. Catalogue/wholesale is a B2B channel and is not in this consumer row. |
-| `SectionHeading.tsx` | Server | The one section heading style: left-aligned eyebrow, serif title, optional description and right-edge action link. `tone="dark"` for deep panels. |
+| `EditorialHeading.tsx` | Server | The content-section heading style: left-aligned eyebrow, serif title, optional description and right-edge action link. `tone="dark"` for deep panels. Not the same component as `policies/SectionHeading.tsx`, which is an icon-plus-title block for policy pages. |
 | `PreOrderSteps.tsx` | Server | Four-step explainer. |
 | `WholesaleBanner.tsx` | Server | Wholesale value proposition and stats. |
 | `TestimonialsSection.tsx` | Client | Fetches random reviews; falls back gracefully. |

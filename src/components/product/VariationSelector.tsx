@@ -254,7 +254,7 @@ export function VariationSelector({ product }: { product: Product }) {
                           'relative h-11 w-11 overflow-hidden rounded-full transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent-strong',
                           isActive
                             ? 'ring-2 ring-brand-accent-strong ring-offset-2 ring-offset-brand-bg'
-                            : 'ring-1 ring-[#D9D2CB] hover:ring-brand-accent-strong/50',
+                            : 'ring-1 ring-brand-border hover:ring-brand-accent-strong/50',
                         )}
                       >
                         {hex ? (

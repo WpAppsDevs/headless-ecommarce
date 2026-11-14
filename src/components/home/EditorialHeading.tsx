@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
-interface SectionHeadingProps {
+interface EditorialHeadingProps {
   /** Small uppercase label above the title. */
   eyebrow?: string;
   title: string;
@@ -17,11 +17,11 @@ interface SectionHeadingProps {
 }
 
 /**
- * One heading style for every section: left-aligned, small uppercase eyebrow,
+ * One heading style for every content section: left-aligned, small uppercase eyebrow,
  * serif title, hairline rule. Replaces the centred pill + h2 pattern that every
  * section on the home page used to repeat.
  */
-export function SectionHeading({
+export function EditorialHeading({
   eyebrow,
   title,
   description,
@@ -29,7 +29,7 @@ export function SectionHeading({
   tone = 'light',
   action,
   className,
-}: SectionHeadingProps) {
+}: EditorialHeadingProps) {
   const dark = tone === 'dark';
 
   return (

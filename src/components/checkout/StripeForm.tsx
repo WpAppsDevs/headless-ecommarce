@@ -61,6 +61,8 @@ const StripeInner = forwardRef<StripeFormHandle, {}>((_, ref) => {
       <div className="rounded-xl border border-zinc-200 bg-white px-3 py-2.5 focus-within:ring-1 focus-within:ring-zinc-300">
         <CardElement
           options={{
+            // Stripe Elements renders in its own iframe and cannot read CSS variables.
+            // Keep these literals in step with --brand-text, --brand-text-muted and the danger colour.
             style: {
               base: {
                 fontSize: '14px',

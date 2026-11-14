@@ -1,5 +1,5 @@
 import { Search, ShoppingBag, Package, Sparkles } from 'lucide-react';
-import { SectionHeading } from '@/components/home/SectionHeading';
+import { EditorialHeading } from '@/components/home/EditorialHeading';
 
 const STEPS = [
   {
@@ -33,7 +33,7 @@ export function PreOrderSteps() {
     <section aria-labelledby="preorder-heading" className="bg-brand-dark-surface py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
-        <SectionHeading
+        <EditorialHeading
           id="preorder-heading"
           tone="dark"
           eyebrow="Pre-Order Process"
