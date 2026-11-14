@@ -33,7 +33,8 @@ The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local
 | `HeroSlider.tsx` | Server | Despite the name, it does not slide. Static hero with a desktop image and a mobile stacked image. Its headline and calls to action follow the catalog's Ready Stock, Pre-Order, or contact fallback. |
 | `AnnouncementBar.tsx` | Server | Top strip with shipping copy and social links. |
 | `CategoryBanners.tsx` | Server | Three category image cards linking to `/products?category=…`. |
-| `CategoryGrid.tsx` | Server | Ready stock, pre-order, and catalog entry cards. |
+| `CategoryGrid.tsx` | Server | Ready stock and pre-order entry cards. Catalogue/wholesale is a B2B channel and is not in this consumer row. |
+| `EditorialHeading.tsx` | Server | The content-section heading style: left-aligned eyebrow, serif title, optional description and right-edge action link. `tone="dark"` for deep panels. Not the same component as `policies/SectionHeading.tsx`, which is an icon-plus-title block for policy pages. |
 | `PreOrderSteps.tsx` | Server | Four-step explainer. |
 | `WholesaleBanner.tsx` | Server | Wholesale value proposition and stats. |
 | `TestimonialsSection.tsx` | Client | Fetches random reviews; falls back gracefully. |
@@ -62,12 +63,10 @@ Shop surfaces use the brand tokens from `globals.css` rather than zinc or black.
 | `ProductCard.tsx` | Client | Image hover swap, availability badge, price, quantity, add-to-cart or select-options, wishlist heart. |
 | `AvailabilityBadge.tsx` | Shared | Pre-Order or Sold Out badge shared by cards and the product detail. |
 | `ProductCardSkeleton.tsx` | Server | Loading placeholder. |
-| `ProductGrid.tsx` | Server | Simple grid wrapper. |
 | `ProductImages.tsx` | Client | Gallery, thumbnails, lightbox. |
 | `VariationSelector.tsx` | Client | Price, availability badge, attribute controls, quantity, add-to-cart or sold-out state, mobile sticky bar. |
 | `ProductTabs.tsx` | Client | Accordion for details, additional info, shipping, reviews. |
 | `RelatedProducts.tsx` | Server | Fetches four products; renders nothing on failure. |
-| `SearchBar.tsx` | Client | Legacy search input. The header has its own overlay. |
 
 `ProductCard` sends `variationId = 0` for simple products. A variable product shows "Select Options" and links to the detail page instead of adding directly. Its quantity selector is local to the card.
 

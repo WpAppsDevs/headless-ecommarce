@@ -270,8 +270,8 @@ export function ShopClient({
           ) : (
             <>
               <div className={gridColsClass(viewCols)}>
-                {filteredProducts.map((p) => (
-                  <ProductCard key={p.id} product={p} />
+                {filteredProducts.map((p, i) => (
+                  <ProductCard key={p.id} product={p} priority={i === 0} />
                 ))}
               </div>
 

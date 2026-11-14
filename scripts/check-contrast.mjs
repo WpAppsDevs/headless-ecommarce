@@ -77,6 +77,8 @@ const checks = [
   ['Pre-order on the page background', token('brand-preorder'), token('brand-bg'), 4.5],
   ['Pre-order on a section', token('brand-preorder'), token('brand-section'), 4.5],
   ['Pre-order on a card', token('brand-preorder'), token('brand-card'), 4.5],
+  ['Danger on the page background', token('brand-danger'), token('brand-bg'), 4.5],
+  ['Danger on a card', token('brand-danger'), token('brand-card'), 4.5],
   ['White on WhatsApp', '#FFFFFF', token('brand-whatsapp'), 4.5],
   ['WhatsApp on white', token('brand-whatsapp'), '#FFFFFF', 4.5],
   ['Strong gold on a card', token('brand-gold-strong'), token('brand-card'), 3.0],

@@ -6,22 +6,12 @@ import type { Order } from '@/lib/api/orders';
 import { useReviewStore } from '@/stores/reviewStore';
 import { ReviewModal } from '@/components/review-modal/ReviewModal';
 import type { ReviewableItem } from '@/components/review-modal/ReviewModal';
+import { orderStatusStyle } from '@/lib/order-status';
 
 interface OrderCardProps {
   order: Order;
   onViewDetails: () => void;
 }
-
-const STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
-  pending:    { label: 'Pending',    cls: 'bg-[#D89A6A]/15 text-[#D89A6A] border border-[#D89A6A]/40' },
-  processing: { label: 'Processing', cls: 'bg-[#D89A6A]/15 text-[#D89A6A] border border-[#D89A6A]/40' },
-  'on-hold':  { label: 'On Hold',    cls: 'bg-[#B39DDB]/15 text-[#B39DDB] border border-[#B39DDB]/40' },
-  delivery:   { label: 'Delivery',   cls: 'bg-[#D89A6A]/15 text-[#D89A6A] border border-[#D89A6A]/40' },
-  completed:  { label: 'Delivered',  cls: 'bg-[#7BAE7F]/15 text-[#7BAE7F] border border-[#7BAE7F]/40' },
-  cancelled:  { label: 'Cancelled',  cls: 'bg-[#E57373]/15 text-[#E57373] border border-[#E57373]/40' },
-  refunded:   { label: 'Refunded',   cls: 'bg-zinc-100 text-zinc-500 border border-zinc-200' },
-  failed:     { label: 'Failed',     cls: 'bg-[#E57373]/15 text-[#E57373] border border-[#E57373]/40' },
-};
 
 const PAID_STATUSES = ['completed', 'processing'];
 
@@ -31,7 +21,7 @@ function fmtDate(dateStr: string | null) {
 }
 
 export function OrderCard({ order, onViewDetails }: OrderCardProps) {
-  const sc        = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
+  const sc        = orderStatusStyle(order.status);
   const isPaid    = PAID_STATUSES.includes(order.status);
 
   const isReviewed = useReviewStore((s) => s.isReviewed);
@@ -100,7 +90,7 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
           Amount:{' '}
           <span className="font-semibold text-zinc-900">{order.currency} {order.total}</span>
           {isPaid && (
-            <span className="ml-1.5 text-xs font-semibold text-[#7BAE7F]">(Paid)</span>
+            <span className="ml-1.5 text-xs font-semibold text-brand-stock">(Paid)</span>
           )}
         </p>
         <p className="text-[13px] text-zinc-600">
@@ -117,7 +107,7 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
       <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
         <div className="flex items-center gap-2">
           <span className="text-[13px] text-zinc-500">Status:</span>
-          <span className={`rounded-md px-3 py-0.5 text-[11px] font-semibold ${sc.cls}`}>
+          <span className={`rounded-md border px-3 py-0.5 text-[11px] font-semibold ${sc.badge}`}>
             {sc.label}
           </span>
         </div>
@@ -125,7 +115,7 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
           {hasReviewableItems && (
             <button
               onClick={() => setReviewModalOpen(true)}
-              className="flex items-center gap-1.5 rounded-lg border border-[#D89A6A]/60 px-4 py-2 text-[12px] font-semibold text-[#D89A6A] transition hover:bg-[#D89A6A]/5"
+              className="flex items-center gap-1.5 rounded-lg border border-brand-preorder/40 px-4 py-2 text-[12px] font-semibold text-brand-preorder transition hover:bg-brand-preorder/5"
             >
               <PenLine className="h-3.5 w-3.5" strokeWidth={2} />
               Write Review

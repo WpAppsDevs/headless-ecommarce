@@ -47,7 +47,7 @@ export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProp
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white font-geist">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
         {/* Mobile tab bar */}
         <div className="mb-6 flex overflow-x-auto rounded-xl border border-zinc-200 bg-white p-1 lg:hidden">

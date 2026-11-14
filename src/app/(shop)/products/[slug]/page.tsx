@@ -108,7 +108,7 @@ export default async function ProductPage({ params }: PageProps) {
         ]}
       />
 
-      <section className="font-ui nums-lining bg-[#FBF7F3]">
+      <section className="font-ui nums-lining bg-brand-bg">
         <div className="mx-auto max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
           {/* 2-col product section */}
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,48%)_1fr] lg:gap-12">
@@ -124,7 +124,7 @@ export default async function ProductPage({ params }: PageProps) {
                     <Link
                       key={cat.id}
                       href={`/products?category=${cat.slug}`}
-                      className="rounded-full bg-[#F6E4E4] px-3 py-1 text-xs font-medium text-[#7A2E3A] transition-colors hover:bg-[#EFD5D5]"
+                      className="rounded-full bg-brand-accent-light px-3 py-1 text-xs font-medium text-brand-accent-strong transition-colors hover:bg-brand-accent/25"
                     >
                       {cat.name}
                     </Link>
@@ -133,7 +133,7 @@ export default async function ProductPage({ params }: PageProps) {
               )}
 
               {/* Name */}
-              <h1 className="mb-3 font-serif text-2xl font-medium uppercase leading-[1.2] tracking-[0.01em] text-[#1F2A3C] lg:text-[32px]">
+              <h1 className="mb-3 font-serif text-2xl font-medium uppercase leading-[1.2] tracking-[0.01em] text-brand-text lg:text-[32px]">
                 {product.name}
               </h1>
 
@@ -156,13 +156,13 @@ export default async function ProductPage({ params }: PageProps) {
                         );
                       })}
                     </span>
-                    <span className="text-[#5A5A5A]">{product.average_rating} / 5</span>
-                    <span className="text-[#5A5A5A]">({product.rating_count} Reviews)</span>
+                    <span className="text-brand-text-muted">{product.average_rating} / 5</span>
+                    <span className="text-brand-text-muted">({product.rating_count} Reviews)</span>
                   </>
                 ) : (
                   <a
                     href="#reviews"
-                    className="font-medium text-[#9E2F45] underline underline-offset-2 hover:text-[#862640]"
+                    className="font-medium text-brand-accent-strong underline underline-offset-2 hover:text-brand-accent-strong-hover"
                   >
                     Be the first to review
                   </a>
@@ -170,8 +170,8 @@ export default async function ProductPage({ params }: PageProps) {
 
                 {product.sku && (
                   <>
-                    <span aria-hidden="true" className="h-4 w-px bg-[#D9D2CB]" />
-                    <span className="text-[#5A5A5A]">Product Code: {product.sku}</span>
+                    <span aria-hidden="true" className="h-4 w-px bg-brand-border" />
+                    <span className="text-brand-text-muted">Product Code: {product.sku}</span>
                   </>
                 )}
               </div>
@@ -179,7 +179,7 @@ export default async function ProductPage({ params }: PageProps) {
               {/* Short description (kept from API when present) */}
               {product.short_description && (
                 <div
-                  className="mb-5 text-[15px] leading-relaxed text-[#5A5A5A] [&_p]:leading-relaxed"
+                  className="mb-5 text-[15px] leading-relaxed text-brand-text-muted [&_p]:leading-relaxed"
                   dangerouslySetInnerHTML={{ __html: product.short_description }}
                 />
               )}
@@ -188,7 +188,7 @@ export default async function ProductPage({ params }: PageProps) {
               <VariationSelector product={product} />
 
               {/* Divider + accordions (inside the right column) */}
-              <div className="mt-7 border-t border-[#E6DED6]" />
+              <div className="mt-7 border-t border-brand-border" />
               <div className="mt-5">
                 <ProductTabs
                   description={product.description}

@@ -74,7 +74,7 @@ export function ProductImages({ images, name, isOnSale }: Props) {
                 className={cn(
                   'relative h-[76px] w-[76px] shrink-0 overflow-hidden rounded-[6px] border-2 transition-all',
                   active === i
-                    ? 'border-[#9E2F45] opacity-100'
+                    ? 'border-brand-accent-strong opacity-100'
                     : 'border-transparent opacity-60 hover:opacity-100',
                 )}
               >
@@ -94,7 +94,7 @@ export function ProductImages({ images, name, isOnSale }: Props) {
 
       {/* Main image */}
       <div
-        className="group relative aspect-[6/7] min-w-0 flex-1 overflow-hidden rounded-[12px] bg-[#F1ECE7]"
+        className="group relative aspect-[6/7] min-w-0 flex-1 overflow-hidden rounded-[12px] bg-brand-card"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
@@ -111,7 +111,7 @@ export function ProductImages({ images, name, isOnSale }: Props) {
         {/* Sale badge (kept from original, positioned top-left) */}
         {isOnSale && (
           <div className="absolute left-3 top-3">
-            <span className="rounded-full bg-[#9E2F45] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
+            <span className="rounded-full bg-brand-accent-strong px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
               Sale
             </span>
           </div>
@@ -131,7 +131,7 @@ export function ProductImages({ images, name, isOnSale }: Props) {
               type="button"
               onClick={goPrev}
               aria-label="Previous image"
-              className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white text-[#1F2A3C] shadow-sm transition-opacity hover:bg-[#F6E4E4] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45]"
+              className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white text-brand-text shadow-sm transition-opacity hover:bg-brand-accent-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent-strong"
             >
               <ChevronLeft className="h-5 w-5" strokeWidth={1.5} />
             </button>
@@ -139,7 +139,7 @@ export function ProductImages({ images, name, isOnSale }: Props) {
               type="button"
               onClick={goNext}
               aria-label="Next image"
-              className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white text-[#1F2A3C] shadow-sm transition-opacity hover:bg-[#F6E4E4] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45]"
+              className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white text-brand-text shadow-sm transition-opacity hover:bg-brand-accent-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent-strong"
             >
               <ChevronRight className="h-5 w-5" strokeWidth={1.5} />
             </button>
@@ -152,7 +152,7 @@ export function ProductImages({ images, name, isOnSale }: Props) {
             type="button"
             onClick={() => setZoomOpen(true)}
             aria-label="Zoom image"
-            className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#1F2A3C] shadow-sm transition-opacity hover:bg-[#F6E4E4] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45]"
+            className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-white text-brand-text shadow-sm transition-opacity hover:bg-brand-accent-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent-strong"
           >
             <ZoomIn className="h-4 w-4" strokeWidth={1.5} />
           </button>
@@ -172,7 +172,7 @@ export function ProductImages({ images, name, isOnSale }: Props) {
             type="button"
             onClick={() => setZoomOpen(false)}
             aria-label="Close image preview"
-            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-[#1F2A3C] hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-brand-text hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
             <X className="h-5 w-5" />
           </button>

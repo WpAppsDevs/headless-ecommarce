@@ -95,7 +95,7 @@ export function Footer() {
   return (
     <footer>
       {/* ── Main content ──────────────────────────────────────────────── */}
-      <div className="bg-gradient-to-br from-[#fef5f0] to-[#fdf0f4]">
+      <div className="bg-brand-bg">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
 
@@ -195,7 +195,7 @@ export function Footer() {
       </div>
 
       {/* ── Bottom bar ────────────────────────────────────────────────── */}
-      <div className="bg-[#f5e4de]">
+      <div className="bg-brand-card">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-5 sm:flex-row lg:px-8">
           <p className="text-xs text-brand-text-muted">
             © {year} {config.siteName}. All rights reserved.

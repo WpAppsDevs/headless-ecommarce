@@ -1,6 +1,11 @@
+import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingBag, Boxes, BookOpen } from 'lucide-react';
+import { ShoppingBag, Boxes } from 'lucide-react';
 
+/**
+ * The two consumer purchase modes. Catalogue/wholesale is a B2B channel and is
+ * carried by the wholesale section further down the page, not by this row.
+ */
 const PURCHASE_TYPES = [
   {
     icon: ShoppingBag,
@@ -9,7 +14,6 @@ const PURCHASE_TYPES = [
     desc2: 'across Bangladesh',
     href: '/products?tag=ready-stock',
     image: '/images/category-grid/ready-stock.jpg',
-    catalog: false,
   },
   {
     icon: Boxes,
@@ -18,35 +22,19 @@ const PURCHASE_TYPES = [
     desc2: 'Delivery in 15-25 days',
     href: '/products?tag=pre-order',
     image: '/images/category-grid/pre-order.jpg',
-    catalog: false,
   },
-  {
-    icon: BookOpen,
-    label: 'Catalog / Wholesale',
-    desc1: 'Bulk buying for resellers',
-    desc2: 'Best price guarantee',
-    href: '/products?tag=catalog',
-    image: '',
-    catalog: true,
-  },
-];
-
-const CATALOG_IMAGES = [
-  '/images/category-grid/catalog-1.jpg',
-  '/images/category-grid/catalog-2.jpg',
-  '/images/category-grid/catalog-3.jpg',
 ];
 
 export function CategoryGrid() {
   return (
-    <section className="py-10">
+    <section className="py-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-4 sm:grid-cols-3">
-          {PURCHASE_TYPES.map(({ icon: Icon, label, desc1, desc2, href, image, catalog }) => (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {PURCHASE_TYPES.map(({ icon: Icon, label, desc1, desc2, href, image }) => (
             <Link
               key={label}
               href={href}
-              className="group flex min-h-[160px] overflow-hidden rounded-2xl bg-brand-card shadow-md ring-1 ring-brand-border transition-all hover:-translate-y-1 hover:shadow-lg"
+              className="group flex min-h-[160px] overflow-hidden rounded-xl bg-brand-card ring-1 ring-brand-border transition-colors hover:bg-brand-accent-light"
               aria-label={`Browse ${label}`}
             >
               {/* Left: content */}
@@ -67,34 +55,14 @@ export function CategoryGrid() {
               </div>
 
               {/* Right: product image */}
-              <div className="relative w-32 shrink-0 overflow-hidden sm:w-28 lg:w-36">
-                {catalog ? (
-                  /* Catalog: polaroid-style overlapping photos */
-                  <div className="relative flex h-full w-full items-center justify-center bg-brand-accent/5 p-2">
-                    {CATALOG_IMAGES.map((src, i) => (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        key={i}
-                        src={src}
-                        alt=""
-                        className="absolute h-[75%] w-[55%] rounded-sm object-cover shadow-md ring-2 ring-white"
-                        style={{
-                          top: '50%',
-                          left: '50%',
-                          transform: `translate(-50%, -50%) rotate(${(i - 1) * 9}deg) translate(${(i - 1) * 18}px, ${i === 1 ? -4 : 4}px)`,
-                          zIndex: i === 1 ? 3 : i === 0 ? 1 : 2,
-                        }}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={image}
-                    alt={label}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                )}
+              <div className="relative w-36 shrink-0 overflow-hidden sm:w-40 lg:w-48">
+                <Image
+                  src={image}
+                  alt={label}
+                  fill
+                  sizes="(min-width: 1024px) 192px, (min-width: 640px) 160px, 144px"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
               </div>
             </Link>
           ))}

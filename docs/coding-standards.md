@@ -107,6 +107,8 @@ throw new ApiError('out_of_stock', 'This item is out of stock');
 ## Styling
 
 - Use brand tokens and Tailwind utilities.
+- Colour comes from a token. `npm run check:tokens` fails on a Tailwind arbitrary colour class (`bg-[#9E2F45]`), because a literal survives every future palette change. Add the token to `:root` and `@theme inline` in `src/app/globals.css` instead.
+- A component name is unique across `src/components`, one export per file, and referenced somewhere. `npm run check:components` enforces all three.
 - Use `cn()` for conditional classes.
 - Keep global CSS for tokens and base styles; style a component with Tailwind utilities.
 - Match the surrounding visual language. Product pages are editorial and account/auth pages are shadcn; keep each screen in its own system.

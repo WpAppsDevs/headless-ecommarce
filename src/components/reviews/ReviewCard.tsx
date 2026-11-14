@@ -43,7 +43,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
               {review.author.name ?? 'Anonymous'}
             </span>
             {review.author.is_verified && (
-              <span className="flex items-center gap-1 rounded-full bg-[#7BAE7F]/10 px-2 py-0.5 text-[10px] font-semibold text-[#7BAE7F]">
+              <span className="flex items-center gap-1 rounded-full bg-brand-stock/10 px-2 py-0.5 text-[10px] font-semibold text-brand-stock">
                 <BadgeCheck className="h-3 w-3" strokeWidth={2.5} />
                 Verified Purchase
               </span>
@@ -57,8 +57,8 @@ export function ReviewCard({ review }: ReviewCardProps) {
               <Star
                 key={i}
                 className="h-3.5 w-3.5"
-                fill={i <= review.rating ? '#f59e0b' : 'none'}
-                stroke={i <= review.rating ? '#f59e0b' : '#d1d5db'}
+                fill={i <= review.rating ? 'var(--brand-gold-strong)' : 'none'}
+                stroke={i <= review.rating ? 'var(--brand-gold-strong)' : 'var(--brand-border)'}
                 strokeWidth={1.5}
               />
             ))}

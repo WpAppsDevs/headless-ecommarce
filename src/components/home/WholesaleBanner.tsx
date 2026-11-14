@@ -25,10 +25,10 @@ export function WholesaleBanner() {
 
           {/* Text block */}
           <div className="flex-1 text-center lg:text-left">
-            <span className="inline-block rounded-full border border-brand-accent/30 bg-brand-accent/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-accent">
-              Wholesale & Catalog
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-accent">
+              Wholesale &amp; Catalog
             </span>
-            <h2 id="wholesale-heading" className="mt-5 font-serif text-3xl font-bold leading-tight text-white sm:text-4xl">
+            <h2 id="wholesale-heading" className="mt-3 font-serif text-3xl font-bold leading-tight tracking-[-0.01em] text-white sm:text-4xl">
               Grow Your Business with
               <br />
               <span className="text-brand-accent">Our Catalog Collections</span>
@@ -71,7 +71,7 @@ export function WholesaleBanner() {
 
           {/* Stats card */}
           <div className="lg:w-[400px]">
-            <div className="rounded-2xl border border-brand-accent/10 bg-brand-accent/[0.05] p-6">
+            <div className="rounded-xl border border-brand-accent/10 bg-brand-accent/[0.05] p-6">
               <p className="mb-5 text-center text-xs font-semibold uppercase tracking-widest text-brand-accent lg:text-left">
                 Our Wholesale Network
               </p>
@@ -79,7 +79,7 @@ export function WholesaleBanner() {
                 {STATS.map(({ value, label }) => (
                   <div
                     key={label}
-                    className="flex flex-col items-center rounded-xl bg-brand-accent/[0.07] px-4 py-5 ring-1 ring-brand-accent/10 transition-all duration-300 hover:bg-brand-accent/[0.13] hover:ring-brand-accent/30 hover:shadow-lg hover:shadow-brand-accent/20"
+                    className="flex flex-col items-center rounded-xl bg-brand-accent/[0.07] px-4 py-5 ring-1 ring-brand-accent/10 transition-colors duration-300 hover:bg-brand-accent/[0.13] hover:ring-brand-accent/30"
                   >
                     <span className="font-serif text-2xl font-bold text-brand-gold">{value}</span>
                     <span className="mt-1 text-center text-xs leading-snug text-white/55">{label}</span>

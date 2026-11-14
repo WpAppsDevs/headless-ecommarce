@@ -1,4 +1,5 @@
 import { Search, ShoppingBag, Package, Sparkles } from 'lucide-react';
+import { EditorialHeading } from '@/components/home/EditorialHeading';
 
 const STEPS = [
   {
@@ -32,24 +33,20 @@ export function PreOrderSteps() {
     <section aria-labelledby="preorder-heading" className="bg-brand-dark-surface py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
-        <div className="mb-14 text-center">
-          <span className="inline-block rounded-full bg-brand-accent/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-accent">
-            Pre-Order Process
-          </span>
-          <h2 id="preorder-heading" className="mt-4 font-serif text-3xl font-bold text-white sm:text-4xl">
-            How Pre-Order Works
-          </h2>
-          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/60">
-            Get your dream Pakistani dress delivered to your doorstep in just 4 simple steps.
-          </p>
-        </div>
+        <EditorialHeading
+          id="preorder-heading"
+          tone="dark"
+          eyebrow="Pre-Order Process"
+          title="How Pre-Order Works"
+          description="Your dress is sourced in Pakistan after you order. Four steps, 15–25 days, tracked the whole way."
+        />
 
         {/* Steps */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map(({ step, icon: Icon, title, desc }) => (
             <div
               key={step}
-              className="group relative overflow-hidden rounded-2xl border border-brand-accent/10 bg-brand-accent/[0.06] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-brand-accent/30 hover:bg-brand-accent/[0.10] hover:shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
+              className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] p-6 transition-colors duration-300 hover:border-white/25 hover:bg-white/[0.06]"
             >
               {/* Ghost step number — decorative */}
               <span
