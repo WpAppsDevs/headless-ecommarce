@@ -4,21 +4,9 @@ import { type ReactNode } from 'react';
 import { X, Home, Printer, Download, RotateCcw, Check } from 'lucide-react';
 import type { Order } from '@/lib/api/orders';
 import { useFormatPrice } from '@/lib/utils/currency';
+import { orderStatusStyle } from '@/lib/order-status';
 
 // ── Status config ────────────────────────────────────────────────────────────
-
-interface StatusCfg { label: string; bg: string; text: string; border: string }
-
-const STATUS_CONFIG: Record<string, StatusCfg> = {
-  pending:    { label: 'Pending',    bg: 'bg-[#D89A6A]/15', text: 'text-[#D89A6A]', border: 'border-[#D89A6A]/40' },
-  processing: { label: 'Processing', bg: 'bg-[#D89A6A]/15', text: 'text-[#D89A6A]', border: 'border-[#D89A6A]/40' },
-  'on-hold':  { label: 'On Hold',    bg: 'bg-[#B39DDB]/15', text: 'text-[#B39DDB]', border: 'border-[#B39DDB]/40' },
-  delivery:   { label: 'Delivery',   bg: 'bg-[#D89A6A]/15', text: 'text-[#D89A6A]', border: 'border-[#D89A6A]/40' },
-  completed:  { label: 'Delivered',  bg: 'bg-[#7BAE7F]/15', text: 'text-[#7BAE7F]', border: 'border-[#7BAE7F]/40' },
-  cancelled:  { label: 'Cancelled',  bg: 'bg-[#E57373]/15', text: 'text-[#E57373]', border: 'border-[#E57373]/40' },
-  refunded:   { label: 'Refunded',   bg: 'bg-zinc-100',     text: 'text-zinc-500',  border: 'border-zinc-200'     },
-  failed:     { label: 'Failed',     bg: 'bg-[#E57373]/15', text: 'text-[#E57373]', border: 'border-[#E57373]/40' },
-};
 
 // ── Timeline steps ───────────────────────────────────────────────────────────
 
@@ -105,7 +93,7 @@ interface OrderDetailsModalProps {
 }
 
 export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
-  const sc           = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
+  const sc           = orderStatusStyle(order.status);
   const doneSteps    = STATUS_STEP_COUNT[order.status] ?? 1;
   const total        = Number(order.total);
   const discount     = Number(order.discount_total ?? 0);
@@ -148,7 +136,7 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
                   )}
                 </p>
               </div>
-              <span className={`shrink-0 rounded-lg border px-3 py-1 text-[12px] font-semibold ${sc.bg} ${sc.text} ${sc.border}`}>
+              <span className={`shrink-0 rounded-lg border px-3 py-1 text-[12px] font-semibold ${sc.badge}`}>
                 {sc.label}
               </span>
             </div>
@@ -249,12 +237,12 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
                     {/* Circle + connector */}
                     <div className="flex flex-col items-center">
                       <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                        done ? 'border-[#7BAE7F] bg-[#7BAE7F]' : 'border-zinc-300 bg-white'
+                        done ? 'border-brand-stock bg-brand-stock' : 'border-zinc-300 bg-white'
                       }`}>
                         {done && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
                       </div>
                       {!isLast && (
-                        <div className={`mt-1 w-0.5 min-h-[44px] flex-1 ${done ? 'bg-[#7BAE7F]/30' : 'bg-zinc-200'}`} />
+                        <div className={`mt-1 w-0.5 min-h-[44px] flex-1 ${done ? 'bg-brand-stock/30' : 'bg-zinc-200'}`} />
                       )}
                     </div>
 
@@ -277,7 +265,7 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
           <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-4">
               <h3 className="text-[15px] font-bold text-zinc-900">Order Summary</h3>
-              <span className={`rounded-lg border px-3 py-1 text-[12px] font-semibold ${sc.bg} ${sc.text} ${sc.border}`}>
+              <span className={`rounded-lg border px-3 py-1 text-[12px] font-semibold ${sc.badge}`}>
                 {sc.label}
               </span>
             </div>
@@ -297,12 +285,12 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
               {discount > 0 && (
                 <div className="flex justify-between text-[13px] text-zinc-600">
                   <span>Discount applied:</span>
-                  <span className="font-medium text-[#E57373]">-{fmt(discount)}</span>
+                  <span className="font-medium text-brand-danger">-{fmt(discount)}</span>
                 </div>
               )}
               <div className="flex justify-between text-[13px] text-zinc-600">
                 <span>Delivery Charge:</span>
-                <span className={`font-medium ${shippingCost === 0 ? 'text-[#7BAE7F]' : 'text-zinc-800'}`}>
+                <span className={`font-medium ${shippingCost === 0 ? 'text-brand-stock' : 'text-brand-text'}`}>
                   {shippingCost === 0 ? 'Free' : fmt(shippingCost)}
                 </span>
               </div>
@@ -317,7 +305,7 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => window.print()}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#7BAE7F] px-5 py-3 text-[13px] font-semibold text-white shadow-sm transition hover:opacity-90 sm:flex-none"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-stock px-5 py-3 text-[13px] font-semibold text-white shadow-sm transition hover:opacity-90 sm:flex-none"
             >
               <Printer className="h-4 w-4" strokeWidth={2} />
               Print Invoice
@@ -327,7 +315,7 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
               Download Invoice
             </button>
             {order.status === 'completed' && (
-              <button className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#E57373] px-5 py-3 text-[13px] font-semibold text-white shadow-sm transition hover:opacity-90 sm:flex-none">
+              <button className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-danger px-5 py-3 text-[13px] font-semibold text-white shadow-sm transition hover:opacity-90 sm:flex-none">
                 <RotateCcw className="h-4 w-4" strokeWidth={2} />
                 Return Product
               </button>

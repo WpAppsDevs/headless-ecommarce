@@ -56,7 +56,7 @@ export function ProductReviewsSection({
       <div>
         {isAuthenticated ? (
           alreadyReviewed ? (
-            <p className="inline-flex items-center gap-2 rounded-lg bg-[#7BAE7F]/10 px-4 py-2.5 text-sm font-medium text-[#7BAE7F]">
+            <p className="inline-flex items-center gap-2 rounded-lg bg-brand-stock/10 px-4 py-2.5 text-sm font-medium text-brand-stock">
               ✓ You have reviewed this product
             </p>
           ) : (

@@ -34,6 +34,7 @@ The `:root` block defines the palette. The `@theme inline` block maps each varia
 | `--brand-topbar` | `bg-brand-topbar` | Announcement bar |
 | `--brand-gold` | `text-brand-gold` | Premium accents on dark surfaces |
 | `--brand-gold-strong` | `text-brand-gold-strong` | Stars and small accents on light surfaces |
+| `--brand-danger` | `text-brand-danger` | Destructive and terminal-negative states (cancelled, failed, a deduction) |
 | `--brand-whatsapp` | `bg-brand-whatsapp` | WhatsApp action |
 | `--brand-dark` | `bg-brand-dark` | Dark sections |
 | `--brand-dark-surface` | `bg-brand-dark-surface` | Deep dark panels |

@@ -71,6 +71,7 @@
   --color-brand-topbar: var(--brand-topbar);
   --color-brand-gold: var(--brand-gold);
   --color-brand-gold-strong: var(--brand-gold-strong);
+  --color-brand-danger: var(--brand-danger);
   --color-brand-whatsapp: var(--brand-whatsapp);
   --color-brand-dark-surface: var(--brand-dark-surface);
   --font-serif: var(--font-playfair), Georgia, "Times New Roman", serif;
@@ -102,6 +103,7 @@
   --brand-topbar: #DDE0EA;
   --brand-gold: #C2A468;
   --brand-gold-strong: #7C6124;
+  --brand-danger: #B3261E;
   --brand-whatsapp: #075E54;
   --brand-dark-surface: #0B0D16;
 
