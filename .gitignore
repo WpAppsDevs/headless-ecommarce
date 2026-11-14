@@ -32,3 +32,8 @@ out/
 
 # TypeScript build artifact
 tsconfig.tsbuildinfo
+
+# Local agent workspace (specs, audits) — see AGENTS.md
+.scratch/
+.openchamber/
+.playwright-mcp/
