@@ -92,7 +92,7 @@ export function HeroSlider({ primaryAction = 'ready-stock' }: { primaryAction?: 
   const mode = HERO_MODES[primaryAction];
 
   return (
-    <section className="relative min-h-[520px] overflow-hidden bg-[#F7EEE8] lg:min-h-[620px]">
+    <section className="relative min-h-[520px] overflow-hidden bg-brand-hero lg:min-h-[620px]">
 
       {/* ── Model image — absolute right half, desktop only ── */}
       <div className="absolute bottom-0 right-0 top-0 hidden w-[52%] lg:block" aria-hidden="true">
@@ -105,13 +105,13 @@ export function HeroSlider({ primaryAction = 'ready-stock' }: { primaryAction?: 
           sizes="52vw"
         />
         {/* Fade from warm blush to transparent on the left edge */}
-        <div className="absolute inset-y-0 left-0 w-56 bg-gradient-to-r from-[#F7EEE8] via-[#F7EEE8]/70 to-transparent" />
+        <div className="absolute inset-y-0 left-0 w-56 bg-gradient-to-r from-brand-hero via-brand-hero/70 to-transparent" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-10 lg:px-16">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         {/* ── Mobile image — stacks above text ── */}
-        <div className="relative mt-6 h-[300px] overflow-hidden rounded-2xl lg:hidden">
+        <div className="relative mt-6 h-[260px] overflow-hidden rounded-xl lg:hidden">
           <Image
             src="/images/hero/women-fashion.jpg"
             alt="Premium Pakistani fashion collection"
@@ -150,7 +150,7 @@ export function HeroSlider({ primaryAction = 'ready-stock' }: { primaryAction?: 
             </div>
 
             {/* ── Trust bar: white card with vertical dividers ── */}
-            <div className="mt-8 inline-flex w-full flex-col divide-y divide-brand-border overflow-hidden rounded-xl border border-brand-border bg-white/90 shadow-md backdrop-blur-sm sm:w-auto sm:flex-row sm:divide-x sm:divide-y-0">
+            <div className="mt-8 inline-flex w-full flex-col divide-y divide-brand-border overflow-hidden rounded-xl border border-brand-border bg-brand-section sm:w-auto sm:flex-row sm:divide-x sm:divide-y-0">
               <div className="flex items-center gap-3 px-5 py-3.5">
                 <Truck className="h-[18px] w-[18px] shrink-0 text-brand-wine/70" strokeWidth={1.5} />
                 <div>

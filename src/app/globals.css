@@ -7,7 +7,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* Neutral face for auth and account surfaces only. See docs/design-system.md. */
+  --font-geist: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -58,6 +60,7 @@
   --color-brand-accent-strong-hover: var(--brand-accent-strong-hover);
   --color-brand-accent-light: var(--brand-accent-light);
   --color-brand-bg: var(--brand-bg);
+  --color-brand-hero: var(--brand-hero);
   --color-brand-section: var(--brand-section);
   --color-brand-card: var(--brand-card);
   --color-brand-border: var(--brand-border);
@@ -80,26 +83,27 @@
      -------------------------------------------------------------------------
      Usage in components: bg-brand-accent, text-brand-text, etc.
      See @theme inline above for the full Tailwind utility mapping.          */
-  --brand-text: #2B2B2B;
-  --brand-text-muted: #6F6F6F;
-  --brand-accent: #C97C7C;
-  --brand-accent-hover: #B46666;
-  --brand-accent-strong: #9E2F45;
-  --brand-accent-strong-hover: #87273B;
-  --brand-accent-light: #F3E4E4;
-  --brand-bg: #fef7f4;
+  --brand-text: #0F1115;
+  --brand-text-muted: #565B66;
+  --brand-accent: #9AA3C4;
+  --brand-accent-hover: #7B85AB;
+  --brand-accent-strong: #1E3AC8;
+  --brand-accent-strong-hover: #16289A;
+  --brand-accent-light: #E7E9F9;
+  --brand-bg: #F7F7F5;
+  --brand-hero: #F0F0EC;
   --brand-section: #FFFFFF;
-  --brand-card: #FBF7F5;
-  --brand-border: #E8E2DD;
-  --brand-stock: #3F7A4A;
-  --brand-preorder: #A65D1E;
-  --brand-dark: #2B2B2B;
-  --brand-wine: #9E2F45;
-  --brand-topbar: #C2899D;
-  --brand-gold: #C5A56A;
-  --brand-gold-strong: #A67C1F;
+  --brand-card: #F2F2EE;
+  --brand-border: #DCDCD6;
+  --brand-stock: #2F6B45;
+  --brand-preorder: #94601F;
+  --brand-dark: #0B0D16;
+  --brand-wine: #1E3AC8;
+  --brand-topbar: #DDE0EA;
+  --brand-gold: #C2A468;
+  --brand-gold-strong: #7C6124;
   --brand-whatsapp: #075E54;
-  --brand-dark-surface: #180E0A;
+  --brand-dark-surface: #0B0D16;
 
   /* ── Shadcn/base-ui system vars — wired to brand tokens ─────────────────
      Default shadcn components (Button, Input, Card, Badge, etc.) auto-adopt

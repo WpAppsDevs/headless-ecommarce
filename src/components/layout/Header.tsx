@@ -211,9 +211,11 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
             className={`${HEADER_ICON_CLASS} ml-0.5`}
           >
             <ShoppingCart className="h-[19px] w-[19px]" strokeWidth={1.8} />
-            <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
-              {itemCount > 99 ? '99+' : itemCount}
-            </span>
+            {itemCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
+                {itemCount > 99 ? '99+' : itemCount}
+              </span>
+            )}
           </button>
         </div>
 
@@ -246,9 +248,11 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
             className={HEADER_ICON_CLASS}
           >
             <ShoppingCart className="h-5 w-5" strokeWidth={1.8} />
-            <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
-              {itemCount > 99 ? '99+' : itemCount}
-            </span>
+            {itemCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
+                {itemCount > 99 ? '99+' : itemCount}
+              </span>
+            )}
           </button>
 
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>

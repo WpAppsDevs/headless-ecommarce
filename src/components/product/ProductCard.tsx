@@ -13,7 +13,7 @@ import { getProductBadge, isPurchasable } from '@/lib/product-availability';
 import { useFormatPrice } from '@/lib/utils/currency';
 
 const PLACEHOLDER =
-  'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22%3E%3Crect width=%22400%22 height=%22500%22 fill=%22%23FBF7F5%22/%3E%3C/svg%3E';
+  'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22%3E%3Crect width=%22400%22 height=%22500%22 fill=%22%23F2F2EE%22/%3E%3C/svg%3E';
 
 // ── Star Rating ──────────────────────────────────────────────────────────────
 function StarRating({ score = 4.5, count = 0 }: { score?: number; count?: number }) {
@@ -52,7 +52,7 @@ function StarRating({ score = 4.5, count = 0 }: { score?: number; count?: number
 }
 
 // ── Main Card ────────────────────────────────────────────────────────────────
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
   const [qty, setQty] = useState(1);
   const [adding, setAdding] = useState(false);
   const [activeImg, setActiveImg] = useState(0);
@@ -90,7 +90,7 @@ export function ProductCard({ product }: { product: Product }) {
   }
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-brand-border bg-white transition-all duration-300 hover:shadow-lg hover:border-brand-wine/30">
+    <article className="group relative flex flex-col overflow-hidden rounded-xl border border-brand-border bg-brand-section transition-colors duration-300 hover:border-brand-accent-strong/40">
 
       {/* ── Image area ─────────────────────────────────────────────────────── */}
       <Link
@@ -111,7 +111,7 @@ export function ProductCard({ product }: { product: Product }) {
               'object-cover transition-all duration-500 group-hover:scale-105',
               i === activeImg ? 'opacity-100' : 'opacity-0',
             )}
-            priority={i === 0}
+            priority={priority && i === 0}
             aria-hidden={i !== activeImg}
           />
         )) : (
@@ -134,10 +134,10 @@ export function ProductCard({ product }: { product: Product }) {
           )}
         </div>
 
-        {/* Image carousel dots — clickable, bottom-center */}
+        {/* Image carousel dots — 44px hit areas, always visible on touch */}
         {allImages.length > 1 && (
           <div
-            className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            className="absolute inset-x-0 bottom-0 flex justify-center opacity-100 transition-opacity duration-300 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
             aria-label="Image navigation"
           >
             {allImages.map((_, i) => (
@@ -146,11 +146,16 @@ export function ProductCard({ product }: { product: Product }) {
                 type="button"
                 onClick={(e) => { e.preventDefault(); setActiveImg(i); }}
                 aria-label={`Show image ${i + 1}`}
-                className={cn(
-                  'h-1.5 w-1.5 rounded-full transition-all duration-200',
-                  i === activeImg ? 'bg-white scale-125' : 'bg-white/60 hover:bg-white',
-                )}
-              />
+                aria-pressed={i === activeImg}
+                className="flex h-11 w-11 items-center justify-center"
+              >
+                <span
+                  className={cn(
+                    'block h-1.5 w-1.5 rounded-full transition-all duration-200',
+                    i === activeImg ? 'bg-white scale-125' : 'bg-white/60',
+                  )}
+                />
+              </button>
             ))}
           </div>
         )}

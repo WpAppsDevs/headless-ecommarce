@@ -1,4 +1,5 @@
 import { ShieldCheck, Truck, Star, HeadphonesIcon } from 'lucide-react';
+import { SectionHeading } from '@/components/home/SectionHeading';
 
 const FEATURES = [
   {
@@ -28,21 +29,18 @@ export function FeaturesStrip() {
     <section aria-labelledby="why-us-heading" className="bg-brand-bg py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
-        <div className="mb-10 text-center">
-          <span className="inline-block rounded-full bg-brand-accent/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-accent-strong">
-            Our Promise
-          </span>
-          <h2 id="why-us-heading" className="mt-4 font-serif text-3xl font-bold text-brand-text sm:text-4xl">
-            Why Choose Us
-          </h2>
-        </div>
+        <SectionHeading
+          id="why-us-heading"
+          eyebrow="Our Promise"
+          title="Why Choose Us"
+        />
 
         {/* Grid */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {FEATURES.map(({ icon: Icon, title, desc }) => (
             <div
               key={title}
-              className="flex flex-col items-center gap-4 rounded-2xl border border-brand-border bg-brand-section p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-accent/40 hover:shadow-lg hover:shadow-brand-accent/20 cursor-default"
+              className="flex flex-col items-center gap-4 rounded-xl border border-brand-border bg-brand-section p-6 text-center transition-colors duration-300 hover:border-brand-accent-strong/40 cursor-default"
             >
               {/* Icon tile */}
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-brand-accent-light">

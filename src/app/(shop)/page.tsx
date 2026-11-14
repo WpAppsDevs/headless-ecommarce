@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { MAX_PER_PAGE, getProducts } from '@/lib/api/products';
 import { getHeroPrimaryAction } from '@/lib/product-availability';
 import { ProductCard } from '@/components/product/ProductCard';
@@ -11,6 +10,7 @@ import { TestimonialsSection } from '@/components/home/TestimonialsSection';
 import { FeaturesStrip } from '@/components/home/FeaturesStrip';
 import { ComingSoonSection } from '@/components/home/ComingSoonSection';
 import { WhatsAppCTA } from '@/components/home/WhatsAppCTA';
+import { SectionHeading } from '@/components/home/SectionHeading';
 
 export const revalidate = 60;
 
@@ -33,30 +33,18 @@ export default async function HomePage() {
       <section aria-labelledby="featured-heading" className="bg-brand-section py-16">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Heading — matches other section headings */}
-          <div className="mb-10 text-center">
-            <span className="inline-block rounded-full bg-brand-accent/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-accent-strong">
-              New Arrivals
-            </span>
-            <h2 id="featured-heading" className="mt-4 font-serif text-3xl font-bold text-brand-text sm:text-4xl">
-              Latest Collection
-            </h2>
-          </div>
+          <SectionHeading
+            id="featured-heading"
+            eyebrow="New Arrivals"
+            title="Latest Collection"
+            action={{ href: '/products', label: 'View all products' }}
+          />
 
           {featured.length > 0 && (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {featured.map((p) => <ProductCard key={p.id} product={p} />)}
             </div>
           )}
-
-          {/* View all — after grid */}
-          <div className="mt-10 flex justify-center">
-            <Link
-              href="/products"
-              className="inline-flex items-center gap-2 rounded-full border border-brand-border bg-brand-bg px-8 py-3 text-sm font-medium text-brand-text transition hover:border-brand-accent/40 hover:text-brand-accent-strong"
-            >
-              View all products <span aria-hidden="true">→</span>
-            </Link>
-          </div>
         </div>
       </section>
       <WholesaleBanner />

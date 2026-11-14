@@ -74,11 +74,11 @@ export function ProductTabs({
           <table className="w-full text-[15px]">
             <tbody>
               {specs.map((row, i) => (
-                <tr key={`${row.label}-${i}`} className="border-b border-[#E6DED6] last:border-b-0">
-                  <td className="w-[45%] py-3 pr-4 align-top font-medium text-[#3A3A4A] lg:w-[40%]">
+                <tr key={`${row.label}-${i}`} className="border-b border-brand-border last:border-b-0">
+                  <td className="w-[45%] py-3 pr-4 align-top font-medium text-brand-text lg:w-[40%]">
                     {row.label}
                   </td>
-                  <td className="py-3 text-[#1F2A3C]">{row.value}</td>
+                  <td className="py-3 text-brand-text">{row.value}</td>
                 </tr>
               ))}
             </tbody>
@@ -86,13 +86,13 @@ export function ProductTabs({
         )}
 
         {included.length > 0 && (
-          <div className="mt-5 rounded-[12px] bg-[#EADFDC] p-5 sm:p-6">
-            <h3 className="font-serif text-lg font-bold text-[#1F2A3C]">{"What's Included"}</h3>
+          <div className="mt-5 rounded-[12px] bg-brand-card p-5 sm:p-6">
+            <h3 className="font-serif text-lg font-bold text-brand-text">{"What's Included"}</h3>
             <ul className="mt-4 space-y-4">
               {included.map((item, i) => (
                 <li key={`${item.name}-${i}`} className="flex items-center gap-3">
-                  <CheckCircle2 className="h-6 w-6 shrink-0 text-[#6B2A2A]" strokeWidth={1.5} />
-                  <span className="text-[15px] text-[#1F2A3C]">
+                  <CheckCircle2 className="h-6 w-6 shrink-0 text-brand-accent-strong" strokeWidth={1.5} />
+                  <span className="text-[15px] text-brand-text">
                     {item.qty} × {item.name}
                   </span>
                 </li>
@@ -113,7 +113,7 @@ export function ProductTabs({
           <div
             key={item.id}
             id={item.id === 'reviews' ? 'reviews' : undefined}
-            className="overflow-hidden rounded-[10px] border border-[#E6DED6] bg-white"
+            className="overflow-hidden rounded-[10px] border border-brand-border bg-white"
           >
             <button
               type="button"
@@ -121,15 +121,15 @@ export function ProductTabs({
               aria-expanded={open}
               aria-controls={`${item.id}-panel`}
               id={`${item.id}-header`}
-              className="flex min-h-14 w-full items-center gap-3 px-5 text-left focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#9E2F45]"
+              className="flex min-h-14 w-full items-center gap-3 px-5 text-left focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-accent-strong"
             >
-              <Icon className="h-5 w-5 shrink-0 text-[#1F2A3C]" strokeWidth={1.5} />
-              <span className="flex-1 font-serif text-base font-medium text-[#1F2A3C]">
+              <Icon className="h-5 w-5 shrink-0 text-brand-text" strokeWidth={1.5} />
+              <span className="flex-1 font-serif text-base font-medium text-brand-text">
                 {item.title}
               </span>
               <ChevronDown
                 className={cn(
-                  'h-5 w-5 shrink-0 text-[#1F2A3C] transition-transform duration-300',
+                  'h-5 w-5 shrink-0 text-brand-text transition-transform duration-300',
                   open && 'rotate-180',
                 )}
                 strokeWidth={1.5}
@@ -151,24 +151,24 @@ export function ProductTabs({
 
                   {item.id === 'additional-info' && (
                     <table className="text-sm">
-                      <tbody className="divide-y divide-[#E6DED6]">
+                      <tbody className="divide-y divide-brand-border">
                         {sku && (
                           <tr>
-                            <td className="w-40 py-2 pr-8 font-medium text-[#3A3A4A]">SKU</td>
-                            <td className="py-2 text-[#1F2A3C]">{sku}</td>
+                            <td className="w-40 py-2 pr-8 font-medium text-brand-text">SKU</td>
+                            <td className="py-2 text-brand-text">{sku}</td>
                           </tr>
                         )}
                         {categories && categories.length > 0 && (
                           <tr>
-                            <td className="w-40 py-2 pr-8 font-medium text-[#3A3A4A]">Categories</td>
-                            <td className="py-2 text-[#1F2A3C]">
+                            <td className="w-40 py-2 pr-8 font-medium text-brand-text">Categories</td>
+                            <td className="py-2 text-brand-text">
                               {categories.map((c) => c.name).join(', ')}
                             </td>
                           </tr>
                         )}
                         {!sku && (!categories || categories.length === 0) && (
                           <tr>
-                            <td colSpan={2} className="py-2 text-[#5A5A5A]">
+                            <td colSpan={2} className="py-2 text-brand-text-muted">
                               No additional information.
                             </td>
                           </tr>
@@ -178,7 +178,7 @@ export function ProductTabs({
                   )}
 
                   {item.id === 'shipping-returns' && (
-                    <div className="max-w-xl space-y-3 text-sm text-[#5A5A5A]">
+                    <div className="max-w-xl space-y-3 text-sm text-brand-text-muted">
                       <p>
                         Delivery times and charges depend on whether the item is in
                         stock or pre-order. Returns are accepted only for eligible
@@ -186,13 +186,13 @@ export function ProductTabs({
                       </p>
                       <Link
                         href="/shipping"
-                        className="block font-medium text-[#9E2F45] underline underline-offset-2"
+                        className="block font-medium text-brand-accent-strong underline underline-offset-2"
                       >
                         Read the shipping and delivery policy
                       </Link>
                       <Link
                         href="/returns"
-                        className="block font-medium text-[#9E2F45] underline underline-offset-2"
+                        className="block font-medium text-brand-accent-strong underline underline-offset-2"
                       >
                         Read the returns and exchange policy
                       </Link>

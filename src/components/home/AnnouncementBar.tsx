@@ -41,7 +41,7 @@ export function AnnouncementBar() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Facebook"
-            className="opacity-80 transition hover:opacity-100"
+            className="relative opacity-80 transition hover:opacity-100 after:absolute after:-inset-4 after:content-['']"
           >
             <FacebookIcon />
           </Link>
@@ -50,7 +50,7 @@ export function AnnouncementBar() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
-            className="opacity-80 transition hover:opacity-100"
+            className="relative opacity-80 transition hover:opacity-100 after:absolute after:-inset-4 after:content-['']"
           >
             <InstagramIcon />
           </Link>

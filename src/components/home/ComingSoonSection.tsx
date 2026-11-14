@@ -36,7 +36,7 @@ export function ComingSoonSection() {
   return (
     <section aria-labelledby="coming-soon-heading" className="bg-brand-bg py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl bg-brand-dark-surface">
+        <div className="relative overflow-hidden rounded-xl bg-brand-dark-surface">
 
           {/* Decorative glows */}
           <div aria-hidden="true" className="pointer-events-none absolute inset-0">
@@ -54,7 +54,7 @@ export function ComingSoonSection() {
               <div className="flex h-16 w-16 items-center justify-center rounded-full border border-brand-gold/30 bg-brand-gold/10 shadow-lg shadow-brand-gold/10">
                 <Gem className="h-7 w-7 text-brand-gold" strokeWidth={1.5} />
               </div>
-              <span className="inline-block rounded-full border border-white/15 bg-white/[0.08] px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.25em] text-white/60">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/60">
                 Coming Soon
               </span>
             </div>

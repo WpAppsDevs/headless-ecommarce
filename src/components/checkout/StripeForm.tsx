@@ -64,11 +64,11 @@ const StripeInner = forwardRef<StripeFormHandle, {}>((_, ref) => {
             style: {
               base: {
                 fontSize: '14px',
-                color: '#18181b',
+                color: '#0F1115',
                 fontFamily: 'inherit',
-                '::placeholder': { color: '#a1a1aa' },
+                '::placeholder': { color: '#8A8F99' },
               },
-              invalid: { color: '#e11d48' },
+              invalid: { color: '#C0392B' },
             },
           }}
         />

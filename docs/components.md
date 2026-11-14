@@ -33,7 +33,8 @@ The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local
 | `HeroSlider.tsx` | Server | Despite the name, it does not slide. Static hero with a desktop image and a mobile stacked image. Its headline and calls to action follow the catalog's Ready Stock, Pre-Order, or contact fallback. |
 | `AnnouncementBar.tsx` | Server | Top strip with shipping copy and social links. |
 | `CategoryBanners.tsx` | Server | Three category image cards linking to `/products?category=…`. |
-| `CategoryGrid.tsx` | Server | Ready stock, pre-order, and catalog entry cards. |
+| `CategoryGrid.tsx` | Server | Ready stock and pre-order entry cards. Catalogue/wholesale is a B2B channel and is not in this consumer row. |
+| `SectionHeading.tsx` | Server | The one section heading style: left-aligned eyebrow, serif title, optional description and right-edge action link. `tone="dark"` for deep panels. |
 | `PreOrderSteps.tsx` | Server | Four-step explainer. |
 | `WholesaleBanner.tsx` | Server | Wholesale value proposition and stats. |
 | `TestimonialsSection.tsx` | Client | Fetches random reviews; falls back gracefully. |

@@ -8,7 +8,7 @@ export function WhatsAppCTA() {
           href={config.whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="group flex flex-col items-center justify-between gap-4 rounded-2xl bg-brand-whatsapp px-8 py-6 transition hover:bg-brand-whatsapp/90 sm:flex-row"
+          className="group flex flex-col items-center justify-between gap-4 rounded-xl bg-brand-whatsapp px-8 py-6 transition hover:bg-brand-whatsapp/90 sm:flex-row"
         >
           {/* Left side */}
           <div className="flex items-center gap-4">

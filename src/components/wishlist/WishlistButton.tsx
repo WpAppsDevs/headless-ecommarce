@@ -45,10 +45,10 @@ export function WishlistButton({
         onClick={handleClick}
         disabled={isPending}
         className={cn(
-          'flex h-11 w-11 items-center justify-center rounded-[8px] border-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45]',
+          'flex h-11 w-11 items-center justify-center rounded-[8px] border-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent-strong',
           isWishlisted
-            ? 'border-[#9E2F45] bg-[#FBEAEA] text-[#9E2F45]'
-            : 'border-[#9E2F45]/40 text-[#9E2F45] hover:border-[#9E2F45]',
+            ? 'border-brand-accent-strong bg-brand-accent-light text-brand-accent-strong'
+            : 'border-brand-accent-strong/40 text-brand-accent-strong hover:border-brand-accent-strong',
           isPending && 'cursor-not-allowed opacity-60',
           className,
         )}

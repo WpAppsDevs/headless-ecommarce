@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Star } from 'lucide-react';
 import Image from 'next/image';
 import { getRandomReviews } from '@/lib/api/reviews';
+import { SectionHeading } from '@/components/home/SectionHeading';
 import type { Review } from '@/lib/api/reviews';
 
 function Stars({ rating }: { rating: number }) {
@@ -30,7 +31,7 @@ function ReviewCard({ review }: { review: Awaited<ReturnType<typeof getRandomRev
   const initials = authorName.charAt(0).toUpperCase();
 
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-brand-border bg-brand-section p-6 shadow-sm">
+    <div className="flex flex-col gap-4 rounded-xl border border-brand-border bg-brand-section p-6">
       {/* Stars */}
       <Stars rating={review.rating} />
 
@@ -113,16 +114,16 @@ export function TestimonialsSection() {
     return (
       <section className="bg-brand-bg py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 text-center">
-            <div className="inline-block h-6 w-32 animate-pulse rounded-full bg-brand-border" />
-            <div className="mx-auto mt-4 h-9 w-64 animate-pulse rounded bg-brand-border" />
-            <div className="mx-auto mt-2 h-4 w-80 animate-pulse rounded bg-brand-border" />
+          <div className="mb-10 max-w-2xl">
+            <div className="mb-3 h-3 w-24 animate-pulse rounded bg-brand-border" />
+            <div className="h-8 w-64 animate-pulse rounded bg-brand-border" />
+            <div className="mt-3 h-3 w-80 animate-pulse rounded bg-brand-border" />
           </div>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
-                className="flex flex-col gap-4 rounded-2xl border border-brand-border bg-brand-section p-6 shadow-sm"
+                className="flex flex-col gap-4 rounded-xl border border-brand-border bg-brand-section p-6"
               >
                 <div className="flex gap-0.5">
                   {Array.from({ length: 5 }).map((_, j) => (
@@ -155,17 +156,12 @@ export function TestimonialsSection() {
     <section aria-labelledby="testimonials-heading" className="bg-brand-bg py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
-        <div className="mb-10 text-center">
-          <span className="inline-block rounded-full bg-brand-accent/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-accent-strong">
-            Customer Reviews
-          </span>
-          <h2 id="testimonials-heading" className="mt-4 font-serif text-3xl font-bold text-brand-text sm:text-4xl">
-            What Our Customers Say
-          </h2>
-          <p className="mt-2 text-sm text-brand-text-muted">
-            Real experiences from our customers across the country.
-          </p>
-        </div>
+        <SectionHeading
+          id="testimonials-heading"
+          eyebrow="Customer Reviews"
+          title="What Our Customers Say"
+          description="Real experiences from our customers across the country."
+        />
 
         {/* Cards */}
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

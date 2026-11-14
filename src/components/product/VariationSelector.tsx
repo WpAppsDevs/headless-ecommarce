@@ -68,23 +68,23 @@ function QuantityStepper({
   onIncrease: () => void;
 }) {
   return (
-    <div className="inline-flex h-11 w-[112px] items-center justify-between overflow-hidden rounded-[8px] border border-[#D9D2CB] bg-white">
+    <div className="inline-flex h-11 w-[112px] items-center justify-between overflow-hidden rounded-[8px] border border-brand-border bg-white">
       <button
         type="button"
         onClick={onDecrease}
         aria-label="Decrease quantity"
-        className="flex h-full w-9 items-center justify-center text-[#1F2A3C] transition-colors hover:bg-[#F6E4E4] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#9E2F45]"
+        className="flex h-full w-9 items-center justify-center text-brand-text transition-colors hover:bg-brand-accent-light focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-accent-strong"
       >
         <Minus className="h-3.5 w-3.5" />
       </button>
-      <span className="flex w-8 items-center justify-center text-sm font-semibold text-[#1F2A3C]">
+      <span className="flex w-8 items-center justify-center text-sm font-semibold text-brand-text">
         {quantity}
       </span>
       <button
         type="button"
         onClick={onIncrease}
         aria-label="Increase quantity"
-        className="flex h-full w-9 items-center justify-center text-[#1F2A3C] transition-colors hover:bg-[#F6E4E4] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#9E2F45]"
+        className="flex h-full w-9 items-center justify-center text-brand-text transition-colors hover:bg-brand-accent-light focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-accent-strong"
       >
         <Plus className="h-3.5 w-3.5" />
       </button>
@@ -212,11 +212,11 @@ export function VariationSelector({ product }: { product: Product }) {
       <div className="flex flex-col">
         {/* 1. Price */}
         <div className="flex items-baseline gap-3">
-          <span className="font-serif text-[30px] font-bold leading-none text-[#1F2A3C] lg:text-[36px]">
+          <span className="font-serif text-[30px] font-bold leading-none text-brand-text lg:text-[36px]">
             {fmt(displayPrice)}
           </span>
           {isOnSale && displayRegularPrice && (
-            <span className="text-lg text-[#5A5A5A] line-through">{fmt(displayRegularPrice)}</span>
+            <span className="text-lg text-brand-text-muted line-through">{fmt(displayRegularPrice)}</span>
           )}
         </div>
 
@@ -232,8 +232,8 @@ export function VariationSelector({ product }: { product: Product }) {
           <div className="mt-6 flex flex-col gap-5">
             {colorKeys.map((key) => (
               <div key={key}>
-                <p className="mb-3 text-sm text-[#5A5A5A]">
-                  <span className="font-medium text-[#1F2A3C]">Color</span>
+                <p className="mb-3 text-sm text-brand-text-muted">
+                  <span className="font-medium text-brand-text">Color</span>
                   {selected[key] && <span className="ml-1">: {selected[key]}</span>}
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -251,10 +251,10 @@ export function VariationSelector({ product }: { product: Product }) {
                         aria-pressed={isActive}
                         onClick={() => selectOption(key, val)}
                         className={cn(
-                          'relative h-11 w-11 overflow-hidden rounded-full transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45]',
+                          'relative h-11 w-11 overflow-hidden rounded-full transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent-strong',
                           isActive
-                            ? 'ring-2 ring-[#9E2F45] ring-offset-2 ring-offset-[#FBF7F3]'
-                            : 'ring-1 ring-[#D9D2CB] hover:ring-[#9E2F45]/50',
+                            ? 'ring-2 ring-brand-accent-strong ring-offset-2 ring-offset-brand-bg'
+                            : 'ring-1 ring-[#D9D2CB] hover:ring-brand-accent-strong/50',
                         )}
                       >
                         {hex ? (
@@ -265,7 +265,7 @@ export function VariationSelector({ product }: { product: Product }) {
                         ) : variationImage ? (
                           <Image src={variationImage} alt={val} fill className="object-cover" sizes="44px" />
                         ) : (
-                          <span className="flex h-full w-full items-center justify-center text-[10px] font-semibold text-[#5A5A5A]">
+                          <span className="flex h-full w-full items-center justify-center text-[10px] font-semibold text-brand-text-muted">
                             {val.slice(0, 2).toUpperCase()}
                           </span>
                         )}
@@ -278,8 +278,8 @@ export function VariationSelector({ product }: { product: Product }) {
 
             {otherKeys.map((key) => (
               <div key={key}>
-                <p className="mb-3 text-sm text-[#5A5A5A]">
-                  <span className="font-medium text-[#1F2A3C]">{formatAttrLabel(key)}</span>
+                <p className="mb-3 text-sm text-brand-text-muted">
+                  <span className="font-medium text-brand-text">{formatAttrLabel(key)}</span>
                   {selected[key] && <span className="ml-1">: {selected[key]}</span>}
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -294,18 +294,18 @@ export function VariationSelector({ product }: { product: Product }) {
                         onClick={() => selectOption(key, val)}
                         aria-pressed={isActive}
                         className={cn(
-                          'relative min-h-11 min-w-[48px] overflow-hidden rounded-[8px] border px-4 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45]',
+                          'relative min-h-11 min-w-[48px] overflow-hidden rounded-[8px] border px-4 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent-strong',
                           isActive
-                            ? 'border-[#9E2F45] bg-[#FBEAEA] text-[#9E2F45]'
-                            : 'border-[#D9D2CB] bg-white text-[#1F2A3C] hover:border-[#9E2F45]',
-                          optionUnavailable && 'cursor-not-allowed opacity-50 hover:border-[#D9D2CB]',
+                            ? 'border-brand-accent-strong bg-brand-accent-light text-brand-accent-strong'
+                            : 'border-brand-border bg-white text-brand-text hover:border-brand-accent-strong',
+                          optionUnavailable && 'cursor-not-allowed opacity-50 hover:border-brand-border',
                         )}
                       >
                         {val}
                         {optionUnavailable && (
                           <span
                             aria-hidden="true"
-                            className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top_right,transparent_45%,#D9D2CB_50%,transparent_55%)]"
+                            className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top_right,transparent_45%,var(--brand-border)_50%,transparent_55%)]"
                           />
                         )}
                       </button>
@@ -320,7 +320,7 @@ export function VariationSelector({ product }: { product: Product }) {
         {/* 4. Quantity */}
         {purchasable && (
           <div className="mt-5">
-            <p className="mb-3 text-sm font-medium text-[#1F2A3C]">Quantity</p>
+            <p className="mb-3 text-sm font-medium text-brand-text">Quantity</p>
             <QuantityStepper
               quantity={quantity}
               onDecrease={() => setQuantity((q) => Math.max(1, q - 1))}
@@ -331,12 +331,12 @@ export function VariationSelector({ product }: { product: Product }) {
 
         {/* 5. Inline validation / cart errors (between quantity and action row) */}
         {cartError && (
-          <p role="alert" className="mt-5 text-[13px] text-[#9E2F45]">
+          <p role="alert" className="mt-5 text-[13px] text-brand-accent-strong">
             {cartError}
           </p>
         )}
         {sizeError && !allSelected && (
-          <p role="alert" className="mt-5 text-[13px] font-medium text-[#9E2F45]">
+          <p role="alert" className="mt-5 text-[13px] font-medium text-brand-accent-strong">
             {missingLabel}
           </p>
         )}
@@ -348,12 +348,12 @@ export function VariationSelector({ product }: { product: Product }) {
             onClick={handleAddToCart}
             disabled={!canAdd}
             className={cn(
-              'flex min-h-11 flex-1 items-center justify-center gap-2 rounded-[8px] px-4 font-serif text-sm font-semibold text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45] disabled:cursor-not-allowed',
+              'flex min-h-11 flex-1 items-center justify-center gap-2 rounded-[8px] px-4 font-serif text-sm font-semibold text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent-strong disabled:cursor-not-allowed',
               added
                 ? 'bg-emerald-700 hover:bg-emerald-800'
                 : unavailable
-                ? 'bg-[#D9D2CB] text-[#5A5A5A]'
-                : 'bg-[#9E2F45] hover:bg-[#862640]',
+                ? 'bg-brand-border text-brand-text-muted'
+                : 'bg-brand-accent-strong hover:bg-brand-accent-strong-hover',
             )}
           >
             {loading ? (
@@ -388,13 +388,13 @@ export function VariationSelector({ product }: { product: Product }) {
       {purchasable && (
       <div
         className={cn(
-          'fixed inset-x-0 bottom-0 z-50 border-t border-[#E6DED6] bg-white px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-4px_16px_rgba(31,42,60,0.08)] transition-transform duration-300 lg:hidden',
+          'fixed inset-x-0 bottom-0 z-50 border-t border-brand-border bg-white px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-4px_16px_rgba(31,42,60,0.08)] transition-transform duration-300 lg:hidden',
           showSticky ? 'translate-y-0' : 'translate-y-full',
         )}
         inert={!showSticky}
       >
         {sizeError && !allSelected && (
-          <p role="alert" className="mb-2 text-xs font-medium text-[#9E2F45]">
+          <p role="alert" className="mb-2 text-xs font-medium text-brand-accent-strong">
             {missingLabel}
           </p>
         )}
@@ -409,12 +409,12 @@ export function VariationSelector({ product }: { product: Product }) {
             onClick={handleAddToCart}
             disabled={!canAdd}
             className={cn(
-              'flex min-h-11 flex-1 items-center justify-center gap-2 rounded-[8px] px-4 font-serif text-sm font-semibold text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9E2F45] disabled:cursor-not-allowed',
+              'flex min-h-11 flex-1 items-center justify-center gap-2 rounded-[8px] px-4 font-serif text-sm font-semibold text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent-strong disabled:cursor-not-allowed',
               added
                 ? 'bg-emerald-700'
                 : unavailable
-                ? 'bg-[#D9D2CB] text-[#5A5A5A]'
-                : 'bg-[#9E2F45] hover:bg-[#862640]',
+                ? 'bg-brand-border text-brand-text-muted'
+                : 'bg-brand-accent-strong hover:bg-brand-accent-strong-hover',
             )}
           >
             {loading ? (

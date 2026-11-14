@@ -24,12 +24,13 @@ The `:root` block defines the palette. The `@theme inline` block maps each varia
 | `--brand-accent-strong-hover` | `bg-brand-accent-strong-hover` | Hover for filled strong actions |
 | `--brand-accent-light` | `bg-brand-accent-light` | Tints, chips |
 | `--brand-bg` | `bg-brand-bg` | Page background |
+| `--brand-hero` | `bg-brand-hero` | Home hero ground; one step off the page background |
 | `--brand-section` | `bg-brand-section` | Section surfaces |
 | `--brand-card` | `bg-brand-card` | Cards |
 | `--brand-border` | `border-brand-border` | Hairlines |
 | `--brand-stock` | `text-brand-stock` | In-stock / success |
 | `--brand-preorder` | `text-brand-preorder` | Pre-order text and badge background |
-| `--brand-wine` | `bg-brand-wine` | Primary action, selected state, sale badge |
+| `--brand-wine` | `bg-brand-wine` | Primary action, selected state, sale badge. The name is legacy; the value is the same cobalt as `--brand-accent-strong`. |
 | `--brand-topbar` | `bg-brand-topbar` | Announcement bar |
 | `--brand-gold` | `text-brand-gold` | Premium accents on dark surfaces |
 | `--brand-gold-strong` | `text-brand-gold-strong` | Stars and small accents on light surfaces |
@@ -45,11 +46,13 @@ Change a token here, not in components. A raw hex in a component is either a one
 
 ### Contrast
 
+The palette is **Cobalt & Paper**: a near-neutral warm-grey page (`#F7F7F5`), white sections, ink text (`#0F1115`), a single cobalt accent (`#1E3AC8`) for text, icons, links and filled actions, and brass (`#C2A468` / `#7C6124`) reserved for stars and premium accents on dark panels. Anything warm-rose from the previous palette is gone.
+
 WCAG AA is the bar: 4.5:1 for normal text and 3:1 for non-text indicators. The palette keeps two accents on purpose:
 
-- **Strong accent** (`--brand-accent-strong`) for text, icons, links, and filled actions on light surfaces.
-- **Soft accent** (`--brand-accent`) for tinted surfaces, and for text and icons on the dark surface. Never put white text on the soft accent; it reaches only 3.15:1.
-- The topbar keeps its dusky rose background and uses brand text (`#2B2B2B`) instead of white.
+- **Strong accent** (`--brand-accent-strong`, cobalt) for text, icons, links, and filled actions on light surfaces.
+- **Soft accent** (`--brand-accent`, pale slate-blue) for tinted surfaces, and for text and icons on the dark surface. Never put white text on the soft accent; it is far below 4.5:1.
+- The topbar is a light slate (`--brand-topbar`) and uses brand text, not white.
 - The WhatsApp action uses the dark WhatsApp token with white text.
 
 Run `npm run check:contrast` after any palette change. It reads the root tokens and fails when a pair drops below its threshold.
@@ -62,14 +65,14 @@ The storefront mixes two systems. Know which one a screen follows before restyli
 
 Used by the home page, shop, product detail, cart, checkout, and order pages.
 
-- Playfair Display for headings (`font-serif`) and Inter for small UI text (`font-ui`).
-- Maroon `#9E2F45` for selected states and primary product actions.
-- Navy `#1F2A3C` for primary text and icons.
-- Cream `#FBF7F3` for product surfaces.
-- Hairline borders, 8-10px radii, no heavy shadows.
+- Playfair Display for headings (`font-serif`) and Inter for body and small UI text.
+- Cobalt `--brand-accent-strong` for selected states and primary product actions.
+- Ink `--brand-text` for primary text and icons.
+- `--brand-bg` / `--brand-card` for product surfaces.
+- Hairline borders, 8-12px radii, no heavy shadows.
 - Lining numerals (`.nums-lining`) on serif prices and headings.
 
-Several product-detail components hardcode these values (`#9E2F45`, `#1F2A3C`, `#E6DED6`) instead of using brand tokens. That is the current implementation. When editing those files, either keep the hardcoded pair or migrate them to tokens in the same change; use one approach per file.
+Product-detail components used to hardcode a maroon and navy pair (`#9E2F45`, `#1F2A3C`, `#E6DED6`, `#FBF7F3`). They now use the brand tokens, so a palette change reaches them. Keep it that way: no raw hex for brand colour in a component.
 
 ### 2. shadcn / base-nova
 
@@ -87,22 +90,25 @@ Fonts are loaded in `src/app/layout.tsx` through `next/font/google`:
 
 | Variable | Family | Utility |
 | --- | --- | --- |
-| `--font-geist-sans` | Geist | `font-sans` (global body) |
+| `--font-geist-sans` | Geist | `font-geist` (auth and account only) |
 | `--font-geist-mono` | Geist Mono | `font-mono` |
 | `--font-playfair` | Playfair Display | `font-serif` |
-| `--font-inter` | Inter | `font-ui` |
+| `--font-inter` | Inter | `font-sans` (global body) and `font-ui` |
 
-`font-serif` is mapped to Playfair with a Georgia fallback. `font-ui` is scoped to the product detail section and similar dense UI; it does not change the global font.
+The global sans maps to Inter: Playfair Display for headings plus Inter for body is the "Classic Elegant" pairing the editorial surfaces were always documented to use. `font-geist` keeps the neutral shadcn look on `/login`, `/register`, `/forgot-password`, `/reset-password`, and `/account`.
 
-The global sans maps to Geist through `--font-geist-sans`. Do not set `--font-sans` to `var(--font-sans)`; that self-reference resolves to nothing and the browser falls back to Times.
+`font-serif` is mapped to Playfair with a Georgia fallback. `font-ui` is scoped to the product detail section and similar dense UI.
 
-Use `font-serif` for marketing headings and product names. Use the default sans for body and controls. Use `font-ui` only where the approved design uses Inter.
+Do not set `--font-sans` to `var(--font-sans)`; that self-reference resolves to nothing and the browser falls back to Times.
+
+Use `font-serif` for marketing headings and product names. Use the default sans for body and controls. Use `font-geist` only on auth and account surfaces.
 
 ## Layout and spacing
 
 - Max width: `max-w-7xl` for most pages, `max-w-[1200px]` for product detail, `max-w-3xl` for policies and auth.
 - Page padding: `px-4 sm:px-6 lg:px-8`.
 - Section rhythm: `py-14` to `py-20`.
+- Section headings: `SectionHeading` from `src/components/home/SectionHeading.tsx` — left-aligned eyebrow, serif title, hairline of space, optional action link. Do not reintroduce the centred pill badge plus centred `h2` pattern; it made every section look the same.
 - Grid: 2 columns on mobile, 3 at `sm`, 4 at `lg` for product grids.
 - Header height: 68px. Sticky offsets use `top-24` (96px) to clear it.
 - Touch targets: at least 44px for every mobile control, including header icons, pagination, colour swatches, and auth inputs. The visible glyph may be smaller; expand the hit area with padding so layout does not shift.
