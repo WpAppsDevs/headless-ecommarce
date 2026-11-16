@@ -93,7 +93,7 @@ export function SettingsTab({ profile }: SettingsTabProps) {
               className="font-medium text-zinc-800 underline underline-offset-2"
             >
               support@najifasshop.com
-            </a>
+            </a>{' '}
             {copy.settings.noteTail}{' '}
             <Link href="/privacy-policy" className="font-medium text-zinc-800 underline underline-offset-2">
               {copy.settings.privacyPolicy}

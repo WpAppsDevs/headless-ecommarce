@@ -68,7 +68,9 @@ export function LoginForm() {
   const resetSuccess = searchParams.get('reset') === 'success';
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+    // method="post" is a fallback: if Enter is pressed before hydration, a native
+    // submit would otherwise put the password in the query string.
+    <form method="post" onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       {/* Password reset success banner */}
       {resetSuccess && (
         <div className="rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-300">

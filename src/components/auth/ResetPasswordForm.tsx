@@ -72,7 +72,9 @@ export function ResetPasswordForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+    // method="post" is a fallback: if Enter is pressed before hydration, a native
+    // submit would otherwise put the password in the query string.
+    <form method="post" onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       {apiError && (
         <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
           {apiError}

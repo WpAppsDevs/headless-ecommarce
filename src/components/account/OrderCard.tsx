@@ -92,17 +92,17 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
       {/* Row 3 – Amount / Items / Payment */}
       <div className="flex flex-wrap items-center gap-x-8 gap-y-1 px-6 py-4">
         <p className="text-[13px] text-zinc-600">
-          Amount:{' '}
+          {copy.amount}{' '}
           <span className="font-semibold text-zinc-900">{order.currency} {order.total}</span>
           {isPaid && (
-            <span className="ml-1.5 text-xs font-semibold text-brand-stock">(Paid)</span>
+            <span className="ml-1.5 text-xs font-semibold text-brand-stock">{copy.paid}</span>
           )}
         </p>
         <p className="text-[13px] text-zinc-600">
-          Items: <span className="font-semibold text-zinc-900">{order.line_items.length}</span>
+          {copy.itemsCount} <span className="font-semibold text-zinc-900">{order.line_items.length}</span>
         </p>
         <p className="ml-auto text-[13px] text-zinc-600">
-          Payment: <span className="font-semibold text-zinc-900">{order.payment_method_title ?? '—'}</span>
+          {copy.payment} <span className="font-semibold text-zinc-900">{order.payment_method_title ?? '—'}</span>
         </p>
       </div>
 
