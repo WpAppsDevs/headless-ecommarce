@@ -9,6 +9,7 @@ import type { ReviewableItem } from '@/components/review-modal/ReviewModal';
 import { orderStatusStyle } from '@/lib/order-status';
 import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
 import { intlLocale } from '@/i18n/locales';
+import { useFormatPrice } from '@/lib/utils/currency';
 
 interface OrderCardProps {
   order: Order;
@@ -23,6 +24,7 @@ function fmtDate(dateStr: string | null, locale: string) {
 }
 
 export function OrderCard({ order, onViewDetails }: OrderCardProps) {
+  const fmt = useFormatPrice();
   const dict = useDictionary().account;
   const copy = dict.orders;
   const locale = intlLocale(useLocale());
@@ -93,7 +95,7 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
       <div className="flex flex-wrap items-center gap-x-8 gap-y-1 px-6 py-4">
         <p className="text-[13px] text-zinc-600">
           {copy.amount}{' '}
-          <span className="font-semibold text-zinc-900">{order.currency} {order.total}</span>
+          <span className="font-semibold text-zinc-900">{fmt(order.total)}</span>
           {isPaid && (
             <span className="ml-1.5 text-xs font-semibold text-brand-stock">{copy.paid}</span>
           )}

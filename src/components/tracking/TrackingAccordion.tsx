@@ -7,6 +7,7 @@ import type { TrackingOrderEntry, TrackingInfo } from '@/lib/api/tracking';
 import { TrackingTimeline } from './TrackingTimeline';
 import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
 import { intlLocale } from '@/i18n/locales';
+import { useFormatPrice } from '@/lib/utils/currency';
 
 interface TrackingAccordionProps {
   entry: TrackingOrderEntry;
@@ -99,6 +100,7 @@ function TrackingDetails({ order, tracking }: { order: TrackingOrderEntry['order
 }
 
 export function TrackingAccordion({ entry, defaultOpen = false }: TrackingAccordionProps) {
+  const fmt = useFormatPrice();
   const dict = useDictionary().tracking;
   const locale = intlLocale(useLocale());
   const [open, setOpen] = useState(defaultOpen);
@@ -141,7 +143,7 @@ export function TrackingAccordion({ entry, defaultOpen = false }: TrackingAccord
           <span className="flex items-center gap-1.5 text-sm text-brand-text-muted">
             <span>{dict.orderTotal}</span>
             <span className="font-semibold text-brand-accent-strong">
-              {order.currency} {parseFloat(order.total).toFixed(2)}
+              {fmt(order.total)}
             </span>
           </span>
         </div>
