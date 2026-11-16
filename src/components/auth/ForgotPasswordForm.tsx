@@ -50,7 +50,9 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+    // method="post" is a fallback: if Enter is pressed before hydration, a native
+    // submit would otherwise put the password in the query string.
+    <form method="post" onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <div className="space-y-1.5">
         <Label htmlFor="email">{copy.emailLabel}</Label>
         <Input

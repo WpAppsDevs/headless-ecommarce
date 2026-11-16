@@ -74,7 +74,9 @@ export function RegisterForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+    // method="post" is a fallback: if Enter is pressed before hydration, a native
+    // submit would otherwise put the password in the query string.
+    <form method="post" onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       {/* Root / API error */}
       {errors.root && (
         <p role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
