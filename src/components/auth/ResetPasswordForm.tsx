@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -12,17 +12,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { AUTH_CONTROL_CLASS } from '@/components/auth/styles';
+import { useDictionary } from '@/i18n/LocaleProvider';
 
-const schema = z
-  .object({
-    new_password: z.string().min(8, 'Password must be at least 8 characters'),
-    confirm_password: z.string(),
-  })
-  .refine((d) => d.new_password === d.confirm_password, {
-    message: 'Passwords do not match',
-    path: ['confirm_password'],
-  });
-type FormValues = z.infer<typeof schema>;
+const buildSchema = (copy: { passwordTooShort: string; passwordMismatch: string }) =>
+  z
+    .object({
+      new_password: z.string().min(8, copy.passwordTooShort),
+      confirm_password: z.string(),
+    })
+    .refine((d) => d.new_password === d.confirm_password, {
+      message: copy.passwordMismatch,
+      path: ['confirm_password'],
+    });
+type FormValues = z.infer<ReturnType<typeof buildSchema>>;
 
 export function ResetPasswordForm() {
   const router = useRouter();
@@ -31,6 +33,8 @@ export function ResetPasswordForm() {
   const key = searchParams.get('key');
   const login = searchParams.get('login');
 
+  const copy = useDictionary().auth.reset;
+  const schema = useMemo(() => buildSchema(copy), [copy]);
   const [apiError, setApiError] = useState<string | null>(null);
 
   const {
@@ -52,9 +56,9 @@ export function ResetPasswordForm() {
       router.push('/login?reset=success');
     } catch (e) {
       if (e instanceof ApiError && e.code === 'invalid_reset_key') {
-        setApiError('This link is invalid or has expired.');
+        setApiError(copy.invalidLink);
       } else {
-        setApiError('Something went wrong. Please try again.');
+        setApiError(copy.failed);
       }
     }
   };
@@ -76,7 +80,7 @@ export function ResetPasswordForm() {
       )}
 
       <div className="space-y-1.5">
-        <Label htmlFor="new_password">New password</Label>
+        <Label htmlFor="new_password">{copy.newPasswordLabel}</Label>
         <Input
           className={AUTH_CONTROL_CLASS}
           id="new_password"
@@ -90,7 +94,7 @@ export function ResetPasswordForm() {
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="confirm_password">Confirm password</Label>
+        <Label htmlFor="confirm_password">{copy.confirmLabel}</Label>
         <Input
           className={AUTH_CONTROL_CLASS}
           id="confirm_password"
@@ -104,7 +108,7 @@ export function ResetPasswordForm() {
       </div>
 
       <Button type="submit" className={`${AUTH_CONTROL_CLASS} w-full`} disabled={isSubmitting}>
-        {isSubmitting ? 'Saving…' : 'Set New Password'}
+        {isSubmitting ? copy.submitting : copy.submit}
       </Button>
     </form>
   );
