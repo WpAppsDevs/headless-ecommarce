@@ -5,6 +5,8 @@ import { Package, Calendar, CreditCard, Mail, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TrackingOrderEntry, TrackingInfo } from '@/lib/api/tracking';
 import { TrackingTimeline } from './TrackingTimeline';
+import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
+import { intlLocale } from '@/i18n/locales';
 
 interface TrackingAccordionProps {
   entry: TrackingOrderEntry;
@@ -20,8 +22,8 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; dot: string }> =
   on_hold: { bg: 'bg-orange-50', text: 'text-orange-700', dot: 'bg-orange-500' },
 };
 
-function formatDate(value: string): string {
-  return new Date(value).toLocaleDateString('en-US', {
+function formatDate(value: string, locale: string): string {
+  return new Date(value).toLocaleDateString(locale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -29,6 +31,8 @@ function formatDate(value: string): string {
 }
 
 function TrackingDetails({ order, tracking }: { order: TrackingOrderEntry['order']; tracking: TrackingInfo }) {
+  const copy = useDictionary().tracking;
+  const locale = intlLocale(useLocale());
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -36,7 +40,7 @@ function TrackingDetails({ order, tracking }: { order: TrackingOrderEntry['order
           <div className="flex items-center gap-3">
             <CreditCard className="h-4 w-4 text-brand-accent-strong shrink-0" strokeWidth={1.5} />
             <div>
-              <p className="text-xs text-brand-text-muted">Payment Method</p>
+              <p className="text-xs text-brand-text-muted">{copy.paymentMethod}</p>
               <p className="text-sm font-medium text-brand-text">{order.payment_method.toUpperCase()}</p>
             </div>
           </div>
@@ -46,7 +50,7 @@ function TrackingDetails({ order, tracking }: { order: TrackingOrderEntry['order
           <div className="flex items-center gap-3">
             <Mail className="h-4 w-4 text-brand-accent-strong shrink-0" strokeWidth={1.5} />
             <div>
-              <p className="text-xs text-brand-text-muted">Billing Email</p>
+              <p className="text-xs text-brand-text-muted">{copy.billingEmail}</p>
               <p className="text-sm font-medium text-brand-text truncate max-w-[180px]">{order.billing_email}</p>
             </div>
           </div>
@@ -59,13 +63,13 @@ function TrackingDetails({ order, tracking }: { order: TrackingOrderEntry['order
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
             {tracking.provider && (
               <div>
-                <span className="text-brand-text-muted">Carrier:</span>{' '}
+                <span className="text-brand-text-muted">{copy.carrier}</span>{' '}
                 <span className="font-medium text-brand-text capitalize">{tracking.provider}</span>
               </div>
             )}
             {tracking.tracking_number && (
               <div>
-                <span className="text-brand-text-muted">Tracking #:</span>{' '}
+                <span className="text-brand-text-muted">{copy.trackingNumber}</span>{' '}
                 <span className="font-mono font-medium text-brand-text">{tracking.tracking_number}</span>
               </div>
             )}
@@ -77,14 +81,14 @@ function TrackingDetails({ order, tracking }: { order: TrackingOrderEntry['order
                   rel="noopener noreferrer"
                   className="text-brand-accent-strong hover:underline font-medium text-sm"
                 >
-                  Track Shipment →
+                  {copy.trackShipment} →
                 </a>
               </div>
             )}
             {tracking.estimated_delivery && (
               <div>
-                <span className="text-brand-text-muted">Estimated Delivery:</span>{' '}
-                <span className="font-medium text-brand-text">{formatDate(tracking.estimated_delivery)}</span>
+                <span className="text-brand-text-muted">{copy.estimatedDelivery}</span>{' '}
+                <span className="font-medium text-brand-text">{formatDate(tracking.estimated_delivery, locale)}</span>
               </div>
             )}
           </div>
@@ -95,11 +99,15 @@ function TrackingDetails({ order, tracking }: { order: TrackingOrderEntry['order
 }
 
 export function TrackingAccordion({ entry, defaultOpen = false }: TrackingAccordionProps) {
+  const dict = useDictionary().tracking;
+  const locale = intlLocale(useLocale());
   const [open, setOpen] = useState(defaultOpen);
   const { order, tracking, timeline } = entry;
 
   const colors = STATUS_COLORS[order.status] ?? STATUS_COLORS.pending;
-  const statusLabel = order.status.charAt(0).toUpperCase() + order.status.slice(1).replace('_', ' ');
+  const statusLabel =
+    dict.statuses[order.status as keyof typeof dict.statuses] ??
+    order.status.charAt(0).toUpperCase() + order.status.slice(1).replace('_', ' ');
   const headerId = `order-header-${order.id}`;
   const panelId = `order-panel-${order.id}`;
 
@@ -116,7 +124,7 @@ export function TrackingAccordion({ entry, defaultOpen = false }: TrackingAccord
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2">
           <span className="flex items-center gap-2">
             <Package className="h-5 w-5 shrink-0 text-brand-accent-strong" strokeWidth={1.5} />
-            <span className="text-xs text-brand-text-muted">Order ID</span>
+            <span className="text-xs text-brand-text-muted">{dict.orderId}</span>
             <span className="text-base font-bold text-brand-text">#{order.id}</span>
           </span>
 
@@ -127,11 +135,11 @@ export function TrackingAccordion({ entry, defaultOpen = false }: TrackingAccord
 
           <span className="flex items-center gap-1.5 text-sm text-brand-text-muted">
             <Calendar className="h-4 w-4 text-brand-accent-strong" strokeWidth={1.5} />
-            <span className="font-medium text-brand-text">{formatDate(order.created_at)}</span>
+            <span className="font-medium text-brand-text">{formatDate(order.created_at, locale)}</span>
           </span>
 
           <span className="flex items-center gap-1.5 text-sm text-brand-text-muted">
-            <span>Order Total:</span>
+            <span>{dict.orderTotal}</span>
             <span className="font-semibold text-brand-accent-strong">
               {order.currency} {parseFloat(order.total).toFixed(2)}
             </span>

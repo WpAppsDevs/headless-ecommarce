@@ -1,4 +1,6 @@
 import { cn } from '@/lib/utils';
+import { useLocale } from '@/i18n/LocaleProvider';
+import { intlLocale } from '@/i18n/locales';
 
 interface TrackingStatusProps {
   status: string;
@@ -8,6 +10,7 @@ interface TrackingStatusProps {
 }
 
 export function TrackingStatus({ status, date, isCompleted, isLast }: TrackingStatusProps) {
+  const locale = intlLocale(useLocale());
   return (
     <div className={cn('flex gap-4', !isLast && 'pb-0')}>
       {/* Timeline Line */}
@@ -46,7 +49,7 @@ export function TrackingStatus({ status, date, isCompleted, isLast }: TrackingSt
         </p>
         {date && (
           <p className="text-xs text-brand-text-muted/60 mt-1">
-            {new Date(date).toLocaleDateString('en-US', {
+            {new Date(date).toLocaleDateString(locale, {
               year: 'numeric',
               month: 'short',
               day: 'numeric',
