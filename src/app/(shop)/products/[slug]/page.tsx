@@ -9,6 +9,9 @@ import { ProductImages } from '@/components/product/ProductImages';
 import { VariationSelector } from '@/components/product/VariationSelector';
 import { ProductTabs } from '@/components/product/ProductTabs';
 import { RelatedProducts } from '@/components/product/RelatedProducts';
+import { getDictionary } from '@/i18n/get-dictionary';
+import { getLocale } from '@/i18n/server';
+import { interpolate } from '@/i18n/interpolate';
 import { ProductCardSkeleton } from '@/components/product/ProductCardSkeleton';
 import { ApiError } from '@/lib/errors';
 
@@ -45,7 +48,7 @@ export async function generateMetadata({ params }: PageProps) {
       description: product.short_description?.replace(/<[^>]+>/g, '') ?? '',
     };
   } catch {
-    return { title: 'Product' };
+    return { title: getDictionary(await getLocale()).productDetail.metadataFallbackTitle };
   }
 }
 
@@ -70,6 +73,7 @@ export default async function ProductPage({ params }: PageProps) {
   const isOnSale =
     product.on_sale && product.sale_price && product.sale_price !== product.regular_price;
   const primaryCategory = product.categories[0];
+  const dictionary = getDictionary(await getLocale());
 
   return (
     <>
@@ -99,8 +103,8 @@ export default async function ProductPage({ params }: PageProps) {
       <PageHeader
         title={product.name}
         breadcrumbs={[
-          { label: 'Home', href: '/' },
-          { label: 'Shop', href: '/products' },
+          { label: dictionary.common.home, href: '/' },
+          { label: dictionary.shop.title, href: '/products' },
           ...(primaryCategory
             ? [{ label: primaryCategory.name, href: `/products?category=${primaryCategory.slug}` }]
             : []),
@@ -141,7 +145,9 @@ export default async function ProductPage({ params }: PageProps) {
               <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px]">
                 {(product.rating_count ?? 0) > 0 ? (
                   <>
-                    <span className="flex items-center gap-0.5" aria-label={`${product.average_rating} out of 5 stars`}>
+                    <span className="flex items-center gap-0.5" aria-label={interpolate(dictionary.productDetail.ratingAria, {
+                      rating: product.average_rating ?? '0',
+                    })}>
                       {[1, 2, 3, 4, 5].map((i) => {
                         const avg = parseFloat(product.average_rating ?? '0');
                         const filled = i <= Math.floor(avg);
@@ -157,21 +163,30 @@ export default async function ProductPage({ params }: PageProps) {
                       })}
                     </span>
                     <span className="text-brand-text-muted">{product.average_rating} / 5</span>
-                    <span className="text-brand-text-muted">({product.rating_count} Reviews)</span>
+                    <span className="text-brand-text-muted">
+                      {interpolate(
+                        product.rating_count === 1
+                          ? dictionary.productDetail.reviewCountOne
+                          : dictionary.productDetail.reviewCount,
+                        { count: product.rating_count ?? 0 },
+                      )}
+                    </span>
                   </>
                 ) : (
                   <a
                     href="#reviews"
                     className="font-medium text-brand-accent-strong underline underline-offset-2 hover:text-brand-accent-strong-hover"
                   >
-                    Be the first to review
+                    {dictionary.productDetail.beFirstToReview}
                   </a>
                 )}
 
                 {product.sku && (
                   <>
                     <span aria-hidden="true" className="h-4 w-px bg-brand-border" />
-                    <span className="text-brand-text-muted">Product Code: {product.sku}</span>
+                    <span className="text-brand-text-muted">
+                      {interpolate(dictionary.productDetail.productCode, { code: product.sku })}
+                    </span>
                   </>
                 )}
               </div>

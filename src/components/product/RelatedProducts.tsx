@@ -1,6 +1,8 @@
 import { getProducts } from '@/lib/api/products';
 import type { Product, PaginationMeta } from '@/lib/api/products';
 import { ProductCard } from '@/components/product/ProductCard';
+import { getDictionary } from '@/i18n/get-dictionary';
+import { getLocale } from '@/i18n/server';
 
 export async function RelatedProducts() {
   const { items } = await getProducts({ per_page: 4 }).catch(
@@ -12,13 +14,15 @@ export async function RelatedProducts() {
 
   if (items.length === 0) return null;
 
+  const copy = getDictionary(await getLocale()).productDetail;
+
   return (
     <section className="mt-16">
       <div className="mb-6">
         <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
-          You may also like
+          {copy.relatedEyebrow}
         </p>
-        <h2 className="mt-1 text-2xl font-bold text-zinc-900">Related Products</h2>
+        <h2 className="mt-1 text-2xl font-bold text-zinc-900">{copy.relatedTitle}</h2>
       </div>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {items.map((product) => (

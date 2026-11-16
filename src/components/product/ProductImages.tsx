@@ -4,6 +4,8 @@ import { useRef, useState } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, X, ZoomIn } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useDictionary } from '@/i18n/LocaleProvider';
+import { interpolate } from '@/i18n/interpolate';
 import type { ProductImage } from '@/lib/api/products';
 
 const PLACEHOLDER =
@@ -16,6 +18,7 @@ interface Props {
 }
 
 export function ProductImages({ images, name, isOnSale }: Props) {
+  const copy = useDictionary().productDetail;
   const [active, setActive] = useState(0);
   const [zoomOpen, setZoomOpen] = useState(false);
   // Track which images have failed to load so we can fall back to placeholder
@@ -69,7 +72,7 @@ export function ProductImages({ images, name, isOnSale }: Props) {
                 key={img.id ?? i}
                 type="button"
                 onClick={() => setActive(i)}
-                aria-label={img.alt || `Image ${i + 1}`}
+                aria-label={img.alt || interpolate(copy.imageNumber, { index: i + 1 })}
                 aria-current={active === i}
                 className={cn(
                   'relative h-[76px] w-[76px] shrink-0 overflow-hidden rounded-[6px] border-2 transition-all',
@@ -130,7 +133,7 @@ export function ProductImages({ images, name, isOnSale }: Props) {
             <button
               type="button"
               onClick={goPrev}
-              aria-label="Previous image"
+              aria-label={copy.previousImage}
               className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white text-brand-text shadow-sm transition-opacity hover:bg-brand-accent-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent-strong"
             >
               <ChevronLeft className="h-5 w-5" strokeWidth={1.5} />
@@ -138,7 +141,7 @@ export function ProductImages({ images, name, isOnSale }: Props) {
             <button
               type="button"
               onClick={goNext}
-              aria-label="Next image"
+              aria-label={copy.nextImage}
               className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white text-brand-text shadow-sm transition-opacity hover:bg-brand-accent-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent-strong"
             >
               <ChevronRight className="h-5 w-5" strokeWidth={1.5} />
@@ -151,7 +154,7 @@ export function ProductImages({ images, name, isOnSale }: Props) {
           <button
             type="button"
             onClick={() => setZoomOpen(true)}
-            aria-label="Zoom image"
+            aria-label={copy.zoomImage}
             className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-white text-brand-text shadow-sm transition-opacity hover:bg-brand-accent-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent-strong"
           >
             <ZoomIn className="h-4 w-4" strokeWidth={1.5} />
@@ -165,13 +168,13 @@ export function ProductImages({ images, name, isOnSale }: Props) {
           className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 p-4"
           role="dialog"
           aria-modal="true"
-          aria-label="Product image preview"
+          aria-label={copy.previewLabel}
           onClick={() => setZoomOpen(false)}
         >
           <button
             type="button"
             onClick={() => setZoomOpen(false)}
-            aria-label="Close image preview"
+            aria-label={copy.closePreview}
             className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-brand-text hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
             <X className="h-5 w-5" />
