@@ -95,10 +95,13 @@ Fonts are loaded in `src/app/layout.tsx` through `next/font/google`:
 | `--font-geist-mono` | Geist Mono | `font-mono` |
 | `--font-playfair` | Playfair Display | `font-serif` |
 | `--font-inter` | Inter | `font-sans` (global body) and `font-ui` |
+| `--font-bengali` | Noto Sans Bengali | every Bangla glyph, behind Inter in the sans, serif and geist stacks |
 
 The global sans maps to Inter: Playfair Display for headings plus Inter for body is the "Classic Elegant" pairing the editorial surfaces were always documented to use. `font-geist` keeps the neutral shadcn look on `/login`, `/register`, `/forgot-password`, `/reset-password`, and `/account`.
 
 `font-serif` is mapped to Playfair with a Georgia fallback. `font-ui` is scoped to the product detail section and similar dense UI.
+
+**Bangla text uses per-glyph fallback, not a locale switch.** Inter carries the `latin` range and Noto Sans Bengali carries `bengali`, so one stack serves both languages: Latin letters resolve to Inter, Bangla letters fall through to Noto. Because the Bengali face ships a `unicode-range`, an English page never downloads it. `--font-serif` lists the Bengali face after Playfair for the same reason — Playfair has no Bengali glyphs, so a Bangla heading would otherwise drop to the operating system's font and look unrelated to the body copy beside it. A serif Bangla face (Noto Serif Bengali) is a separate decision, not yet made.
 
 Do not set `--font-sans` to `var(--font-sans)`; that self-reference resolves to nothing and the browser falls back to Times.
 

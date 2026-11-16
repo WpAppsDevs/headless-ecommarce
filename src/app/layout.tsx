@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Playfair_Display, Inter } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display, Inter, Noto_Sans_Bengali } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -39,6 +39,17 @@ const inter = Inter({
   display: "swap",
 });
 
+/**
+ * Bengali glyphs only. It sits behind Inter in the font stacks, so Latin text
+ * keeps Inter and Bangla text falls here — and because the file carries only
+ * the `bengali` unicode range, an English page never downloads it.
+ */
+const notoBengali = Noto_Sans_Bengali({
+  variable: "--font-bengali",
+  subsets: ["bengali"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: config.siteName,
   description: "Headless eCommerce powered by WooCommerce",
@@ -55,7 +66,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${inter.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${inter.variable} ${notoBengali.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <LocaleProvider locale={locale} dictionary={getDictionary(locale)}>
