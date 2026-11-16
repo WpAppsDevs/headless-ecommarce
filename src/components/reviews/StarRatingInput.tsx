@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { Star } from 'lucide-react';
+import { useDictionary } from '@/i18n/LocaleProvider';
+import { interpolate } from '@/i18n/interpolate';
 
 interface StarRatingInputProps {
   value: number;
@@ -9,28 +11,24 @@ interface StarRatingInputProps {
   disabled?: boolean;
 }
 
-const LABELS: Record<number, string> = {
-  1: 'Poor',
-  2: 'Fair',
-  3: 'Good',
-  4: 'Very Good',
-  5: 'Excellent',
-};
-
 export function StarRatingInput({ value, onChange, disabled = false }: StarRatingInputProps) {
+  const copy = useDictionary().reviews;
   const [hovered, setHovered] = useState(0);
   const active = hovered || value;
 
   return (
     <div className="flex items-center gap-1.5">
-      <div className="flex items-center gap-1" role="radiogroup" aria-label="Star rating">
+      <div className="flex items-center gap-1" role="radiogroup" aria-label={copy.starGroupAria}>
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
             type="button"
             role="radio"
             aria-checked={value === star}
-            aria-label={`${star} star${star > 1 ? 's' : ''} — ${LABELS[star]}`}
+            aria-label={interpolate(star > 1 ? copy.starAriaPlural : copy.starAria, {
+              star,
+              label: copy.starLabels[star - 1],
+            })}
             disabled={disabled}
             onClick={() => onChange(star)}
             onMouseEnter={() => setHovered(star)}
@@ -47,7 +45,7 @@ export function StarRatingInput({ value, onChange, disabled = false }: StarRatin
         ))}
       </div>
       {active > 0 && (
-        <span className="text-sm font-medium text-amber-600">{LABELS[active]}</span>
+        <span className="text-sm font-medium text-amber-600">{copy.starLabels[active - 1]}</span>
       )}
     </div>
   );

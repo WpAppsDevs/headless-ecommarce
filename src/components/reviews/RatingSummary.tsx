@@ -2,12 +2,15 @@
 
 import { Star } from 'lucide-react';
 import type { RatingAggregate } from '@/lib/api/reviews';
+import { useDictionary } from '@/i18n/LocaleProvider';
+import { interpolate } from '@/i18n/interpolate';
 
 interface RatingSummaryProps {
   aggregate: RatingAggregate;
 }
 
 export function RatingSummary({ aggregate }: RatingSummaryProps) {
+  const copy = useDictionary().reviews;
   const { total_reviews, average_rating } = aggregate;
   const stars = [5, 4, 3, 2, 1] as const;
 
@@ -33,7 +36,9 @@ export function RatingSummary({ aggregate }: RatingSummaryProps) {
           ))}
         </div>
         <p className="mt-1 text-xs text-zinc-400">
-          {total_reviews} {total_reviews === 1 ? 'review' : 'reviews'}
+          {interpolate(total_reviews === 1 ? copy.countOne : copy.countMany, {
+            count: total_reviews,
+          })}
         </p>
       </div>
 

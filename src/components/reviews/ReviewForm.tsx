@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,31 +11,33 @@ import { ReviewImageUpload } from './ReviewImageUpload';
 import { submitReview, uploadReviewMedia } from '@/lib/api/reviews';
 import { useReviewStore } from '@/stores/reviewStore';
 import type { Review } from '@/lib/api/reviews';
+import { useDictionary } from '@/i18n/LocaleProvider';
 
 // ---------------------------------------------------------------------------
 // Schema
 // ---------------------------------------------------------------------------
 
-const schema = z.object({
-  rating: z.number().int().min(1, 'Please select a rating').max(5),
-  title: z.string().max(200).optional(),
-  content: z.string().min(10, 'Review must be at least 10 characters').max(5000),
-});
+const buildSchema = (copy: { ratingRequired: string; contentTooShort: string }) =>
+  z.object({
+    rating: z.number().int().min(1, copy.ratingRequired).max(5),
+    title: z.string().max(200).optional(),
+    content: z.string().min(10, copy.contentTooShort).max(5000),
+  });
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<ReturnType<typeof buildSchema>>;
 
 // ---------------------------------------------------------------------------
 // Error code → friendly message
 // ---------------------------------------------------------------------------
 
-function friendlyError(code: string): string {
+function friendlyError(code: string, errors: ReturnType<typeof useDictionary>['reviews']['errors']): string {
   switch (code) {
-    case 'already_reviewed':  return 'You have already reviewed this product.';
-    case 'duplicate_review':  return 'This review looks identical to one you submitted recently.';
-    case 'rate_limited':      return 'You have submitted too many reviews. Please wait 24 hours.';
-    case 'invalid_product':   return 'This product could not be found.';
-    case 'no_token':          return 'You must be logged in to submit a review.';
-    default:                  return 'Something went wrong. Please try again.';
+    case 'already_reviewed':  return errors.alreadyReviewed;
+    case 'duplicate_review':  return errors.duplicate;
+    case 'rate_limited':      return errors.rateLimited;
+    case 'invalid_product':   return errors.invalidProduct;
+    case 'no_token':          return errors.noToken;
+    default:                  return errors.generic;
   }
 }
 
@@ -53,6 +55,8 @@ interface ReviewFormProps {
 
 export function ReviewForm({ productId, productName, orderId, onSuccess, onCancel }: ReviewFormProps) {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const copy = useDictionary().reviews;
+  const schema = useMemo(() => buildSchema(copy.errors), [copy.errors]);
   const [uploading, setUploading] = useState(false);
   const markAsReviewed = useReviewStore((s) => s.markAsReviewed);
 
@@ -91,7 +95,7 @@ export function ReviewForm({ productId, productName, orderId, onSuccess, onCance
         try {
           await uploadReviewMedia(review.id, imageFiles);
         } catch {
-          toast.warning('Review submitted, but some images could not be uploaded.');
+          toast.warning(copy.toasts.uploadWarning);
         } finally {
           setUploading(false);
         }
@@ -100,14 +104,14 @@ export function ReviewForm({ productId, productName, orderId, onSuccess, onCance
       markAsReviewed(productId);
       toast.success(
         review.status === 'approved'
-          ? 'Review published!'
-          : 'Review submitted — it will appear after approval.',
+          ? copy.toasts.published
+          : copy.toasts.pending,
       );
       onSuccess?.(review);
     } catch (err) {
       const code = err instanceof Error ? (err.message.match(/\[([^\]]+)\]/)?.[1] ?? '') : '';
       const apiCode = (err as { code?: string })?.code ?? code;
-      toast.error(friendlyError(apiCode));
+      toast.error(friendlyError(apiCode, copy.errors));
     }
   };
 
@@ -117,13 +121,15 @@ export function ReviewForm({ productId, productName, orderId, onSuccess, onCance
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       {/* Product name */}
       <p className="text-sm text-zinc-500">
-        Writing a review for <span className="font-medium text-zinc-900">{productName}</span>
+        {copy.form.writingFor.split('{name}')[0]}
+        <span className="font-medium text-zinc-900">{productName}</span>
+        {copy.form.writingFor.split('{name}')[1]}
       </p>
 
       {/* Rating */}
       <div className="space-y-1.5">
         <label className="block text-sm font-medium text-zinc-700">
-          Rating <span className="text-red-500">*</span>
+          {copy.form.rating} <span className="text-red-500">*</span>
         </label>
         <StarRatingInput value={rating} onChange={onRatingChange} disabled={busy} />
         {errors.rating && (
@@ -134,12 +140,12 @@ export function ReviewForm({ productId, productName, orderId, onSuccess, onCance
       {/* Title */}
       <div className="space-y-1.5">
         <label className="block text-sm font-medium text-zinc-700">
-          Review title <span className="text-zinc-400">(optional)</span>
+          {copy.form.titleLabel} <span className="text-zinc-400">{copy.form.optional}</span>
         </label>
         <input
           {...register('title')}
           disabled={busy}
-          placeholder="Summarise your experience"
+          placeholder={copy.form.titlePlaceholder}
           className="w-full rounded-lg border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-0 disabled:opacity-50"
         />
         {errors.title && (
@@ -150,13 +156,13 @@ export function ReviewForm({ productId, productName, orderId, onSuccess, onCance
       {/* Content */}
       <div className="space-y-1.5">
         <label className="block text-sm font-medium text-zinc-700">
-          Your review <span className="text-red-500">*</span>
+          {copy.form.contentLabel} <span className="text-red-500">*</span>
         </label>
         <textarea
           {...register('content')}
           rows={5}
           disabled={busy}
-          placeholder="What did you like or dislike? How is the quality?"
+          placeholder={copy.form.contentPlaceholder}
           className="w-full resize-none rounded-lg border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-0 disabled:opacity-50"
         />
         {errors.content && (
@@ -167,7 +173,7 @@ export function ReviewForm({ productId, productName, orderId, onSuccess, onCance
       {/* Images */}
       <div className="space-y-1.5">
         <label className="block text-sm font-medium text-zinc-700">
-          Photos <span className="text-zinc-400">(optional)</span>
+          {copy.form.photos} <span className="text-zinc-400">{copy.form.optional}</span>
         </label>
         <ReviewImageUpload files={imageFiles} onChange={setImageFiles} disabled={busy} />
       </div>
@@ -181,7 +187,7 @@ export function ReviewForm({ productId, productName, orderId, onSuccess, onCance
             disabled={busy}
             className="rounded-lg border border-zinc-200 px-5 py-2.5 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50 disabled:opacity-50"
           >
-            Cancel
+            {copy.form.cancel}
           </button>
         )}
         <button
@@ -190,7 +196,7 @@ export function ReviewForm({ productId, productName, orderId, onSuccess, onCance
           className="flex items-center gap-2 rounded-lg bg-brand-wine px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
         >
           {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-          {uploading ? 'Uploading photos…' : isSubmitting ? 'Submitting…' : 'Submit Review'}
+          {uploading ? copy.form.uploading : isSubmitting ? copy.form.submitting : copy.form.submit}
         </button>
       </div>
     </form>
