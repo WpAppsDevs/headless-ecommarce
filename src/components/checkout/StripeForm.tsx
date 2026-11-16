@@ -8,6 +8,7 @@ import {
   useStripe,
 } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
+import { useDictionary } from '@/i18n/LocaleProvider';
 
 export interface StripeFormHandle {
   /** Returns a Stripe PaymentMethod ID, or null on error (error displayed inline). */
@@ -23,6 +24,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PK ?? '');
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 const StripeInner = forwardRef<StripeFormHandle, {}>((_, ref) => {
+  const copy = useDictionary().checkout;
   const stripe = useStripe();
   const elements = useElements();
   const [cardError, setCardError] = useState<string | null>(null);
@@ -32,13 +34,13 @@ const StripeInner = forwardRef<StripeFormHandle, {}>((_, ref) => {
       setCardError(null);
 
       if (!stripe || !elements) {
-        setCardError('Stripe has not loaded. Please refresh the page.');
+        setCardError(copy.errors.stripeNotLoaded);
         return null;
       }
 
       const cardElement = elements.getElement(CardElement);
       if (!cardElement) {
-        setCardError('Card element not found. Please refresh the page.');
+        setCardError(copy.errors.cardElementMissing);
         return null;
       }
 
@@ -48,7 +50,7 @@ const StripeInner = forwardRef<StripeFormHandle, {}>((_, ref) => {
       });
 
       if (error) {
-        setCardError(error.message ?? 'Card error. Please try again.');
+        setCardError(error.message ?? copy.errors.cardError);
         return null;
       }
 

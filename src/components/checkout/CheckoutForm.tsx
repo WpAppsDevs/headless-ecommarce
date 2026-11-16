@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import type React from 'react';
 import Image from 'next/image';
@@ -10,6 +10,8 @@ import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { ApiError } from '@/lib/errors';
+import { useDictionary } from '@/i18n/LocaleProvider';
+import { interpolate } from '@/i18n/interpolate';
 import { getCountries, placeOrder } from '@/lib/api/checkout';
 import { useCartStore } from '@/stores/cartStore';
 import { useFormatPrice } from '@/lib/utils/currency';
@@ -35,17 +37,22 @@ const StripeForm = dynamic(
 // Schema
 // ---------------------------------------------------------------------------
 
-const schema = z
+const buildSchema = (copy: {
+  required: string;
+  invalidEmail: string;
+  shippingMethod: string;
+  terms: string;
+}) => z
   .object({
     billing: z.object({
-      first_name: z.string().min(1, 'Required'),
-      email: z.string().email('Invalid email'),
-      phone: z.string().min(1, 'Required'),
-      address_1: z.string().min(1, 'Required'),
-      country: z.string().min(2, 'Required'),
-      state: z.string().min(1, 'Required'),
-      city: z.string().min(1, 'Required'),
-      postcode: z.string().min(1, 'Required'),
+      first_name: z.string().min(1, copy.required),
+      email: z.string().email(copy.invalidEmail),
+      phone: z.string().min(1, copy.required),
+      address_1: z.string().min(1, copy.required),
+      country: z.string().min(2, copy.required),
+      state: z.string().min(1, copy.required),
+      city: z.string().min(1, copy.required),
+      postcode: z.string().min(1, copy.required),
     }),
     sameAsBilling: z.boolean(),
     shipping: z.object({
@@ -57,9 +64,9 @@ const schema = z
       postcode: z.string(),
     }),
     gateway: z.enum(['stripe', 'bacs']),
-    shipping_method: z.string().min(1, 'Please select a shipping method'),
+    shipping_method: z.string().min(1, copy.shippingMethod),
     terms_accepted: z.boolean().refine((val) => val === true, {
-      message: 'You must accept the terms',
+      message: copy.terms,
     }),
   })
   .superRefine((data, ctx) => {
@@ -68,26 +75,26 @@ const schema = z
       const required = ['first_name', 'address_1', 'country', 'state', 'city', 'postcode'] as const;
       for (const key of required) {
         if (!s[key]) {
-          ctx.addIssue({ code: 'custom', message: 'Required', path: ['shipping', key] });
+          ctx.addIssue({ code: 'custom', message: copy.required, path: ['shipping', key] });
         }
       }
     }
   });
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<ReturnType<typeof buildSchema>>;
 
 // ---------------------------------------------------------------------------
 // Error code → user-friendly message
 // ---------------------------------------------------------------------------
 
-const API_ERRORS: Record<string, string> = {
-  invalid_token: 'Session expired. Please log in again.',
-  session_expired: 'Session expired. Please log in again.',
-  empty_cart: 'Your cart is empty. Please add items before checking out.',
-  unknown_gateway: 'Unknown payment method selected.',
-  out_of_stock: 'One or more items are out of stock. Please review your cart.',
-  order_creation_failed: 'Failed to create your order. Please try again.',
-  payment_failed: 'Payment was declined. Please check your card details and try again.',
+const API_ERROR_KEYS: Record<string, keyof ReturnType<typeof useDictionary>['checkout']['errors']> = {
+  invalid_token: 'invalidToken',
+  session_expired: 'invalidToken',
+  empty_cart: 'emptyCart',
+  unknown_gateway: 'unknownGateway',
+  out_of_stock: 'outOfStock',
+  order_creation_failed: 'orderFailed',
+  payment_failed: 'paymentFailed',
 };
 
 // ---------------------------------------------------------------------------
@@ -112,6 +119,9 @@ export function CheckoutForm({ profile, cartItems }: Props) {
   const [formError, setFormError] = useState<string | null>(null);
   const [countries, setCountries] = useState<Country[]>([]);
   const fmt = useFormatPrice();
+  const dict = useDictionary();
+  const copy = dict.checkout;
+  const schema = useMemo(() => buildSchema(copy.errors), [copy.errors]);
 
   useEffect(() => {
     getCountries()
@@ -256,7 +266,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
       router.push(`/order-confirmation/${result.order_id}`);
     } catch (e) {
       if (e instanceof ApiError) {
-        setApiError(API_ERRORS[e.code] ?? e.message);
+        setApiError(copy.errors[API_ERROR_KEYS[e.code]] ?? e.message);
       } else if (e instanceof Error && e.message === 'Request timed out') {
         setApiError('Request timed out. Please try again.');
       } else {
@@ -271,23 +281,24 @@ export function CheckoutForm({ profile, cartItems }: Props) {
     setApiError(null);
 
     // Build list of missing field labels
+    const f = copy.fields;
     const FIELD_LABELS: Record<string, string> = {
-      'billing.first_name': 'Full Name',
-      'billing.email': 'Email',
-      'billing.phone': 'Phone',
-      'billing.address_1': 'Address',
-      'billing.country': 'Country',
-      'billing.state': 'State / Province',
-      'billing.city': 'City',
-      'billing.postcode': 'Postcode / ZIP',
-      'shipping.first_name': 'Shipping Full Name',
-      'shipping.address_1': 'Shipping Address',
-      'shipping.country': 'Shipping Country',
-      'shipping.state': 'Shipping State / Province',
-      'shipping.city': 'Shipping City',
-      'shipping.postcode': 'Shipping Postcode / ZIP',
-      shipping_method: 'Shipping method',
-      terms_accepted: 'Terms & Conditions',
+      'billing.first_name': f.fullName,
+      'billing.email': f.email,
+      'billing.phone': f.phone,
+      'billing.address_1': f.address,
+      'billing.country': f.country,
+      'billing.state': f.state,
+      'billing.city': f.city,
+      'billing.postcode': f.postcode,
+      'shipping.first_name': f.shippingFullName,
+      'shipping.address_1': f.shippingAddress,
+      'shipping.country': f.shippingCountry,
+      'shipping.state': f.shippingState,
+      'shipping.city': f.shippingCity,
+      'shipping.postcode': f.shippingPostcode,
+      shipping_method: f.shippingMethod,
+      terms_accepted: f.terms,
     };
 
     const missing: string[] = [];
@@ -315,9 +326,9 @@ export function CheckoutForm({ profile, cartItems }: Props) {
     if (formErrors.terms_accepted) missing.push(FIELD_LABELS.terms_accepted);
 
     if (missing.length === 0) {
-      setFormError('Please fill in all required fields before placing your order.');
+      setFormError(copy.errors.requiredFields);
     } else {
-      setFormError(`Missing: ${missing.join(', ')}.`);
+      setFormError(interpolate(copy.errors.missing, { fields: missing.join(', ') }));
     }
   };
 
@@ -339,11 +350,11 @@ export function CheckoutForm({ profile, cartItems }: Props) {
         <div className="space-y-6">
           {/* Billing */}
           <section className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-lg font-bold text-zinc-900">Billing Address</h2>
+            <h2 className="mb-4 text-lg font-bold text-zinc-900">{copy.billingAddress}</h2>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1">
                 <label className="text-sm font-medium text-zinc-600">
-                  Full Name <span className="text-rose-500">*</span>
+                  {copy.fields.fullName} <span className="text-rose-500">*</span>
                 </label>
                 <input
                   {...register('billing.first_name')}
@@ -356,7 +367,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
               </div>
               <div className="space-y-1">
                 <label className="text-sm font-medium text-zinc-600">
-                  Phone <span className="text-rose-500">*</span>
+                  {copy.fields.phone} <span className="text-rose-500">*</span>
                 </label>
                 <input
                   {...register('billing.phone')}
@@ -370,7 +381,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
               </div>
               <div className="col-span-full space-y-1">
                 <label className="text-sm font-medium text-zinc-600">
-                  Email <span className="text-rose-500">*</span>
+                  {copy.fields.email} <span className="text-rose-500">*</span>
                 </label>
                 <input
                   {...register('billing.email')}
@@ -385,14 +396,14 @@ export function CheckoutForm({ profile, cartItems }: Props) {
 
               <div className="col-span-full space-y-1">
                 <label className="text-sm font-medium text-zinc-600">
-                  Country <span className="text-rose-500">*</span>
+                  {copy.fields.country} <span className="text-rose-500">*</span>
                 </label>
                 <select
                   {...register('billing.country')}
                   autoComplete="billing country"
                   className="w-full rounded-xl border border-zinc-200 px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-300 bg-white"
                 >
-                  <option value="">Select country</option>
+                  <option value="">{copy.selectCountry}</option>
                   {countries.map((c) => (
                     <option key={c.code} value={c.code}>
                       {c.name}
@@ -405,7 +416,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
               </div>
               <div className="space-y-1">
                 <label className="text-sm font-medium text-zinc-600">
-                  State / Province <span className="text-rose-500">*</span>
+                  {copy.fields.state} <span className="text-rose-500">*</span>
                 </label>
                 {selectedBillingCountry?.states.length ? (
                   <select
@@ -413,7 +424,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
                     autoComplete="billing address-level1"
                     className="w-full rounded-xl border border-zinc-200 px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-300 bg-white"
                   >
-                    <option value="">Select state</option>
+                    <option value="">{copy.selectState}</option>
                     {selectedBillingCountry.states.map((s) => (
                       <option key={s.code} value={s.code}>
                         {s.name}
@@ -433,7 +444,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
               </div>
               <div className="space-y-1">
                 <label className="text-sm font-medium text-zinc-600">
-                  City <span className="text-rose-500">*</span>
+                  {copy.fields.city} <span className="text-rose-500">*</span>
                 </label>
                 <input
                   {...register('billing.city')}
@@ -446,7 +457,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
               </div>
               <div className="space-y-1">
                 <label className="text-sm font-medium text-zinc-600">
-                  Postcode / ZIP <span className="text-rose-500">*</span>
+                  {copy.fields.postcode} <span className="text-rose-500">*</span>
                 </label>
                 <input
                   {...register('billing.postcode')}
@@ -459,7 +470,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
               </div>
               <div className="col-span-full space-y-1">
                 <label className="text-sm font-medium text-zinc-600">
-                  Address <span className="text-rose-500">*</span>
+                  {copy.fields.address} <span className="text-rose-500">*</span>
                 </label>
                 <input
                   {...register('billing.address_1')}
@@ -483,7 +494,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
                 {...register('sameAsBilling')}
               />
               <label htmlFor="sameAsBilling" className="cursor-pointer text-sm font-medium text-zinc-700">
-                Shipping address same as billing
+                {copy.shippingSame}
               </label>
             </div>
 
@@ -491,7 +502,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="col-span-full space-y-1">
                   <label className="text-sm font-medium text-zinc-600">
-                    Full Name <span className="text-rose-500">*</span>
+                    {copy.fields.fullName} <span className="text-rose-500">*</span>
                   </label>
                   <input
                     {...register('shipping.first_name')}
@@ -504,14 +515,14 @@ export function CheckoutForm({ profile, cartItems }: Props) {
                 </div>
                 <div className="col-span-full space-y-1">
                   <label className="text-sm font-medium text-zinc-600">
-                    Country <span className="text-rose-500">*</span>
+                    {copy.fields.country} <span className="text-rose-500">*</span>
                   </label>
                   <select
                     {...register('shipping.country')}
                     autoComplete="shipping country"
                     className="w-full rounded-xl border border-zinc-200 px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-300 bg-white"
                   >
-                    <option value="">Select country</option>
+                    <option value="">{copy.selectCountry}</option>
                     {countries.map((c) => (
                       <option key={c.code} value={c.code}>
                         {c.name}
@@ -524,7 +535,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-zinc-600">
-                    State / Province <span className="text-rose-500">*</span>
+                    {copy.fields.state} <span className="text-rose-500">*</span>
                   </label>
                   {selectedShippingCountryObj?.states.length ? (
                     <select
@@ -532,7 +543,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
                       autoComplete="shipping address-level1"
                       className="w-full rounded-xl border border-zinc-200 px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-300 bg-white"
                     >
-                      <option value="">Select state</option>
+                      <option value="">{copy.selectState}</option>
                       {selectedShippingCountryObj.states.map((s) => (
                         <option key={s.code} value={s.code}>
                           {s.name}
@@ -552,7 +563,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-zinc-600">
-                    City <span className="text-rose-500">*</span>
+                    {copy.fields.city} <span className="text-rose-500">*</span>
                   </label>
                   <input
                     {...register('shipping.city')}
@@ -565,7 +576,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-zinc-600">
-                    Postcode / ZIP <span className="text-rose-500">*</span>
+                    {copy.fields.postcode} <span className="text-rose-500">*</span>
                   </label>
                   <input
                     {...register('shipping.postcode')}
@@ -578,7 +589,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
                 </div>
                 <div className="col-span-full space-y-1">
                   <label className="text-sm font-medium text-zinc-600">
-                    Address <span className="text-rose-500">*</span>
+                    {copy.fields.address} <span className="text-rose-500">*</span>
                   </label>
                   <input
                     {...register('shipping.address_1')}
@@ -597,7 +608,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
         {/* ── RIGHT COLUMN: Order Summary + Payment + Place Order ───────────── */}
         <div className="lg:sticky lg:top-24 lg:self-start">
           <div className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-lg font-bold text-zinc-900">Order Summary</h2>
+            <h2 className="mb-4 text-lg font-bold text-zinc-900">{copy.orderSummary}</h2>
 
             {/* Product List */}
             <div className="mb-6 space-y-4">
@@ -624,7 +635,9 @@ export function CheckoutForm({ profile, cartItems }: Props) {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-zinc-900">{item.product_name}</p>
-                      <p className="text-xs text-zinc-500">Qty: {item.quantity}</p>
+                      <p className="text-xs text-zinc-500">
+                        {interpolate(copy.qty, { qty: item.quantity })}
+                      </p>
                     </div>
                     <div className="text-sm font-semibold text-zinc-900">
                       {fmt(lineTotal)}
@@ -637,7 +650,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
             <div className="space-y-3 border-t border-zinc-100 pt-4">
               {/* Subtotal */}
               <div className="flex items-center justify-between text-sm">
-                <span className="font-medium text-zinc-600">Subtotal</span>
+                <span className="font-medium text-zinc-600">{copy.subtotal}</span>
                 <span className="font-semibold text-zinc-900">{fmt(subtotal)}</span>
               </div>
 
@@ -666,7 +679,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
                       </span>
                     </label>
                   )) ?? (
-                    <p className="text-sm text-zinc-500">No shipping methods available</p>
+                    <p className="text-sm text-zinc-500">{copy.noShippingMethods}</p>
                   )}
                 </div>
                 {errors.shipping_method && (
@@ -676,7 +689,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
 
               {/* Total */}
               <div className="flex items-center justify-between border-t border-zinc-100 pt-3">
-                <span className="text-base font-bold text-zinc-900">Total</span>
+                <span className="text-base font-bold text-zinc-900">{copy.total}</span>
                 <span className="text-base font-bold text-zinc-900">{fmt(orderTotal)}</span>
               </div>
             </div>
@@ -684,7 +697,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
 
           {/* Payment Method */}
           <div className="mt-6 rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-lg font-bold text-zinc-900">Payment Method</h2>
+            <h2 className="mb-4 text-lg font-bold text-zinc-900">{copy.paymentMethod}</h2>
             <div className="space-y-3">
               <label className="flex cursor-pointer items-center gap-2.5">
                 <input
@@ -693,7 +706,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
                   className="h-4 w-4 accent-zinc-900"
                   {...register('gateway')}
                 />
-                <span className="text-sm font-medium text-zinc-900">Bank Transfer (BACS)</span>
+                <span className="text-sm font-medium text-zinc-900">{copy.bankTransfer}</span>
               </label>
               <label className="flex cursor-pointer items-center gap-2.5">
                 <input
@@ -702,7 +715,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
                   className="h-4 w-4 accent-zinc-900"
                   {...register('gateway')}
                 />
-                <span className="text-sm font-medium text-zinc-900">Credit Card (Stripe)</span>
+                <span className="text-sm font-medium text-zinc-900">{copy.creditCard}</span>
               </label>
             </div>
 
@@ -728,14 +741,14 @@ export function CheckoutForm({ profile, cartItems }: Props) {
                   {...register('terms_accepted')}
                 />
                 <span className="text-sm text-zinc-700">
-                  I agree to the{' '}
+                  {copy.agreeTo}{' '}
                   <a
                     href="/terms"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-medium text-zinc-900 underline underline-offset-4"
                   >
-                    Terms & Conditions
+                    {copy.termsLink}
                   </a>
                 </span>
               </label>
@@ -752,15 +765,15 @@ export function CheckoutForm({ profile, cartItems }: Props) {
               {isPlacing ? (
                 <span className="inline-flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Placing order…
+                  {copy.placingOrder}
                 </span>
               ) : (
-                'Place Order'
+                copy.placeOrder
               )}
             </button>
 
             <p className="mt-3 text-center text-xs text-zinc-500">
-              Secure checkout · SSL encrypted
+              {copy.secure}
             </p>
           </div>
         </div>

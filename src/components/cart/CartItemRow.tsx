@@ -2,6 +2,8 @@
 
 import Image from 'next/image';
 import { Minus, Plus, X } from 'lucide-react';
+import { useDictionary } from '@/i18n/LocaleProvider';
+import { interpolate } from '@/i18n/interpolate';
 import { useCartStore } from '@/stores/cartStore';
 import type { CartItem } from '@/lib/api/cart';
 import { useFormatPrice } from '@/lib/utils/currency';
@@ -20,6 +22,7 @@ function parseMeta(meta: string | null): { attributes: Record<string, string> } 
 }
 
 export function CartItemRow({ item }: Props) {
+  const copy = useDictionary().cart;
   const { updateItem, removeItem, loading } = useCartStore();
   const qty = Number(item.quantity);
   const { attributes } = parseMeta(item.meta);
@@ -88,7 +91,7 @@ export function CartItemRow({ item }: Props) {
           <button
             onClick={() => qty > 1 && updateItem(Number(item.id), qty - 1)}
             disabled={loading || qty <= 1}
-            aria-label="Decrease quantity"
+            aria-label={copy.decreaseQuantity}
             className="flex h-9 w-9 items-center justify-center text-zinc-500 transition-colors hover:bg-zinc-50 disabled:opacity-30"
           >
             <Minus className="h-3 w-3" />
@@ -99,7 +102,7 @@ export function CartItemRow({ item }: Props) {
           <button
             onClick={() => updateItem(Number(item.id), qty + 1)}
             disabled={loading}
-            aria-label="Increase quantity"
+            aria-label={copy.increaseQuantity}
             className="flex h-9 w-9 items-center justify-center text-zinc-500 transition-colors hover:bg-zinc-50 disabled:opacity-30"
           >
             <Plus className="h-3 w-3" />
@@ -117,7 +120,7 @@ export function CartItemRow({ item }: Props) {
         <button
           onClick={() => removeItem(Number(item.id))}
           disabled={loading}
-          aria-label={`Remove ${productName}`}
+          aria-label={interpolate(copy.removeAria, { name: productName })}
           className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-rose-200 text-rose-400 transition-colors hover:border-rose-400 hover:bg-rose-50 hover:text-rose-500 disabled:opacity-50"
         >
           <X className="h-3.5 w-3.5" />

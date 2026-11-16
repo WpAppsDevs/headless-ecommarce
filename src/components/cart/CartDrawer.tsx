@@ -2,12 +2,14 @@
 
 import Link from 'next/link';
 import { X, ShoppingBag } from 'lucide-react';
+import { useDictionary } from '@/i18n/LocaleProvider';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useCartStore } from '@/stores/cartStore';
 import { CartItem } from './CartItem';
 import { useFormatPrice } from '@/lib/utils/currency';
 
 export function CartDrawer() {
+  const copy = useDictionary().cart;
   const { items, cartDrawerOpen, setCartDrawerOpen } = useCartStore();
 
   const subtotal = items.reduce(
@@ -38,7 +40,7 @@ export function CartDrawer() {
           </div>
           <button
             onClick={() => setCartDrawerOpen(false)}
-            aria-label="Close cart"
+            aria-label={copy.closeCart}
             className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
           >
             <X className="h-4 w-4" />
@@ -52,14 +54,14 @@ export function CartDrawer() {
               <ShoppingBag className="h-7 w-7 text-zinc-400" />
             </div>
             <div className="space-y-1">
-              <p className="text-sm font-medium text-zinc-900">Your cart is empty</p>
-              <p className="text-xs text-zinc-400">Add items to get started</p>
+              <p className="text-sm font-medium text-zinc-900">{copy.emptyTitle}</p>
+              <p className="text-xs text-zinc-400">{copy.emptyBody}</p>
             </div>
             <button
               onClick={() => setCartDrawerOpen(false)}
               className="text-sm font-medium text-zinc-900 underline underline-offset-4 transition-opacity hover:opacity-70"
             >
-              Continue Shopping
+              {copy.continueShopping}
             </button>
           </div>
         ) : (
@@ -92,7 +94,7 @@ export function CartDrawer() {
             {/* ── Subtotal ───────────────────────────────────────────────── */}
             <div className="shrink-0 border-t px-5 py-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-zinc-900">Subtotal</span>
+                <span className="text-sm font-semibold text-zinc-900">{copy.subtotal}</span>
                 <span className="text-sm font-bold text-zinc-900">{fmt(subtotal)}</span>
               </div>
             </div>
@@ -119,7 +121,7 @@ export function CartDrawer() {
                 onClick={() => setCartDrawerOpen(false)}
                 className="w-full py-1 text-center text-xs text-zinc-400 transition-colors hover:text-zinc-700"
               >
-                Continue Shopping
+                {copy.continueShopping}
               </button>
             </div>
           </>

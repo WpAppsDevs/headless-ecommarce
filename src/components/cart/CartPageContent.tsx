@@ -3,11 +3,13 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { ShoppingCart } from 'lucide-react';
+import { useDictionary } from '@/i18n/LocaleProvider';
 import { useCartStore } from '@/stores/cartStore';
 import { CartItemRow } from '@/components/cart/CartItemRow';
 import { CartSummary } from '@/components/cart/CartSummary';
 
 export function CartPageContent() {
+  const copy = useDictionary().cart;
   const { items, loading, error, fetchCart } = useCartStore();
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export function CartPageContent() {
 
       {/* Loading skeleton */}
       {loading && items.length === 0 && (
-        <div className="py-16 text-center text-sm text-zinc-400">Loading cart…</div>
+        <div className="py-16 text-center text-sm text-zinc-400">{copy.loading}</div>
       )}
 
       {/* Empty state */}
@@ -41,7 +43,7 @@ export function CartPageContent() {
             <ShoppingCart className="h-9 w-9 text-zinc-300" />
           </div>
           <div className="space-y-1">
-            <p className="text-lg font-semibold text-zinc-800">Your cart is empty</p>
+            <p className="text-lg font-semibold text-zinc-800">{copy.emptyTitle}</p>
             <p className="text-sm text-zinc-500">
               Looks like you haven&apos;t added anything yet.
             </p>

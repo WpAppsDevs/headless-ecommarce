@@ -8,10 +8,13 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { getUser, type UserProfile } from '@/lib/api/checkout';
 import { useCartStore } from '@/stores/cartStore';
 import { ApiError } from '@/lib/errors';
+import { useDictionary } from '@/i18n/LocaleProvider';
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { items } = useCartStore();
+  const dictionary = useDictionary();
+  const copy = dictionary.checkout;
 
   const [profile, setProfile] = useState<UserProfile | undefined>();
   const [ready, setReady] = useState(false);
@@ -43,7 +46,7 @@ export default function CheckoutPage() {
       setReady(true);
     }
 
-    init().catch(() => setInitError('Failed to load checkout. Please try again.'));
+    init().catch(() => setInitError(copy.loadFailed));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -66,11 +69,11 @@ export default function CheckoutPage() {
   return (
     <>
       <PageHeader
-        title="Checkout"
+        title={copy.title}
         breadcrumbs={[
-          { label: 'Home', href: '/' },
-          { label: 'Shop', href: '/products' },
-          { label: 'Checkout' },
+          { label: dictionary.common.home, href: '/' },
+          { label: dictionary.shop.title, href: '/products' },
+          { label: copy.title },
         ]}
       />
 
