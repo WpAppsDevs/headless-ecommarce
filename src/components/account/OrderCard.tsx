@@ -7,6 +7,8 @@ import { useReviewStore } from '@/stores/reviewStore';
 import { ReviewModal } from '@/components/review-modal/ReviewModal';
 import type { ReviewableItem } from '@/components/review-modal/ReviewModal';
 import { orderStatusStyle } from '@/lib/order-status';
+import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
+import { intlLocale } from '@/i18n/locales';
 
 interface OrderCardProps {
   order: Order;
@@ -15,12 +17,15 @@ interface OrderCardProps {
 
 const PAID_STATUSES = ['completed', 'processing'];
 
-function fmtDate(dateStr: string | null) {
+function fmtDate(dateStr: string | null, locale: string) {
   if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  return new Date(dateStr).toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 export function OrderCard({ order, onViewDetails }: OrderCardProps) {
+  const dict = useDictionary().account;
+  const copy = dict.orders;
+  const locale = intlLocale(useLocale());
   const sc        = orderStatusStyle(order.status);
   const isPaid    = PAID_STATUSES.includes(order.status);
 
@@ -59,12 +64,12 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
       {/* Row 1 – Order ID + Date */}
       <div className="flex items-center justify-between px-6 pt-5 pb-4">
         <span className="text-[13px] text-zinc-800">
-          <span className="font-medium">Order ID: </span>
+          <span className="font-medium">{copy.orderId.replace('{id}','').trim()} </span>
           <span className="font-bold">#{order.id}</span>
         </span>
         <span className="text-[13px] text-zinc-500">
-          <span className="font-medium text-zinc-600">Date: </span>
-          {fmtDate(order.date_created)}
+          <span className="font-medium text-zinc-600">{copy.date.replace('{date}','').trim()} </span>
+          {fmtDate(order.date_created, locale)}
         </span>
       </div>
 
@@ -106,9 +111,9 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
       {/* Row 4 – Status badge + action buttons */}
       <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
         <div className="flex items-center gap-2">
-          <span className="text-[13px] text-zinc-500">Status:</span>
+          <span className="text-[13px] text-zinc-500">{copy.status}</span>
           <span className={`rounded-md border px-3 py-0.5 text-[11px] font-semibold ${sc.badge}`}>
-            {sc.label}
+            {dict.statuses[sc.key]}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -118,7 +123,7 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
               className="flex items-center gap-1.5 rounded-lg border border-brand-preorder/40 px-4 py-2 text-[12px] font-semibold text-brand-preorder transition hover:bg-brand-preorder/5"
             >
               <PenLine className="h-3.5 w-3.5" strokeWidth={2} />
-              Write Review
+              {copy.writeReview}
             </button>
           )}
           <button
@@ -126,7 +131,7 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
             className="flex items-center gap-1.5 rounded-lg bg-brand-wine px-4 py-2 text-[12px] font-semibold text-white transition hover:opacity-90"
           >
             <Eye className="h-3.5 w-3.5" strokeWidth={2} />
-            View Details
+            {copy.viewDetails}
           </button>
         </div>
       </div>

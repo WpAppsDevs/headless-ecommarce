@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Order, OrdersMeta } from '@/lib/api/orders';
+import { useDictionary } from '@/i18n/LocaleProvider';
 import { filterCheckoutDrafts } from '@/lib/order-utils';
 import { OrderCard } from './OrderCard';
 import { OrderDetailsModal } from './OrderDetailsModal';
@@ -14,17 +15,20 @@ interface OrdersProps {
 
 type OrderFilter = 'all' | 'pending' | 'delivery' | 'completed' | 'cancelled';
 
-const FILTERS: Array<{ id: OrderFilter; label: string }> = [
-  { id: 'all',       label: 'All Orders' },
-  { id: 'pending',   label: 'Pending'    },
-  { id: 'delivery',  label: 'Delivery'   },
-  { id: 'completed', label: 'Completed'  },
-  { id: 'cancelled', label: 'Canceled'   },
-];
+const FILTERS: OrderFilter[] = ['all', 'pending', 'delivery', 'completed', 'cancelled'];
 
 const PER_PAGE = 5;
 
 export function Orders({ orders }: OrdersProps) {
+  const dict = useDictionary().account;
+  const copy = dict.orders;
+  const FILTER_LABELS = {
+    all: copy.filterAll,
+    pending: copy.filterPending,
+    delivery: copy.filterDelivery,
+    completed: copy.filterCompleted,
+    cancelled: copy.filterCancelled,
+  };
   const [activeFilter, setActiveFilter] = useState<OrderFilter>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [page, setPage] = useState(1);
@@ -44,11 +48,11 @@ export function Orders({ orders }: OrdersProps) {
   return (
     <>
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-zinc-900">My Orders</h2>
+        <h2 className="text-2xl font-bold text-zinc-900">{copy.title}</h2>
 
         {/* Filter tabs */}
         <div className="flex gap-5 overflow-x-auto border-b border-zinc-200">
-          {FILTERS.map(({ id, label }) => (
+          {FILTERS.map((id) => (
             <button
               key={id}
               onClick={() => handleFilter(id)}
@@ -58,7 +62,7 @@ export function Orders({ orders }: OrdersProps) {
                   : 'border-transparent text-zinc-400 hover:text-zinc-700'
               }`}
             >
-              {label}
+              {FILTER_LABELS[id]}
             </button>
           ))}
         </div>
@@ -67,7 +71,7 @@ export function Orders({ orders }: OrdersProps) {
         <div className="space-y-4">
           {paged.length === 0 ? (
             <div className="rounded-2xl border border-zinc-200 p-10 text-center">
-              <p className="text-sm text-zinc-400">No orders found</p>
+              <p className="text-sm text-zinc-400">{copy.noOrders}</p>
             </div>
           ) : (
             paged.map(order => (
