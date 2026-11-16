@@ -20,12 +20,21 @@ interface Props {
   initialAggregate?: RatingAggregate | null;
 }
 
+/**
+ * The accordion's single source: id, icon and the dictionary key for its title.
+ * `titleKey` is typed against the dictionary, so adding an entry without adding
+ * the message in both languages is a type error rather than a blank tab.
+ */
 const ACCORDION_ITEMS = [
-  { id: 'product-details', title: 'Product Details', icon: FileText },
-  { id: 'additional-info', title: 'Additional Info', icon: Info },
-  { id: 'shipping-returns', title: 'Shipping & Returns', icon: Truck },
-  { id: 'reviews', title: 'Reviews', icon: Star },
-] as const;
+  { id: 'product-details', icon: FileText, titleKey: 'tabDetails' },
+  { id: 'additional-info', icon: Info, titleKey: 'tabInfo' },
+  { id: 'shipping-returns', icon: Truck, titleKey: 'tabShipping' },
+  { id: 'reviews', icon: Star, titleKey: 'tabReviews' },
+] as const satisfies ReadonlyArray<{
+  id: string;
+  icon: typeof FileText;
+  titleKey: keyof ReturnType<typeof useDictionary>['productDetail'];
+}>;
 
 type AccordionId = (typeof ACCORDION_ITEMS)[number]['id'];
 
@@ -40,13 +49,6 @@ export function ProductTabs({
 }: Props) {
   const copy = useDictionary().productDetail;
   const [openItem, setOpenItem] = useState<AccordionId | ''>('product-details');
-
-  const TAB_TITLES: Record<string, string> = {
-    'product-details': copy.tabDetails,
-    'additional-info': copy.tabInfo,
-    'shipping-returns': copy.tabShipping,
-    reviews: copy.tabReviews,
-  };
 
   useEffect(() => {
     const openFromHash = () => {
@@ -134,7 +136,7 @@ export function ProductTabs({
             >
               <Icon className="h-5 w-5 shrink-0 text-brand-text" strokeWidth={1.5} />
               <span className="flex-1 font-serif text-base font-medium text-brand-text">
-                {TAB_TITLES[item.id]}
+                {copy[item.titleKey]}
               </span>
               <ChevronDown
                 className={cn(
