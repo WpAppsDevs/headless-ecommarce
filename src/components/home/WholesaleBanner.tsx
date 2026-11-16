@@ -1,17 +1,14 @@
 import Link from 'next/link';
 import { Phone, ArrowRight } from 'lucide-react';
 import { config } from '@/lib/config';
+import { formatNumber } from '@/i18n/format';
+import { getDictionary } from '@/i18n/get-dictionary';
+import { getLocale } from '@/i18n/server';
 
-const STATS = [
-  { value: '50+', label: 'Active Resellers' },
-  { value: '90%', label: 'Repeat Clients' },
-  { value: '7', label: 'Divisions Covered' },
-  { value: '99%', label: 'Client Satisfaction' },
-];
+export async function WholesaleBanner() {
+  const locale = await getLocale();
+  const copy = getDictionary(locale).home.wholesale;
 
-const FEATURES = ['Stock: Cash on Delivery', 'Pre-Order: 70% Advance', 'MOQ: As Per Catalog'];
-
-export function WholesaleBanner() {
   return (
     <section aria-labelledby="wholesale-heading" className="relative overflow-hidden bg-brand-dark-surface py-20">
       {/* Warm radial glows */}
@@ -26,25 +23,25 @@ export function WholesaleBanner() {
           {/* Text block */}
           <div className="flex-1 text-center lg:text-left">
             <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-accent">
-              Wholesale &amp; Catalog
+              {copy.eyebrow}
             </span>
             <h2 id="wholesale-heading" className="mt-3 font-serif text-3xl font-bold leading-tight tracking-[-0.01em] text-white sm:text-4xl">
-              Grow Your Business with
+              {copy.titleLead}
               <br />
-              <span className="text-brand-accent">Our Catalog Collections</span>
+              <span className="text-brand-accent">{copy.titleAccent}</span>
             </h2>
             <p className="mt-4 text-sm leading-relaxed text-white/60 lg:max-w-lg">
-              Are you a boutique owner or reseller? Access our full catalog of Pakistani dresses at wholesale prices. Fast turnaround, reliable quality, and dedicated account support.
+              {copy.body}
             </p>
 
             {/* Feature pills */}
             <div className="mt-5 flex flex-wrap justify-center gap-2 lg:justify-start">
-              {FEATURES.map((f) => (
+              {copy.features.map((feature) => (
                 <span
-                  key={f}
+                  key={feature}
                   className="rounded-full bg-brand-accent/[0.08] px-3 py-1 text-xs font-medium text-brand-accent/80 ring-1 ring-brand-accent/15"
                 >
-                  {f}
+                  {feature}
                 </span>
               ))}
             </div>
@@ -55,7 +52,7 @@ export function WholesaleBanner() {
                 href="/products?tag=catalog"
                 className="inline-flex items-center gap-2 rounded-full bg-brand-accent-strong px-7 py-3 text-sm font-semibold text-white ring-1 ring-brand-accent/30 transition hover:bg-brand-accent-strong-hover"
               >
-                View Catalog <ArrowRight className="h-4 w-4" strokeWidth={2} />
+                {copy.catalogCta} <ArrowRight className="h-4 w-4" strokeWidth={2} />
               </Link>
               <a
                 href={config.whatsappUrl}
@@ -64,7 +61,7 @@ export function WholesaleBanner() {
                 className="inline-flex items-center gap-2 rounded-full border border-brand-accent/25 bg-brand-accent/[0.08] px-7 py-3 text-sm font-semibold text-white transition hover:bg-brand-accent/15"
               >
                 <Phone className="h-4 w-4" strokeWidth={1.5} />
-                Contact on WhatsApp
+                {copy.whatsappCta}
               </a>
             </div>
           </div>
@@ -73,21 +70,24 @@ export function WholesaleBanner() {
           <div className="lg:w-[400px]">
             <div className="rounded-xl border border-brand-accent/10 bg-brand-accent/[0.05] p-6">
               <p className="mb-5 text-center text-xs font-semibold uppercase tracking-widest text-brand-accent lg:text-left">
-                Our Wholesale Network
+                {copy.networkLabel}
               </p>
               <div className="grid grid-cols-2 gap-3">
-                {STATS.map(({ value, label }) => (
+                {copy.stats.map(({ value, suffix, label }) => (
                   <div
                     key={label}
                     className="flex flex-col items-center rounded-xl bg-brand-accent/[0.07] px-4 py-5 ring-1 ring-brand-accent/10 transition-colors duration-300 hover:bg-brand-accent/[0.13] hover:ring-brand-accent/30"
                   >
-                    <span className="font-serif text-2xl font-bold text-brand-gold">{value}</span>
+                    <span className="font-serif text-2xl font-bold text-brand-gold">
+                      {formatNumber(locale, value)}
+                      {suffix}
+                    </span>
                     <span className="mt-1 text-center text-xs leading-snug text-white/55">{label}</span>
                   </div>
                 ))}
               </div>
               <p className="mt-4 text-center text-xs text-white/50">
-                  Built for Resellers, Boutiques &amp; Fashion Entrepreneurs
+                {copy.footnote}
               </p>
             </div>
           </div>

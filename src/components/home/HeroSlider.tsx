@@ -2,14 +2,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Clock, MessageCircle, Plane, ShieldCheck, ShoppingBag, Truck } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import type { ReactNode } from 'react';
 import type { HeroPrimaryAction } from '@/lib/product-availability';
 import { config } from '@/lib/config';
 import { cn } from '@/lib/utils';
-import { PRE_ORDER_WINDOW_DAYS } from '@/lib/delivery';
+import { PRE_ORDER_WINDOW_DAYS, READY_STOCK_WINDOW_DAYS } from '@/lib/delivery';
 import { formatRange } from '@/i18n/format';
-
-const PRE_ORDER_WINDOW = formatRange('en', PRE_ORDER_WINDOW_DAYS.min, PRE_ORDER_WINDOW_DAYS.max);
+import { getDictionary } from '@/i18n/get-dictionary';
+import { getLocale } from '@/i18n/server';
+import { interpolate } from '@/i18n/interpolate';
 
 interface Cta {
   href: string;
@@ -46,58 +46,68 @@ function CtaButton({ cta, primary }: { cta: Cta; primary: boolean }) {
 
 interface HeroMode {
   headline: string;
-  body: ReactNode;
+  body: string;
   primary: Cta;
   secondary: Cta;
 }
 
-const HERO_MODES: Record<HeroPrimaryAction, HeroMode> = {
-  'ready-stock': {
-    headline: 'Stock & Pre-Order Available',
-    body: (
-      <>
-        Shop the latest Pakistani collections in ready stock{' '}
-        <br className="hidden sm:block" />
-        or pre-order your favorite designs directly from Pakistan.
-      </>
-    ),
-    primary: { href: '/products?tag=ready-stock', label: 'Shop Ready Stock', Icon: ShoppingBag },
-    secondary: { href: '/products?tag=pre-order', label: 'Pre-Order Collection', Icon: Clock },
-  },
-  'pre-order': {
-    headline: 'Pre-Order Available',
-    body: (
-      <>
-        Shop the latest Pakistani collections by pre-order, delivered directly from Pakistan in{' '}
-        {PRE_ORDER_WINDOW} days.
-      </>
-    ),
-    primary: { href: '/products?tag=pre-order', label: 'Shop Pre-Order', Icon: Clock },
-    secondary: {
-      href: config.whatsappUrl,
-      label: 'Ask on WhatsApp',
-      Icon: MessageCircle,
-      external: true,
-    },
-  },
-  contact: {
-    headline: 'Contact Us for Availability',
-    body: (
-      <>
-        Our next collection is on its way. Message us for availability and styling help.
-      </>
-    ),
-    primary: {
-      href: config.whatsappUrl,
-      label: 'Contact on WhatsApp',
-      Icon: MessageCircle,
-      external: true,
-    },
-    secondary: { href: '/products', label: 'View All Products', Icon: ArrowRight },
-  },
-};
+export async function HeroSlider({
+  primaryAction = 'ready-stock',
+}: {
+  primaryAction?: HeroPrimaryAction;
+}) {
+  const locale = await getLocale();
+  const copy = getDictionary(locale).home.hero;
+  const preOrderWindow = formatRange(locale, PRE_ORDER_WINDOW_DAYS.min, PRE_ORDER_WINDOW_DAYS.max);
+  const readyStockWindow = formatRange(
+    locale,
+    READY_STOCK_WINDOW_DAYS.min,
+    READY_STOCK_WINDOW_DAYS.max,
+  );
 
-export function HeroSlider({ primaryAction = 'ready-stock' }: { primaryAction?: HeroPrimaryAction }) {
+  const HERO_MODES: Record<HeroPrimaryAction, HeroMode> = {
+    'ready-stock': {
+      headline: copy.modes.readyStock.headline,
+      body: copy.modes.readyStock.body,
+      primary: {
+        href: '/products?tag=ready-stock',
+        label: copy.modes.readyStock.primary,
+        Icon: ShoppingBag,
+      },
+      secondary: {
+        href: '/products?tag=pre-order',
+        label: copy.modes.readyStock.secondary,
+        Icon: Clock,
+      },
+    },
+    'pre-order': {
+      headline: copy.modes.preOrder.headline,
+      body: interpolate(copy.modes.preOrder.body, { window: preOrderWindow }),
+      primary: {
+        href: '/products?tag=pre-order',
+        label: copy.modes.preOrder.primary,
+        Icon: Clock,
+      },
+      secondary: {
+        href: config.whatsappUrl,
+        label: copy.modes.preOrder.secondary,
+        Icon: MessageCircle,
+        external: true,
+      },
+    },
+    contact: {
+      headline: copy.modes.contact.headline,
+      body: copy.modes.contact.body,
+      primary: {
+        href: config.whatsappUrl,
+        label: copy.modes.contact.primary,
+        Icon: MessageCircle,
+        external: true,
+      },
+      secondary: { href: '/products', label: copy.modes.contact.secondary, Icon: ArrowRight },
+    },
+  };
+
   const mode = HERO_MODES[primaryAction];
 
   return (
@@ -123,7 +133,7 @@ export function HeroSlider({ primaryAction = 'ready-stock' }: { primaryAction?: 
         <div className="relative mt-6 h-[260px] overflow-hidden rounded-xl lg:hidden">
           <Image
             src="/images/hero/women-fashion.jpg"
-            alt="Premium Pakistani fashion collection"
+            alt={copy.imageAlt}
             fill
             className="object-cover object-top"
             priority
@@ -136,12 +146,12 @@ export function HeroSlider({ primaryAction = 'ready-stock' }: { primaryAction?: 
 
             {/* Eyebrow */}
             <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand-wine">
-              Premium Pakistani Fashion
+              {copy.eyebrow}
             </p>
 
             {/* Headline */}
             <h1 className="mt-4 font-serif text-[1.6rem] font-bold leading-[1.15] text-brand-text sm:text-[2.2rem] sm:leading-[1.1] lg:text-[3rem] xl:text-[3.2rem]">
-              <span className="block">Premium Pakistani Dresses</span>
+              <span className="block">{copy.headline}</span>
               <span className="block text-[1.4rem] sm:text-[1.8rem] lg:text-[2.2rem] xl:text-[2.4rem]">
                 {mode.headline}
               </span>
@@ -163,22 +173,32 @@ export function HeroSlider({ primaryAction = 'ready-stock' }: { primaryAction?: 
               <div className="flex items-center gap-3 px-5 py-3.5">
                 <Truck className="h-[18px] w-[18px] shrink-0 text-brand-wine/70" strokeWidth={1.5} />
                 <div>
-                  <p className="text-[13px] font-semibold text-brand-text">Fast Delivery</p>
-                  <p className="text-[12px] text-brand-text-muted">2-5 Days (Stock)</p>
+                  <p className="text-[13px] font-semibold text-brand-text">
+                    {copy.trust.fastDelivery.title}
+                  </p>
+                  <p className="text-[12px] text-brand-text-muted">
+                    {interpolate(copy.trust.fastDelivery.detail, { window: readyStockWindow })}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-3 px-5 py-3.5">
                 <Plane className="h-[18px] w-[18px] shrink-0 text-brand-wine/70" strokeWidth={1.5} />
                 <div>
-                  <p className="text-[13px] font-semibold text-brand-text">Pre-Order Delivery</p>
-                  <p className="text-[12px] text-brand-text-muted">{PRE_ORDER_WINDOW} Days</p>
+                  <p className="text-[13px] font-semibold text-brand-text">
+                    {copy.trust.preOrderDelivery.title}
+                  </p>
+                  <p className="text-[12px] text-brand-text-muted">
+                    {interpolate(copy.trust.preOrderDelivery.detail, { window: preOrderWindow })}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-3 px-5 py-3.5">
                 <ShieldCheck className="h-[18px] w-[18px] shrink-0 text-brand-wine/70" strokeWidth={1.5} />
                 <div>
-                  <p className="text-[13px] font-semibold text-brand-text">100% Original</p>
-                  <p className="text-[12px] text-brand-text-muted">Authentic Quality</p>
+                  <p className="text-[13px] font-semibold text-brand-text">
+                    {copy.trust.original.title}
+                  </p>
+                  <p className="text-[12px] text-brand-text-muted">{copy.trust.original.detail}</p>
                 </div>
               </div>
             </div>

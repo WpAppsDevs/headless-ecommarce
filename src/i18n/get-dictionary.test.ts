@@ -37,7 +37,12 @@ describe('dictionary parity', () => {
   });
 
   it('has no empty message', () => {
+    // `suffix` is decoration on a stat, so it is legitimately empty when the
+    // number stands alone (`7 divisions`), unlike a missing sentence.
+    const mayBeEmpty = new Set(['suffix']);
+
     for (const [path, message] of Object.entries({ ...flatten(en), ...flatten(bn) })) {
+      if (mayBeEmpty.has(path.split('.').pop() ?? '')) continue;
       expect(message.trim(), path).not.toBe('');
     }
   });
