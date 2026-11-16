@@ -489,6 +489,7 @@ export const en = {
       settings: 'Setting',
     },
     breadcrumb: 'My Account',
+    description: 'Manage your profile, track orders, and easily update your personal details anytime, all in one convenient place.',
     logout: 'Logout',
     loadFailed: 'Failed to load account. Please try again.',
     notSet: 'Not set',
