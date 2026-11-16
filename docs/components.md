@@ -12,7 +12,7 @@ Component conventions live in [coding-standards.md](coding-standards.md). This f
 | `layout/HeaderMobileNav.tsx` | Client | Mobile nav links inside the sheet, with the same active behaviour. |
 | `layout/HeaderMobileNavFallback.tsx` | Client | Mobile nav rendered during Suspense without an active item. |
 | `layout/HeaderNavItem.tsx` | Client | One nav link with desktop or mobile styling. |
-| `layout/Footer.tsx` | Server | Brand block, Bengali support links, English newsletter form, payment badges. |
+| `layout/Footer.tsx` | Server | Brand block, bilingual support links, newsletter form, payment badges. |
 | `layout/FooterNewsletterForm.tsx` | Client | Posts to `/api/newsletter`. |
 | `layout/AuthHydrator.tsx` | Client | Calls `authStore.hydrate()` once. |
 | `layout/CartHydrator.tsx` | Client | Fetches the cart once, after auth hydration, only if there is something to restore. |
@@ -22,7 +22,7 @@ Component conventions live in [coding-standards.md](coding-standards.md). This f
 
 `Header` takes `navLinks?: NavLink[]`. Empty or missing links fall back to `STATIC_NAV_LINKS`, which includes `/contact`; that static support page exists. The active item is resolved on the client by `isNavLinkActive()`, which compares both pathname and query string, so exactly one collection link is active after hydration and a product detail page activates none of them. The links render immediately; the Suspense fallback shows them without an active state.
 
-The footer support block is Bengali, including its heading, and is marked `lang="bn"`. Commerce, contact, and newsletter content stay English. Social destinations come from `config` so the footer and announcement bar cannot drift apart.
+The footer support block, the header, and the announcement bar read their copy from the locale in `src/i18n/`. The locale comes from the `locale` cookie, resolves to English when unset, and reaches server components through `getLocale()` and client components through `useLocale()` / `useDictionary()`. `LanguageSwitcher` writes the cookie and calls `router.refresh()`; it appears in the desktop header, inside the mobile sheet, and in the footer's help column. Nav labels are resolved by `href` so a WordPress label survives when no translation exists. Social destinations come from `config` so the footer and announcement bar cannot drift apart.
 
 The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local component with autofocus and Escape-to-close.
 

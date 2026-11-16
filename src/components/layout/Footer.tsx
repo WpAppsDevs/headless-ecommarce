@@ -4,15 +4,17 @@ import { config } from '@/lib/config';
 import { Mail, Phone, Truck, RefreshCcw, MapPin, FileText, Scale } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { FooterNewsletterForm } from './FooterNewsletterForm';
+import { getDictionary, type Dictionary } from '@/i18n/get-dictionary';
+import { getLocale } from '@/i18n/server';
+import { interpolate } from '@/i18n/interpolate';
+import { LanguageSwitcher } from '@/i18n/LanguageSwitcher';
 
-const HELP_LINKS: { href: string; label: string; Icon: LucideIcon }[] = [
-  // { href: '/faq',         label: 'FAQ',                  Icon: HelpCircle  },
-  { href: '/shipping',    label: 'শিপিং ও ডেলিভারি',        Icon: Truck       },
-  { href: '/returns',     label: 'রিটার্ন ও এক্সচেঞ্জ',       Icon: RefreshCcw  },
-  // { href: '/contact',     label: 'Contact Us',           Icon: PhoneIcon   },
-  { href: '/track-order', label: 'ট্র্যাক অর্ডার',          Icon: MapPin      },
-  { href: '/privacy-policy', label: 'প্রাইভেসি পলিসি',       Icon: FileText    },
-  { href: '/terms',       label: 'টার্মস অফ সার্ভিস',       Icon: Scale       },
+const HELP_LINKS: { href: string; key: keyof Dictionary['footer']['help']; Icon: LucideIcon }[] = [
+  { href: '/shipping',       key: 'shipping',      Icon: Truck       },
+  { href: '/returns',        key: 'returns',       Icon: RefreshCcw  },
+  { href: '/track-order',    key: 'trackOrder',    Icon: MapPin      },
+  { href: '/privacy-policy', key: 'privacyPolicy', Icon: FileText    },
+  { href: '/terms',          key: 'terms',         Icon: Scale       },
 ];
 
 // LEGAL_LINKS commented out — Privacy Policy and Terms of Service moved to HELP_LINKS
@@ -89,8 +91,9 @@ function CodBadge() {
   );
 }
 
-export function Footer() {
+export async function Footer() {
   const year = new Date().getFullYear();
+  const dictionary = getDictionary(await getLocale());
 
   return (
     <footer>
@@ -113,8 +116,7 @@ export function Footer() {
               </Link>
 
               <p className="max-w-xs text-sm leading-relaxed text-brand-text-muted">
-                Authentic Pakistani dresses for women across Bangladesh. Ready stock,
-                pre-order, and wholesale catalog — all from trusted Pakistani manufacturers.
+                {dictionary.footer.brandParagraph}
               </p>
 
               <div className="flex gap-3">
@@ -155,12 +157,12 @@ export function Footer() {
             </div>
 
             {/* Column 2 — Help */}
-            <div lang="bn" className="lg:border-l lg:border-brand-border lg:pl-12">
-              <SectionHeading>সহায়তা</SectionHeading>
+            <div className="lg:border-l lg:border-brand-border lg:pl-12">
+              <SectionHeading>{dictionary.footer.helpHeading}</SectionHeading>
               <ul>
-                {HELP_LINKS.map(({ href, label, Icon }, idx) => (
+                {HELP_LINKS.map(({ href, key, Icon }, idx) => (
                   <li
-                    key={label}
+                    key={href}
                     className={idx < HELP_LINKS.length - 1 ? 'border-b border-brand-border' : ''}
                   >
                     <Link
@@ -168,18 +170,19 @@ export function Footer() {
                       className="flex items-center gap-3.5 py-3.5 text-sm font-medium text-brand-text transition-colors hover:text-brand-accent-strong"
                     >
                       <Icon className="h-5 w-5 shrink-0 text-brand-accent-strong" />
-                      {label}
+                      {dictionary.footer.help[key]}
                     </Link>
                   </li>
                 ))}
               </ul>
+              <LanguageSwitcher className="mt-5" />
             </div>
 
             {/* Column 3 — Newsletter */}
             <div className="lg:border-l lg:border-brand-border lg:pl-12">
-              <SectionHeading>Subscribe to Newsletter</SectionHeading>
+              <SectionHeading>{dictionary.footer.newsletterHeading}</SectionHeading>
               <p className="mb-7 text-sm leading-relaxed text-brand-text-muted">
-                Get updates on new collections and exclusive offers.
+                {dictionary.footer.newsletterCopy}
               </p>
               <FooterNewsletterForm />
               <div className="mt-5 flex flex-wrap items-center gap-2">
@@ -198,7 +201,7 @@ export function Footer() {
       <div className="bg-brand-card">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-5 sm:flex-row lg:px-8">
           <p className="text-xs text-brand-text-muted">
-            © {year} {config.siteName}. All rights reserved.
+            {interpolate(dictionary.footer.copyright, { year, site: config.siteName })}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5">
             {/* LEGAL_LINKS commented out - moved to HELP_LINKS section */}
