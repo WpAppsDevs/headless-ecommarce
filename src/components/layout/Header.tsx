@@ -21,6 +21,11 @@ import { HeaderMobileNav } from '@/components/layout/HeaderMobileNav';
 import { HeaderMobileNavFallback } from '@/components/layout/HeaderMobileNavFallback';
 
 import type { NavLink } from '@/lib/api/menus';
+import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
+import { LanguageSwitcher } from '@/i18n/LanguageSwitcher';
+import { localizeNavLinks } from '@/i18n/nav-labels';
+import { interpolate } from '@/i18n/interpolate';
+import { formatNumber } from '@/i18n/format';
 
 const HEADER_ICON_CLASS =
   'relative flex h-9 w-9 items-center justify-center rounded-lg text-brand-text-muted transition-colors hover:bg-brand-accent-light hover:text-brand-text focus-brand after:absolute after:-inset-1 after:content-[""] xl:after:hidden';
@@ -53,6 +58,7 @@ function SiteLogo() {
 // ── Search overlay ───────────────────────────────────────────────────────────
 function SearchOverlay({ onClose }: { onClose: () => void }) {
   const router = useRouter();
+  const dictionary = useDictionary();
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -76,11 +82,11 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
         <input
           ref={inputRef}
           type="search"
-          placeholder="Search for products, categories…"
+          placeholder={dictionary.header.searchPlaceholder}
           className="flex-1 bg-transparent text-base text-zinc-900 placeholder:text-zinc-400 outline-none"
-          aria-label="Search"
+          aria-label={dictionary.header.search}
         />
-        <button type="button" onClick={onClose} aria-label="Close search" className="p-1 text-zinc-500 hover:text-zinc-900">
+        <button type="button" onClick={onClose} aria-label={dictionary.header.closeSearch} className="p-1 text-zinc-500 hover:text-zinc-900">
           <X className="h-5 w-5" />
         </button>
       </form>
@@ -91,21 +97,22 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
 // ── Auth dropdown content ────────────────────────────────────────────────────
 function UserMenu({ onClose }: { onClose?: () => void }) {
   const { isAuthenticated, logout } = useAuthStore();
+  const dictionary = useDictionary();
 
   if (isAuthenticated) {
     return (
       <div className="flex flex-col gap-2">
         <Link href="/account" onClick={onClose}
           className="text-sm font-medium text-zinc-700 hover:text-zinc-900 transition-colors">
-          My Account
+          {dictionary.header.myAccount}
         </Link>
         <Link href="/account" onClick={onClose}
           className="text-sm text-zinc-500 hover:text-zinc-700 transition-colors">
-          Orders
+          {dictionary.header.orders}
         </Link>
         <button onClick={async () => { await logout(); onClose?.(); }}
           className="text-left text-sm font-medium text-rose-500 hover:text-rose-600 transition-colors">
-          Sign Out
+          {dictionary.header.signOut}
         </button>
       </div>
     );
@@ -115,11 +122,11 @@ function UserMenu({ onClose }: { onClose?: () => void }) {
     <div className="flex flex-col gap-2">
       <Link href="/login" onClick={onClose}
         className="text-sm font-medium text-zinc-900 hover:text-zinc-600 transition-colors">
-        Sign In
+        {dictionary.header.signIn}
       </Link>
       <Link href="/register" onClick={onClose}
         className="text-sm text-zinc-500 hover:text-zinc-700 transition-colors">
-        Create Account
+        {dictionary.header.createAccount}
       </Link>
     </div>
   );
@@ -127,7 +134,9 @@ function UserMenu({ onClose }: { onClose?: () => void }) {
 
 // ── Main Header ──────────────────────────────────────────────────────────────
 export function Header({ navLinks }: { navLinks?: NavLink[] }) {
-  const links = navLinks && navLinks.length > 0 ? navLinks : STATIC_NAV_LINKS;
+  const dictionary = useDictionary();
+  const locale = useLocale();
+  const links = localizeNavLinks(navLinks && navLinks.length > 0 ? navLinks : STATIC_NAV_LINKS, dictionary);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -135,6 +144,10 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
   const itemCount = useCartStore((s) => s.items.length);
   const setCartDrawerOpen = useCartStore((s) => s.setCartDrawerOpen);
   const wishlistCount = useWishlistStore((s) => s.count);
+  const wishlistAria = interpolate(dictionary.header.wishlistCount, { count: formatNumber(locale, wishlistCount) });
+  const cartAria = interpolate(dictionary.header.cartCount, { count: formatNumber(locale, itemCount) });
+  /** Badge text, with the digits of the reading language and a capped `99+`. */
+  const badge = (count: number) => (count > 99 ? `${formatNumber(locale, 99)}+` : formatNumber(locale, count));
 
   // Close account dropdown on outside click
   useEffect(() => {
@@ -167,7 +180,7 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
           {/* Search */}
           <button
             onClick={() => setSearchOpen(true)}
-            aria-label="Open search"
+            aria-label={dictionary.header.openSearch}
             className={HEADER_ICON_CLASS}
           >
             <Search className="h-[19px] w-[19px]" strokeWidth={1.8} />
@@ -176,7 +189,7 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
           {/* Account */}
           <div className="relative" ref={accountRef}>
             <button
-              aria-label="Account"
+              aria-label={dictionary.header.account}
               aria-expanded={accountOpen}
               onClick={() => setAccountOpen((v) => !v)}
               className={HEADER_ICON_CLASS}
@@ -193,13 +206,13 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
           {/* Wishlist */}
           <Link
             href="/account?tab=wishlist"
-            aria-label={`Wishlist — ${wishlistCount} items`}
+            aria-label={wishlistAria}
             className={HEADER_ICON_CLASS}
           >
             <Heart className="h-[19px] w-[19px]" strokeWidth={1.8} />
             {wishlistCount > 0 && (
               <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
-                {wishlistCount > 99 ? '99+' : wishlistCount}
+                {badge(wishlistCount)}
               </span>
             )}
           </Link>
@@ -207,23 +220,25 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
           {/* Cart */}
           <button
             onClick={() => setCartDrawerOpen(true)}
-            aria-label={`Cart — ${itemCount} items`}
+            aria-label={cartAria}
             className={`${HEADER_ICON_CLASS} ml-0.5`}
           >
             <ShoppingCart className="h-[19px] w-[19px]" strokeWidth={1.8} />
             {itemCount > 0 && (
               <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
-                {itemCount > 99 ? '99+' : itemCount}
+                {badge(itemCount)}
               </span>
             )}
           </button>
+
+          <LanguageSwitcher className="ml-1" />
         </div>
 
         {/* ── Mobile: search + cart + hamburger ── */}
         <div className="flex items-center gap-2 xl:hidden">
           <button
             onClick={() => setSearchOpen(true)}
-            aria-label="Open search"
+            aria-label={dictionary.header.openSearch}
             className={HEADER_ICON_CLASS}
           >
             <Search className="h-5 w-5" strokeWidth={1.8} />
@@ -231,33 +246,33 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
 
           <Link
             href="/account?tab=wishlist"
-            aria-label={`Wishlist — ${wishlistCount} items`}
+            aria-label={wishlistAria}
             className={HEADER_ICON_CLASS}
           >
             <Heart className="h-5 w-5" strokeWidth={1.8} />
             {wishlistCount > 0 && (
               <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
-                {wishlistCount > 99 ? '99+' : wishlistCount}
+                {badge(wishlistCount)}
               </span>
             )}
           </Link>
 
           <button
             onClick={() => setCartDrawerOpen(true)}
-            aria-label={`Cart — ${itemCount} items`}
+            aria-label={cartAria}
             className={HEADER_ICON_CLASS}
           >
             <ShoppingCart className="h-5 w-5" strokeWidth={1.8} />
             {itemCount > 0 && (
               <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
-                {itemCount > 99 ? '99+' : itemCount}
+                {badge(itemCount)}
               </span>
             )}
           </button>
 
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger
-              aria-label="Open menu"
+              aria-label={dictionary.header.openMenu}
               className={HEADER_ICON_CLASS}
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -276,7 +291,7 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-6 px-6 py-6">
-                <nav className="flex flex-col gap-4" aria-label="Mobile navigation">
+                <nav className="flex flex-col gap-4" aria-label={dictionary.header.mobileNav}>
                   <Suspense
                     fallback={
                       <HeaderMobileNavFallback links={links} onClick={() => setMobileOpen(false)} />
@@ -286,15 +301,17 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
                   </Suspense>
                 </nav>
                 <hr className="border-zinc-100" />
+                <LanguageSwitcher className="w-full" />
+                <hr className="border-zinc-100" />
                 <div>
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-400">My Lists</p>
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-400">{dictionary.header.myLists}</p>
                   <Link
                     href="/account?tab=wishlist"
                     onClick={() => setMobileOpen(false)}
                     className="flex items-center gap-2 text-sm font-medium text-zinc-700 hover:text-zinc-900 transition-colors"
                   >
                     <Heart className="h-4 w-4 text-brand-wine" />
-                    Wishlist
+                    {dictionary.header.wishlist}
                     {wishlistCount > 0 && (
                       <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-wine px-1 text-[10px] font-bold text-white">
                         {wishlistCount}
@@ -304,7 +321,7 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
                 </div>
                 <hr className="border-zinc-100" />
                 <div>
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-400">Account</p>
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-400">{dictionary.header.account}</p>
                   <UserMenu onClose={() => setMobileOpen(false)} />
                 </div>
               </div>

@@ -10,18 +10,20 @@ export interface BreadcrumbItem {
 interface PageHeaderProps {
   title: string;
   breadcrumbs: BreadcrumbItem[];
+  /** Landmark label for the trail; pass the translated word on a translated page. */
+  breadcrumbLabel?: string;
 }
 
 /**
  * Full-width gradient page header with centred title and breadcrumb trail.
  * Matches the design used on the Cart page — reuse across all interior pages.
  */
-export function PageHeader({ title, breadcrumbs }: PageHeaderProps) {
+export function PageHeader({ title, breadcrumbs, breadcrumbLabel = 'Breadcrumb' }: PageHeaderProps) {
   return (
     <div className="bg-gradient-to-r from-brand-accent-light via-brand-section to-brand-accent-light py-14 text-center">
       <h1 className="text-4xl font-bold tracking-tight text-zinc-900">{title}</h1>
 
-      <nav aria-label="Breadcrumb" className="mt-3">
+      <nav aria-label={breadcrumbLabel} className="mt-3">
         <ol className="flex flex-wrap items-center justify-center gap-2 text-sm text-zinc-500">
           {breadcrumbs.map((item, i) => (
             <Fragment key={i}>

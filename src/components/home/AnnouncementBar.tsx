@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { config } from '@/lib/config';
+import { getDictionary } from '@/i18n/get-dictionary';
+import { getLocale } from '@/i18n/server';
 
 function FacebookIcon() {
   return (
@@ -17,7 +19,9 @@ function InstagramIcon() {
   );
 }
 
-export function AnnouncementBar() {
+export async function AnnouncementBar() {
+  const announcements = getDictionary(await getLocale()).announcement;
+
   return (
     <div className="bg-brand-topbar text-brand-text">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
@@ -26,12 +30,12 @@ export function AnnouncementBar() {
 
         {/* Center: 3 items with pipe separators */}
         <div className="flex flex-1 items-center justify-center gap-2 text-[12px] font-medium sm:gap-4 lg:gap-6">
-          <span className="hidden sm:inline">Pre-Order from Pakistan 🇵🇰</span>
-          <span className="inline text-[11px] sm:hidden">Pre-Order 🇵🇰| 15-25 Days | Original</span>
+          <span className="hidden sm:inline">{announcements.preOrder}</span>
+          <span className="inline text-[11px] sm:hidden">{announcements.preOrderMobile}</span>
           <span className="hidden text-brand-text sm:inline">|</span>
-          <span className="hidden sm:inline">Delivery in 15-25 Days</span>
+          <span className="hidden sm:inline">{announcements.delivery}</span>
           <span className="hidden text-brand-text sm:inline">|</span>
-          <span className="hidden sm:inline">Authentic Pakistani Collections</span>
+          <span className="hidden sm:inline">{announcements.authentic}</span>
         </div>
 
         {/* Right: Social icons */}

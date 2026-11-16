@@ -10,8 +10,11 @@ import { ApiError } from '@/lib/errors';
 import type { TrackingResult } from '@/lib/api/tracking';
 import { isCheckoutDraftStatus } from '@/lib/order-utils';
 import { useAuthStore } from '@/stores/authStore';
+import { useDictionary } from '@/i18n/LocaleProvider';
 
 export default function TrackOrderPage() {
+  const dictionary = useDictionary();
+  const copy = dictionary.trackOrder;
   const { isAuthenticated, hydrated } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,14 +33,14 @@ export default function TrackOrderPage() {
         setResult(data);
       } else if (!isAuthenticated) {
         if (!email) {
-          setError('Email is required for guest tracking.');
+          setError(copy.errorEmailRequired);
           setLoading(false);
           return;
         }
         const data = await searchTracking({ email, order_id: orderId });
         setResult(data);
       } else {
-        setError('Please enter an order number.');
+        setError(copy.errorOrderNumberRequired);
         setLoading(false);
         return;
       }
@@ -45,7 +48,7 @@ export default function TrackOrderPage() {
       if (err instanceof ApiError) {
         setError(err.message);
       } else {
-        setError('Something went wrong. Please try again.');
+        setError(copy.errorGeneric);
       }
     } finally {
       setLoading(false);
@@ -60,10 +63,11 @@ export default function TrackOrderPage() {
   return (
     <>
       <PageHeader
-        title="ট্র্যাক অর্ডার"
+        title={dictionary.pages.trackOrder.title}
+        breadcrumbLabel={dictionary.common.breadcrumb}
         breadcrumbs={[
-          { label: 'হোম', href: '/' },
-          { label: 'ট্র্যাক অর্ডার' },
+          { label: dictionary.common.home, href: '/' },
+          { label: dictionary.pages.trackOrder.title },
         ]}
       />
 
@@ -77,7 +81,7 @@ export default function TrackOrderPage() {
         {loading && (
           <div className="flex flex-col items-center justify-center py-16 space-y-4">
             <Loader2 className="h-8 w-8 animate-spin text-brand-accent-strong" />
-            <p className="text-sm text-brand-text-muted">Searching for your order...</p>
+            <p className="text-sm text-brand-text-muted">{copy.searching}</p>
           </div>
         )}
 
@@ -86,7 +90,7 @@ export default function TrackOrderPage() {
           <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center space-y-3">
             <AlertCircle className="h-8 w-8 text-red-500 mx-auto" />
             <div>
-              <p className="text-sm font-semibold text-red-900">Unable to find order</p>
+              <p className="text-sm font-semibold text-red-900">{copy.errorTitle}</p>
               <p className="text-sm text-red-700 mt-1">{error}</p>
             </div>
           </div>
@@ -100,19 +104,19 @@ export default function TrackOrderPage() {
               {hydrated && isAuthenticated ? (
                 <>
                   <p className="text-sm font-medium text-brand-text-muted">
-                    Enter your order number to track your order
+                    {copy.emptyAuthTitle}
                   </p>
                   <p className="text-xs text-brand-text-muted/60 mt-1">
-                    We will look up your order using your authenticated account
+                    {copy.emptyAuthSub}
                   </p>
                 </>
               ) : (
                 <>
                   <p className="text-sm font-medium text-brand-text-muted">
-                    Enter your email address to track your order
+                    {copy.emptyGuestTitle}
                   </p>
                   <p className="text-xs text-brand-text-muted/60 mt-1">
-                    You can optionally provide an order number for faster lookup
+                    {copy.emptyGuestSub}
                   </p>
                 </>
               )}
@@ -136,7 +140,7 @@ export default function TrackOrderPage() {
                 onClick={() => setShowAll(true)}
                 className="w-full rounded-xl border border-brand-border bg-brand-section px-4 py-3 text-sm font-medium text-brand-accent-strong transition hover:bg-brand-accent/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent-strong"
               >
-                Show more orders
+                {copy.showMore}
               </button>
             )}
           </div>
@@ -148,9 +152,7 @@ export default function TrackOrderPage() {
             <PackageX className="h-12 w-12 text-zinc-300 mx-auto" />
             <div>
               <p className="text-sm font-medium text-zinc-500">
-                {hydrated && isAuthenticated
-                  ? 'No orders found with this order number'
-                  : 'No orders found for this email address'}
+                {hydrated && isAuthenticated ? copy.noOrdersAuth : copy.noOrdersGuest}
               </p>
             </div>
           </div>
