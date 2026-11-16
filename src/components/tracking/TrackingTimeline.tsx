@@ -1,4 +1,5 @@
 import { TrackingStatus } from './TrackingStatus';
+import { useDictionary } from '@/i18n/LocaleProvider';
 import type { TrackingEvent } from '@/lib/api/tracking';
 
 interface TrackingTimelineProps {
@@ -9,6 +10,7 @@ interface TrackingTimelineProps {
 }
 
 export function TrackingTimeline({ events, currentStatus, embedded = false }: TrackingTimelineProps) {
+  const copy = useDictionary().tracking;
   if (events.length === 0) return null;
 
   const completedStatuses = events.map(e => e.status.toLowerCase());
@@ -19,7 +21,7 @@ export function TrackingTimeline({ events, currentStatus, embedded = false }: Tr
         <svg className="h-5 w-5 text-brand-accent-strong" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
         </svg>
-        <h3 className="text-lg font-semibold text-brand-text">Order Timeline</h3>
+        <h3 className="text-lg font-semibold text-brand-text">{copy.timeline}</h3>
       </div>
 
       <div className="relative">

@@ -11,8 +11,11 @@ import { useCartStore } from '@/stores/cartStore';
 import { useAuthStore } from '@/stores/authStore';
 import { getOrders } from '@/lib/api/orders';
 import type { OrderResult } from '@/lib/api/checkout';
+import { useDictionary } from '@/i18n/LocaleProvider';
+import { interpolate } from '@/i18n/interpolate';
 
 export default function OrderConfirmationPage() {
+  const copy = useDictionary().orderConfirmation;
   const { id } = useParams<{ id: string }>();
   const clearCart = useCartStore((s) => s.clearCart);
   const hydrated = useAuthStore((s) => s.hydrated);
@@ -91,10 +94,10 @@ export default function OrderConfirmationPage() {
       {/* Heading */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">
-          Order #{id} confirmed!
+          {interpolate(copy.titleConfirmed, { id })}
         </h1>
         <p className="text-muted-foreground">
-          Thank you for your purchase. A confirmation email has been sent to you.
+          {copy.thankYou}
         </p>
       </div>
 
@@ -105,7 +108,7 @@ export default function OrderConfirmationPage() {
             variant={isCompleted ? 'default' : 'secondary'}
             className="text-sm px-3 py-1"
           >
-            {isCompleted ? 'Payment Completed' : 'Pending Payment'}
+            {isCompleted ? copy.paymentCompleted : copy.pendingPayment}
           </Badge>
         </div>
       )}
@@ -113,7 +116,7 @@ export default function OrderConfirmationPage() {
       {/* Transaction ID (Stripe) */}
       {order?.transaction_id && (
         <div className="rounded-md border bg-muted/40 px-4 py-3 text-sm text-left space-y-1">
-          <p className="text-muted-foreground">Payment reference</p>
+          <p className="text-muted-foreground">{copy.paymentReference}</p>
           <p className="font-mono text-xs break-all">{order.transaction_id}</p>
         </div>
       )}
@@ -122,15 +125,15 @@ export default function OrderConfirmationPage() {
       {isBacs && (
         <div className="rounded-md border bg-amber-50 border-amber-200 px-5 py-4 text-sm text-left space-y-2">
           <p className="font-semibold text-amber-900">
-            Bank Transfer Instructions
+            {copy.bankTitle}
           </p>
           <p className="text-amber-800 leading-relaxed">
-            Your order is reserved and awaiting payment. Please use{' '}
-            <strong>Order #{id}</strong> as the payment reference when making your
-            bank transfer. Full banking details have been sent to your email address.
+            {copy.bankBodyBefore}{' '}
+            <strong>{interpolate(copy.orderRef, { id })}</strong>{' '}
+            {copy.bankBodyAfter}
           </p>
           <p className="text-amber-700 text-xs">
-            Your order will be processed once the transfer is received.
+            {copy.bankFooter}
           </p>
         </div>
       )}
@@ -138,11 +141,11 @@ export default function OrderConfirmationPage() {
       {/* Direct visit with no recoverable order */}
       {lookedUp && !order && (
         <div className="rounded-md border border-zinc-200 bg-zinc-50 px-5 py-4 text-sm text-zinc-600">
-          We could not load the payment details for this order in this tab.{' '}
+          {copy.loadFailed}{' '}
           <Link href="/account?tab=orders" className="font-medium underline underline-offset-2">
-            View your orders
+            {copy.viewOrders}
           </Link>{' '}
-          or contact support with this order number.
+          {copy.contactSuffix}
         </div>
       )}
 
@@ -153,14 +156,14 @@ export default function OrderConfirmationPage() {
           className={cn(buttonVariants({ variant: 'default' }))}
         >
           <LayoutList className="mr-2 h-4 w-4" />
-          View My Orders
+          {copy.viewMyOrders}
         </Link>
         <Link
           href="/products"
           className={cn(buttonVariants({ variant: 'outline' }))}
         >
           <ShoppingBag className="mr-2 h-4 w-4" />
-          Continue Shopping
+          {copy.continueShopping}
         </Link>
       </div>
     </div>
