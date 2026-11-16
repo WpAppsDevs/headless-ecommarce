@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useDictionary } from '@/i18n/LocaleProvider';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ReviewCard } from './ReviewCard';
 import { ReviewListSkeleton } from './ReviewListSkeleton';
@@ -20,7 +21,10 @@ export function ReviewList({ productId }: ReviewListProps) {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<ReviewSortOption>('created_at');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const copy = useDictionary().reviews;
+  // A flag, not the sentence: the message must follow a locale switch without
+  // re-running the request, and a ref write during render is not allowed.
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -31,10 +35,10 @@ export function ReviewList({ productId }: ReviewListProps) {
         if (cancelled) return;
         setReviews(result.reviews);
         setMeta(result.meta);
-        setError(null);
+        setFailed(false);
       } catch {
         if (!cancelled) {
-          setError('Could not load reviews. Please refresh the page.');
+          setFailed(true);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -57,8 +61,8 @@ export function ReviewList({ productId }: ReviewListProps) {
     setPage(nextPage);
   };
 
-  if (error) {
-    return <p className="text-sm text-red-500">{error}</p>;
+  if (failed) {
+    return <p className="text-sm text-red-500">{copy.loadError}</p>;
   }
 
   return (

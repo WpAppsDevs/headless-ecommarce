@@ -4,13 +4,15 @@ import { useState } from 'react';
 import { Star, BadgeCheck } from 'lucide-react';
 import Image from 'next/image';
 import type { Review } from '@/lib/api/reviews';
+import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
+import { intlLocale } from '@/i18n/locales';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function fmtDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', {
+function fmtDate(dateStr: string, locale: string): string {
+  return new Date(dateStr).toLocaleDateString(locale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -26,6 +28,8 @@ interface ReviewCardProps {
 }
 
 export function ReviewCard({ review }: ReviewCardProps) {
+  const copy = useDictionary().reviews;
+  const locale = intlLocale(useLocale());
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
   return (
@@ -40,7 +44,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
         <div className="flex-1 space-y-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm font-semibold text-zinc-900">
-              {review.author.name ?? 'Anonymous'}
+              {review.author.name ?? copy.anonymous}
             </span>
             {review.author.is_verified && (
               <span className="flex items-center gap-1 rounded-full bg-brand-stock/10 px-2 py-0.5 text-[10px] font-semibold text-brand-stock">
@@ -48,7 +52,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
                 Verified Purchase
               </span>
             )}
-            <span className="ml-auto text-xs text-zinc-400">{fmtDate(review.date)}</span>
+            <span className="ml-auto text-xs text-zinc-400">{fmtDate(review.date, locale)}</span>
           </div>
 
           {/* Stars */}

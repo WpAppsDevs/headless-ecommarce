@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { X, ChevronLeft } from 'lucide-react';
 import { ReviewForm } from '@/components/reviews/ReviewForm';
 import type { Review } from '@/lib/api/reviews';
+import { useDictionary } from '@/i18n/LocaleProvider';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -29,6 +30,7 @@ interface ReviewModalProps {
 // ---------------------------------------------------------------------------
 
 export function ReviewModal({ isOpen, onClose, orderId, items, onSuccess }: ReviewModalProps) {
+  const copy = useDictionary().reviews;
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
 
@@ -91,7 +93,7 @@ export function ReviewModal({ isOpen, onClose, orderId, items, onSuccess }: Revi
               </button>
             )}
             <div>
-              <h2 className="text-base font-semibold text-zinc-900">Write a Review</h2>
+              <h2 className="text-base font-semibold text-zinc-900">{copy.writeReview}</h2>
               {orderId && (
                 <p className="text-xs text-zinc-400">Order #{orderId}</p>
               )}
@@ -111,7 +113,7 @@ export function ReviewModal({ isOpen, onClose, orderId, items, onSuccess }: Revi
           {/* Product selector — shown when multiple items */}
           {!selectedItem && items.length > 1 && (
             <div className="space-y-3">
-              <p className="text-sm text-zinc-600">Which product would you like to review?</p>
+              <p className="text-sm text-zinc-600">{copy.chooseProduct}</p>
               <ul className="divide-y divide-zinc-100 rounded-xl border border-zinc-200">
                 {items.map((item) => (
                   <li key={item.product_id}>

@@ -8,6 +8,7 @@ import { ReviewModal } from '@/components/review-modal/ReviewModal';
 import { useAuthStore } from '@/stores/authStore';
 import { useReviewStore } from '@/stores/reviewStore';
 import type { RatingAggregate } from '@/lib/api/reviews';
+import { useDictionary } from '@/i18n/LocaleProvider';
 import { useRouter } from 'next/navigation';
 
 interface ProductReviewsSectionProps {
@@ -23,6 +24,7 @@ export function ProductReviewsSection({
   initialAggregate,
 }: ProductReviewsSectionProps) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const copy = useDictionary().reviews;
   const isReviewed = useReviewStore((s) => s.isReviewed);
   const router = useRouter();
 
@@ -49,7 +51,7 @@ export function ProductReviewsSection({
           <RatingSummary aggregate={aggregate} />
         </div>
       ) : (
-        <p className="text-sm text-zinc-400">No reviews yet.</p>
+        <p className="text-sm text-zinc-400">{copy.noReviews}</p>
       )}
 
       {/* Write review CTA */}
@@ -57,7 +59,7 @@ export function ProductReviewsSection({
         {isAuthenticated ? (
           alreadyReviewed ? (
             <p className="inline-flex items-center gap-2 rounded-lg bg-brand-stock/10 px-4 py-2.5 text-sm font-medium text-brand-stock">
-              ✓ You have reviewed this product
+              ✓ {copy.reviewedBadge}
             </p>
           ) : (
             <button
@@ -65,7 +67,7 @@ export function ProductReviewsSection({
               className="flex items-center gap-2 rounded-lg bg-brand-wine px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
             >
               <PenLine className="h-4 w-4" strokeWidth={2} />
-              Write a Review
+              {copy.writeReview}
             </button>
           )
         ) : (
@@ -74,7 +76,7 @@ export function ProductReviewsSection({
             className="flex items-center gap-2 rounded-lg border border-zinc-200 px-5 py-2.5 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50"
           >
             <LogIn className="h-4 w-4" strokeWidth={1.5} />
-            Log in to write a review
+            {copy.loginToReview}
           </button>
         )}
       </div>

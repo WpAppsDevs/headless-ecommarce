@@ -34,6 +34,7 @@ const CASES = [
   { route: '/products', cookie: 'locale=bn', lang: 'bn', body: 'সব পণ্য' },
   { discoverFrom: '/products', cookie: '', lang: 'en', body: 'Product Details' },
   { discoverFrom: '/products', cookie: 'locale=bn', lang: 'bn', body: 'পণ্যের বিবরণ' },
+  { discoverFrom: '/products', cookie: 'locale=bn', lang: 'bn', body: 'রিভিউ লিখতে সাইন ইন করুন' },
   { route: '/login', cookie: '', lang: 'en', title: 'Sign In' },
   { route: '/login', cookie: 'locale=bn', lang: 'bn', title: 'সাইন ইন' },
   { route: '/register', cookie: 'locale=bn', lang: 'bn', title: 'অ্যাকাউন্ট খোলা' },

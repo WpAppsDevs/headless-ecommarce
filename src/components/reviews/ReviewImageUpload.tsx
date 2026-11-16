@@ -3,6 +3,8 @@
 import { useCallback, useRef } from 'react';
 import { ImagePlus, X, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
+import { useDictionary } from '@/i18n/LocaleProvider';
+import { interpolate } from '@/i18n/interpolate';
 
 const ACCEPTED = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 const MAX_FILES = 5;
@@ -15,13 +17,17 @@ interface ReviewImageUploadProps {
   disabled?: boolean;
 }
 
-function validateFile(file: File): string | null {
-  if (!ACCEPTED.includes(file.type)) return 'Only JPEG, PNG, GIF, or WebP images are allowed.';
-  if (file.size > MAX_SIZE_BYTES) return `File must be under ${MAX_SIZE_MB} MB.`;
+function validateFile(
+  file: File,
+  copy: { typeError: string; sizeError: string },
+): string | null {
+  if (!ACCEPTED.includes(file.type)) return copy.typeError;
+  if (file.size > MAX_SIZE_BYTES) return interpolate(copy.sizeError, { size: MAX_SIZE_MB });
   return null;
 }
 
 export function ReviewImageUpload({ files, onChange, disabled = false }: ReviewImageUploadProps) {
+  const copy = useDictionary().reviewUpload;
   const inputRef = useRef<HTMLInputElement>(null);
 
   const addFiles = useCallback(
@@ -31,7 +37,7 @@ export function ReviewImageUpload({ files, onChange, disabled = false }: ReviewI
       const valid: File[] = [];
 
       for (const file of Array.from(incoming)) {
-        const err = validateFile(file);
+        const err = validateFile(file, copy);
         if (err) errors.push(`${file.name}: ${err}`);
         else valid.push(file);
       }
@@ -41,7 +47,7 @@ export function ReviewImageUpload({ files, onChange, disabled = false }: ReviewI
 
       if (errors.length > 0) alert(errors.join('\n'));
     },
-    [files, onChange],
+    [files, onChange, copy],
   );
 
   const removeFile = (index: number) => {
@@ -65,10 +71,11 @@ export function ReviewImageUpload({ files, onChange, disabled = false }: ReviewI
         >
           <ImagePlus className="h-7 w-7 text-zinc-400" strokeWidth={1.5} />
           <p className="text-sm text-zinc-500">
-            Drop images here or <span className="font-medium text-zinc-700">click to upload</span>
+            {copy.dropPrefix}{' '}
+            <span className="font-medium text-zinc-700">{copy.clickToUpload}</span>
           </p>
           <p className="text-xs text-zinc-400">
-            Up to {MAX_FILES} images · Max {MAX_SIZE_MB} MB each · JPEG, PNG, GIF, WebP
+            {interpolate(copy.limits, { max: MAX_FILES, size: MAX_SIZE_MB })}
           </p>
         </div>
       )}
@@ -101,7 +108,7 @@ export function ReviewImageUpload({ files, onChange, disabled = false }: ReviewI
                   type="button"
                   onClick={() => removeFile(i)}
                   className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition group-hover:opacity-100"
-                  aria-label={`Remove ${file.name}`}
+                  aria-label={interpolate(copy.removeAria, { name: file.name })}
                 >
                   <X className="h-3 w-3" />
                 </button>
