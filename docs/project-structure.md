@@ -101,6 +101,21 @@ Files in `api/` may run on the server, the client, or both. The `typeof window !
 
 Stores import API functions and other stores. `authStore` calls into cart, wishlist, and review stores on login and logout. That dependency direction is one-way: cart and wishlist do not import auth.
 
+## `src/i18n`
+
+| File | Role |
+| --- | --- |
+| `locales.ts` | `Locale` (`en` \| `bn`), `DEFAULT_LOCALE`, `LOCALE_COOKIE`, `resolveLocale()` for untrusted cookie values, `intlLocale()` for `Intl`. |
+| `en.ts`, `bn.ts` | Message maps grouped by surface. `bn` is typed as `Dictionary`, so a missing Bangla key fails typecheck. |
+| `get-dictionary.ts` | `getDictionary(locale)`; also exports the `Dictionary` type. |
+| `server.ts` | `getLocale()` — reads the cookie in a Server Component or route handler. |
+| `LocaleProvider.tsx` | Client context plus `useLocale()` and `useDictionary()`. |
+| `LanguageSwitcher.tsx` | Writes the cookie and calls `router.refresh()`. |
+| `nav-labels.ts` | Resolves nav labels by `href`, falling back to the WordPress label. |
+| `interpolate.ts` | Fills `{name}` placeholders without printing `undefined`. |
+
+Policy page bodies are JSX, not dictionary entries: they live in `src/app/<route>/content/en.tsx` and `bn.tsx`, with `page.tsx` choosing between them. See [ADR-0008](adr/0008-locale-cookie-not-url.md).
+
 ## Route handlers
 
 `src/app/api/` mirrors the remote namespaces but does not copy every endpoint.
@@ -144,5 +159,7 @@ The route guard is `src/proxy.ts` at the project root, not under `src/app/api/`.
 | A reusable primitive | `src/components/ui/` only if it is generic |
 | A remote call | `src/lib/api/<domain>.ts` |
 | Cross-component client state | `src/stores/<domain>Store.ts` |
+| User-facing copy | `src/i18n/en.ts` and `src/i18n/bn.ts` (both, or typecheck fails) |
+| A page body that is long-form content | `src/app/<route>/content/{en,bn}.tsx` |
 | A pure helper | `src/lib/` |
 | A hook used by more than one component | `src/hooks/` (create it when the first shared hook appears) |

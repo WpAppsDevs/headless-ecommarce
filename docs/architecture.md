@@ -11,7 +11,7 @@ The storefront is a Next.js 16 App Router application. It renders every page its
 Three tiers:
 
 1. **Browser.** React 19 client components plus five Zustand stores. The browser holds the access token in memory, the guest cart token and guest wishlist IDs in `localStorage`, and the order result for the confirmation page in `sessionStorage`.
-2. **Next.js server.** Server Components fetch catalog data during render. Route handlers under `src/app/api/` proxy endpoints that need CORS handling, cookie handling, or response normalization. ISR caches pages and some API reads.
+2. **Next.js server.** Server Components fetch catalog data during render. Route handlers under `src/app/api/` proxy endpoints that need CORS handling, cookie handling, or response normalization. `fetch`-level revalidation caches the WordPress reads; the pages themselves render per request because the root layout reads the locale cookie.
 3. **WordPress.** The wrapper plugin exposes WooCommerce data under `/wp-json`. It owns products, carts, orders, users, reviews, and tracking. It is the source of truth.
 
 Third parties are narrow: Stripe.js tokenizes cards in the browser, and Mailchimp receives newsletter signups through a Next.js route. WordPress performs the actual charge through its Stripe integration.
@@ -37,7 +37,9 @@ The diagram marks the public cart path as a direct browser call and the authenti
 
 ## Rendering strategy
 
-Catalog routes (`/`, `/products`, and product detail) are Server Components with 60-second ISR. Cart, checkout, account, tracking, and order confirmation are client pages because they depend on store state or browser storage. Login, registration, and password routes are static shells around client forms.
+Catalog routes (`/`, `/products`, and product detail) are Server Components. Cart, checkout, account, tracking, and order confirmation are client pages because they depend on store state or browser storage. Login, registration, and password routes are static shells around client forms.
+
+**Catalog routes are not prerendered.** The root layout reads the `locale` cookie, which makes every route render per request, so the `revalidate = 60` exports on catalog pages no longer produce static HTML. Only the auth shells (`force-static`) stay prerendered, which also means they always render `lang="en"`. The WordPress reads they perform are still cached; only the HTML is per-request. See [ADR-0008](adr/0008-locale-cookie-not-url.md); Cache Components with a `<Suspense>` boundary around the translated chrome is the recorded remedy.
 
 The route-by-route map, including auth requirements, is in [routing-and-pages.md](routing-and-pages.md).
 
@@ -76,9 +78,9 @@ A 401 in the browser triggers one refresh attempt. If the retry is also 401, `au
 
 **Proxies are not a security layer.** They forward the caller's bearer token. They exist for CORS, cookies, caching, and small response fixes. Authorization is enforced by WordPress.
 
-**Client stores are the only shared client state.** There is no React Context for commerce data and no server-state library. A new cross-component value belongs in a store or in the API layer, not in a context provider added for one screen.
+**Client stores are the only shared client state.** There is no React Context for commerce data and no server-state library. A new cross-component value belongs in a store or in the API layer, not in a context provider added for one screen. The one Context in the app is `LocaleProvider`, which carries UI chrome, not commerce data: the locale is read from a cookie on the server, so a store would only be a second copy that can disagree.
 
-**The browser can hold three kinds of identity.** A user access token (memory), a guest cart token (localStorage), and a refresh token (httpOnly cookie). Any change to auth must account for all three and for the merged-cart path.
+**The browser can hold three kinds of identity.** A user access token (memory), a guest cart token (localStorage), and a refresh token (httpOnly cookie). Any change to auth must account for all three and for the merged-cart path. The `locale` cookie is a fourth browser-side value but not an identity: it is a readable preference, written by the client, and the server tolerates a missing or invalid value by rendering English.
 
 ## Related
 
