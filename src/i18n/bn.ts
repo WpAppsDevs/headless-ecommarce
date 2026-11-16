@@ -3,6 +3,7 @@ import type { Dictionary } from './get-dictionary';
 export const bn: Dictionary = {
   common: {
     home: 'হোম',
+    mainNavigation: 'প্রধান মেনু',
     breadcrumb: 'পথনির্দেশ',
     language: {
       en: 'English',
@@ -404,6 +405,8 @@ export const bn: Dictionary = {
   reviews: {
     writeReview: 'রিভিউ লিখুন',
     chooseProduct: 'কোন পণ্যটির রিভিউ দিতে চান?',
+    backToSelection: 'পণ্য বেছে নেওয়ার জায়গায় ফিরুন',
+    closeModal: 'রিভিউ উইন্ডো বন্ধ করুন',
     reviewedBadge: 'আপনি এই পণ্যের রিভিউ দিয়েছেন',
     loginToReview: 'রিভিউ লিখতে সাইন ইন করুন',
     noReviews: 'এখনো কোনো রিভিউ নেই।',

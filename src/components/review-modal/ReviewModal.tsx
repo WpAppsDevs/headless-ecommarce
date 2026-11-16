@@ -87,7 +87,7 @@ export function ReviewModal({ isOpen, onClose, orderId, items, onSuccess }: Revi
               <button
                 onClick={() => setSelectedId(null)}
                 className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100"
-                aria-label="Back to product selection"
+                aria-label={copy.backToSelection}
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -102,7 +102,7 @@ export function ReviewModal({ isOpen, onClose, orderId, items, onSuccess }: Revi
           <button
             onClick={handleClose}
             className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-600"
-            aria-label="Close review modal"
+            aria-label={copy.closeModal}
           >
             <X className="h-4.5 w-4.5" />
           </button>

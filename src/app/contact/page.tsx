@@ -1,61 +1,58 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { Mail, MessageCircle, Phone, Clock } from 'lucide-react';
+import { Mail, MessageCircle, Phone } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { Card } from '@/components/policies/Card';
-import { SectionHeading } from '@/components/policies/SectionHeading';
 import { config } from '@/lib/config';
+import { getLocale } from '@/i18n/server';
+import { getDictionary } from '@/i18n/get-dictionary';
+import { contactCopyEn } from './content/ContactIntroEn';
+import { contactCopyBn } from './content/ContactIntroBn';
+import { contactChannelsEn } from './content/ContactChannelsEn';
+import { contactChannelsBn } from './content/ContactChannelsBn';
+import { ContactIntroEn } from './content/ContactIntroEn';
+import { ContactIntroBn } from './content/ContactIntroBn';
+import { ContactBeforeEn } from './content/ContactBeforeEn';
+import { ContactBeforeBn } from './content/ContactBeforeBn';
 
-export const metadata: Metadata = {
-  title: 'Contact Us',
-  description: 'Contact Najifa\'s Shop for order help, product questions, and wholesale enquiries.',
-};
-
-const BREADCRUMBS = [{ label: 'Home', href: '/' }, { label: 'Contact' }];
+const COPY = { en: contactCopyEn, bn: contactCopyBn };
+const CHANNEL_COPY = { en: contactChannelsEn, bn: contactChannelsBn };
+const INTRO = { en: ContactIntroEn, bn: ContactIntroBn };
+const BEFORE = { en: ContactBeforeEn, bn: ContactBeforeBn };
 
 const CHANNELS = [
-  {
-    icon: MessageCircle,
-    title: 'WhatsApp',
-    detail: 'Fastest for order updates and styling questions.',
-    href: config.whatsappUrl,
-    label: 'Chat on WhatsApp',
-  },
-  {
-    icon: Mail,
-    title: 'Email',
-    detail: 'For detailed enquiries, invoices, and wholesale requests.',
-    href: 'mailto:support@najifasshop.com',
-    label: 'support@najifasshop.com',
-  },
-  {
-    icon: Phone,
-    title: 'Phone',
-    detail: 'Available during business hours for urgent order help.',
-    href: 'tel:+8801841654663',
-    label: '+880 1841-654663',
-  },
+  { icon: MessageCircle, title: 'WhatsApp', href: config.whatsappUrl },
+  { icon: Mail, title: 'Email', href: 'mailto:support@najifasshop.com' },
+  { icon: Phone, title: 'Phone', href: 'tel:+8801841654663' },
 ];
 
-export default function ContactPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const copy = COPY[await getLocale()];
+
+  return { title: copy.metadataTitle, description: copy.metadataDescription };
+}
+
+export default async function ContactPage() {
+  const locale = await getLocale();
+  const copy = COPY[locale];
+  const dictionary = getDictionary(locale);
+  const channelCopy = CHANNEL_COPY[locale];
+  const Intro = INTRO[locale];
+  const Before = BEFORE[locale];
+
   return (
     <div>
-      <PageHeader title="Contact Us" breadcrumbs={BREADCRUMBS} />
+      <PageHeader
+        title={copy.pageTitle}
+        breadcrumbs={[{ label: dictionary.common.home, href: '/' }, { label: copy.breadcrumb }]}
+      />
 
       <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:px-8">
-        <section className="mb-10">
-          <SectionHeading icon={MessageCircle} title="Talk to our team" />
-          <Card>
-            <p className="text-sm leading-relaxed text-brand-text-muted">
-              We answer questions about sizing, stock, pre-orders, delivery, and
-              returns. Include your order number when you write so we can find your
-              order faster.
-            </p>
-          </Card>
-        </section>
+        <Intro />
 
         <div className="grid gap-4 sm:grid-cols-3">
-          {CHANNELS.map(({ icon: Icon, title, detail, href, label }) => (
+          {CHANNELS.map(({ icon: Icon, title, href }, index) => {
+            const { detail, label } = channelCopy[index];
+
+            return (
             <a
               key={title}
               href={href}
@@ -72,29 +69,11 @@ export default function ContactPage() {
                 {label}
               </p>
             </a>
-          ))}
+            );
+          })}
         </div>
 
-        <section className="mt-10">
-          <SectionHeading icon={Clock} title="Before you write" />
-          <Card>
-            <p className="text-sm leading-relaxed text-brand-text-muted">
-              You can check an order yourself with your email address on the{' '}
-              <Link href="/track-order" className="font-medium text-brand-accent-strong underline underline-offset-2">
-                order tracking page
-              </Link>
-              . Delivery and exchange rules are in the{' '}
-              <Link href="/shipping" className="font-medium text-brand-accent-strong underline underline-offset-2">
-                shipping policy
-              </Link>{' '}
-              and{' '}
-              <Link href="/returns" className="font-medium text-brand-accent-strong underline underline-offset-2">
-                returns policy
-              </Link>
-              .
-            </p>
-          </Card>
-        </section>
+        <Before />
       </div>
     </div>
   );
