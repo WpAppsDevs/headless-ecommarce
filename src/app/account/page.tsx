@@ -9,15 +9,18 @@ import { getOrders, type OrdersResult } from '@/lib/api/orders';
 import { useAuthStore } from '@/stores/authStore';
 import { AccountLayout } from '@/components/account/AccountLayout';
 import { PageHeader } from '@/components/ui/PageHeader';
-
-const BREADCRUMBS = [
-  { label: 'Home', href: '/' },
-  { label: 'My Account' },
-];
+import { useDictionary } from '@/i18n/LocaleProvider';
 
 export default function AccountPage() {
   const router = useRouter();
   const { logout, hydrated, isAuthenticated } = useAuthStore();
+  const dictionary = useDictionary();
+  const accountCopy = dictionary.account;
+
+  const breadcrumbs = [
+    { label: dictionary.common.home, href: '/' },
+    { label: accountCopy.breadcrumb },
+  ];
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [ordersResult, setOrdersResult] = useState<OrdersResult | null>(null);
@@ -66,7 +69,7 @@ export default function AccountPage() {
 
   return (
     <>
-      <PageHeader title="My Account" breadcrumbs={BREADCRUMBS} />
+      <PageHeader title={accountCopy.breadcrumb} breadcrumbs={breadcrumbs} />
 
       {initError ? (
         <div className="flex min-h-[50vh] items-center justify-center">

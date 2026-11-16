@@ -6,41 +6,52 @@
  * here are token-derived; `badge` is a complete set for a bordered pill.
  */
 export interface OrderStatusStyle {
-  label: string;
+  /** Dictionary key under `account.statuses`; labels are translated, classes are not. */
+  key: OrderStatusKey;
   badge: string;
 }
 
+export type OrderStatusKey =
+  | 'pending'
+  | 'processing'
+  | 'delivery'
+  | 'onHold'
+  | 'completed'
+  | 'cancelled'
+  | 'failed'
+  | 'refunded';
+
 const ORDER_STATUS_STYLES: Record<string, OrderStatusStyle> = {
   pending: {
-    label: 'Pending',
+    key: 'pending',
     badge: 'bg-brand-preorder/10 text-brand-preorder border-brand-preorder/30',
   },
   processing: {
-    label: 'Processing',
+    key: 'processing',
     badge: 'bg-brand-preorder/10 text-brand-preorder border-brand-preorder/30',
   },
   delivery: {
-    label: 'Delivery',
+    key: 'delivery',
     badge: 'bg-brand-preorder/10 text-brand-preorder border-brand-preorder/30',
   },
   'on-hold': {
-    label: 'On Hold',
+    key: 'onHold',
     badge: 'bg-brand-text-muted/10 text-brand-text-muted border-brand-border',
   },
   completed: {
-    label: 'Delivered',
+    key: 'completed',
     badge: 'bg-brand-stock/10 text-brand-stock border-brand-stock/30',
   },
   cancelled: {
-    label: 'Cancelled',
+    key: 'cancelled',
     badge: 'bg-brand-danger/10 text-brand-danger border-brand-danger/30',
   },
   failed: {
-    label: 'Failed',
+    key: 'failed',
     badge: 'bg-brand-danger/10 text-brand-danger border-brand-danger/30',
   },
   refunded: {
-    label: 'Refunded',
+    key: 'refunded',
     badge: 'bg-brand-card text-brand-text-muted border-brand-border',
   },
 };

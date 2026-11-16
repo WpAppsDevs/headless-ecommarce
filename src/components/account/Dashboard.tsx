@@ -5,12 +5,27 @@ import type { Order } from '@/lib/api/orders';
 import type { UserProfile } from '@/lib/api/checkout';
 import { filterCheckoutDrafts } from '@/lib/order-utils';
 import { StatsCard } from './StatsCard';
+import { useDictionary } from '@/i18n/LocaleProvider';
 import { useFormatPrice } from '@/lib/utils/currency';
 
 interface DashboardProps {
   profile: UserProfile | null;
   orders: Order[];
 }
+
+/**
+ * WooCommerce slugs → dictionary keys. `on-hold` is the only slug that is not a
+ * valid identifier, so the mapping exists rather than a lookup by slug.
+ */
+const STATUS_KEYS = {
+  pending: 'pending',
+  processing: 'processing',
+  'on-hold': 'onHold',
+  delivery: 'delivery',
+  completed: 'completed',
+  cancelled: 'cancelled',
+  refunded: 'refunded',
+} as const;
 
 const STATUS_STYLES: Record<string, string> = {
   pending:    'bg-orange-50 text-orange-500',
@@ -22,12 +37,10 @@ const STATUS_STYLES: Record<string, string> = {
   refunded:   'bg-zinc-100 text-zinc-600',
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  pending: 'Pending', processing: 'Processing', 'on-hold': 'On Hold',
-  delivery: 'Delivery', completed: 'Completed', cancelled: 'Canceled', refunded: 'Refunded',
-};
+
 
 export function Dashboard({ orders }: DashboardProps) {
+  const copy = useDictionary().account;
   const visibleOrders   = filterCheckoutDrafts(orders);
   const totalOrders     = visibleOrders.length;
   const awaitingPickup  = visibleOrders.filter(o => ['pending', 'processing', 'on-hold'].includes(o.status)).length;
@@ -37,32 +50,32 @@ export function Dashboard({ orders }: DashboardProps) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-zinc-900">Dashboard</h2>
+      <h2 className="text-2xl font-bold text-zinc-900">{copy.dashboard.title}</h2>
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatsCard label="Awaiting Pickup"        value={awaitingPickup}  icon={Hourglass} />
-        <StatsCard label="Cancelled Orders"       value={cancelledOrders} icon={PackageX}  />
-        <StatsCard label="Total Number of Orders" value={totalOrders}     icon={Package}   />
+        <StatsCard label={copy.dashboard.awaitingPickup} value={awaitingPickup} icon={Hourglass} />
+        <StatsCard label={copy.dashboard.cancelledOrders} value={cancelledOrders} icon={PackageX} />
+        <StatsCard label={copy.dashboard.totalOrders} value={totalOrders} icon={Package} />
       </div>
 
       {/* Recent Orders */}
       <div className="rounded-xl border border-zinc-200 bg-white">
         <div className="border-b border-zinc-100 px-6 py-5">
-          <h3 className="text-base font-semibold text-zinc-900">Recent Orders</h3>
+          <h3 className="text-base font-semibold text-zinc-900">{copy.dashboard.recentOrders}</h3>
         </div>
 
         {recentOrders.length === 0 ? (
-          <p className="py-10 text-center text-sm text-zinc-400">No orders yet</p>
+          <p className="py-10 text-center text-sm text-zinc-400">{copy.dashboard.noOrders}</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-zinc-100 text-left text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                  <th className="px-6 py-3">Order</th>
-                  <th className="px-6 py-3">Products</th>
-                  <th className="px-6 py-3">Pricing</th>
-                  <th className="px-6 py-3">Status</th>
+                  <th className="px-6 py-3">{copy.dashboard.colOrder}</th>
+                  <th className="px-6 py-3">{copy.dashboard.colProducts}</th>
+                  <th className="px-6 py-3">{copy.dashboard.colPricing}</th>
+                  <th className="px-6 py-3">{copy.dashboard.colStatus}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
@@ -88,7 +101,9 @@ export function Dashboard({ orders }: DashboardProps) {
                       <td className="px-6 py-4 text-zinc-700">{fmt(Number(order.total))}</td>
                       <td className="px-6 py-4">
                         <span className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${badgeClass}`}>
-                          {STATUS_LABELS[order.status] ?? order.status}
+                          {order.status in STATUS_KEYS
+                            ? copy.statuses[STATUS_KEYS[order.status as keyof typeof STATUS_KEYS]]
+                            : order.status}
                         </span>
                       </td>
                     </tr>

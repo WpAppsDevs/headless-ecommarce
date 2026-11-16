@@ -1,6 +1,7 @@
 'use client';
 
 import type { UserProfile } from '@/lib/api/checkout';
+import { useDictionary } from '@/i18n/LocaleProvider';
 
 interface AddressProps {
   profile: UserProfile | null;
@@ -20,7 +21,15 @@ type DisplayAddress = Partial<{
   phone: string;
 }> | null | undefined;
 
-function AddressBlock({ title, address }: { title: string; address: DisplayAddress }) {
+function AddressBlock({
+  title,
+  address,
+  emptyLabel,
+}: {
+  title: string;
+  address: DisplayAddress;
+  emptyLabel: string;
+}) {
   const isEmpty =
     !address ||
     (!address.first_name &&
@@ -36,7 +45,7 @@ function AddressBlock({ title, address }: { title: string; address: DisplayAddre
       </div>
 
       {isEmpty ? (
-        <p className="py-8 text-center text-sm text-zinc-500">Not set</p>
+        <p className="py-8 text-center text-sm text-zinc-500">{emptyLabel}</p>
       ) : (
         <address className="not-italic space-y-1 text-sm leading-relaxed text-zinc-700">
           {address.first_name && address.last_name && (
@@ -67,18 +76,24 @@ function AddressBlock({ title, address }: { title: string; address: DisplayAddre
 }
 
 export function Address({ profile }: AddressProps) {
+  const copy = useDictionary().account;
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-zinc-900">My Address</h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          Addresses are saved with your orders. Contact support to change your
-          default billing or shipping address.
-        </p>
+        <h2 className="text-2xl font-bold text-zinc-900">{copy.address.title}</h2>
+        <p className="mt-1 text-sm text-zinc-500">{copy.address.note}</p>
       </div>
       <div className="grid gap-6 sm:grid-cols-2">
-        <AddressBlock title="Billing Address" address={profile?.billing} />
-        <AddressBlock title="Shipping Address" address={profile?.shipping} />
+        <AddressBlock
+          title={copy.address.billingTitle}
+          address={profile?.billing}
+          emptyLabel={copy.address.empty}
+        />
+        <AddressBlock
+          title={copy.address.shippingTitle}
+          address={profile?.shipping}
+          emptyLabel={copy.address.empty}
+        />
       </div>
     </div>
   );

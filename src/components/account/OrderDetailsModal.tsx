@@ -5,20 +5,23 @@ import { X, Home, Printer, Download, RotateCcw, Check } from 'lucide-react';
 import type { Order } from '@/lib/api/orders';
 import { useFormatPrice } from '@/lib/utils/currency';
 import { orderStatusStyle } from '@/lib/order-status';
+import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
+import { interpolate } from '@/i18n/interpolate';
+import { intlLocale } from '@/i18n/locales';
 
 // ── Status config ────────────────────────────────────────────────────────────
 
 // ── Timeline steps ───────────────────────────────────────────────────────────
 
 const TIMELINE_STEPS = [
-  { label: 'Order Placed',  desc: 'Your order has been successfully placed.' },
-  { label: 'Processing',    desc: 'We have received your order and are processing it.' },
-  { label: 'Packing',       desc: 'Your order is currently being packed.' },
-  { label: 'Packed',        desc: 'Your order is packed and ready for dispatch.' },
-  { label: 'Delivering',    desc: 'Rider has picked up your order for delivery.' },
-  { label: 'Payment',       desc: 'Your payment has been confirmed.' },
-  { label: 'Delivered',     desc: 'You have received your order.' },
-];
+  'placed',
+  'processing',
+  'packing',
+  'packed',
+  'delivering',
+  'payment',
+  'delivered',
+] as const;
 
 const STATUS_STEP_COUNT: Record<string, number> = {
   pending: 1, processing: 2, 'on-hold': 1, delivery: 5,
@@ -27,21 +30,21 @@ const STATUS_STEP_COUNT: Record<string, number> = {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function fmtDate(d: string | null) {
+function fmtDate(d: string | null, locale: string) {
   if (!d) return '—';
-  return new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  return new Date(d).toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-function fmtDateTime(d: string | null) {
+function fmtDateTime(d: string | null, locale: string) {
   if (!d) return '—';
-  return new Date(d).toLocaleString('en-US', {
+  return new Date(d).toLocaleString(locale, {
     year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
   });
 }
 
-function fmtShort(d: string | null) {
+function fmtShort(d: string | null, locale: string) {
   if (!d) return '';
-  return new Date(d).toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+  return new Date(d).toLocaleDateString(locale, { day: 'numeric', month: 'short' });
 }
 
 // ── Sub-components ───────────────────────────────────────────────────────────
@@ -93,6 +96,9 @@ interface OrderDetailsModalProps {
 }
 
 export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
+  const dict         = useDictionary().account;
+  const copy         = dict.details;
+  const locale       = intlLocale(useLocale());
   const sc           = orderStatusStyle(order.status);
   const doneSteps    = STATUS_STEP_COUNT[order.status] ?? 1;
   const total        = Number(order.total);
@@ -112,10 +118,10 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
       <div className="mx-auto max-w-2xl">
         {/* Modal title bar */}
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-white">Order Details</h2>
+          <h2 className="text-xl font-bold text-white">{copy.title}</h2>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={copy.close}
             className="rounded-full bg-white/15 p-1.5 text-white transition hover:bg-white/25"
           >
             <X className="h-5 w-5" />
@@ -128,22 +134,24 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
           <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-[15px] font-bold text-zinc-900">Order ID: #{order.id}</h3>
+                <h3 className="text-[15px] font-bold text-zinc-900">
+                  {interpolate(copy.orderId, { id: order.id })}
+                </h3>
                 <p className="mt-1 text-[13px] text-zinc-500">
-                  {fmtDateTime(order.date_created)}
+                  {fmtDateTime(order.date_created, locale)}
                   {order.payment_method_title && (
                     <> &bull; <span className="font-medium text-zinc-700">{order.payment_method_title}</span></>
                   )}
                 </p>
               </div>
               <span className={`shrink-0 rounded-lg border px-3 py-1 text-[12px] font-semibold ${sc.badge}`}>
-                {sc.label}
+                {dict.statuses[sc.key]}
               </span>
             </div>
           </div>
 
           {/* 2 – Products */}
-          <SectionCard title="Products">
+          <SectionCard title={copy.products}>
             <div className="divide-y divide-zinc-100">
               {order.line_items.map((item, i) => {
                 const unitPrice = item.quantity > 0 ? Number(item.total) / item.quantity : 0;
@@ -151,20 +159,20 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
                   <div key={i} className="flex items-start gap-4 py-4 first:pt-0 last:pb-0">
                     <div className="h-16 w-16 shrink-0 rounded-xl bg-zinc-100" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-[12px] text-zinc-400">Vendor: —</p>
+                      <p className="text-[12px] text-zinc-400">{copy.vendor}</p>
                       <p className="mt-0.5 text-[13px] font-semibold leading-snug text-zinc-900">{item.name}</p>
                     </div>
                     <div className="shrink-0 space-y-0.5 text-right text-[12px]">
                       <div className="flex justify-between gap-6 text-zinc-500">
-                        <span>Price:</span>
+                        <span>{copy.price}</span>
                         <span className="font-medium text-zinc-700">{fmt(unitPrice)}</span>
                       </div>
                       <div className="flex justify-between gap-6 text-zinc-500">
-                        <span>Qty:</span>
+                        <span>{copy.qty}</span>
                         <span className="font-medium text-zinc-700">{item.quantity}</span>
                       </div>
                       <div className="flex justify-between gap-6 text-zinc-500">
-                        <span>Total:</span>
+                        <span>{copy.total}</span>
                         <span className="font-semibold text-zinc-900">{fmt(Number(item.total))}</span>
                       </div>
                     </div>
@@ -173,13 +181,13 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
               })}
             </div>
             <div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-4">
-              <span className="text-[13px] font-semibold text-zinc-700">Total Amount:</span>
+              <span className="text-[13px] font-semibold text-zinc-700">{copy.totalAmount}</span>
               <span className="text-[15px] font-bold text-brand-wine">{fmt(total)}</span>
             </div>
           </SectionCard>
 
           {/* 3 – Shipping Address */}
-          <SectionCard title="Shipping Address">
+          <SectionCard title={copy.shippingAddress}>
             {s ? (
               <AddressBlock
                 name={`${s.first_name} ${s.last_name}`.trim()}
@@ -200,13 +208,13 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
                 postcode={b.postcode}
               />
             ) : (
-              <p className="text-[13px] text-zinc-400">No shipping address</p>
+              <p className="text-[13px] text-zinc-400">{copy.noShippingAddress}</p>
             )}
           </SectionCard>
 
           {/* 4 – Billing Address */}
           {b && (
-            <SectionCard title="Billing Address">
+            <SectionCard title={copy.billingAddress}>
               <AddressBlock
                 name={`${b.first_name} ${b.last_name}`.trim()}
                 phone={b.phone}
@@ -220,7 +228,7 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
           )}
 
           {/* 5 – Timeline */}
-          <SectionCard title="Timeline">
+          <SectionCard title={copy.timeline}>
             <div className="space-y-0">
               {TIMELINE_STEPS.map((step, i) => {
                 const done   = i < doneSteps;
@@ -230,7 +238,7 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
                     {/* Date column */}
                     <div className="w-[68px] shrink-0 pt-1 text-right">
                       <span className="text-[10px] leading-tight text-zinc-400">
-                        {done ? fmtShort(order.date_created) : ''}
+                        {done ? fmtShort(order.date_created, locale) : ''}
                       </span>
                     </div>
 
@@ -249,10 +257,10 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
                     {/* Step content */}
                     <div className="min-w-0 flex-1 pb-4">
                       <p className={`text-[13px] font-semibold ${done ? 'text-zinc-900' : 'text-zinc-400'}`}>
-                        {step.label}
+                        {copy.steps[`${step}`]}
                       </p>
                       <p className={`mt-0.5 text-[12px] leading-relaxed ${done ? 'text-zinc-500' : 'text-zinc-300'}`}>
-                        {step.desc}
+                        {copy.steps[`${step}Desc` as keyof typeof copy.steps]}
                       </p>
                     </div>
                   </div>
@@ -264,38 +272,38 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
           {/* 6 – Order Summary */}
           <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-4">
-              <h3 className="text-[15px] font-bold text-zinc-900">Order Summary</h3>
+              <h3 className="text-[15px] font-bold text-zinc-900">{copy.orderSummary}</h3>
               <span className={`rounded-lg border px-3 py-1 text-[12px] font-semibold ${sc.badge}`}>
-                {sc.label}
+                {dict.statuses[sc.key]}
               </span>
             </div>
             <div className="space-y-3 px-6 py-5">
               <div className="flex justify-between text-[13px] text-zinc-600">
-                <span>Order ID:</span>
+                <span>{copy.orderIdLabel}</span>
                 <span className="font-medium text-zinc-800">#{order.id}</span>
               </div>
               <div className="flex justify-between text-[13px] text-zinc-600">
-                <span>Order At:</span>
-                <span className="font-medium text-zinc-800">{fmtDate(order.date_created)}</span>
+                <span>{copy.orderAt}</span>
+                <span className="font-medium text-zinc-800">{fmtDate(order.date_created, locale)}</span>
               </div>
               <div className="flex justify-between text-[13px] text-zinc-600">
-                <span>Subtotal (MRP):</span>
+                <span>{copy.subtotal}</span>
                 <span className="font-medium text-zinc-800">{fmt(subtotalMrp)}</span>
               </div>
               {discount > 0 && (
                 <div className="flex justify-between text-[13px] text-zinc-600">
-                  <span>Discount applied:</span>
+                  <span>{copy.discount}</span>
                   <span className="font-medium text-brand-danger">-{fmt(discount)}</span>
                 </div>
               )}
               <div className="flex justify-between text-[13px] text-zinc-600">
-                <span>Delivery Charge:</span>
+                <span>{copy.deliveryCharge}</span>
                 <span className={`font-medium ${shippingCost === 0 ? 'text-brand-stock' : 'text-brand-text'}`}>
-                  {shippingCost === 0 ? 'Free' : fmt(shippingCost)}
+                  {shippingCost === 0 ? copy.free : fmt(shippingCost)}
                 </span>
               </div>
               <div className="flex items-center justify-between border-t border-zinc-100 pt-4">
-                <span className="text-[14px] font-bold text-zinc-900">Amount Paid</span>
+                <span className="text-[14px] font-bold text-zinc-900">{copy.amountPaid}</span>
                 <span className="text-[16px] font-bold text-brand-wine">{fmt(total)}</span>
               </div>
             </div>
