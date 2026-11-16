@@ -33,7 +33,8 @@ The locale lives in a `locale` cookie, read in the root layout, with English as 
 - **Google sees one language.** The five support pages switch from Bangla to English in the index, because a crawler arrives without a cookie. Bangla remains served to Bangla visitors but is no longer crawlable. If that matters later, it reopens this decision rather than being patched around.
 - **No shareable language links.** A URL cannot pin a language, so a shared `/shipping` link renders in the recipient's language.
 - **English is both the default and the only indexed language,** which keeps ad landing pages consistent for visitors arriving cold.
-- The footer rule in `docs/components.md` ("the support block is Bengali, commerce stays English") no longer describes the site and is replaced by the locale mechanism.
+- **The footer rule in `docs/components.md` no longer applies.** The old rule ("the support block is Bengali, commerce stays English") is replaced by the locale mechanism.
+- **Known gap: untranslated pages declare the chosen language.** `<html lang>` follows the cookie, but `/`, `/products`, product pages and `/contact` are still English-only. A Bangla visitor therefore gets `lang="bn"` over English copy, which a screen reader will read with Bangla pronunciation. The gap closes as each surface is translated; until then only the five support pages and the chrome are genuinely bilingual. Phase 2 is where it closes, not a patch here.
 
 ## Related
 

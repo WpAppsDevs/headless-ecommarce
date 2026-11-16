@@ -24,7 +24,7 @@ These rules describe how the codebase is written today and where it is going. Fo
 | Page | `page.tsx` | `app/cart/page.tsx` |
 | Utility | camelCase | `order-utils.ts` |
 
-One exported component per file, PascalCase filename, and import it directly; there are no barrel files. `npm run check:components` enforces the export rule. Local props interfaces stay in the component file unless another file needs them. Domain components live under their domain folder; `src/components/ui/` holds primitives with no commerce meaning.
+One exported component per file, PascalCase filename, and import it directly; there are no barrel files. `npm run check:components` enforces the export rule, name uniqueness, that each component is referenced somewhere, and the PascalCase filename for page bodies under `src/app/<route>/content/`. Local props interfaces stay in the component file unless another file needs them. Domain components live under their domain folder; `src/components/ui/` holds primitives with no commerce meaning.
 
 Split a file when it grows past roughly 300 lines or mixes more than one responsibility. `CheckoutForm.tsx` at 769 lines is the current exception, not the template.
 
@@ -108,7 +108,7 @@ throw new ApiError('out_of_stock', 'This item is out of stock');
 
 - Use brand tokens and Tailwind utilities.
 - Colour comes from a token. `npm run check:tokens` fails on a Tailwind arbitrary colour class (`bg-[#9E2F45]`), because a literal survives every future palette change. Add the token to `:root` and `@theme inline` in `src/app/globals.css` instead.
-- A component name is unique across `src/components`, one export per file, and referenced somewhere. `npm run check:components` enforces all three.
+- A component name is unique across `src/components`, one export per file, and referenced somewhere. `npm run check:components` enforces all three, and the same rules for the page bodies under `src/app/<route>/content/`, whose filenames must be PascalCase.
 - Use `cn()` for conditional classes.
 - Keep global CSS for tokens and base styles; style a component with Tailwind utilities.
 - Match the surrounding visual language. Product pages are editorial and account/auth pages are shadcn; keep each screen in its own system.
@@ -164,14 +164,14 @@ throw new ApiError('out_of_stock', 'This item is out of stock');
 Before calling a change complete:
 
 1. `npm run verify` passes: typecheck, lint, unit tests, the contrast check, and the one-export-per-component check.
-2. `npm run verify:full` passes before committing when the change touches routing, data fetching, or dependencies. It adds the production build.
+2. `npm run verify:full` passes before committing when the change touches routing, data fetching, dependencies, or user-facing copy. It adds the production build and `npm run check:routes`, which boots the built app and asserts the `<html lang>` and `<title>` of `/`, `/shipping`, `/terms` and `/track-order` in both locales.
 3. Empty, loading, and error states still render.
 4. The change works on a narrow viewport, not only desktop.
 5. Auth changes are tested signed out, signed in, after reload, and with an expired token.
 6. Cart changes are tested as a guest, after login, and with an empty cart.
 7. The relevant docs in this folder are updated if behavior changed.
 
-CI runs the same `verify` and `build` on every pull request. Vercel is the preview, not the gate.
+CI runs the same `verify`, `build` and `check:routes` on every pull request. Vercel is the preview, not the gate.
 
 ## Review checklist
 
