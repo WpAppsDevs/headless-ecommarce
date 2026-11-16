@@ -69,7 +69,11 @@ export default function AccountPage() {
 
   return (
     <>
-      <PageHeader title={accountCopy.breadcrumb} breadcrumbs={breadcrumbs} />
+      <PageHeader
+        title={accountCopy.breadcrumb}
+        breadcrumbs={breadcrumbs}
+        description={accountCopy.description}
+      />
 
       {initError ? (
         <div className="flex min-h-[50vh] items-center justify-center">

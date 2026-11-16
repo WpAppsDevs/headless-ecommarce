@@ -12,13 +12,20 @@ interface PageHeaderProps {
   breadcrumbs: BreadcrumbItem[];
   /** Landmark label for the trail; pass the translated word on a translated page. */
   breadcrumbLabel?: string;
+  /** Optional line under the trail. Pass it instead of matching on the title. */
+  description?: string;
 }
 
 /**
  * Full-width gradient page header with centred title and breadcrumb trail.
  * Matches the design used on the Cart page — reuse across all interior pages.
  */
-export function PageHeader({ title, breadcrumbs, breadcrumbLabel = 'Breadcrumb' }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  breadcrumbs,
+  breadcrumbLabel = 'Breadcrumb',
+  description,
+}: PageHeaderProps) {
   return (
     <div className="bg-gradient-to-r from-brand-accent-light via-brand-section to-brand-accent-light py-14 text-center">
       <h1 className="text-4xl font-bold tracking-tight text-zinc-900">{title}</h1>
@@ -53,10 +60,9 @@ export function PageHeader({ title, breadcrumbs, breadcrumbLabel = 'Breadcrumb' 
           ))}
         </ol>
       </nav>
-      {title === 'My Account' && (
+      {description && (
         <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-zinc-500">
-          Manage your profile, track orders, and easily update your personal details anytime,{' '}
-          all in one convenient place.
+          {description}
         </p>
       )}
     </div>
