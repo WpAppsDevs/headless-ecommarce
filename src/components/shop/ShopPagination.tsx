@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useDictionary } from '@/i18n/LocaleProvider';
 
 // 36px visual control with a 44px hit area from the pseudo-element. Keeping the
 // visual size prevents the pagination row from wrapping at 375px.
@@ -28,23 +29,25 @@ export function ShopPagination({
   totalPages: number;
   hrefForPage: (page: number) => string;
 }) {
+  const copy = useDictionary().shop;
+
   if (totalPages <= 1) return null;
 
   return (
     <nav
-      aria-label="Pagination"
+      aria-label={copy.pagination}
       className="mt-10 flex items-center justify-center gap-2.5"
     >
       {page > 1 ? (
         <Link
           href={hrefForPage(page - 1)}
           className={`${PAGINATION_CONTROL_CLASS} border-brand-border text-brand-text-muted hover:border-brand-accent-strong hover:bg-brand-card`}
-          aria-label="Previous page"
+          aria-label={copy.previousPage}
         >
           <ChevronLeft className="h-4 w-4" />
         </Link>
       ) : (
-        <button type="button" disabled className={DISABLED_CLASS} aria-label="Previous page">
+        <button type="button" disabled className={DISABLED_CLASS} aria-label={copy.previousPage}>
           <ChevronLeft className="h-4 w-4" />
         </button>
       )}
@@ -73,12 +76,12 @@ export function ShopPagination({
         <Link
           href={hrefForPage(page + 1)}
           className={`${PAGINATION_CONTROL_CLASS} border-brand-border text-brand-text-muted hover:border-brand-accent-strong hover:bg-brand-card`}
-          aria-label="Next page"
+          aria-label={copy.nextPage}
         >
           <ChevronRight className="h-4 w-4" />
         </Link>
       ) : (
-        <button type="button" disabled className={DISABLED_CLASS} aria-label="Next page">
+        <button type="button" disabled className={DISABLED_CLASS} aria-label={copy.nextPage}>
           <ChevronRight className="h-4 w-4" />
         </button>
       )}

@@ -5,6 +5,8 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import type { BreadcrumbItem } from '@/components/ui/PageHeader';
 import { selectReadyStockPage, shouldShowReadyStockFallback } from '@/lib/ready-stock-page';
 import { READY_STOCK_TAG } from '@/lib/product-availability';
+import { getDictionary } from '@/i18n/get-dictionary';
+import { getLocale } from '@/i18n/server';
 
 export const revalidate = 60;
 
@@ -54,16 +56,18 @@ export default async function ProductsPage({ searchParams }: PageProps) {
     ? category.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
     : null;
 
+  const copy = getDictionary(await getLocale()).shop;
+
   const breadcrumbs: BreadcrumbItem[] = [
-    { label: 'Home', href: '/' },
+    { label: getDictionary(await getLocale()).common.home, href: '/' },
     ...(categoryLabel
-      ? [{ label: 'Shop', href: '/products' }, { label: categoryLabel }]
-      : [{ label: 'Shop' }]),
+      ? [{ label: copy.title, href: '/products' }, { label: categoryLabel }]
+      : [{ label: copy.title }]),
   ];
 
   return (
     <>
-      <PageHeader title={categoryLabel ?? 'Shop'} breadcrumbs={breadcrumbs} />
+      <PageHeader title={categoryLabel ?? copy.title} breadcrumbs={breadcrumbs} />
       <ShopClient
         initialProducts={items}
         meta={meta}

@@ -2,6 +2,8 @@
 
 import { SlidersHorizontal, LayoutGrid, List, Grid3X3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useDictionary } from '@/i18n/LocaleProvider';
+import { interpolate } from '@/i18n/interpolate';
 
 export type SortOrder = 'default' | 'price-asc' | 'price-desc' | 'latest';
 
@@ -29,13 +31,18 @@ export function ShopTopBar({
   onMobileFiltersToggle,
   activeFilterCount = 0,
 }: ShopTopBarProps) {
+  const copy = useDictionary().shop;
   const start = total === 0 ? 0 : (page - 1) * perPage + 1;
   const end = Math.min(page * perPage, total);
 
   const resultText =
     total === 0
-      ? '0 products'
-      : `Showing ${start}–${end} of ${total} product${total !== 1 ? 's' : ''}`;
+      ? copy.resultsZero
+      : interpolate(total === 1 ? copy.resultsRangeOne : copy.resultsRange, {
+          start,
+          end,
+          total,
+        });
 
   const hasActiveFilters = activeFilterCount > 0;
 
@@ -53,7 +60,7 @@ export function ShopTopBar({
           )}
         >
           <SlidersHorizontal className="h-4 w-4" />
-          Filters
+          {copy.filters}
           {hasActiveFilters && (
             <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-wine px-1 text-[10px] font-bold text-white">
               {activeFilterCount}
@@ -65,7 +72,10 @@ export function ShopTopBar({
           <p className="text-sm font-medium text-brand-text">{resultText}</p>
           {hasActiveFilters && (
             <p className="text-xs text-brand-wine mt-0.5">
-              {activeFilterCount} filter{activeFilterCount > 1 ? 's' : ''} applied
+              {interpolate(
+                activeFilterCount > 1 ? copy.filterCountMany : copy.filterCountOne,
+                { count: activeFilterCount },
+              )}
             </p>
           )}
         </div>
@@ -78,18 +88,18 @@ export function ShopTopBar({
           onChange={(e) => onSortChange(e.target.value as SortOrder)}
           className="min-h-11 rounded-lg border border-brand-border bg-brand-section px-3 py-2 text-sm text-brand-text cursor-pointer transition-all duration-150 focus-brand focus:border-brand-accent-strong"
         >
-          <option value="default">Default sorting</option>
-          <option value="price-asc">Price: Low to High</option>
-          <option value="price-desc">Price: High to Low</option>
-          <option value="latest">Newest first</option>
+          <option value="default">{copy.sortDefault}</option>
+          <option value="price-asc">{copy.sortPriceAsc}</option>
+          <option value="price-desc">{copy.sortPriceDesc}</option>
+          <option value="latest">{copy.sortLatest}</option>
         </select>
 
         <div className="hidden sm:flex items-center gap-1 p-1 rounded-lg border border-brand-border bg-brand-section">
           {(
             [
-              { cols: 2, Icon: List, label: '2 columns' },
-              { cols: 3, Icon: LayoutGrid, label: '3 columns' },
-              { cols: 4, Icon: Grid3X3, label: '4 columns' },
+              { cols: 2, Icon: List, label: interpolate(copy.columnsAria, { count: 2 }) },
+              { cols: 3, Icon: LayoutGrid, label: interpolate(copy.columnsAria, { count: 3 }) },
+              { cols: 4, Icon: Grid3X3, label: interpolate(copy.columnsAria, { count: 4 }) },
             ] as const
           ).map(({ cols, Icon, label }) => (
             <button
