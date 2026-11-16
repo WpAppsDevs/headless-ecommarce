@@ -33,7 +33,7 @@ Run `npm run verify` before the build. `npm run build` also performs type checki
 
 `shadcn` is a devDependency: it supplies build-time CSS and is not needed by the running server. A build host must install dev dependencies (`npm ci`, not `npm ci --omit=dev`). A production-only install is safe after the build, when running `next start`.
 
-GitHub Actions runs `npm run verify` and `npm run build` on every pull request and on pushes to `master`. Vercel provides the preview deployment; CI is the merge gate.
+GitHub Actions runs `npm run verify`, `npm run build` and `npm run check:routes` on every pull request and on pushes to `master`. Vercel provides the preview deployment; CI is the merge gate.
 
 ## Pull requests and merge gate
 
