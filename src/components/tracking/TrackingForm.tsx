@@ -5,6 +5,7 @@ import { Search, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useDictionary } from '@/i18n/LocaleProvider';
 
 interface TrackingFormProps {
   onSubmit: (email: string, orderId?: number) => void;
@@ -13,6 +14,7 @@ interface TrackingFormProps {
 }
 
 export function TrackingForm({ onSubmit, isLoading, isAuthenticated = false }: TrackingFormProps) {
+  const copy = useDictionary().tracking.form;
   const [email, setEmail] = useState('');
   const [orderId, setOrderId] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -23,15 +25,15 @@ export function TrackingForm({ onSubmit, isLoading, isAuthenticated = false }: T
     e.preventDefault();
 
     if (!isAuthenticated && !email.trim()) {
-      setEmailError('Email is required');
+      setEmailError(copy.emailRequired);
       return;
     }
     if (!isAuthenticated && email.trim() && !isValidEmail(email)) {
-      setEmailError('Please enter a valid email address');
+      setEmailError(copy.emailInvalid);
       return;
     }
     if (isAuthenticated && !orderId.trim()) {
-      setEmailError('Order number is required');
+      setEmailError(copy.orderNumberRequired);
       return;
     }
 
@@ -46,11 +48,11 @@ export function TrackingForm({ onSubmit, isLoading, isAuthenticated = false }: T
         <div className="space-y-4 sm:space-y-2">
           {!isAuthenticated && (
             <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
+              <Label htmlFor="email">{copy.emailLabel}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder={copy.emailPlaceholder}
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -68,13 +70,13 @@ export function TrackingForm({ onSubmit, isLoading, isAuthenticated = false }: T
 
           <div className="space-y-2">
             <Label htmlFor="orderId">
-              Order Number
+              {copy.orderNumberLabel}
             </Label>
             <Input
               id="orderId"
               type="text"
               inputMode="numeric"
-              placeholder={isAuthenticated ? 'e.g. 1234' : 'e.g. 1234'}
+              placeholder={copy.orderNumberPlaceholder}
               value={orderId}
               onChange={(e) => setOrderId(e.target.value)}
               disabled={isLoading}
@@ -90,12 +92,12 @@ export function TrackingForm({ onSubmit, isLoading, isAuthenticated = false }: T
           {isLoading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              Tracking...
+              {copy.submitting}
             </>
           ) : (
             <>
               <Search className="h-4 w-4 mr-2" />
-              Track Order
+              {copy.submit}
             </>
           )}
         </Button>

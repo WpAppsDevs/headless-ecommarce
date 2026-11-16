@@ -159,7 +159,9 @@ For older orders in the third shape, the timeline is reduced to an "Order Placed
 
 ## Policy pages
 
-`/shipping`, `/returns`, `/privacy-policy`, and `/terms` are static Bengali pages. They share `SectionHeading`, `Card`, `StatCard`, `NoteCallout`, `TypePanel`, and `BulletList` from one file each under `src/components/policies/`.
+`/shipping`, `/returns`, `/privacy-policy`, and `/terms` are bilingual and stay static content, not CMS content. Each route has a `page.tsx` that picks `content/bn.tsx` or `content/en.tsx` from the locale cookie and exports `generateMetadata` from `pages.*` in the dictionary; the Bangla body is the original copy, the English one is its translation. They share `SectionHeading`, `Card`, `StatCard`, `NoteCallout`, `TypePanel`, and `BulletList` from one file each under `src/components/policies/`.
+
+`/track-order` is a client page and takes its copy from `trackOrder` and `tracking.form` in the dictionary. Tracking results (`TrackingAccordion`, `TrackingStatus`, `TrackingTimeline`) stay English in both languages.
 
 The product page's Shipping & Returns accordion summarizes the rules and links to `/shipping` and `/returns`, so the policy pages remain the single source of truth.
 

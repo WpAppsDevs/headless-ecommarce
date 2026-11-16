@@ -63,4 +63,53 @@ export const bn: Dictionary = {
     },
     copyright: '© {year} {site}। সর্বস্বত্ব সংরক্ষিত।',
   },
+  pages: {
+    shipping: {
+      title: 'শিপিং ও ডেলিভারি',
+      description: 'ডেলিভারি এলাকা, সময়, স্থানীয় চার্জ ও প্রি-অর্ডার শিপিং চার্জ সম্পর্কে বিস্তারিত জানুন।',
+    },
+    returns: {
+      title: 'রিটার্ন ও এক্সচেঞ্জ',
+      description: 'স্টক পণ্য ও প্রি-অর্ডার পণ্যের এক্সচেঞ্জ এবং রিফান্ড পলিসি সম্পর্কে বিস্তারিত জানুন।',
+    },
+    trackOrder: {
+      title: 'ট্র্যাক অর্ডার',
+      description: 'ইমেইল বা অ্যাকাউন্ট দিয়ে অর্ডার ট্র্যাক করুন।',
+    },
+    privacyPolicy: {
+      title: 'প্রাইভেসি পলিসি',
+      description: 'আমরা কীভাবে আপনার ব্যক্তিগত তথ্য সংগ্রহ, ব্যবহার এবং সংরক্ষণ করি তা জানুন।',
+    },
+    terms: {
+      title: 'টার্মস অফ সার্ভিস',
+      description: 'আমাদের ওয়েবসাইট ব্যবহারের শর্তাবলী পড়ুন।',
+    },
+  },
+  trackOrder: {
+    searching: 'আপনার অর্ডার খোঁজা হচ্ছে...',
+    errorTitle: 'অর্ডার পাওয়া যায়নি',
+    errorEmailRequired: 'গেস্ট ট্র্যাকিংয়ের জন্য ইমেইল প্রয়োজন।',
+    errorOrderNumberRequired: 'অনুগ্রহ করে অর্ডার নম্বর লিখুন।',
+    errorGeneric: 'কিছু একটা সমস্যা হয়েছে। আবার চেষ্টা করুন।',
+    emptyAuthTitle: 'অর্ডার ট্র্যাক করতে অর্ডার নম্বর লিখুন',
+    emptyAuthSub: 'আপনার অ্যাকাউন্ট দিয়ে আমরা অর্ডারটি খুঁজে দেখব',
+    emptyGuestTitle: 'অর্ডার ট্র্যাক করতে আপনার ইমেইল ঠিকানা লিখুন',
+    emptyGuestSub: 'দ্রুত খোঁজার জন্য চাইলে অর্ডার নম্বরও দিতে পারেন',
+    showMore: 'আরও অর্ডার দেখুন',
+    noOrdersAuth: 'এই অর্ডার নম্বরে কোনো অর্ডার পাওয়া যায়নি',
+    noOrdersGuest: 'এই ইমেইল ঠিকানায় কোনো অর্ডার পাওয়া যায়নি',
+  },
+  tracking: {
+    form: {
+      emailLabel: 'ইমেইল ঠিকানা',
+      emailPlaceholder: 'your@email.com',
+      emailRequired: 'ইমেইল প্রয়োজন',
+      emailInvalid: 'সঠিক ইমেইল ঠিকানা লিখুন',
+      orderNumberLabel: 'অর্ডার নম্বর',
+      orderNumberRequired: 'অর্ডার নম্বর প্রয়োজন',
+      orderNumberPlaceholder: 'যেমন 1234',
+      submit: 'অর্ডার ট্র্যাক করুন',
+      submitting: 'খোঁজা হচ্ছে...',
+    },
+  },
 };

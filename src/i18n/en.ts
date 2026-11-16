@@ -61,4 +61,53 @@ export const en = {
     },
     copyright: '© {year} {site}. All rights reserved.',
   },
+  pages: {
+    shipping: {
+      title: 'Shipping & Delivery',
+      description: 'Delivery coverage, timelines, local charges and pre-order shipping charges explained.',
+    },
+    returns: {
+      title: 'Returns & Exchange',
+      description: 'Exchange and refund policy for stock products and pre-order products.',
+    },
+    trackOrder: {
+      title: 'Track Order',
+      description: 'Track an order with your email address or your account.',
+    },
+    privacyPolicy: {
+      title: 'Privacy Policy',
+      description: 'How we collect, use and store your personal information.',
+    },
+    terms: {
+      title: 'Terms of Service',
+      description: 'The terms that apply when you use our website.',
+    },
+  },
+  trackOrder: {
+    searching: 'Searching for your order...',
+    errorTitle: 'Unable to find order',
+    errorEmailRequired: 'Email is required for guest tracking.',
+    errorOrderNumberRequired: 'Please enter an order number.',
+    errorGeneric: 'Something went wrong. Please try again.',
+    emptyAuthTitle: 'Enter your order number to track your order',
+    emptyAuthSub: 'We will look up your order using your authenticated account',
+    emptyGuestTitle: 'Enter your email address to track your order',
+    emptyGuestSub: 'You can optionally provide an order number for faster lookup',
+    showMore: 'Show more orders',
+    noOrdersAuth: 'No orders found with this order number',
+    noOrdersGuest: 'No orders found for this email address',
+  },
+  tracking: {
+    form: {
+      emailLabel: 'Email Address',
+      emailPlaceholder: 'your@email.com',
+      emailRequired: 'Email is required',
+      emailInvalid: 'Please enter a valid email address',
+      orderNumberLabel: 'Order Number',
+      orderNumberRequired: 'Order number is required',
+      orderNumberPlaceholder: 'e.g. 1234',
+      submit: 'Track Order',
+      submitting: 'Tracking...',
+    },
+  },
 };
