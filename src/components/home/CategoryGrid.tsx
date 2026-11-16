@@ -1,6 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ShoppingBag, Boxes } from 'lucide-react';
+import { PRE_ORDER_WINDOW_DAYS } from '@/lib/delivery';
+import { formatRange } from '@/i18n/format';
+
+const PRE_ORDER_WINDOW = formatRange('en', PRE_ORDER_WINDOW_DAYS.min, PRE_ORDER_WINDOW_DAYS.max);
 
 /**
  * The two consumer purchase modes. Catalogue/wholesale is a B2B channel and is
@@ -19,7 +23,7 @@ const PURCHASE_TYPES = [
     icon: Boxes,
     label: 'Pre-Order',
     desc1: 'Imported from Pakistan',
-    desc2: 'Delivery in 15-25 days',
+    desc2: `Delivery in ${PRE_ORDER_WINDOW} days`,
     href: '/products?tag=pre-order',
     image: '/images/category-grid/pre-order.jpg',
   },

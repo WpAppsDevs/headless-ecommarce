@@ -1,5 +1,9 @@
 import { Search, ShoppingBag, Package, Sparkles } from 'lucide-react';
 import { EditorialHeading } from '@/components/home/EditorialHeading';
+import { PRE_ORDER_WINDOW_DAYS } from '@/lib/delivery';
+import { formatRange } from '@/i18n/format';
+
+const PRE_ORDER_WINDOW = formatRange('en', PRE_ORDER_WINDOW_DAYS.min, PRE_ORDER_WINDOW_DAYS.max);
 
 const STEPS = [
   {
@@ -24,7 +28,7 @@ const STEPS = [
     step: '04',
     icon: Sparkles,
     title: 'Receive & Enjoy',
-    desc: 'Your order arrives in 15–25 days, carefully packaged and ready to wear.',
+    desc: `Your order arrives in ${PRE_ORDER_WINDOW} days, carefully packaged and ready to wear.`,
   },
 ];
 
@@ -38,7 +42,7 @@ export function PreOrderSteps() {
           tone="dark"
           eyebrow="Pre-Order Process"
           title="How Pre-Order Works"
-          description="Your dress is sourced in Pakistan after you order. Four steps, 15–25 days, tracked the whole way."
+          description={`Your dress is sourced in Pakistan after you order. Four steps, ${PRE_ORDER_WINDOW} days, tracked the whole way.`}
         />
 
         {/* Steps */}
