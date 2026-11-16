@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,25 +12,34 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuthStore } from '@/stores/authStore';
 import { AUTH_CONTROL_CLASS } from '@/components/auth/styles';
+import { useDictionary } from '@/i18n/LocaleProvider';
 
 // ---------------------------------------------------------------------------
 // Schema
 // ---------------------------------------------------------------------------
 
-const schema = z
-  .object({
-    first_name: z.string().min(1, 'First name is required'),
-    last_name: z.string().min(1, 'Last name is required'),
-    email: z.string().email('Enter a valid email address'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
-    confirm_password: z.string().min(1, 'Please confirm your password'),
-  })
-  .refine((v) => v.password === v.confirm_password, {
-    message: 'Passwords do not match',
-    path: ['confirm_password'],
-  });
+const buildSchema = (copy: {
+  firstNameRequired: string;
+  lastNameRequired: string;
+  emailInvalid: string;
+  passwordTooShort: string;
+  confirmRequired: string;
+  passwordMismatch: string;
+}) =>
+  z
+    .object({
+      first_name: z.string().min(1, copy.firstNameRequired),
+      last_name: z.string().min(1, copy.lastNameRequired),
+      email: z.string().email(copy.emailInvalid),
+      password: z.string().min(8, copy.passwordTooShort),
+      confirm_password: z.string().min(1, copy.confirmRequired),
+    })
+    .refine((v) => v.password === v.confirm_password, {
+      message: copy.passwordMismatch,
+      path: ['confirm_password'],
+    });
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<ReturnType<typeof buildSchema>>;
 
 // ---------------------------------------------------------------------------
 // Component
@@ -38,6 +48,8 @@ type FormValues = z.infer<typeof schema>;
 export function RegisterForm() {
   const router = useRouter();
   const { register: registerUser, loading } = useAuthStore();
+  const copy = useDictionary().auth.register;
+  const schema = useMemo(() => buildSchema(copy), [copy]);
 
   const {
     register,
@@ -51,11 +63,11 @@ export function RegisterForm() {
       await registerUser(email, password, first_name, last_name);
       router.push('/account');
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Registration failed';
+      const msg = e instanceof Error ? e.message : copy.genericFailure;
       const friendly = msg.toLowerCase().includes('email')
-        ? 'This email is already registered.'
+        ? copy.alreadyRegistered
         : msg.toLowerCase().includes('failed') || msg.toLowerCase().includes('error')
-        ? 'Registration failed. Please try again.'
+        ? copy.failed
         : msg;
       setError('root', { message: friendly });
     }
@@ -73,7 +85,7 @@ export function RegisterForm() {
       {/* Name row */}
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <Label htmlFor="first_name">First Name</Label>
+          <Label htmlFor="first_name">{copy.firstNameLabel}</Label>
           <Input
             className={AUTH_CONTROL_CLASS}
             id="first_name"
@@ -87,7 +99,7 @@ export function RegisterForm() {
           )}
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="last_name">Last Name</Label>
+          <Label htmlFor="last_name">{copy.lastNameLabel}</Label>
           <Input
             className={AUTH_CONTROL_CLASS}
             id="last_name"
@@ -104,7 +116,7 @@ export function RegisterForm() {
 
       {/* Email */}
       <div className="space-y-1.5">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{copy.emailLabel}</Label>
         <Input
           className={AUTH_CONTROL_CLASS}
           id="email"
@@ -120,7 +132,7 @@ export function RegisterForm() {
 
       {/* Password */}
       <div className="space-y-1.5">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">{copy.passwordLabel}</Label>
         <Input
           className={AUTH_CONTROL_CLASS}
           id="password"
@@ -136,7 +148,7 @@ export function RegisterForm() {
 
       {/* Confirm password */}
       <div className="space-y-1.5">
-        <Label htmlFor="confirm_password">Confirm Password</Label>
+        <Label htmlFor="confirm_password">{copy.confirmLabel}</Label>
         <Input
           className={AUTH_CONTROL_CLASS}
           id="confirm_password"
@@ -155,17 +167,17 @@ export function RegisterForm() {
         {loading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Creating account…
+            {copy.submitting}
           </>
         ) : (
-          'Create Account'
+          copy.submit
         )}
       </Button>
 
       <p className="text-center text-sm text-muted-foreground">
-        Already have an account?{' '}
+        {copy.haveAccount}{' '}
         <Link href="/login" className="font-medium text-primary hover:underline">
-          Sign in
+          {copy.signIn}
         </Link>
       </p>
     </form>

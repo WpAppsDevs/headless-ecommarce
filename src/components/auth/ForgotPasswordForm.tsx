@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -10,13 +10,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { AUTH_CONTROL_CLASS } from '@/components/auth/styles';
+import { useDictionary } from '@/i18n/LocaleProvider';
 
-const schema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-});
-type FormValues = z.infer<typeof schema>;
+const buildSchema = (copy: { emailInvalid: string }) =>
+  z.object({ email: z.string().email(copy.emailInvalid) });
+
+type FormValues = z.infer<ReturnType<typeof buildSchema>>;
 
 export function ForgotPasswordForm() {
+  const copy = useDictionary().auth.forgot;
+  const schema = useMemo(() => buildSchema(copy), [copy]);
   const [submitted, setSubmitted] = useState(false);
 
   const {
@@ -41,7 +44,7 @@ export function ForgotPasswordForm() {
   if (submitted) {
     return (
       <div className="rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-300">
-        If an account exists for this email, a reset link has been sent.
+        {copy.sent}
       </div>
     );
   }
@@ -49,13 +52,13 @@ export function ForgotPasswordForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <div className="space-y-1.5">
-        <Label htmlFor="email">Email address</Label>
+        <Label htmlFor="email">{copy.emailLabel}</Label>
         <Input
           className={AUTH_CONTROL_CLASS}
           id="email"
           type="email"
           autoComplete="email"
-          placeholder="you@example.com"
+          placeholder={copy.emailPlaceholder}
           {...register('email')}
         />
         {errors.email && (
@@ -64,7 +67,7 @@ export function ForgotPasswordForm() {
       </div>
 
       <Button type="submit" className={`${AUTH_CONTROL_CLASS} w-full`} disabled={isSubmitting}>
-        {isSubmitting ? 'Sending…' : 'Send Reset Link'}
+        {isSubmitting ? copy.submitting : copy.submit}
       </Button>
     </form>
   );
