@@ -107,6 +107,19 @@ _Avoid_: Catalog
 
 **Optimistic update** — the store changes local state before the network call resolves, then reconciles or rolls back. Cart add and wishlist toggle use it.
 
+## Localization
+
+**Locale** — the display language a visitor is reading: `en` or `bn`. It is a UI preference, not commerce data. WordPress owns product, order, and account language and does not participate.
+
+**Default locale** — `en`. The answer for a visitor with no locale cookie, which also means the answer every search crawler receives.
+_Avoid_: Fallback locale (it implies a per-string fallback, which this does not do)
+
+**Locale cookie** — the `locale` cookie, read in the root layout, written by the language switcher. It is the single source of truth for the locale; there is no store, no `localStorage` copy, and no URL segment.
+
+**Translation dictionary** — the message map for one locale (`src/i18n/en.ts`, `src/i18n/bn.ts`), grouped by surface. Chrome strings live here, flat and keyed; support-page bodies live as JSX beside their page.
+
+**Bilingual surface** — a part of the UI that has copy in both dictionaries. Phase 1's bilingual surfaces are the announcement bar, the header, the footer, and the five pages under সহায়তা.
+
 ## Design
 
 **Brand token** — a CSS variable in `src/app/globals.css` (`--brand-accent`, `--brand-text`, …) exposed as a Tailwind utility (`bg-brand-accent`). Change the token, not the component.

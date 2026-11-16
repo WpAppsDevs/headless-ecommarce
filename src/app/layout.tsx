@@ -13,6 +13,8 @@ import { CartDrawer } from "@/components/cart/CartDrawer";
 import { config } from "@/lib/config";
 import { AnnouncementBar } from "@/components/home/AnnouncementBar";
 import { getMenuByLocation } from "@/lib/api/menus";
+import { LocaleProvider } from "@/i18n/LocaleProvider";
+import { getLocale } from "@/i18n/server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,24 +49,27 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const navLinks = await getMenuByLocation('primary');
+  const locale = await getLocale();
 
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <AuthHydrator />
-        <CartHydrator />
-        <WishlistHydrator />
-        <CurrencyHydrator />
-        <ErrorReporter />
-        <AnnouncementBar />
-        <Header navLinks={navLinks} />
-        <CartDrawer />
-        <Toaster richColors position="top-right" />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <LocaleProvider locale={locale}>
+          <AuthHydrator />
+          <CartHydrator />
+          <WishlistHydrator />
+          <CurrencyHydrator />
+          <ErrorReporter />
+          <AnnouncementBar />
+          <Header navLinks={navLinks} />
+          <CartDrawer />
+          <Toaster richColors position="top-right" />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </LocaleProvider>
       </body>
     </html>
   );
