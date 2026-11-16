@@ -11,6 +11,8 @@ import { AvailabilityBadge } from '@/components/product/AvailabilityBadge';
 import type { Product } from '@/lib/api/products';
 import { getProductBadge, isPurchasable } from '@/lib/product-availability';
 import { useFormatPrice } from '@/lib/utils/currency';
+import { useDictionary } from '@/i18n/LocaleProvider';
+import { interpolate } from '@/i18n/interpolate';
 
 // The placeholder is an inline SVG data URI, which cannot read CSS variables;
 // keep its fill in step with --brand-card. The card itself sets bg-brand-card.
@@ -18,11 +20,19 @@ const PLACEHOLDER =
   'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22%3E%3Crect width=%22400%22 height=%22500%22 fill=%22%23F2F2EE%22/%3E%3C/svg%3E';
 
 // ── Star Rating ──────────────────────────────────────────────────────────────
-function StarRating({ score = 4.5, count = 0 }: { score?: number; count?: number }) {
+function StarRating({
+  score = 4.5,
+  count = 0,
+  label,
+}: {
+  score?: number;
+  count?: number;
+  label: string;
+}) {
   const full = Math.floor(score);
   const half = score % 1 >= 0.5;
   return (
-    <div className="flex items-center gap-1" aria-label={`Rating: ${score} out of 5`}>
+    <div className="flex items-center gap-1" aria-label={label}>
       <div className="flex items-center gap-0.5">
         {Array.from({ length: 5 }).map((_, i) => {
           const filled = i < full;
@@ -61,6 +71,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
   const addItem = useCartStore((s) => s.addItem);
   const setCartDrawerOpen = useCartStore((s) => s.setCartDrawerOpen);
   const fmt = useFormatPrice();
+  const copy = useDictionary().product;
 
   const allImages = (Array.isArray(product.images) ? product.images : []).slice(0, 3);
   const isOnSale =
@@ -98,7 +109,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
       <Link
         href={`/products/${product.slug}`}
         className="relative block aspect-[3/4] overflow-hidden bg-brand-card"
-        aria-label={`View ${product.name}`}
+        aria-label={interpolate(copy.viewAria, { name: product.name })}
         tabIndex={-1}
       >
         {/* Image slider — show activeImg, fade between images */}
@@ -140,14 +151,14 @@ export function ProductCard({ product, priority = false }: { product: Product; p
         {allImages.length > 1 && (
           <div
             className="absolute inset-x-0 bottom-0 flex justify-center opacity-100 transition-opacity duration-300 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
-            aria-label="Image navigation"
+            aria-label={copy.imageNavigation}
           >
             {allImages.map((_, i) => (
               <button
                 key={i}
                 type="button"
                 onClick={(e) => { e.preventDefault(); setActiveImg(i); }}
-                aria-label={`Show image ${i + 1}`}
+                aria-label={interpolate(copy.showImage, { index: i + 1 })}
                 aria-pressed={i === activeImg}
                 className="flex h-11 w-11 items-center justify-center"
               >
@@ -186,6 +197,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
           <StarRating
             score={parseFloat(product.average_rating)}
             count={product.rating_count}
+            label={interpolate(copy.ratingAria, { score: parseFloat(product.average_rating) })}
           />
         )}
 
@@ -204,7 +216,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
         {/* Variable: prompt to product page for option selection */}
         {isVariable && purchasable && (
           <p className="text-xs text-brand-text-muted">
-            Multiple colors &amp; sizes available
+            {copy.multipleOptions}
           </p>
         )}
 
@@ -218,7 +230,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
               href={`/products/${product.slug}`}
               className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-brand-border bg-brand-card py-2.5 text-xs font-semibold text-brand-text transition-colors hover:border-brand-wine hover:text-brand-wine sm:min-h-0 sm:flex-1 sm:py-2 sm:text-sm"
             >
-              View Product
+              {copy.viewProduct}
             </Link>
           ) : (
             <>
@@ -227,7 +239,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
                 <button
                   type="button"
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  aria-label="Decrease quantity"
+                  aria-label={copy.decreaseQuantity}
                   className="flex h-10 w-10 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text sm:h-9 sm:w-8"
                 >
                   −
@@ -241,7 +253,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
                 <button
                   type="button"
                   onClick={() => setQty((q) => q + 1)}
-                  aria-label="Increase quantity"
+                  aria-label={copy.increaseQuantity}
                   className="flex h-10 w-10 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text sm:h-9 sm:w-8"
                 >
                   +
@@ -255,7 +267,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
                   className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-wine py-3 text-xs font-semibold text-white transition-colors hover:bg-brand-accent-strong-hover sm:flex-1 sm:gap-1.5 sm:py-2 sm:text-sm sm:px-3"
                 >
                   <ShoppingBag className="h-4 w-4 shrink-0 sm:h-3.5 sm:w-3.5" />
-                  <span>Select Options</span>
+                  <span>{copy.selectOptions}</span>
                 </Link>
               ) : (
                 <button
@@ -268,7 +280,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
                   )}
                 >
                   <ShoppingBag className="h-4 w-4 shrink-0 sm:h-3.5 sm:w-3.5" />
-                  <span className="truncate">{adding ? 'Adding…' : 'Add to Cart'}</span>
+                  <span className="truncate">{adding ? copy.adding : copy.addToCart}</span>
                 </button>
               )}
             </>
