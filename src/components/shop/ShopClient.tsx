@@ -11,6 +11,7 @@ import { ShopTopBar, type SortOrder } from '@/components/shop/ShopTopBar';
 import { ShopPagination } from '@/components/shop/ShopPagination';
 import { ReadyStockEmptyState } from '@/components/shop/ReadyStockEmptyState';
 import { buildShopFilterHref, buildShopHref, clearShopFilters } from '@/lib/navigation';
+import { useDictionary } from '@/i18n/LocaleProvider';
 
 interface ShopClientProps {
   initialProducts: Product[];
@@ -31,21 +32,23 @@ function gridColsClass(cols: 2 | 3 | 4) {
 }
 
 function EmptyState({ onClear }: { onClear: () => void }) {
+  const copy = useDictionary().shop;
+
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <div className="h-20 w-20 rounded-full bg-brand-card flex items-center justify-center mb-6">
         <Search className="h-8 w-8 text-brand-accent-strong" />
       </div>
-      <h3 className="text-lg font-semibold text-brand-text mb-2">No products found</h3>
+      <h3 className="text-lg font-semibold text-brand-text mb-2">{copy.emptyTitle}</h3>
       <p className="text-sm text-brand-text-muted mb-6 max-w-sm">
-        Try adjusting your filters or search terms to find what you&apos;re looking for.
+        {copy.emptyBody}
       </p>
       <button
         onClick={onClear}
         className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-brand-accent-strong px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-accent-strong-hover focus-brand"
       >
         <X className="h-4 w-4" />
-        Clear all filters
+        {copy.clearFilters}
       </button>
     </div>
   );
@@ -70,6 +73,7 @@ export function ShopClient({
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [viewCols, setViewCols] = useState<2 | 3 | 4>(3);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const copy = useDictionary().shop;
 
   const priceRange = useMemo<[number, number]>(() => {
     if (!initialProducts.length) return [0, 9999];
@@ -205,24 +209,24 @@ export function ShopClient({
         <div className="fixed inset-0 z-50 lg:hidden">
           <button
             type="button"
-            aria-label="Close filters"
+            aria-label={copy.closeFilters}
             className="absolute inset-0 bg-brand-dark/40 backdrop-blur-sm"
             onClick={() => setMobileFiltersOpen(false)}
           />
           <div
             role="dialog"
             aria-modal="true"
-            aria-label="Filters"
+            aria-label={copy.filters}
             className="absolute inset-y-0 left-0 w-80 max-w-[85vw] overflow-y-auto bg-brand-section shadow-2xl"
           >
             <div className="sticky top-0 z-10 bg-brand-section border-b border-brand-border px-5 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Filter className="h-5 w-5 text-brand-text" />
-                <h2 className="text-lg font-semibold text-brand-text">Filters</h2>
+                <h2 className="text-lg font-semibold text-brand-text">{copy.filters}</h2>
               </div>
               <button
                 onClick={() => setMobileFiltersOpen(false)}
-                aria-label="Close filters"
+                aria-label={copy.closeFilters}
                 className="flex h-11 w-11 items-center justify-center rounded-lg text-brand-text-muted transition-colors hover:bg-brand-card focus-brand"
               >
                 <X className="h-5 w-5" />
@@ -242,7 +246,7 @@ export function ShopClient({
           <div className="sticky top-24">
             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-brand-border">
               <Filter className="h-4 w-4 text-brand-text-muted" />
-              <h2 className="text-sm font-semibold text-brand-text uppercase tracking-wider">Filters</h2>
+              <h2 className="text-sm font-semibold text-brand-text uppercase tracking-wider">{copy.filters}</h2>
             </div>
             <ShopSidebar {...sidebarProps} />
           </div>

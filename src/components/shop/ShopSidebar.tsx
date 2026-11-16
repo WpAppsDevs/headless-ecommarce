@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 import type { FilterTag, FilterBrand, FilterAttributeTerm } from '@/lib/api/filters';
 import { useFormatPrice } from '@/lib/utils/currency';
 import { buildShopFilterHref } from '@/lib/navigation';
+import { useDictionary } from '@/i18n/LocaleProvider';
+import { interpolate } from '@/i18n/interpolate';
 
 interface ShopSidebarProps {
   categories: Array<{ id: number; name: string; slug: string }>;
@@ -147,6 +149,7 @@ export function ShopSidebar({
   currentSearch,
 }: ShopSidebarProps) {
   const fmt = useFormatPrice();
+  const copy = useDictionary().shop;
   const isAllProducts = !selectedCategory && !selectedTag && !selectedBrand && !currentSearch;
 
   return (
@@ -156,19 +159,19 @@ export function ShopSidebar({
         <div className="mb-4 p-3 rounded-xl bg-brand-card border border-brand-border">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold text-brand-text-muted uppercase tracking-wider">
-              Active Filters
+              {copy.activeFilters}
             </span>
             <button
               onClick={onClearAll}
               className="text-xs text-brand-wine hover:text-brand-accent-strong-hover font-medium transition-colors"
             >
-              Clear All
+              {copy.clearAll}
             </button>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {currentSearch && (
               <ActiveFilterPill
-                label={`Search: ${currentSearch}`}
+                label={interpolate(copy.searchPill, { value: currentSearch })}
                 onRemove={() => {
                   window.location.href = buildShopFilterHref({
                     category: selectedCategory,
@@ -181,7 +184,9 @@ export function ShopSidebar({
             )}
             {selectedCategory && (
               <ActiveFilterPill
-                label={`Category: ${selectedCategory.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}`}
+                label={interpolate(copy.categoryPill, {
+                  value: selectedCategory.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+                })}
                 onRemove={() => {
                   window.location.href = buildShopFilterHref({
                     category: null,
@@ -194,7 +199,7 @@ export function ShopSidebar({
             )}
             {selectedTag && (
               <ActiveFilterPill
-                label={`Tag: ${selectedTag}`}
+                label={interpolate(copy.tagPill, { value: selectedTag })}
                 onRemove={() => {
                   window.location.href = buildShopFilterHref({
                     category: selectedCategory,
@@ -207,7 +212,7 @@ export function ShopSidebar({
             )}
             {selectedBrand && (
               <ActiveFilterPill
-                label={`Brand: ${selectedBrand}`}
+                label={interpolate(copy.brandPill, { value: selectedBrand })}
                 onRemove={() => {
                   window.location.href = buildShopFilterHref({
                     category: selectedCategory,
@@ -221,14 +226,14 @@ export function ShopSidebar({
             {selectedColors.map((color) => (
               <ActiveFilterPill
                 key={color}
-                label={`Color: ${color}`}
+                label={interpolate(copy.colorPill, { value: color })}
                 onRemove={() => onColorToggle(color)}
               />
             ))}
             {selectedSizes.map((size) => (
               <ActiveFilterPill
                 key={size}
-                label={`Size: ${size}`}
+                label={interpolate(copy.sizeFilterLabel, { size })}
                 onRemove={() => onSizeToggle(size)}
               />
             ))}
@@ -238,7 +243,7 @@ export function ShopSidebar({
 
       {/* Categories */}
       <FilterSection
-        title="Categories"
+        title={copy.categories}
         defaultOpen={true}
         badge={selectedCategory ? (
           <span className="h-2 w-2 rounded-full bg-brand-wine" />
@@ -261,7 +266,7 @@ export function ShopSidebar({
               )}
             >
               {isAllProducts && <ChevronRight className="h-3 w-3" />}
-              <span className={isAllProducts ? 'ml-1' : 'ml-5'}>All Products</span>
+              <span className={isAllProducts ? 'ml-1' : 'ml-5'}>{copy.allProducts}</span>
             </Link>
           </li>
           {categories.map((cat) => {
@@ -289,7 +294,7 @@ export function ShopSidebar({
       {/* Tags */}
       {tags.length > 0 && (
         <FilterSection
-          title="Tags"
+          title={copy.tags}
           defaultOpen={false}
           badge={selectedTag ? (
             <span className="h-2 w-2 rounded-full bg-brand-wine" />
@@ -320,7 +325,7 @@ export function ShopSidebar({
       {/* Brands */}
       {brands.length > 0 && (
         <FilterSection
-          title="Brands"
+          title={copy.brands}
           defaultOpen={false}
           badge={selectedBrand ? (
             <span className="h-2 w-2 rounded-full bg-brand-wine" />
@@ -355,7 +360,7 @@ export function ShopSidebar({
 
       {/* Price Range */}
       <FilterSection
-        title="Price Range"
+        title={copy.priceRange}
         defaultOpen={false}
         badge={activePriceRange && (activePriceRange[0] !== priceRange[0] || activePriceRange[1] !== priceRange[1]) ? (
           <span className="h-2 w-2 rounded-full bg-brand-wine" />
@@ -364,7 +369,7 @@ export function ShopSidebar({
         <div className="space-y-3 px-2">
           <div className="flex items-center gap-2">
             <div className="flex-1">
-              <label className="text-xs text-brand-text-muted mb-1 block">Min Price</label>
+              <label className="text-xs text-brand-text-muted mb-1 block">{copy.minPrice}</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-brand-text-muted">
                   {fmt(0).replace(/[0-9.,\s]/g, '')}
@@ -385,7 +390,7 @@ export function ShopSidebar({
               </div>
             </div>
             <div className="flex-1">
-              <label className="text-xs text-brand-text-muted mb-1 block">Max Price</label>
+              <label className="text-xs text-brand-text-muted mb-1 block">{copy.maxPrice}</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-brand-text-muted">
                   {fmt(0).replace(/[0-9.,\s]/g, '')}
@@ -417,7 +422,7 @@ export function ShopSidebar({
       {/* Colors */}
       {colorTerms.length > 0 && (
         <FilterSection
-          title="Colors"
+          title={copy.colors}
           defaultOpen={false}
           badge={selectedColors.length > 0 ? (
             <span className="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-brand-wine px-1 text-[10px] font-bold text-white">
@@ -435,7 +440,10 @@ export function ShopSidebar({
                   key={color.slug}
                   onClick={() => onColorToggle(color.slug)}
                   title={color.name}
-                  aria-label={`${isActive ? 'Remove' : 'Add'} ${color.name} filter`}
+                  aria-label={interpolate(copy.colorFilterAria, {
+                    action: isActive ? copy.removeFilter : copy.addFilter,
+                    name: color.name,
+                  })}
                   aria-pressed={isActive}
                   className={cn(
                     'group relative flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all duration-150 focus-brand after:absolute after:-inset-1.5 after:content-[""]',
@@ -467,7 +475,7 @@ export function ShopSidebar({
       {/* Sizes */}
       {sizeTerms.length > 0 && (
         <FilterSection
-          title="Sizes"
+          title={copy.sizes}
           defaultOpen={false}
           badge={selectedSizes.length > 0 ? (
             <span className="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-brand-wine px-1 text-[10px] font-bold text-white">
