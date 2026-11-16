@@ -1,4 +1,7 @@
+'use client';
+
 import { cn } from '@/lib/utils';
+import { useDictionary } from '@/i18n/LocaleProvider';
 import type { ProductBadge } from '@/lib/product-availability';
 
 export function AvailabilityBadge({
@@ -8,6 +11,8 @@ export function AvailabilityBadge({
   badge: ProductBadge;
   className?: string;
 }) {
+  const copy = useDictionary().product.badge;
+
   if (!badge) return null;
 
   return (
@@ -18,7 +23,7 @@ export function AvailabilityBadge({
         className,
       )}
     >
-      {badge === 'pre-order' ? 'Pre-Order' : 'Sold Out'}
+      {badge === 'pre-order' ? copy.preOrder : copy.soldOut}
     </span>
   );
 }

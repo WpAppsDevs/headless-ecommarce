@@ -227,4 +227,21 @@ export const en = {
       cta: 'Start Chat',
     },
   },
+  product: {
+    badge: {
+      preOrder: 'Pre-Order',
+      soldOut: 'Sold Out',
+    },
+    viewAria: 'View {name}',
+    viewProduct: 'View Product',
+    addToCart: 'Add to Cart',
+    adding: 'Adding…',
+    selectOptions: 'Select Options',
+    multipleOptions: 'Multiple colors & sizes available',
+    decreaseQuantity: 'Decrease quantity',
+    increaseQuantity: 'Increase quantity',
+    imageNavigation: 'Image navigation',
+    showImage: 'Show image {index}',
+    ratingAria: 'Rating: {score} out of 5',
+  },
 };

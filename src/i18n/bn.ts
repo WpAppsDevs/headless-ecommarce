@@ -229,4 +229,21 @@ export const bn: Dictionary = {
       cta: 'চ্যাট শুরু করুন',
     },
   },
+  product: {
+    badge: {
+      preOrder: 'প্রি-অর্ডার',
+      soldOut: 'স্টক শেষ',
+    },
+    viewAria: '{name} দেখুন',
+    viewProduct: 'পণ্য দেখুন',
+    addToCart: 'কার্টে যোগ করুন',
+    adding: 'যোগ হচ্ছে…',
+    selectOptions: 'অপশন বেছে নিন',
+    multipleOptions: 'একাধিক রঙ ও সাইজ পাওয়া যায়',
+    decreaseQuantity: 'পরিমাণ কমান',
+    increaseQuantity: 'পরিমাণ বাড়ান',
+    imageNavigation: 'ছবি পরিবর্তন',
+    showImage: '{index} নম্বর ছবি দেখুন',
+    ratingAria: 'রেটিং: ৫-এর মধ্যে {score}',
+  },
 };
