@@ -1,8 +1,12 @@
 import { config } from '@/lib/config';
+import { getDictionary } from '@/i18n/get-dictionary';
+import { getLocale } from '@/i18n/server';
 
-export function WhatsAppCTA() {
+export async function WhatsAppCTA() {
+  const copy = getDictionary(await getLocale()).home.whatsapp;
+
   return (
-    <section aria-label="WhatsApp contact" className="bg-brand-section py-8">
+    <section aria-label={copy.sectionLabel} className="bg-brand-section py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <a
           href={config.whatsappUrl}
@@ -19,14 +23,14 @@ export function WhatsAppCTA() {
               </svg>
             </div>
             <div>
-              <p className="text-lg font-bold text-white">Chat With Us on WhatsApp</p>
-              <p className="text-sm text-white/80">Available 7 days a week — order, inquire, or get styling advice</p>
+              <p className="text-lg font-bold text-white">{copy.title}</p>
+              <p className="text-sm text-white/80">{copy.subtitle}</p>
             </div>
           </div>
 
           {/* Right side */}
           <span className="shrink-0 rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-brand-whatsapp transition group-hover:bg-white/90">
-            Start Chat →
+            {copy.cta} →
           </span>
         </a>
       </div>

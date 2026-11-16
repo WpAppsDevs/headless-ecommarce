@@ -21,6 +21,8 @@ const BASE = `http://127.0.0.1:${PORT}`;
 const CASES = [
   { route: '/', cookie: '', lang: 'en', body: 'Delivery in 15–25 Days' },
   { route: '/', cookie: 'locale=bn', lang: 'bn', body: '১৫–২৫ দিনে ডেলিভারি' },
+  { route: '/', cookie: '', lang: 'en', body: 'How Pre-Order Works' },
+  { route: '/', cookie: 'locale=bn', lang: 'bn', body: 'প্রি-অর্ডার যেভাবে কাজ করে' },
   { route: '/shipping', cookie: '', lang: 'en', title: 'Shipping & Delivery' },
   { route: '/shipping', cookie: 'locale=bn', lang: 'bn', title: 'শিপিং ও ডেলিভারি' },
   { route: '/terms', cookie: '', lang: 'en', title: 'Terms of Service' },

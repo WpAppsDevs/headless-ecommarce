@@ -7,6 +7,9 @@
  */
 export const PRE_ORDER_WINDOW_DAYS = { min: 15, max: 25 } as const;
 
+/** Delivery window for products held in stock in Bangladesh. */
+export const READY_STOCK_WINDOW_DAYS = { min: 2, max: 5 } as const;
+
 /** Pre-order air freight, charged per kilogram. */
 export const PRE_ORDER_PER_KG = 1850;
 

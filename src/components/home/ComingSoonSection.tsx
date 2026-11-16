@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import { Check, Gem } from 'lucide-react';
+import { useDictionary } from '@/i18n/LocaleProvider';
 
 export function ComingSoonSection() {
+  const copy = useDictionary().home.comingSoon;
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -24,10 +26,10 @@ export function ComingSoonSection() {
       if (res.ok || data?.alreadySubscribed) {
         setSubmitted(true);
       } else {
-        setError(data?.error ?? 'Something went wrong. Please try again.');
+        setError(data?.error ?? copy.errorGeneric);
       }
     } catch {
-      setError('Network error. Please try again.');
+      setError(copy.errorNetwork);
     } finally {
       setLoading(false);
     }
@@ -55,13 +57,13 @@ export function ComingSoonSection() {
                 <Gem className="h-7 w-7 text-brand-gold" strokeWidth={1.5} />
               </div>
               <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/60">
-                Coming Soon
+                {copy.eyebrow}
               </span>
             </div>
 
             {/* Heading */}
             <h2 id="coming-soon-heading" className="font-serif text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
-              Ornaments Collection
+              {copy.title}
             </h2>
 
             {/* Gold divider */}
@@ -69,7 +71,7 @@ export function ComingSoonSection() {
 
             {/* Description */}
             <p className="mx-auto mt-5 max-w-lg text-[15px] leading-relaxed text-white/55">
-              Exquisite Pakistani jewelry — chokers, earrings, bangles, and bridal sets — coming to complete your traditional look. Stay tuned for the launch.
+              {copy.description}
             </p>
 
             {/* Notify me form */}
@@ -78,21 +80,21 @@ export function ComingSoonSection() {
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-accent-strong ring-1 ring-brand-accent/30">
                   <Check className="h-4 w-4 text-white" />
                 </div>
-                <span className="font-medium">You&apos;re on the list! We&apos;ll notify you at launch.</span>
+                <span className="font-medium">{copy.success}</span>
               </div>
             ) : (
               <form
                 onSubmit={onSubmit}
                 className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row sm:gap-0"
               >
-                <label htmlFor="notify-email" className="sr-only">Email address</label>
+                <label htmlFor="notify-email" className="sr-only">{copy.emailLabel}</label>
                 <input
                   id="notify-email"
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email for launch notification"
+                  placeholder={copy.placeholder}
                   className="flex-1 rounded-xl bg-white/[0.08] px-5 py-3.5 text-sm text-white placeholder:text-white/35 outline-none ring-1 ring-white/15 transition focus:ring-2 focus:ring-brand-accent sm:rounded-r-none sm:rounded-l-xl"
                 />
                 <button
@@ -103,7 +105,7 @@ export function ComingSoonSection() {
                   {loading ? (
                     <span className="block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white mx-auto" />
                   ) : (
-                    'Notify Me'
+                    copy.submit
                   )}
                 </button>
               </form>

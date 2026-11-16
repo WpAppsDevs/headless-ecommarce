@@ -11,6 +11,8 @@ import { FeaturesStrip } from '@/components/home/FeaturesStrip';
 import { ComingSoonSection } from '@/components/home/ComingSoonSection';
 import { WhatsAppCTA } from '@/components/home/WhatsAppCTA';
 import { EditorialHeading } from '@/components/home/EditorialHeading';
+import { getDictionary } from '@/i18n/get-dictionary';
+import { getLocale } from '@/i18n/server';
 
 export const revalidate = 60;
 
@@ -22,6 +24,7 @@ export default async function HomePage() {
     .catch(() => null);
   const heroAction = catalog ? getHeroPrimaryAction(catalog) : 'contact';
   const featured = catalog?.slice(0, 4) ?? [];
+  const copy = getDictionary(await getLocale()).home.featured;
 
   return (
     <div className="flex flex-col">
@@ -35,9 +38,9 @@ export default async function HomePage() {
           {/* Heading — matches other section headings */}
           <EditorialHeading
             id="featured-heading"
-            eyebrow="New Arrivals"
-            title="Latest Collection"
-            action={{ href: '/products', label: 'View all products' }}
+            eyebrow={copy.eyebrow}
+            title={copy.title}
+            action={{ href: '/products', label: copy.action }}
           />
 
           {featured.length > 0 && (

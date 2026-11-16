@@ -76,9 +76,10 @@
   --color-brand-danger: var(--brand-danger);
   --color-brand-whatsapp: var(--brand-whatsapp);
   --color-brand-dark-surface: var(--brand-dark-surface);
-  /* Playfair has no Bengali glyphs, so Bangla headings fall through to the
-     Bengali face rather than the OS font. A serif Bangla face is a later step. */
-  --font-serif: var(--font-playfair), var(--font-bengali), Georgia, "Times New Roman", serif;
+  /* Playfair has no Bengali glyphs; the serif Bengali face follows it so a Bangla
+     heading keeps the serif voice, and the sans face catches anything it lacks. */
+  --font-serif: var(--font-playfair), var(--font-serif-bengali), var(--font-bengali), Georgia,
+    "Times New Roman", serif;
   --font-ui: var(--font-inter), var(--font-bengali), ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 

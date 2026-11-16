@@ -6,10 +6,12 @@ import Image from 'next/image';
 import { getRandomReviews } from '@/lib/api/reviews';
 import { EditorialHeading } from '@/components/home/EditorialHeading';
 import type { Review } from '@/lib/api/reviews';
+import { useDictionary } from '@/i18n/LocaleProvider';
+import { interpolate } from '@/i18n/interpolate';
 
-function Stars({ rating }: { rating: number }) {
+function Stars({ rating, label }: { rating: number; label: string }) {
   return (
-    <div className="flex gap-0.5" aria-label={`${rating} out of 5 stars`}>
+    <div className="flex gap-0.5" aria-label={label}>
       {[1, 2, 3, 4, 5].map((i) => (
         <Star
           key={i}
@@ -23,17 +25,23 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-function ReviewCard({ review }: { review: Awaited<ReturnType<typeof getRandomReviews>>[0] }) {
+function ReviewCard({
+  review,
+  copy,
+}: {
+  review: Awaited<ReturnType<typeof getRandomReviews>>[0];
+  copy: ReturnType<typeof useDictionary>['home']['testimonials'];
+}) {
   const hasImage = review.media && review.media.length > 0;
   const hasText = review.content && review.content.trim().length > 0;
   const avatarUrl = review.author?.avatar_url;
-  const authorName = review.author?.name ?? 'Customer';
+  const authorName = review.author?.name ?? copy.customerFallback;
   const initials = authorName.charAt(0).toUpperCase();
 
   return (
     <div className="flex flex-col gap-4 rounded-xl border border-brand-border bg-brand-section p-6">
       {/* Stars */}
-      <Stars rating={review.rating} />
+      <Stars rating={review.rating} label={interpolate(copy.ratingAria, { rating: review.rating })} />
 
       {/* Title */}
       {review.title && (
@@ -51,7 +59,7 @@ function ReviewCard({ review }: { review: Awaited<ReturnType<typeof getRandomRev
         <div className="relative flex-1 overflow-hidden rounded-lg bg-brand-border">
           <Image
             src={review.media[0].url}
-            alt={`Review by ${authorName}`}
+            alt={interpolate(copy.reviewImageAlt, { name: authorName })}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover"
@@ -83,9 +91,12 @@ function ReviewCard({ review }: { review: Awaited<ReturnType<typeof getRandomRev
 }
 
 export function TestimonialsSection() {
+  const copy = useDictionary().home.testimonials;
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // A failed fetch hides the section, so a flag is enough; the wording lives in
+  // the dictionary only if this ever grows a visible error state.
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -94,11 +105,11 @@ export function TestimonialsSection() {
         const data = await getRandomReviews(4);
         if (mounted) {
           setReviews(data);
-          setError(null);
+          setFailed(false);
         }
       } catch {
         if (mounted) {
-          setError('Unable to load customer reviews.');
+          setFailed(true);
         }
       } finally {
         if (mounted) {
@@ -148,7 +159,7 @@ export function TestimonialsSection() {
     );
   }
 
-  if (error || reviews.length === 0) {
+  if (failed || reviews.length === 0) {
     return null;
   }
 
@@ -158,15 +169,15 @@ export function TestimonialsSection() {
         {/* Heading */}
         <EditorialHeading
           id="testimonials-heading"
-          eyebrow="Customer Reviews"
-          title="What Our Customers Say"
-          description="Real experiences from our customers across the country."
+          eyebrow={copy.eyebrow}
+          title={copy.title}
+          description={copy.description}
         />
 
         {/* Cards */}
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {reviews.map((review) => (
-            <ReviewCard key={review.id} review={review} />
+            <ReviewCard key={review.id} review={review} copy={copy} />
           ))}
         </div>
       </div>
