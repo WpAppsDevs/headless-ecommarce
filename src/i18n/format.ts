@@ -19,3 +19,13 @@ export function formatTaka(locale: Locale, value: number): string {
 export function formatYear(locale: Locale, value: number): string {
   return new Intl.NumberFormat(intlLocale(locale), { useGrouping: false }).format(value);
 }
+
+/**
+ * A range, e.g. `15–25` or `১৫–২৫`.
+ *
+ * Joined here rather than with `Intl.NumberFormat.formatRange`, which is not
+ * available in every runtime Next.js may run on.
+ */
+export function formatRange(locale: Locale, from: number, to: number): string {
+  return `${formatNumber(locale, from)}–${formatNumber(locale, to)}`;
+}

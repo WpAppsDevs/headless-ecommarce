@@ -14,14 +14,15 @@ import { NoteCallout } from '@/components/policies/NoteCallout';
 import { SectionHeading } from '@/components/policies/SectionHeading';
 import { StatCard } from '@/components/policies/StatCard';
 import { TypePanel } from '@/components/policies/TypePanel';
-import { formatNumber, formatTaka } from '@/i18n/format';
+import { formatNumber, formatRange, formatTaka } from '@/i18n/format';
 import {
   EXTRA_KG_CHARGE,
   INCLUDED_KG,
   LOCAL_DELIVERY,
   PRE_ORDER_PER_KG,
+  PRE_ORDER_WINDOW_DAYS,
   WEIGHT_EXAMPLES,
-} from '../rates';
+} from '@/lib/delivery';
 
 const BREADCRUMBS = [{ label: 'Home', href: '/' }, { label: 'Shipping & Delivery' }];
 
@@ -99,7 +100,11 @@ export function ShippingContentEn() {
               Estimated delivery time
             </h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <StatCard label="Total estimated time" value="20–25" sub="days" />
+              <StatCard
+                label="Total estimated time"
+                value={formatRange('en', PRE_ORDER_WINDOW_DAYS.min, PRE_ORDER_WINDOW_DAYS.max)}
+                sub="days"
+              />
               <div className="rounded-2xl border border-brand-border bg-brand-card p-5">
                 <p className="text-sm leading-relaxed text-brand-text-muted">
                   This window covers both steps: the product travelling from Pakistan to Bangladesh,
@@ -215,7 +220,8 @@ export function ShippingContentEn() {
                 because of shipment, logistics, customs clearance or other unforeseen problems.
               </p>
               <p className="mt-2 font-medium">
-                20–25 days is an estimated delivery time.
+                {formatRange('en', PRE_ORDER_WINDOW_DAYS.min, PRE_ORDER_WINDOW_DAYS.max)} days is an
+                estimated delivery time.
               </p>
             </NoteCallout>
           </div>

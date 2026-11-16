@@ -55,7 +55,7 @@ Terms used across this storefront, the WordPress wrapper API, and the docs in `d
 **Ready Stock** — a merchandising collection of products tagged `ready-stock` that have at least one purchasable variation. A product that sells out leaves the collection but stays in the general catalog.
 _Avoid_: In stock, available now
 
-**Pre-Order** — a purchase mode for products tagged `pre-order`, bought before the 15–25 day import window.
+**Pre-Order** — a purchase mode for products tagged `pre-order`, bought before the 15–25 day import window. The window is `PRE_ORDER_WINDOW_DAYS` in `src/lib/delivery.ts`; every surface that quotes it renders those numbers, and 15–25 is final.
 _Avoid_: Backorder (unless the API field literally says `onbackorder`), pre-sale
 
 **Sold out** — a product with no purchasable variation right now. It is not Ready Stock, but it stays visible in the general catalog with a sold-out state and its product page stays reachable.

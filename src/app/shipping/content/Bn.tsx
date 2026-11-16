@@ -14,14 +14,15 @@ import { NoteCallout } from '@/components/policies/NoteCallout';
 import { SectionHeading } from '@/components/policies/SectionHeading';
 import { StatCard } from '@/components/policies/StatCard';
 import { TypePanel } from '@/components/policies/TypePanel';
-import { formatNumber, formatTaka } from '@/i18n/format';
+import { formatNumber, formatRange, formatTaka } from '@/i18n/format';
 import {
   EXTRA_KG_CHARGE,
   INCLUDED_KG,
   LOCAL_DELIVERY,
   PRE_ORDER_PER_KG,
+  PRE_ORDER_WINDOW_DAYS,
   WEIGHT_EXAMPLES,
-} from '../rates';
+} from '@/lib/delivery';
 
 const BREADCRUMBS = [{ label: 'হোম', href: '/' }, { label: 'শিপিং ও ডেলিভারি' }];
 
@@ -99,7 +100,11 @@ export function ShippingContentBn() {
               আনুমানিক ডেলিভারি সময়
             </h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <StatCard label="সর্বমোট আনুমানিক সময়" value="২০–২৫" sub="দিন" />
+              <StatCard
+                label="সর্বমোট আনুমানিক সময়"
+                value={formatRange('bn', PRE_ORDER_WINDOW_DAYS.min, PRE_ORDER_WINDOW_DAYS.max)}
+                sub="দিন"
+              />
               <div className="rounded-2xl border border-brand-border bg-brand-card p-5">
                 <p className="text-sm leading-relaxed text-brand-text-muted">
                   এই সময়ের মধ্যে পাকিস্তান থেকে বাংলাদেশে পণ্য আসার সময় এবং বাংলাদেশে পৌঁছানোর পর
@@ -212,7 +217,8 @@ export function ShippingContentBn() {
                 অন্যান্য অনাকাঙ্ক্ষিত সমস্যার কারণে নির্ধারিত সময়ের চেয়ে বেশি সময় লাগতে পারে।
               </p>
               <p className="mt-2 font-medium">
-                ২০–২৫ দিন একটি আনুমানিক ডেলিভারি সময়।
+                {formatRange('bn', PRE_ORDER_WINDOW_DAYS.min, PRE_ORDER_WINDOW_DAYS.max)} দিন একটি
+                আনুমানিক ডেলিভারি সময়।
               </p>
             </NoteCallout>
           </div>

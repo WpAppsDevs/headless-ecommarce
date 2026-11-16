@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatNumber, formatTaka, formatYear } from '@/i18n/format';
+import { formatNumber, formatRange, formatTaka, formatYear } from '@/i18n/format';
 
 describe('formatNumber', () => {
   it('groups thousands with Western digits in english', () => {
@@ -20,6 +20,13 @@ describe('formatYear', () => {
   it('never groups a year', () => {
     expect(formatYear('en', 2026)).toBe('2026');
     expect(formatYear('bn', 2026)).toBe('২০২৬');
+  });
+});
+
+describe('formatRange', () => {
+  it('joins the two ends with an en dash', () => {
+    expect(formatRange('en', 15, 25)).toBe('15–25');
+    expect(formatRange('bn', 15, 25)).toBe('১৫–২৫');
   });
 });
 

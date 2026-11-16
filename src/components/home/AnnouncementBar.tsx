@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import { config } from '@/lib/config';
+import { PRE_ORDER_WINDOW_DAYS } from '@/lib/delivery';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { getLocale } from '@/i18n/server';
+import { formatRange } from '@/i18n/format';
+import { interpolate } from '@/i18n/interpolate';
 
 function FacebookIcon() {
   return (
@@ -20,7 +23,9 @@ function InstagramIcon() {
 }
 
 export async function AnnouncementBar() {
-  const announcements = getDictionary(await getLocale()).announcement;
+  const locale = await getLocale();
+  const announcements = getDictionary(locale).announcement;
+  const window = formatRange(locale, PRE_ORDER_WINDOW_DAYS.min, PRE_ORDER_WINDOW_DAYS.max);
 
   return (
     <div className="bg-brand-topbar text-brand-text">
@@ -31,9 +36,11 @@ export async function AnnouncementBar() {
         {/* Center: 3 items with pipe separators */}
         <div className="flex flex-1 items-center justify-center gap-2 text-[12px] font-medium sm:gap-4 lg:gap-6">
           <span className="hidden sm:inline">{announcements.preOrder}</span>
-          <span className="inline text-[11px] sm:hidden">{announcements.preOrderMobile}</span>
+          <span className="inline text-[11px] sm:hidden">
+            {interpolate(announcements.preOrderMobile, { window })}
+          </span>
           <span className="hidden text-brand-text sm:inline">|</span>
-          <span className="hidden sm:inline">{announcements.delivery}</span>
+          <span className="hidden sm:inline">{interpolate(announcements.delivery, { window })}</span>
           <span className="hidden text-brand-text sm:inline">|</span>
           <span className="hidden sm:inline">{announcements.authentic}</span>
         </div>

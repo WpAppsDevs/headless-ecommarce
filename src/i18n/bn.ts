@@ -11,8 +11,8 @@ export const bn: Dictionary = {
   },
   announcement: {
     preOrder: 'পাকিস্তান থেকে প্রি-অর্ডার 🇵🇰',
-    preOrderMobile: 'প্রি-অর্ডার 🇵🇰| ১৫-২৫ দিন | অরিজিনাল',
-    delivery: '১৫-২৫ দিনে ডেলিভারি',
+    preOrderMobile: 'প্রি-অর্ডার 🇵🇰| {window} দিন | অরিজিনাল',
+    delivery: '{window} দিনে ডেলিভারি',
     authentic: 'অথেনটিক পাকিস্তানি কালেকশন',
   },
   header: {

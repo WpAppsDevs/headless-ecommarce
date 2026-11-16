@@ -9,8 +9,8 @@ export const en = {
   },
   announcement: {
     preOrder: 'Pre-Order from Pakistan 🇵🇰',
-    preOrderMobile: 'Pre-Order 🇵🇰| 15-25 Days | Original',
-    delivery: 'Delivery in 15-25 Days',
+    preOrderMobile: 'Pre-Order 🇵🇰| {window} Days | Original',
+    delivery: 'Delivery in {window} Days',
     authentic: 'Authentic Pakistani Collections',
   },
   header: {

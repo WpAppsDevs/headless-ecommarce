@@ -6,6 +6,10 @@ import type { ReactNode } from 'react';
 import type { HeroPrimaryAction } from '@/lib/product-availability';
 import { config } from '@/lib/config';
 import { cn } from '@/lib/utils';
+import { PRE_ORDER_WINDOW_DAYS } from '@/lib/delivery';
+import { formatRange } from '@/i18n/format';
+
+const PRE_ORDER_WINDOW = formatRange('en', PRE_ORDER_WINDOW_DAYS.min, PRE_ORDER_WINDOW_DAYS.max);
 
 interface Cta {
   href: string;
@@ -64,8 +68,8 @@ const HERO_MODES: Record<HeroPrimaryAction, HeroMode> = {
     headline: 'Pre-Order Available',
     body: (
       <>
-        Shop the latest Pakistani collections by pre-order, delivered directly from Pakistan in
-        15-25 days.
+        Shop the latest Pakistani collections by pre-order, delivered directly from Pakistan in{' '}
+        {PRE_ORDER_WINDOW} days.
       </>
     ),
     primary: { href: '/products?tag=pre-order', label: 'Shop Pre-Order', Icon: Clock },
@@ -167,7 +171,7 @@ export function HeroSlider({ primaryAction = 'ready-stock' }: { primaryAction?: 
                 <Plane className="h-[18px] w-[18px] shrink-0 text-brand-wine/70" strokeWidth={1.5} />
                 <div>
                   <p className="text-[13px] font-semibold text-brand-text">Pre-Order Delivery</p>
-                  <p className="text-[12px] text-brand-text-muted">15-25 Days</p>
+                  <p className="text-[12px] text-brand-text-muted">{PRE_ORDER_WINDOW} Days</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 px-5 py-3.5">
