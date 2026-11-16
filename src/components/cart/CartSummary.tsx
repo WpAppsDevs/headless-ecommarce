@@ -4,9 +4,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/stores/cartStore';
 import { DEFAULT_SHIPPING_METHODS } from '@/lib/api/cart';
+import { useDictionary } from '@/i18n/LocaleProvider';
 import { useFormatPrice } from '@/lib/utils/currency';
 
 export function CartSummary() {
+  const copy = useDictionary().cart;
   const router = useRouter();
   const items = useCartStore((s) => s.items);
   const shippingMethods =
@@ -24,17 +26,17 @@ export function CartSummary() {
 
   return (
     <div className="sticky top-24 rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm space-y-5">
-      <h2 className="text-lg font-bold text-zinc-900">Order Summary</h2>
+      <h2 className="text-lg font-bold text-zinc-900">{copy.summaryTitle}</h2>
 
       {/* Subtotal */}
       <div className="flex items-center justify-between text-sm">
-        <span className="font-medium text-zinc-600">Subtotal</span>
+        <span className="font-medium text-zinc-600">{copy.subtotal}</span>
         <span className="font-semibold text-zinc-900">{fmt(subtotal)}</span>
       </div>
 
       {/* Discounts */}
       <div className="flex items-center justify-between text-sm">
-        <span className="font-medium text-zinc-600">Discounts</span>
+        <span className="font-medium text-zinc-600">{copy.discounts}</span>
         <span className="font-semibold text-zinc-400 italic text-xs">—</span>
       </div>
 
@@ -42,7 +44,7 @@ export function CartSummary() {
 
       {/* Shipping options are shown for reference; checkout owns the selection */}
       <div className="space-y-3">
-        <p className="text-sm font-medium text-zinc-600">Shipping</p>
+        <p className="text-sm font-medium text-zinc-600">{copy.shipping}</p>
         <div className="space-y-2">
           {shippingMethods.map((method) => (
             <div key={method.id} className="flex items-center justify-between gap-3 text-sm">
@@ -61,7 +63,7 @@ export function CartSummary() {
       {/* Total */}
       <div className="flex items-center justify-between">
         <span className="text-base font-bold text-zinc-900">
-          {chosen ? 'Total' : 'Estimated total'}
+          {chosen ? copy.total : copy.estimatedTotal}
         </span>
         <span className="text-base font-bold text-zinc-900">
           {fmt(subtotal + shippingCost)}
@@ -74,7 +76,7 @@ export function CartSummary() {
         disabled={items.length === 0}
         className="w-full rounded-xl bg-zinc-900 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        Process To Checkout
+        {copy.checkout}
       </button>
 
       <p className="text-center text-sm text-zinc-400">
