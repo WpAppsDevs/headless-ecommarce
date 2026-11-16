@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Loader2, ShoppingCart, CheckCircle2, Minus, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useDictionary } from '@/i18n/LocaleProvider';
+import { interpolate } from '@/i18n/interpolate';
 import { useCartStore } from '@/stores/cartStore';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { useFormatPrice } from '@/lib/utils/currency';
@@ -67,12 +69,14 @@ function QuantityStepper({
   onDecrease: () => void;
   onIncrease: () => void;
 }) {
+  const copy = useDictionary().productDetail;
+
   return (
     <div className="inline-flex h-11 w-[112px] items-center justify-between overflow-hidden rounded-[8px] border border-brand-border bg-white">
       <button
         type="button"
         onClick={onDecrease}
-        aria-label="Decrease quantity"
+        aria-label={copy.decreaseQuantity}
         className="flex h-full w-9 items-center justify-center text-brand-text transition-colors hover:bg-brand-accent-light focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-accent-strong"
       >
         <Minus className="h-3.5 w-3.5" />
@@ -83,7 +87,7 @@ function QuantityStepper({
       <button
         type="button"
         onClick={onIncrease}
-        aria-label="Increase quantity"
+        aria-label={copy.increaseQuantity}
         className="flex h-full w-9 items-center justify-center text-brand-text transition-colors hover:bg-brand-accent-light focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-accent-strong"
       >
         <Plus className="h-3.5 w-3.5" />
@@ -97,6 +101,7 @@ function QuantityStepper({
 // ---------------------------------------------------------------------------
 
 export function VariationSelector({ product }: { product: Product }) {
+  const copy = useDictionary().productDetail;
   const variations = useMemo(() => asVariationObjects(product.variations), [product.variations]);
   const isSimple = product.type === 'simple' || variations.length === 0;
   const badge = getProductBadge(product);
@@ -184,10 +189,10 @@ export function VariationSelector({ product }: { product: Product }) {
   const missingLabel = (() => {
     if (allSelected) return '';
     const missing = attrKeys.find((k) => !selected[k]);
-    if (!missing) return 'Select an option';
-    if (isColorAttr(missing)) return 'Select a color';
-    if (missing.toLowerCase().includes('size')) return 'Select a size';
-    return `Select ${formatAttrLabel(missing)}`;
+    if (!missing) return copy.selectOption;
+    if (isColorAttr(missing)) return copy.selectColor;
+    if (missing.toLowerCase().includes('size')) return copy.selectSize;
+    return interpolate(copy.selectAttribute, { attribute: formatAttrLabel(missing) });
   })();
 
   async function handleAddToCart() {
@@ -247,7 +252,7 @@ export function VariationSelector({ product }: { product: Product }) {
                         key={val}
                         type="button"
                         title={val}
-                        aria-label={`Color ${val}`}
+                        aria-label={interpolate(copy.colorAria, { value: val })}
                         aria-pressed={isActive}
                         onClick={() => selectOption(key, val)}
                         className={cn(
@@ -359,19 +364,19 @@ export function VariationSelector({ product }: { product: Product }) {
             {loading ? (
               <>
                 <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                Adding…
+                {copy.adding}
               </>
             ) : added ? (
               <>
                 <CheckCircle2 className="mr-1 h-4 w-4" />
-                Added to Cart!
+                {copy.addedToCart}
               </>
             ) : unavailable ? (
-              'Sold Out'
+              copy.soldOut
             ) : (
               <>
                 <ShoppingCart className="mr-1 h-4 w-4" />
-                Add to Cart
+                {copy.addToCart}
               </>
             )}
           </button>

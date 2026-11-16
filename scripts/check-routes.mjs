@@ -17,6 +17,10 @@ const BASE = `http://127.0.0.1:${PORT}`;
 /**
  * Each case names a route, the cookie it is requested with, the language the
  * response must declare, and one fragment it must contain.
+ *
+ * A case with `discoverFrom` resolves its route from the catalogue first: the
+ * product detail page needs a real slug, and hard-coding one would rot the day
+ * that product is retired.
  */
 const CASES = [
   { route: '/', cookie: '', lang: 'en', body: 'Delivery in 15–25 Days' },
@@ -28,6 +32,8 @@ const CASES = [
   { route: '/products', cookie: '', lang: 'en', body: 'Default sorting' },
   { route: '/products', cookie: 'locale=bn', lang: 'bn', body: 'ডিফল্ট ক্রম' },
   { route: '/products', cookie: 'locale=bn', lang: 'bn', body: 'সব পণ্য' },
+  { discoverFrom: '/products', cookie: '', lang: 'en', body: 'Product Details' },
+  { discoverFrom: '/products', cookie: 'locale=bn', lang: 'bn', body: 'পণ্যের বিবরণ' },
   { route: '/shipping', cookie: '', lang: 'en', title: 'Shipping & Delivery' },
   { route: '/shipping', cookie: 'locale=bn', lang: 'bn', title: 'শিপিং ও ডেলিভারি' },
   { route: '/terms', cookie: '', lang: 'en', title: 'Terms of Service' },
@@ -58,12 +64,33 @@ async function waitForServer(deadline) {
   throw new Error(`server did not answer on ${BASE} within 30s`);
 }
 
+/**
+ * Reads the first product href off a listing page, so the detail-page cases
+ * follow the catalogue instead of naming a slug that may be deleted.
+ */
+async function discoverProductPath() {
+  const response = await fetch(`${BASE}/products`, { signal: AbortSignal.timeout(30000) });
+  const html = await response.text();
+  const match = html.match(/href="(\/products\/[a-z0-9][^"?#]*)"/);
+  if (!match) throw new Error('no product link found on /products');
+  return match[1].replace(/^href="/, '').replace(/"$/, '');
+}
+
 async function check() {
   const failures = [];
+  let discoveredRoute;
 
-  for (const { route, cookie, lang: expectedLang, title, body } of CASES) {
-    const label = `${route} (${cookie || 'no cookie'})`;
-    const response = await fetch(BASE + route, {
+  for (const { route, discoverFrom, cookie, lang: expectedLang, title, body } of CASES) {
+    const resolvedRoute =
+      route ??
+      (discoveredRoute ??= await discoverProductPath().catch((error) => {
+        failures.push(`${discoverFrom}: ${error.message}`);
+        return null;
+      }));
+    if (!resolvedRoute) continue;
+
+    const label = `${resolvedRoute} (${cookie || 'no cookie'})`;
+    const response = await fetch(BASE + resolvedRoute, {
       headers: cookie ? { cookie } : {},
       signal: AbortSignal.timeout(30000),
     });

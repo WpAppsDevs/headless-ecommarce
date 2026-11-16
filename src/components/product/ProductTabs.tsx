@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { CheckCircle2, ChevronDown, FileText, Info, Star, Truck } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useDictionary } from '@/i18n/LocaleProvider';
 import { ProductReviewsSection } from '@/components/reviews/ProductReviewsSection';
 import { ReviewsErrorBoundary } from '@/components/reviews/ReviewsErrorBoundary';
 import type { ProductCategory, ProductDetails } from '@/lib/api/products';
@@ -37,7 +38,15 @@ export function ProductTabs({
   productName,
   initialAggregate,
 }: Props) {
+  const copy = useDictionary().productDetail;
   const [openItem, setOpenItem] = useState<AccordionId | ''>('product-details');
+
+  const TAB_TITLES: Record<string, string> = {
+    'product-details': copy.tabDetails,
+    'additional-info': copy.tabInfo,
+    'shipping-returns': copy.tabShipping,
+    reviews: copy.tabReviews,
+  };
 
   useEffect(() => {
     const openFromHash = () => {
@@ -62,7 +71,7 @@ export function ProductTabs({
         <div
           className="prose prose-zinc max-w-3xl"
           dangerouslySetInnerHTML={{
-            __html: description ?? '<p>No description available.</p>',
+            __html: description ?? `<p>${copy.noDescription}</p>`,
           }}
         />
       );
@@ -125,7 +134,7 @@ export function ProductTabs({
             >
               <Icon className="h-5 w-5 shrink-0 text-brand-text" strokeWidth={1.5} />
               <span className="flex-1 font-serif text-base font-medium text-brand-text">
-                {item.title}
+                {TAB_TITLES[item.id]}
               </span>
               <ChevronDown
                 className={cn(
@@ -154,13 +163,13 @@ export function ProductTabs({
                       <tbody className="divide-y divide-brand-border">
                         {sku && (
                           <tr>
-                            <td className="w-40 py-2 pr-8 font-medium text-brand-text">SKU</td>
+                            <td className="w-40 py-2 pr-8 font-medium text-brand-text">{copy.sku}</td>
                             <td className="py-2 text-brand-text">{sku}</td>
                           </tr>
                         )}
                         {categories && categories.length > 0 && (
                           <tr>
-                            <td className="w-40 py-2 pr-8 font-medium text-brand-text">Categories</td>
+                            <td className="w-40 py-2 pr-8 font-medium text-brand-text">{copy.categories}</td>
                             <td className="py-2 text-brand-text">
                               {categories.map((c) => c.name).join(', ')}
                             </td>
@@ -169,7 +178,7 @@ export function ProductTabs({
                         {!sku && (!categories || categories.length === 0) && (
                           <tr>
                             <td colSpan={2} className="py-2 text-brand-text-muted">
-                              No additional information.
+                              {copy.noAdditionalInfo}
                             </td>
                           </tr>
                         )}
@@ -179,22 +188,18 @@ export function ProductTabs({
 
                   {item.id === 'shipping-returns' && (
                     <div className="max-w-xl space-y-3 text-sm text-brand-text-muted">
-                      <p>
-                        Delivery times and charges depend on whether the item is in
-                        stock or pre-order. Returns are accepted only for eligible
-                        defects under the policy below.
-                      </p>
+                      <p>{copy.shippingIntro}</p>
                       <Link
                         href="/shipping"
                         className="block font-medium text-brand-accent-strong underline underline-offset-2"
                       >
-                        Read the shipping and delivery policy
+                        {copy.readShipping}
                       </Link>
                       <Link
                         href="/returns"
                         className="block font-medium text-brand-accent-strong underline underline-offset-2"
                       >
-                        Read the returns and exchange policy
+                        {copy.readReturns}
                       </Link>
                     </div>
                   )}
