@@ -7,9 +7,11 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* Inter first, then the Bengali face: per-glyph fallback means Latin keeps
+     Inter and Bangla glyphs come from Noto Sans Bengali, with no locale switch. */
+  --font-sans: var(--font-inter), var(--font-bengali), ui-sans-serif, system-ui, -apple-system, sans-serif;
   /* Neutral face for auth and account surfaces only. See docs/design-system.md. */
-  --font-geist: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-geist: var(--font-geist-sans), var(--font-bengali), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -74,8 +76,10 @@
   --color-brand-danger: var(--brand-danger);
   --color-brand-whatsapp: var(--brand-whatsapp);
   --color-brand-dark-surface: var(--brand-dark-surface);
-  --font-serif: var(--font-playfair), Georgia, "Times New Roman", serif;
-  --font-ui: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* Playfair has no Bengali glyphs, so Bangla headings fall through to the
+     Bengali face rather than the OS font. A serif Bangla face is a later step. */
+  --font-serif: var(--font-playfair), var(--font-bengali), Georgia, "Times New Roman", serif;
+  --font-ui: var(--font-inter), var(--font-bengali), ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
 :root {
