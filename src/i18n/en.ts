@@ -1,6 +1,7 @@
 export const en = {
   common: {
     home: 'Home',
+    mainNavigation: 'Main navigation',
     breadcrumb: 'Breadcrumb',
     language: {
       en: 'English',
@@ -402,6 +403,8 @@ export const en = {
   reviews: {
     writeReview: 'Write a Review',
     chooseProduct: 'Which product would you like to review?',
+    backToSelection: 'Back to product selection',
+    closeModal: 'Close review modal',
     reviewedBadge: 'You have reviewed this product',
     loginToReview: 'Log in to write a review',
     noReviews: 'No reviews yet.',
