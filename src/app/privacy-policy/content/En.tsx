@@ -1,33 +1,14 @@
-import type { ReactNode } from 'react';
-import type { LucideIcon } from 'lucide-react';
-import { ShieldCheck, Info, CheckCircle2, Users, Cookie, Lock, Mail, Phone, MessageCircle } from 'lucide-react';
+import { ShieldCheck, Info, CheckCircle2, Users, Cookie, Lock, Mail } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { BulletList } from '@/components/policies/BulletList';
 import { Card } from '@/components/policies/Card';
-import { SectionHeading } from '@/components/policies/SectionHeading';
-import { config } from '@/lib/config';
+import { Section } from '@/components/policies/Section';
+import { SupportContactLinks } from '@/components/policies/SupportContactLinks';
 
 const BREADCRUMBS = [
   { label: 'Home', href: '/' },
   { label: 'Privacy Policy' },
 ];
-
-function Section({
-  icon,
-  title,
-  children,
-}: {
-  icon: LucideIcon;
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="mb-10">
-      <SectionHeading icon={icon} title={title} />
-      <Card>{children}</Card>
-    </section>
-  );
-}
 
 export function PrivacyPolicyContentEn() {
   return (
@@ -108,31 +89,7 @@ export function PrivacyPolicyContentEn() {
           <p className="mb-4 text-sm leading-relaxed text-brand-text-muted">
             For any question about this Privacy Policy, contact us:
           </p>
-          <div className="space-y-3">
-            <a
-              href="mailto:support@najifasshop.com"
-              className="flex items-center gap-2.5 text-sm text-brand-accent-strong transition-colors hover:underline"
-            >
-              <Mail className="h-4 w-4 shrink-0" />
-              support@najifasshop.com
-            </a>
-            <a
-              href="tel:+8801841654663"
-              className="flex items-center gap-2.5 text-sm text-brand-accent-strong transition-colors hover:underline"
-            >
-              <Phone className="h-4 w-4 shrink-0" />
-              +880 1841-654663
-            </a>
-            <a
-              href={config.whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2.5 text-sm text-brand-accent-strong transition-colors hover:underline"
-            >
-              <MessageCircle className="h-4 w-4 shrink-0" />
-              Message us on WhatsApp
-            </a>
-          </div>
+          <SupportContactLinks whatsappLabel="Message us on WhatsApp" />
         </Section>
       </div>
     </div>

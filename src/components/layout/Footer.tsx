@@ -7,6 +7,7 @@ import { FooterNewsletterForm } from './FooterNewsletterForm';
 import { getDictionary, type Dictionary } from '@/i18n/get-dictionary';
 import { getLocale } from '@/i18n/server';
 import { interpolate } from '@/i18n/interpolate';
+import { formatYear } from '@/i18n/format';
 import { LanguageSwitcher } from '@/i18n/LanguageSwitcher';
 
 const HELP_LINKS: { href: string; key: keyof Dictionary['footer']['help']; Icon: LucideIcon }[] = [
@@ -93,7 +94,8 @@ function CodBadge() {
 
 export async function Footer() {
   const year = new Date().getFullYear();
-  const dictionary = getDictionary(await getLocale());
+  const locale = await getLocale();
+  const dictionary = getDictionary(locale);
 
   return (
     <footer>
@@ -201,7 +203,10 @@ export async function Footer() {
       <div className="bg-brand-card">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-5 sm:flex-row lg:px-8">
           <p className="text-xs text-brand-text-muted">
-            {interpolate(dictionary.footer.copyright, { year, site: config.siteName })}
+            {interpolate(dictionary.footer.copyright, {
+              year: formatYear(locale, year),
+              site: config.siteName,
+            })}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5">
             {/* LEGAL_LINKS commented out - moved to HELP_LINKS section */}

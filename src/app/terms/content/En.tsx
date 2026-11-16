@@ -1,32 +1,13 @@
-import type { ReactNode } from 'react';
-import type { LucideIcon } from 'lucide-react';
 import { CheckCircle2, Package, Banknote, ShoppingCart, FileText, Scale, RefreshCw } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { BulletList } from '@/components/policies/BulletList';
 import { Card } from '@/components/policies/Card';
-import { SectionHeading } from '@/components/policies/SectionHeading';
+import { Section } from '@/components/policies/Section';
 
 const BREADCRUMBS = [
   { label: 'Home', href: '/' },
   { label: 'Terms of Service' },
 ];
-
-function Section({
-  icon,
-  title,
-  children,
-}: {
-  icon: LucideIcon;
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="mb-10">
-      <SectionHeading icon={icon} title={title} />
-      <Card>{children}</Card>
-    </section>
-  );
-}
 
 export function TermsContentEn() {
   return (

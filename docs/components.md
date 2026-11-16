@@ -24,6 +24,8 @@ Component conventions live in [coding-standards.md](coding-standards.md). This f
 
 The footer support block, the header, and the announcement bar read their copy from the locale in `src/i18n/`. The locale comes from the `locale` cookie, resolves to English when unset, and reaches server components through `getLocale()` and client components through `useLocale()` / `useDictionary()`. `LanguageSwitcher` writes the cookie and calls `router.refresh()`; it appears in the desktop header, inside the mobile sheet, and in the footer's help column. Nav labels are resolved by `href` so a WordPress label survives when no translation exists. Social destinations come from `config` so the footer and announcement bar cannot drift apart.
 
+The policy pages share `policies/Section.tsx` (heading plus card) and `policies/SupportContactLinks.tsx` (phone, email and WhatsApp, with the number and address from `config` so the two languages cannot disagree). Their bodies live in `src/app/<route>/content/{En,Bn}.tsx`; `PageHeader` takes an optional `breadcrumbLabel` for the translated landmark word.
+
 The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local component with autofocus and Escape-to-close.
 
 ## Home

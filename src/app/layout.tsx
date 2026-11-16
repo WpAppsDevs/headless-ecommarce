@@ -14,6 +14,7 @@ import { config } from "@/lib/config";
 import { AnnouncementBar } from "@/components/home/AnnouncementBar";
 import { getMenuByLocation } from "@/lib/api/menus";
 import { LocaleProvider } from "@/i18n/LocaleProvider";
+import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/server";
 
 const geistSans = Geist({
@@ -57,7 +58,7 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <LocaleProvider locale={locale}>
+        <LocaleProvider locale={locale} dictionary={getDictionary(locale)}>
           <AuthHydrator />
           <CartHydrator />
           <WishlistHydrator />

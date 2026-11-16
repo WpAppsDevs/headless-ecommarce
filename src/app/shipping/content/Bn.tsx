@@ -14,19 +14,21 @@ import { NoteCallout } from '@/components/policies/NoteCallout';
 import { SectionHeading } from '@/components/policies/SectionHeading';
 import { StatCard } from '@/components/policies/StatCard';
 import { TypePanel } from '@/components/policies/TypePanel';
+import { formatNumber, formatTaka } from '@/i18n/format';
+import {
+  EXTRA_KG_CHARGE,
+  INCLUDED_KG,
+  LOCAL_DELIVERY,
+  PRE_ORDER_PER_KG,
+  WEIGHT_EXAMPLES,
+} from '../rates';
 
 const BREADCRUMBS = [{ label: 'হোম', href: '/' }, { label: 'শিপিং ও ডেলিভারি' }];
-
-const WEIGHT_EXAMPLES = [
-  { weight: '১ কেজি', charge: '৳১,৮৫০' },
-  { weight: '২ কেজি', charge: '৳৩,৭০০' },
-  { weight: '৫ কেজি', charge: '৳৯,২৫০' },
-];
 
 export function ShippingContentBn() {
   return (
     <div>
-      <PageHeader title="শিপিং ও ডেলিভারি" breadcrumbs={BREADCRUMBS} />
+      <PageHeader title="শিপিং ও ডেলিভারি" breadcrumbs={BREADCRUMBS} breadcrumbLabel="পথনির্দেশ" />
 
       <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:px-8">
         {/* Coverage */}
@@ -65,15 +67,16 @@ export function ShippingContentBn() {
               ডেলিভারি চার্জ
             </h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <StatCard label="ঢাকার মধ্যে" value="৳৯০" />
-              <StatCard label="ঢাকার বাইরে" value="৳১৫০" />
+              <StatCard label="ঢাকার মধ্যে" value={formatTaka('bn', LOCAL_DELIVERY.insideDhaka)} />
+              <StatCard label="ঢাকার বাইরে" value={formatTaka('bn', LOCAL_DELIVERY.outsideDhaka)} />
             </div>
 
             <NoteCallout icon={Scale} tone="accent" className="mt-4">
               <p className="font-semibold">অতিরিক্ত ওজনের চার্জ:</p>
               <p className="mt-1">
-                ১ কেজির বেশি ওজনের পণ্যের ক্ষেত্রে প্রতি অতিরিক্ত কেজি বা কেজির অংশের জন্য ৳২০ অতিরিক্ত
-                চার্জ যোগ হবে। অর্থাৎ, ভগ্নাংশ ওজনকেও পরবর্তী পূর্ণ কেজি হিসেবে গণনা করা হবে।
+                {formatNumber('bn', INCLUDED_KG)} কেজির বেশি ওজনের পণ্যের ক্ষেত্রে প্রতি অতিরিক্ত কেজি বা
+                কেজির অংশের জন্য {formatTaka('bn', EXTRA_KG_CHARGE)} অতিরিক্ত চার্জ যোগ হবে। অর্থাৎ,
+                ভগ্নাংশ ওজনকেও পরবর্তী পূর্ণ কেজি হিসেবে গণনা করা হবে।
               </p>
             </NoteCallout>
           </TypePanel>
@@ -117,20 +120,24 @@ export function ShippingContentBn() {
             <div className="rounded-2xl border border-brand-accent/25 bg-brand-accent/[0.06] p-5">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <p className="text-sm font-semibold text-brand-text">পাকিস্তান → বাংলাদেশ</p>
-                <p className="font-serif text-2xl font-bold text-brand-accent-strong">৳১,৮৫০</p>
+                <p className="font-serif text-2xl font-bold text-brand-accent-strong">
+                  {formatTaka('bn', PRE_ORDER_PER_KG)}
+                </p>
                 <p className="text-xs text-brand-text-muted">প্রতি কেজি</p>
               </div>
               <p className="mt-3 text-sm leading-relaxed text-brand-text-muted">
                 শিপিং চার্জ পণ্যের/শিপমেন্টের মোট ওজন অনুযায়ী হিসাব হবে।
               </p>
               <div className="mt-4 grid grid-cols-3 gap-3">
-                {WEIGHT_EXAMPLES.map(({ weight, charge }) => (
+                {WEIGHT_EXAMPLES.map((kg) => (
                   <div
-                    key={weight}
+                    key={kg}
                     className="rounded-xl border border-brand-border bg-brand-section px-3 py-2.5 text-center"
                   >
-                    <p className="text-xs text-brand-text-muted">{weight}</p>
-                    <p className="mt-0.5 text-sm font-bold text-brand-text">{charge}</p>
+                    <p className="text-xs text-brand-text-muted">{formatNumber('bn', kg)} কেজি</p>
+                    <p className="mt-0.5 text-sm font-bold text-brand-text">
+                      {formatTaka('bn', kg * PRE_ORDER_PER_KG)}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -143,16 +150,25 @@ export function ShippingContentBn() {
                 বাংলাদেশে পণ্য পৌঁছানোর পর customer-এর ঠিকানা অনুযায়ী স্থানীয় ডেলিভারি চার্জ:
               </p>
               <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <StatCard label="ঢাকার মধ্যে" value="৳৯০" className="bg-brand-section" />
-                <StatCard label="ঢাকার বাইরে" value="৳১৫০" className="bg-brand-section" />
+                <StatCard
+                  label="ঢাকার মধ্যে"
+                  value={formatTaka('bn', LOCAL_DELIVERY.insideDhaka)}
+                  className="bg-brand-section"
+                />
+                <StatCard
+                  label="ঢাকার বাইরে"
+                  value={formatTaka('bn', LOCAL_DELIVERY.outsideDhaka)}
+                  className="bg-brand-section"
+                />
               </div>
             </div>
 
             <NoteCallout icon={Scale} tone="accent" className="mt-4">
               <p className="font-semibold">অতিরিক্ত ওজনের চার্জ:</p>
               <p className="mt-1">
-                ১ কেজির বেশি ওজনের পণ্যের ক্ষেত্রে প্রতি অতিরিক্ত কেজি বা কেজির অংশের জন্য ৳২০ অতিরিক্ত
-                চার্জ যোগ হবে। অর্থাৎ, ভগ্নাংশ ওজনকেও পরবর্তী পূর্ণ কেজি হিসেবে গণনা করা হবে।
+                {formatNumber('bn', INCLUDED_KG)} কেজির বেশি ওজনের পণ্যের ক্ষেত্রে প্রতি অতিরিক্ত কেজি বা
+                কেজির অংশের জন্য {formatTaka('bn', EXTRA_KG_CHARGE)} অতিরিক্ত চার্জ যোগ হবে। অর্থাৎ,
+                ভগ্নাংশ ওজনকেও পরবর্তী পূর্ণ কেজি হিসেবে গণনা করা হবে।
               </p>
             </NoteCallout>
 
@@ -160,9 +176,15 @@ export function ShippingContentBn() {
               <p className="font-semibold">গুরুত্বপূর্ণ</p>
               <p className="mt-1">
                 প্রি-অর্ডারের ক্ষেত্রে পাকিস্তান থেকে বাংলাদেশে শিপিং চার্জ{' '}
-                <strong className="font-semibold">৳১,৮৫০ প্রতি কেজি</strong> এবং বাংলাদেশে পৌঁছানোর পর
-                স্থানীয় ডেলিভারি চার্জ <strong className="font-semibold">৳৯০/৳১৫০</strong> — এই দুইটি
-                আলাদাভাবে হিসাব হবে।
+                <strong className="font-semibold">
+                  {formatTaka('bn', PRE_ORDER_PER_KG)} প্রতি কেজি
+                </strong>{' '}
+                এবং বাংলাদেশে পৌঁছানোর পর স্থানীয় ডেলিভারি চার্জ{' '}
+                <strong className="font-semibold">
+                  {formatTaka('bn', LOCAL_DELIVERY.insideDhaka)}/
+                  {formatTaka('bn', LOCAL_DELIVERY.outsideDhaka)}
+                </strong>{' '}
+                — এই দুইটি আলাদাভাবে হিসাব হবে।
               </p>
             </NoteCallout>
           </TypePanel>

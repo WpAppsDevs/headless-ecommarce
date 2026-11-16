@@ -113,8 +113,10 @@ Stores import API functions and other stores. `authStore` calls into cart, wishl
 | `LanguageSwitcher.tsx` | Writes the cookie and calls `router.refresh()`. |
 | `nav-labels.ts` | Resolves nav labels by `href`, falling back to the WordPress label. |
 | `interpolate.ts` | Fills `{name}` placeholders without printing `undefined`. |
+| `format.ts` | `formatNumber`, `formatTaka`, `formatYear` — `Intl` in the reading language, so Bengali digits follow the locale. |
+| `localized.ts` | Picks copy per locale from a `Record<Locale, ReactNode>`, so a third locale becomes a type error rather than a silent English fallback. |
 
-Policy page bodies are JSX, not dictionary entries: they live in `src/app/<route>/content/en.tsx` and `bn.tsx`, with `page.tsx` choosing between them. See [ADR-0008](adr/0008-locale-cookie-not-url.md).
+Policy page bodies are JSX, not dictionary entries: they live in `src/app/<route>/content/En.tsx` and `Bn.tsx`, with `page.tsx` choosing between them. See [ADR-0008](adr/0008-locale-cookie-not-url.md).
 
 ## Route handlers
 
@@ -160,6 +162,6 @@ The route guard is `src/proxy.ts` at the project root, not under `src/app/api/`.
 | A remote call | `src/lib/api/<domain>.ts` |
 | Cross-component client state | `src/stores/<domain>Store.ts` |
 | User-facing copy | `src/i18n/en.ts` and `src/i18n/bn.ts` (both, or typecheck fails) |
-| A page body that is long-form content | `src/app/<route>/content/{en,bn}.tsx` |
+| A page body that is long-form content | `src/app/<route>/content/{En,Bn}.tsx` |
 | A pure helper | `src/lib/` |
 | A hook used by more than one component | `src/hooks/` (create it when the first shared hook appears) |

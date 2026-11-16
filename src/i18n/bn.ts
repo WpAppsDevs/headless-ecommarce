@@ -3,6 +3,7 @@ import type { Dictionary } from './get-dictionary';
 export const bn: Dictionary = {
   common: {
     home: 'হোম',
+    breadcrumb: 'পথনির্দেশ',
     language: {
       en: 'English',
       bn: 'বাংলা',

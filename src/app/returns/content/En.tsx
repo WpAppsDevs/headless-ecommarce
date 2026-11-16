@@ -1,4 +1,3 @@
-import { config } from '@/lib/config';
 import {
   RefreshCw,
   Package,
@@ -8,14 +7,13 @@ import {
   XCircle,
   Banknote,
   Phone,
-  Mail,
-  MessageCircle,
 } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { BulletList } from '@/components/policies/BulletList';
 import { Card } from '@/components/policies/Card';
 import { NoteCallout } from '@/components/policies/NoteCallout';
 import { SectionHeading } from '@/components/policies/SectionHeading';
+import { SupportContactLinks } from '@/components/policies/SupportContactLinks';
 import { TypePanel } from '@/components/policies/TypePanel';
 
 const BREADCRUMBS = [{ label: 'Home', href: '/' }, { label: 'Returns & Exchange' }];
@@ -43,7 +41,7 @@ const PREORDER_ELIGIBLE = [
 const NOT_ELIGIBLE = [
   'The product was damaged through use',
   'The product was damaged by the customer',
-  'The product is no longer in its original condition',
+  'The product is no longer in its original condition as a result of alteration or use',
   'Our exchange policy is not met',
 ];
 
@@ -184,31 +182,7 @@ export function ReturnsContentEn() {
             <p className="text-sm text-brand-text-muted">
               For anything relating to an exchange, get in touch:
             </p>
-            <div className="mt-4 space-y-3">
-              <a
-                href="tel:+8801841654663"
-                className="flex items-center gap-2.5 text-sm text-brand-accent-strong transition-colors hover:underline"
-              >
-                <Phone className="h-4 w-4 shrink-0" />
-                +880 1841-654663
-              </a>
-              <a
-                href="mailto:support@najifasshop.com"
-                className="flex items-center gap-2.5 text-sm text-brand-accent-strong transition-colors hover:underline"
-              >
-                <Mail className="h-4 w-4 shrink-0" />
-                support@najifasshop.com
-              </a>
-              <a
-                href={config.whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2.5 text-sm text-brand-accent-strong transition-colors hover:underline"
-              >
-                <MessageCircle className="h-4 w-4 shrink-0" />
-                Message us on WhatsApp
-              </a>
-            </div>
+            <SupportContactLinks whatsappLabel="Message us on WhatsApp" />
           </Card>
         </section>
       </div>

@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { getLocale } from '@/i18n/server';
-import { PrivacyPolicyContentEn } from './content/en';
-import { PrivacyPolicyContentBn } from './content/bn';
+import { localized } from '@/i18n/localized';
+import { PrivacyPolicyContentEn } from './content/En';
+import { PrivacyPolicyContentBn } from './content/Bn';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { title, description } = getDictionary(await getLocale()).pages.privacyPolicy;
@@ -10,6 +11,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PrivacyPolicyPage() {
-  const locale = await getLocale();
-  return locale === 'bn' ? <PrivacyPolicyContentBn /> : <PrivacyPolicyContentEn />;
+  return localized(await getLocale(), {
+    en: <PrivacyPolicyContentEn />,
+    bn: <PrivacyPolicyContentBn />,
+  });
 }

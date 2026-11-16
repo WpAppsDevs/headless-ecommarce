@@ -2,31 +2,46 @@
 
 import { createContext, useContext, type ReactNode } from 'react';
 import type { Locale } from './locales';
-import { getDictionary, type Dictionary } from './get-dictionary';
+import type { Dictionary } from './get-dictionary';
 
-const LocaleContext = createContext<Locale | null>(null);
+const LocaleContext = createContext<{ locale: Locale; dictionary: Dictionary } | null>(null);
 
 /**
- * Hands the server-resolved locale to client components.
+ * Hands the server-resolved locale and its dictionary to client components.
  *
- * The cookie is the source of truth; this exists because a client component
- * cannot read it without turning into a second, possibly stale, copy.
+ * The dictionary is passed in rather than looked up here so a client component
+ * never pulls both languages into its bundle; the server already knows which
+ * one this request needs.
  */
-export function LocaleProvider({ locale, children }: { locale: Locale; children: ReactNode }) {
-  return <LocaleContext.Provider value={locale}>{children}</LocaleContext.Provider>;
+export function LocaleProvider({
+  locale,
+  dictionary,
+  children,
+}: {
+  locale: Locale;
+  dictionary: Dictionary;
+  children: ReactNode;
+}) {
+  return (
+    <LocaleContext.Provider value={{ locale, dictionary }}>{children}</LocaleContext.Provider>
+  );
 }
 
-export function useLocale(): Locale {
-  const locale = useContext(LocaleContext);
+function useLocaleContext() {
+  const value = useContext(LocaleContext);
 
-  if (locale === null) {
+  if (value === null) {
     throw new Error('useLocale must be called inside a <LocaleProvider>.');
   }
 
-  return locale;
+  return value;
+}
+
+export function useLocale(): Locale {
+  return useLocaleContext().locale;
 }
 
 /** The message map for the current locale, for client components. */
 export function useDictionary(): Dictionary {
-  return getDictionary(useLocale());
+  return useLocaleContext().dictionary;
 }

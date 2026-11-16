@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { getLocale } from '@/i18n/server';
-import { TermsContentEn } from './content/en';
-import { TermsContentBn } from './content/bn';
+import { localized } from '@/i18n/localized';
+import { TermsContentEn } from './content/En';
+import { TermsContentBn } from './content/Bn';
 
 export async function generateMetadata(): Promise<Metadata> {
   const { title, description } = getDictionary(await getLocale()).pages.terms;
@@ -10,6 +11,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function TermsPage() {
-  const locale = await getLocale();
-  return locale === 'bn' ? <TermsContentBn /> : <TermsContentEn />;
+  return localized(await getLocale(), {
+    en: <TermsContentEn />,
+    bn: <TermsContentBn />,
+  });
 }

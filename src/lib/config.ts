@@ -12,6 +12,11 @@ export const config = {
   productsNs: 'wpadhlwrapi/v1',
   apiNs: 'api',
   siteName: process.env.NEXT_PUBLIC_SITE_NAME ?? "Najifa's Shop",
+  supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? 'support@najifasshop.com',
+  /** E.164, used for `tel:` and `wa.me` links. */
+  supportPhone: process.env.NEXT_PUBLIC_SUPPORT_PHONE ?? '+8801841654663',
+  /** Grouped for display; Intl does not format phone numbers consistently across locales. */
+  supportPhoneDisplay: process.env.NEXT_PUBLIC_SUPPORT_PHONE_DISPLAY ?? '+880 1841-654663',
   whatsappUrl: process.env.NEXT_PUBLIC_WHATSAPP_URL ?? 'https://wa.me/8801841654663',
   facebookUrl:
     process.env.NEXT_PUBLIC_FACEBOOK_URL ?? 'https://www.facebook.com/najifasshop/',

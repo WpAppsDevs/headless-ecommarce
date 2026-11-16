@@ -40,7 +40,7 @@ export function LanguageSwitcher({ className = '' }: { className?: string }) {
       onClick={switchLanguage}
       lang={target}
       aria-label={interpolate(dictionary.header.switchLanguage, { language: label })}
-      className={`flex h-9 items-center justify-center rounded-lg border border-brand-border px-2.5 text-xs font-semibold text-brand-text-muted transition-colors hover:bg-brand-accent-light hover:text-brand-text focus-brand ${className}`}
+      className={`relative flex h-9 items-center justify-center rounded-lg border border-brand-border px-2.5 text-xs font-semibold text-brand-text-muted transition-colors after:absolute after:-inset-1 after:content-[""] hover:bg-brand-accent-light hover:text-brand-text focus-brand ${className}`}
     >
       {label}
     </button>

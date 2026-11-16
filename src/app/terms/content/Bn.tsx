@@ -1,37 +1,18 @@
-import type { ReactNode } from 'react';
-import type { LucideIcon } from 'lucide-react';
 import { CheckCircle2, Package, Banknote, ShoppingCart, FileText, Scale, RefreshCw } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { BulletList } from '@/components/policies/BulletList';
 import { Card } from '@/components/policies/Card';
-import { SectionHeading } from '@/components/policies/SectionHeading';
+import { Section } from '@/components/policies/Section';
 
 const BREADCRUMBS = [
   { label: 'হোম', href: '/' },
   { label: 'টার্মস অফ সার্ভিস' },
 ];
 
-function Section({
-  icon,
-  title,
-  children,
-}: {
-  icon: LucideIcon;
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="mb-10">
-      <SectionHeading icon={icon} title={title} />
-      <Card>{children}</Card>
-    </section>
-  );
-}
-
 export function TermsContentBn() {
   return (
     <div>
-      <PageHeader title="টার্মস অফ সার্ভিস" breadcrumbs={BREADCRUMBS} />
+      <PageHeader title="টার্মস অফ সার্ভিস" breadcrumbs={BREADCRUMBS} breadcrumbLabel="পথনির্দেশ" />
 
       <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:px-8">
         <Card className="mb-10 text-sm text-brand-text-muted">

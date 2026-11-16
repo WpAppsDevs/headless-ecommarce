@@ -21,10 +21,11 @@ import { HeaderMobileNav } from '@/components/layout/HeaderMobileNav';
 import { HeaderMobileNavFallback } from '@/components/layout/HeaderMobileNavFallback';
 
 import type { NavLink } from '@/lib/api/menus';
-import { useDictionary } from '@/i18n/LocaleProvider';
+import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
 import { LanguageSwitcher } from '@/i18n/LanguageSwitcher';
 import { localizeNavLinks } from '@/i18n/nav-labels';
 import { interpolate } from '@/i18n/interpolate';
+import { formatNumber } from '@/i18n/format';
 
 const HEADER_ICON_CLASS =
   'relative flex h-9 w-9 items-center justify-center rounded-lg text-brand-text-muted transition-colors hover:bg-brand-accent-light hover:text-brand-text focus-brand after:absolute after:-inset-1 after:content-[""] xl:after:hidden';
@@ -134,6 +135,7 @@ function UserMenu({ onClose }: { onClose?: () => void }) {
 // ── Main Header ──────────────────────────────────────────────────────────────
 export function Header({ navLinks }: { navLinks?: NavLink[] }) {
   const dictionary = useDictionary();
+  const locale = useLocale();
   const links = localizeNavLinks(navLinks && navLinks.length > 0 ? navLinks : STATIC_NAV_LINKS, dictionary);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -142,6 +144,10 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
   const itemCount = useCartStore((s) => s.items.length);
   const setCartDrawerOpen = useCartStore((s) => s.setCartDrawerOpen);
   const wishlistCount = useWishlistStore((s) => s.count);
+  const wishlistAria = interpolate(dictionary.header.wishlistCount, { count: formatNumber(locale, wishlistCount) });
+  const cartAria = interpolate(dictionary.header.cartCount, { count: formatNumber(locale, itemCount) });
+  /** Badge text, with the digits of the reading language and a capped `99+`. */
+  const badge = (count: number) => (count > 99 ? `${formatNumber(locale, 99)}+` : formatNumber(locale, count));
 
   // Close account dropdown on outside click
   useEffect(() => {
@@ -200,13 +206,13 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
           {/* Wishlist */}
           <Link
             href="/account?tab=wishlist"
-            aria-label={interpolate(dictionary.header.wishlistCount, { count: wishlistCount })}
+            aria-label={wishlistAria}
             className={HEADER_ICON_CLASS}
           >
             <Heart className="h-[19px] w-[19px]" strokeWidth={1.8} />
             {wishlistCount > 0 && (
               <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
-                {wishlistCount > 99 ? '99+' : wishlistCount}
+                {badge(wishlistCount)}
               </span>
             )}
           </Link>
@@ -214,13 +220,13 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
           {/* Cart */}
           <button
             onClick={() => setCartDrawerOpen(true)}
-            aria-label={interpolate(dictionary.header.cartCount, { count: itemCount })}
+            aria-label={cartAria}
             className={`${HEADER_ICON_CLASS} ml-0.5`}
           >
             <ShoppingCart className="h-[19px] w-[19px]" strokeWidth={1.8} />
             {itemCount > 0 && (
               <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
-                {itemCount > 99 ? '99+' : itemCount}
+                {badge(itemCount)}
               </span>
             )}
           </button>
@@ -240,26 +246,26 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
 
           <Link
             href="/account?tab=wishlist"
-            aria-label={interpolate(dictionary.header.wishlistCount, { count: wishlistCount })}
+            aria-label={wishlistAria}
             className={HEADER_ICON_CLASS}
           >
             <Heart className="h-5 w-5" strokeWidth={1.8} />
             {wishlistCount > 0 && (
               <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
-                {wishlistCount > 99 ? '99+' : wishlistCount}
+                {badge(wishlistCount)}
               </span>
             )}
           </Link>
 
           <button
             onClick={() => setCartDrawerOpen(true)}
-            aria-label={interpolate(dictionary.header.cartCount, { count: itemCount })}
+            aria-label={cartAria}
             className={HEADER_ICON_CLASS}
           >
             <ShoppingCart className="h-5 w-5" strokeWidth={1.8} />
             {itemCount > 0 && (
               <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-wine px-0.5 text-[10px] font-bold text-white">
-                {itemCount > 99 ? '99+' : itemCount}
+                {badge(itemCount)}
               </span>
             )}
           </button>

@@ -1,6 +1,7 @@
 export const en = {
   common: {
     home: 'Home',
+    breadcrumb: 'Breadcrumb',
     language: {
       en: 'English',
       bn: 'বাংলা',

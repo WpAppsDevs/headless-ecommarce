@@ -18,7 +18,7 @@ The locale lives in a `locale` cookie, read in the root layout, with English as 
 - The switcher writes the cookie and calls `router.refresh()`; the URL never changes.
 - The cookie is not `httpOnly` because the browser writes it. It carries a language, not a credential.
 - Locale reaches components through a React Context provided by the root layout, not a Zustand store: the cookie is the source of truth and the server already knows its value at render time.
-- Translations are `en.ts` / `bn.ts` message maps read by `getDictionary(locale)`, with `Intl` (`en`, `bn-BD`) for numbers and dates. No i18n library.
+- Translations are `en.ts` / `bn.ts` message maps read by `getDictionary(locale)`, with `Intl` (`en`, `bn-BD`) formatting every number the UI computes — counts, the copyright year, shipping charges — through `src/i18n/format.ts`. No i18n library.
 
 ## Alternatives considered
 

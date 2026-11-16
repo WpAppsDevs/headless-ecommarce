@@ -64,6 +64,7 @@ export default function TrackOrderPage() {
     <>
       <PageHeader
         title={dictionary.pages.trackOrder.title}
+        breadcrumbLabel={dictionary.common.breadcrumb}
         breadcrumbs={[
           { label: dictionary.common.home, href: '/' },
           { label: dictionary.pages.trackOrder.title },

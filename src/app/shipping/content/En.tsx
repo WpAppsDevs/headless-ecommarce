@@ -14,14 +14,16 @@ import { NoteCallout } from '@/components/policies/NoteCallout';
 import { SectionHeading } from '@/components/policies/SectionHeading';
 import { StatCard } from '@/components/policies/StatCard';
 import { TypePanel } from '@/components/policies/TypePanel';
+import { formatNumber, formatTaka } from '@/i18n/format';
+import {
+  EXTRA_KG_CHARGE,
+  INCLUDED_KG,
+  LOCAL_DELIVERY,
+  PRE_ORDER_PER_KG,
+  WEIGHT_EXAMPLES,
+} from '../rates';
 
 const BREADCRUMBS = [{ label: 'Home', href: '/' }, { label: 'Shipping & Delivery' }];
-
-const WEIGHT_EXAMPLES = [
-  { weight: '1 kg', charge: '৳1,850' },
-  { weight: '2 kg', charge: '৳3,700' },
-  { weight: '5 kg', charge: '৳9,250' },
-];
 
 export function ShippingContentEn() {
   return (
@@ -65,14 +67,15 @@ export function ShippingContentEn() {
               Delivery charge
             </h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <StatCard label="Inside Dhaka" value="৳90" />
-              <StatCard label="Outside Dhaka" value="৳150" />
+              <StatCard label="Inside Dhaka" value={formatTaka('en', LOCAL_DELIVERY.insideDhaka)} />
+              <StatCard label="Outside Dhaka" value={formatTaka('en', LOCAL_DELIVERY.outsideDhaka)} />
             </div>
 
             <NoteCallout icon={Scale} tone="accent" className="mt-4">
               <p className="font-semibold">Extra weight charge:</p>
               <p className="mt-1">
-                For a product heavier than 1 kg, ৳20 is added for every extra kilogram or part of a
+                For a product heavier than {formatNumber('en', INCLUDED_KG)} kg,{' '}
+                {formatTaka('en', EXTRA_KG_CHARGE)} is added for every extra kilogram or part of a
                 kilogram. A partial weight counts as the next full kilogram.
               </p>
             </NoteCallout>
@@ -117,20 +120,26 @@ export function ShippingContentEn() {
             <div className="rounded-2xl border border-brand-accent/25 bg-brand-accent/[0.06] p-5">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <p className="text-sm font-semibold text-brand-text">Pakistan → Bangladesh</p>
-                <p className="font-serif text-2xl font-bold text-brand-accent-strong">৳1,850</p>
+                <p className="font-serif text-2xl font-bold text-brand-accent-strong">
+                  {formatTaka('en', PRE_ORDER_PER_KG)}
+                </p>
                 <p className="text-xs text-brand-text-muted">per kg</p>
               </div>
               <p className="mt-3 text-sm leading-relaxed text-brand-text-muted">
                 Shipping is charged on the total weight of the product or shipment.
               </p>
               <div className="mt-4 grid grid-cols-3 gap-3">
-                {WEIGHT_EXAMPLES.map(({ weight, charge }) => (
+                {WEIGHT_EXAMPLES.map((kg) => (
                   <div
-                    key={weight}
+                    key={kg}
                     className="rounded-xl border border-brand-border bg-brand-section px-3 py-2.5 text-center"
                   >
-                    <p className="text-xs text-brand-text-muted">{weight}</p>
-                    <p className="mt-0.5 text-sm font-bold text-brand-text">{charge}</p>
+                    <p className="text-xs text-brand-text-muted">
+                      {formatNumber('en', kg)} kg
+                    </p>
+                    <p className="mt-0.5 text-sm font-bold text-brand-text">
+                      {formatTaka('en', kg * PRE_ORDER_PER_KG)}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -144,15 +153,24 @@ export function ShippingContentEn() {
                 address:
               </p>
               <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <StatCard label="Inside Dhaka" value="৳90" className="bg-brand-section" />
-                <StatCard label="Outside Dhaka" value="৳150" className="bg-brand-section" />
+                <StatCard
+                  label="Inside Dhaka"
+                  value={formatTaka('en', LOCAL_DELIVERY.insideDhaka)}
+                  className="bg-brand-section"
+                />
+                <StatCard
+                  label="Outside Dhaka"
+                  value={formatTaka('en', LOCAL_DELIVERY.outsideDhaka)}
+                  className="bg-brand-section"
+                />
               </div>
             </div>
 
             <NoteCallout icon={Scale} tone="accent" className="mt-4">
               <p className="font-semibold">Extra weight charge:</p>
               <p className="mt-1">
-                For a product heavier than 1 kg, ৳20 is added for every extra kilogram or part of a
+                For a product heavier than {formatNumber('en', INCLUDED_KG)} kg,{' '}
+                {formatTaka('en', EXTRA_KG_CHARGE)} is added for every extra kilogram or part of a
                 kilogram. A partial weight counts as the next full kilogram.
               </p>
             </NoteCallout>
@@ -161,9 +179,15 @@ export function ShippingContentEn() {
               <p className="font-semibold">Important</p>
               <p className="mt-1">
                 On a pre-order, shipping from Pakistan to Bangladesh is{' '}
-                <strong className="font-semibold">৳1,850 per kg</strong>, and the local delivery charge
-                after the product reaches Bangladesh is{' '}
-                <strong className="font-semibold">৳90/৳150</strong> — the two are charged separately.
+                <strong className="font-semibold">
+                  {formatTaka('en', PRE_ORDER_PER_KG)} per kg
+                </strong>
+                , and the local delivery charge after the product reaches Bangladesh is{' '}
+                <strong className="font-semibold">
+                  {formatTaka('en', LOCAL_DELIVERY.insideDhaka)}/
+                  {formatTaka('en', LOCAL_DELIVERY.outsideDhaka)}
+                </strong>{' '}
+                — the two are charged separately.
               </p>
             </NoteCallout>
           </TypePanel>
@@ -202,7 +226,7 @@ export function ShippingContentEn() {
           <SectionHeading icon={Phone} title="Order confirmation" />
           <Card>
             <p className="text-sm leading-relaxed text-brand-text-muted">
-              Our team may contact the customer by phone or SMS to confirm an order.
+              Our team may contact the customer by phone or SMS, if necessary, to confirm an order.
             </p>
           </Card>
         </section>

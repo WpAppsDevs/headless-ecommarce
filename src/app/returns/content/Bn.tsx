@@ -1,4 +1,3 @@
-import { config } from '@/lib/config';
 import {
   RefreshCw,
   Package,
@@ -8,14 +7,13 @@ import {
   XCircle,
   Banknote,
   Phone,
-  Mail,
-  MessageCircle,
 } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { BulletList } from '@/components/policies/BulletList';
 import { Card } from '@/components/policies/Card';
 import { NoteCallout } from '@/components/policies/NoteCallout';
 import { SectionHeading } from '@/components/policies/SectionHeading';
+import { SupportContactLinks } from '@/components/policies/SupportContactLinks';
 import { TypePanel } from '@/components/policies/TypePanel';
 
 const BREADCRUMBS = [{ label: 'হোম', href: '/' }, { label: 'রিটার্ন ও এক্সচেঞ্জ' }];
@@ -45,7 +43,7 @@ const NOT_ELIGIBLE = [
 export function ReturnsContentBn() {
   return (
     <div>
-      <PageHeader title="রিটার্ন ও এক্সচেঞ্জ" breadcrumbs={BREADCRUMBS} />
+      <PageHeader title="রিটার্ন ও এক্সচেঞ্জ" breadcrumbs={BREADCRUMBS} breadcrumbLabel="পথনির্দেশ" />
 
       <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:px-8">
         {/* Eligibility */}
@@ -175,31 +173,7 @@ export function ReturnsContentBn() {
             <p className="text-sm text-brand-text-muted">
               এক্সচেঞ্জ সংক্রান্ত যেকোনো প্রয়োজনে আমাদের সঙ্গে যোগাযোগ করুন:
             </p>
-            <div className="mt-4 space-y-3">
-              <a
-                href="tel:+8801841654663"
-                className="flex items-center gap-2.5 text-sm text-brand-accent-strong transition-colors hover:underline"
-              >
-                <Phone className="h-4 w-4 shrink-0" />
-                +880 1841-654663
-              </a>
-              <a
-                href="mailto:support@najifasshop.com"
-                className="flex items-center gap-2.5 text-sm text-brand-accent-strong transition-colors hover:underline"
-              >
-                <Mail className="h-4 w-4 shrink-0" />
-                support@najifasshop.com
-              </a>
-              <a
-                href={config.whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2.5 text-sm text-brand-accent-strong transition-colors hover:underline"
-              >
-                <MessageCircle className="h-4 w-4 shrink-0" />
-                WhatsApp-এ মেসেজ করুন
-              </a>
-            </div>
+            <SupportContactLinks whatsappLabel="WhatsApp-এ মেসেজ করুন" />
           </Card>
         </section>
       </div>
