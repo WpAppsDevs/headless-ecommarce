@@ -161,6 +161,22 @@
   }
 }
 
+/*
+ * Bangla letter-spacing
+ *
+ * Bengali is written with joined conjuncts and floating vowel signs. Positive
+ * letter-spacing pulls those clusters apart, so `tracking-[0.3em]` on an eyebrow
+ * renders প্রিমিয়াম as প্রি মি য়াম and detaches the signs. On a Bangla document
+ * any tracking is therefore wrong, and this resets it for every element —
+ * attribute + type selector, so it beats a single utility class without
+ * `!important`.
+ */
+html[lang='bn'] *,
+html[lang='bn'] *::before,
+html[lang='bn'] *::after {
+  letter-spacing: normal !important;
+}
+
 @layer utilities {
   /* Inter for small UI text — scoped to the product detail section only.
      The site's global font is left untouched. */

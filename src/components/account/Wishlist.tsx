@@ -9,7 +9,8 @@ import { apiGetWishlist } from '@/lib/api/wishlist';
 import { ApiError } from '@/lib/errors';
 import type { Product } from '@/lib/api/products';
 import { useFormatPrice } from '@/lib/utils/currency';
-import { useDictionary } from '@/i18n/LocaleProvider';
+import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
+import { taxonomyLabel } from '@/i18n/taxonomy';
 import { interpolate } from '@/i18n/interpolate';
 
 const PLACEHOLDER =
@@ -24,6 +25,7 @@ function WishlistProductCard({ product, onRemove }: { product: Product; onRemove
   const price = product.sale_price || product.price;
   const fmt = useFormatPrice();
   const copy = useDictionary().account.wishlist;
+  const locale = useLocale();
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-brand-border bg-white shadow-sm transition-shadow hover:shadow-md">
@@ -59,7 +61,9 @@ function WishlistProductCard({ product, onRemove }: { product: Product; onRemove
         </Link>
 
         {product.categories[0] && (
-          <p className="text-xs text-brand-text-muted">{product.categories[0].name}</p>
+          <p className="text-xs text-brand-text-muted">
+            {taxonomyLabel(locale, product.categories[0].slug, product.categories[0].name)}
+          </p>
         )}
 
         <div className="mt-auto flex items-center justify-between pt-2">

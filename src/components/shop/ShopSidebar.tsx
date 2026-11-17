@@ -7,7 +7,8 @@ import { cn } from '@/lib/utils';
 import type { FilterTag, FilterBrand, FilterAttributeTerm } from '@/lib/api/filters';
 import { useFormatPrice } from '@/lib/utils/currency';
 import { buildShopFilterHref } from '@/lib/navigation';
-import { useDictionary } from '@/i18n/LocaleProvider';
+import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
+import { taxonomyLabel } from '@/i18n/taxonomy';
 import { interpolate } from '@/i18n/interpolate';
 
 interface ShopSidebarProps {
@@ -150,6 +151,7 @@ export function ShopSidebar({
 }: ShopSidebarProps) {
   const fmt = useFormatPrice();
   const copy = useDictionary().shop;
+  const locale = useLocale();
   const isAllProducts = !selectedCategory && !selectedTag && !selectedBrand && !currentSearch;
 
   return (
@@ -283,7 +285,9 @@ export function ShopSidebar({
                   )}
                 >
                   {isActive && <ChevronRight className="h-3 w-3" />}
-                  <span className={isActive ? 'ml-1' : 'ml-5'}>{cat.name}</span>
+                  <span className={isActive ? 'ml-1' : 'ml-5'}>
+                    {taxonomyLabel(locale, cat.slug, cat.name)}
+                  </span>
                 </Link>
               </li>
             );
@@ -314,7 +318,7 @@ export function ShopSidebar({
                       : 'bg-brand-card text-brand-text-muted hover:bg-brand-accent-light',
                   )}
                 >
-                  {name}
+                  {taxonomyLabel(locale, slug, name)}
                 </Link>
               );
             })}
@@ -349,7 +353,7 @@ export function ShopSidebar({
                       'h-1.5 w-1.5 rounded-full transition-colors',
                       isActive ? 'bg-brand-wine' : 'bg-brand-border',
                     )} />
-                    {name}
+                    {taxonomyLabel(locale, slug, name)}
                   </Link>
                 </li>
               );
@@ -439,10 +443,10 @@ export function ShopSidebar({
                 <button
                   key={color.slug}
                   onClick={() => onColorToggle(color.slug)}
-                  title={color.name}
+                  title={taxonomyLabel(locale, color.slug, color.name)}
                   aria-label={interpolate(copy.colorFilterAria, {
                     action: isActive ? copy.removeFilter : copy.addFilter,
-                    name: color.name,
+                    name: taxonomyLabel(locale, color.slug, color.name),
                   })}
                   aria-pressed={isActive}
                   className={cn(
@@ -497,7 +501,7 @@ export function ShopSidebar({
                       : 'border-brand-border text-brand-text-muted hover:border-brand-accent-strong hover:text-brand-text',
                   )}
                 >
-                  {size.name}
+                  {taxonomyLabel(locale, size.slug, size.name)}
                 </button>
               );
             })}
