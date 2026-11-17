@@ -265,6 +265,8 @@ export const en = {
     viewAria: 'View {name}',
     viewProduct: 'View Product',
     addToCart: 'Add to Cart',
+    addToWishlist: 'Add to wishlist',
+    removeFromWishlist: 'Remove from wishlist',
     adding: 'Adding…',
     selectOptions: 'Select Options',
     multipleOptions: 'Multiple colors & sizes available',
@@ -439,6 +441,8 @@ export const en = {
     loginToReview: 'Log in to write a review',
     noReviews: 'No reviews yet.',
     customerReviews: 'Customer Reviews',
+    reviewImageAlt: 'Review image',
+    reviewPhotoAlt: 'Review photo',
     sortAria: 'Sort reviews',
     sortNewest: 'Newest first',
     sortHelpful: 'Most helpful',
@@ -491,6 +495,10 @@ export const en = {
     sizeError: 'File must be under {size} MB.',
   },
   account: {
+    pagination: {
+      previousPage: 'Previous page',
+      nextPage: 'Next page',
+    },
     tabs: {
       dashboard: 'Dashboard',
       orders: 'Your Orders',

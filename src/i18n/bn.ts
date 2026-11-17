@@ -267,6 +267,8 @@ export const bn: Dictionary = {
     viewAria: '{name} দেখুন',
     viewProduct: 'পণ্য দেখুন',
     addToCart: 'কার্টে যোগ করুন',
+    addToWishlist: 'উইশলিস্টে যোগ করুন',
+    removeFromWishlist: 'উইশলিস্ট থেকে সরান',
     adding: 'যোগ হচ্ছে…',
     selectOptions: 'অপশন বেছে নিন',
     multipleOptions: 'একাধিক রঙ ও সাইজ পাওয়া যায়',
@@ -441,6 +443,8 @@ export const bn: Dictionary = {
     loginToReview: 'রিভিউ লিখতে সাইন ইন করুন',
     noReviews: 'এখনো কোনো রিভিউ নেই।',
     customerReviews: 'কাস্টমার রিভিউ',
+    reviewImageAlt: 'রিভিউয়ের ছবি',
+    reviewPhotoAlt: 'রিভিউয়ের ছবি',
     sortAria: 'রিভিউ সাজান',
     sortNewest: 'নতুন আগে',
     sortHelpful: 'সবচেয়ে সহায়ক',
@@ -493,6 +497,10 @@ export const bn: Dictionary = {
     sizeError: 'ফাইলের আকার {size} MB-এর কম হতে হবে।',
   },
   account: {
+    pagination: {
+      previousPage: 'আগের পৃষ্ঠা',
+      nextPage: 'পরের পৃষ্ঠা',
+    },
     tabs: {
       dashboard: 'ড্যাশবোর্ড',
       orders: 'আপনার অর্ডার',
