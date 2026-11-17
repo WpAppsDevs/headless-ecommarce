@@ -19,6 +19,12 @@ import { join, relative } from 'node:path';
 const ROOT = process.cwd();
 const SRC = join(ROOT, 'src');
 
+/**
+ * Literal attributes that are the shop's own name. A brand is not translated,
+ * and `title="Najifa's Shop"` on a logo is correct in both languages.
+ */
+const PROPER_NOUNS = new Set(["Najifa's Shop", "Najifa's Shop — Pakistani Collection"]);
+
 /** Files whose English literals are deliberate, with the reason. */
 const TEXT_ALLOW = new Map([
   ['src/app/shipping/content/En.tsx', 'English half of a bilingual page'],
@@ -26,10 +32,19 @@ const TEXT_ALLOW = new Map([
   ['src/app/terms/content/En.tsx', 'English half of a bilingual page'],
   ['src/app/privacy-policy/content/En.tsx', 'English half of a bilingual page'],
   ['src/app/track-order/content/En.tsx', 'English half of a bilingual page'],
+  ['src/app/contact/content/ContactBeforeEn.tsx', 'English half of a bilingual page'],
+  ['src/app/contact/content/ContactIntroEn.tsx', 'English half of a bilingual page'],
 ]);
 
 /** Two or more Latin words inside a JSX text node. */
 const JSX_TEXT = />\s*([A-Z][A-Za-z'’-]*(?:\s+[A-Za-z0-9'’-]+)+)\s*</g;
+
+/**
+ * Latin text inside an accessibility or tooltip attribute. These reach a visitor
+ * through a screen reader or a hover, so English there is the same defect as
+ * English in a heading — and the JSX-text pattern cannot see them.
+ */
+const ATTR_TEXT = /\b(?:aria-label|title|placeholder|alt)="([A-Za-z][^"]{6,})"/g;
 
 /** A form element, to check it declares a method. */
 const FORM_TAG = /<form\b([^>]*)>/g;
@@ -57,6 +72,14 @@ for (const file of walk(SRC)) {
     for (const match of source.matchAll(JSX_TEXT)) {
       failures.push(
         `${rel}:${lineOf(source, match.index)}  untranslated text "${match[1].trim()}" — move it to src/i18n or add the file to TEXT_ALLOW`,
+      );
+    }
+
+    for (const match of source.matchAll(ATTR_TEXT)) {
+      if (!/[A-Za-z]\s+[A-Za-z]/.test(match[1])) continue;
+      if (PROPER_NOUNS.has(match[1])) continue;
+      failures.push(
+        `${rel}:${lineOf(source, match.index)}  untranslated attribute "${match[1]}" — a screen reader and a tooltip both say it`,
       );
     }
   }

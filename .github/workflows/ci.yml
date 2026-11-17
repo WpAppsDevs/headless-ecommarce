@@ -47,3 +47,14 @@ jobs:
 
       - name: Production advisory gate
         run: npm run audit:prod
+
+      # Runs only when the two repository secrets exist; without them every test
+      # in the suite skips, so the job stays honest either way.
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Browser tests behind the login
+        env:
+          E2E_EMAIL: ${{ secrets.E2E_EMAIL }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+        run: npm run test:e2e

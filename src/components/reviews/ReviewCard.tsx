@@ -88,7 +88,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
               onClick={() => setLightboxSrc(m.url)}
               className="relative h-20 w-20 overflow-hidden rounded-lg border border-zinc-200 transition hover:opacity-80"
             >
-              <Image src={m.url} alt="Review image" fill sizes="80px" className="object-cover" unoptimized />
+              <Image src={m.url} alt={copy.reviewImageAlt} fill sizes="80px" className="object-cover" unoptimized />
             </button>
           ))}
         </div>
@@ -102,7 +102,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
         >
           <div className="relative max-h-[80vh] max-w-[90vw]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={lightboxSrc} alt="Review photo" className="max-h-[80vh] max-w-[90vw] rounded-lg object-contain" />
+            <img src={lightboxSrc} alt={copy.reviewPhotoAlt} className="max-h-[80vh] max-w-[90vw] rounded-lg object-contain" />
           </div>
         </div>
       )}

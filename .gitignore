@@ -37,3 +37,9 @@ tsconfig.tsbuildinfo
 .scratch/
 .openchamber/
 .playwright-mcp/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

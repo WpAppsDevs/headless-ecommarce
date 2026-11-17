@@ -3,6 +3,7 @@
 import { Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWishlistStore } from '@/stores/wishlistStore';
+import { useDictionary } from '@/i18n/LocaleProvider';
 
 interface WishlistButtonProps {
   productId: number;
@@ -25,8 +26,10 @@ export function WishlistButton({
   variant = 'card',
   className,
 }: WishlistButtonProps) {
+  const copy = useDictionary().product;
   const toggle = useWishlistStore((s) => s.toggle);
   const isWishlisted = useWishlistStore((s) => s.isWishlisted(productId));
+  const label = isWishlisted ? copy.removeFromWishlist : copy.addToWishlist;
   const isPending = useWishlistStore((s) => s.isPending(productId));
 
   function handleClick(e: React.MouseEvent) {
@@ -39,8 +42,8 @@ export function WishlistButton({
     return (
       <button
         type="button"
-        aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-        title={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+        aria-label={label}
+        title={label}
         aria-pressed={isWishlisted}
         onClick={handleClick}
         disabled={isPending}

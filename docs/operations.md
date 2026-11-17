@@ -35,6 +35,20 @@ Run `npm run verify` before the build. `npm run build` also performs type checki
 
 GitHub Actions runs `npm run verify`, `npm run build`, `npm run check:routes` and `npm run audit:prod` on every pull request and on pushes to `master`. `verify` includes `check:untranslated`, so an English literal or a `<form>` without `method="post"` fails the gate rather than reaching a visitor. Vercel provides the preview deployment; CI is the merge gate.
 
+## Browser tests behind the login
+
+`check:routes` reads HTTP responses, so every screen behind a session is invisible to it: the account tabs, order details, checkout validation. Those are where English copy and a broken branch shipped unnoticed, so they are covered by Playwright instead.
+
+```console
+$ npm run build                     # the suite serves the built app
+$ E2E_EMAIL=… E2E_PASSWORD=… npm run test:e2e
+```
+
+- `e2e/account.spec.ts` signs in with a **customer** account (not an administrator), switches the locale cookie to Bangla, and asserts the account tabs, one order card, the order-details modal and the language flag. A session-survives-language-switch case runs last.
+- Credentials come from `E2E_EMAIL` / `E2E_PASSWORD` only. With either missing every test skips, so a checkout without the secret stays green rather than failing for the wrong reason. The same applies in CI: add the two repository secrets to enable the job's browser step.
+- The suite reads a live WordPress. The account test asserts that an order exists, never how many, and the checkout test walks the shop until a product can be added, skipping if none can. Hard-coded ids would rot against real data.
+- `e2e-open` status on the shop means the test cannot run: when every product is sold out there is no way to fill a cart.
+
 ## Advisories
 
 `npm run audit:prod` is the gate: it audits production dependencies only and fails on high or critical. It reports zero, and CI runs it on every pull request.

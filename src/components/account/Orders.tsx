@@ -91,7 +91,7 @@ export function Orders({ orders }: OrdersProps) {
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
               className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 text-zinc-500 transition hover:bg-zinc-50 disabled:opacity-40"
-              aria-label="Previous page"
+              aria-label={dict.pagination.previousPage}
             >
               <ChevronLeft className="h-4 w-4" strokeWidth={2} />
             </button>
@@ -114,7 +114,7 @@ export function Orders({ orders }: OrdersProps) {
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
               className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 text-zinc-500 transition hover:bg-zinc-50 disabled:opacity-40"
-              aria-label="Next page"
+              aria-label={dict.pagination.nextPage}
             >
               <ChevronRight className="h-4 w-4" strokeWidth={2} />
             </button>
