@@ -20,6 +20,8 @@ Read `docs/coding-standards.md` before changing code, `docs/design-system.md` be
 
 Run long commands (`npm run build`, `npm run verify:full`) in the background and continue with other work; the harness reports completion, so read the final output once.
 
+When a task needs a credential from the user, ask with the secret tool so the value never enters the transcript; a password pasted into the conversation is a password to rotate.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know

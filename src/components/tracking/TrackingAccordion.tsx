@@ -60,7 +60,7 @@ function TrackingDetails({ order, tracking }: { order: TrackingOrderEntry['order
 
       {(tracking.provider || tracking.tracking_number) && (
         <div className="pt-4 border-t border-brand-border space-y-3">
-          <h3 className="text-sm font-semibold text-brand-text">Shipping Details</h3>
+          <h3 className="text-sm font-semibold text-brand-text">{copy.shippingDetails}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
             {tracking.provider && (
               <div>

@@ -316,16 +316,16 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
               className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-stock px-5 py-3 text-[13px] font-semibold text-white shadow-sm transition hover:opacity-90 sm:flex-none"
             >
               <Printer className="h-4 w-4" strokeWidth={2} />
-              Print Invoice
+              {copy.printInvoice}
             </button>
             <button className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-wine px-5 py-3 text-[13px] font-semibold text-white shadow-sm transition hover:opacity-90 sm:flex-none">
               <Download className="h-4 w-4" strokeWidth={2} />
-              Download Invoice
+              {copy.downloadInvoice}
             </button>
             {order.status === 'completed' && (
               <button className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-danger px-5 py-3 text-[13px] font-semibold text-white shadow-sm transition hover:opacity-90 sm:flex-none">
                 <RotateCcw className="h-4 w-4" strokeWidth={2} />
-                Return Product
+                {copy.returnProduct}
               </button>
             )}
           </div>

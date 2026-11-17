@@ -49,7 +49,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
             {review.author.is_verified && (
               <span className="flex items-center gap-1 rounded-full bg-brand-stock/10 px-2 py-0.5 text-[10px] font-semibold text-brand-stock">
                 <BadgeCheck className="h-3 w-3" strokeWidth={2.5} />
-                Verified Purchase
+                {copy.verifiedPurchase}
               </span>
             )}
             <span className="ml-auto text-xs text-zinc-400">{fmtDate(review.date, locale)}</span>

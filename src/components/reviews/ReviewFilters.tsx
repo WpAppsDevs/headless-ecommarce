@@ -15,7 +15,7 @@ export function ReviewFilters({ sort, onSortChange }: ReviewFiltersProps) {
 
   return (
     <div className="flex items-center justify-between gap-3">
-      <p className="text-sm font-medium text-zinc-700">Customer Reviews</p>
+      <p className="text-sm font-medium text-zinc-700">{copy.customerReviews}</p>
 
       {/* Sort selector */}
       <div className="relative">

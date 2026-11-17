@@ -97,7 +97,7 @@ function EmptyWishlist() {
         href="/products"
         className="rounded-xl bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700"
       >
-        Browse Products
+        {copy.browseProducts}
       </Link>
     </div>
   );

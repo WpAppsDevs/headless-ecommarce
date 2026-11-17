@@ -24,6 +24,8 @@ These rules describe how the codebase is written today and where it is going. Fo
 | Page | `page.tsx` | `app/cart/page.tsx` |
 | Utility | camelCase | `order-utils.ts` |
 
+A component takes what it needs as a prop. It never inspects a translated value to decide behaviour: a check like `title === 'My Account'` is true only while the title is English, so translating the title silently deletes whatever it guarded. Pass `description` instead of recognising a title.
+
 One exported component per file, PascalCase filename, and import it directly; there are no barrel files. `npm run check:components` enforces the export rule, name uniqueness, that each component is referenced somewhere, and the PascalCase filename for page bodies under `src/app/<route>/content/`. Local props interfaces stay in the component file unless another file needs them. Domain components live under their domain folder; `src/components/ui/` holds primitives with no commerce meaning.
 
 Split a file when it grows past roughly 300 lines or mixes more than one responsibility. `CheckoutForm.tsx` at 769 lines is the current exception, not the template.
@@ -107,6 +109,8 @@ throw new ApiError('out_of_stock', 'This item is out of stock');
 ## Styling
 
 - Use brand tokens and Tailwind utilities.
+- User-visible text lives in `src/i18n/{en,bn}.ts`. `npm run check:untranslated` fails on a JSX text node with two or more Latin words, which is what shipped `Shipping Details` and `Customer Reviews` to Bangla visitors, and it allowlists the English halves of the policy pages explicitly.
+- Every `<form>` declares `method="post"`. A native submit before React hydrates otherwise performs a GET and puts the fields — a password, an address — in the query string, browser history and server log. The same check enforces it.
 - Colour comes from a token. `npm run check:tokens` fails on a Tailwind arbitrary colour class (`bg-[#9E2F45]`), because a literal survives every future palette change. Add the token to `:root` and `@theme inline` in `src/app/globals.css` instead.
 - A component name is unique across `src/components`, one export per file, and referenced somewhere. `npm run check:components` enforces all three, and the same rules for the page bodies under `src/app/<route>/content/`, whose filenames must be PascalCase.
 - Use `cn()` for conditional classes.
@@ -163,7 +167,7 @@ throw new ApiError('out_of_stock', 'This item is out of stock');
 
 Before calling a change complete:
 
-1. `npm run verify` passes: typecheck, lint, unit tests, the contrast check, and the one-export-per-component check.
+1. `npm run verify` passes: typecheck, lint, unit tests, the contrast check, the one-export-per-component check, and the untranslated-text/form-method check.
 2. `npm run verify:full` passes before committing when the change touches routing, data fetching, dependencies, or user-facing copy. It adds the production build and `npm run check:routes`, which boots the built app and asserts the `<html lang>` and `<title>` of `/`, `/shipping`, `/terms` and `/track-order` in both locales.
 3. Empty, loading, and error states still render.
 4. The change works on a narrow viewport, not only desktop.

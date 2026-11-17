@@ -30,7 +30,7 @@ export function CartDrawer() {
         <div className="flex shrink-0 items-center justify-between border-b px-5 py-4">
           <div className="flex items-center gap-2.5">
             <h2 className="text-base font-semibold tracking-tight text-zinc-900">
-              Shopping Cart
+              {copy.drawerTitle}
             </h2>
             {totalQty > 0 && (
               <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-accent-strong px-1.5 text-[11px] font-semibold text-white">
@@ -86,7 +86,7 @@ export function CartDrawer() {
                   href="/shipping"
                   className="text-zinc-700 underline underline-offset-2 hover:text-zinc-900"
                 >
-                  Delivery details
+                  {copy.deliveryDetails}
                 </Link>
               </p>
             </div>
@@ -107,14 +107,14 @@ export function CartDrawer() {
                   onClick={() => setCartDrawerOpen(false)}
                   className="flex items-center justify-center rounded-xl border border-zinc-300 py-3 text-sm font-semibold text-zinc-900 transition-colors hover:bg-zinc-50"
                 >
-                  View Cart
+                  {copy.viewCart}
                 </Link>
                 <Link
                   href="/checkout"
                   onClick={() => setCartDrawerOpen(false)}
                   className="flex items-center justify-center rounded-xl bg-zinc-900 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-700"
                 >
-                  Check Out
+                  {copy.checkOut}
                 </Link>
               </div>
               <button

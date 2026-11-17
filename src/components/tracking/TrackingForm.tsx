@@ -43,7 +43,7 @@ export function TrackingForm({ onSubmit, isLoading, isAuthenticated = false }: T
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full space-y-5">
+    <form method="post" onSubmit={handleSubmit} className="w-full space-y-5">
       <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
         <div className="space-y-4 sm:space-y-2">
           {!isAuthenticated && (
