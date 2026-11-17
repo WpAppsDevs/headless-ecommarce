@@ -33,7 +33,15 @@ Run `npm run verify` before the build. `npm run build` also performs type checki
 
 `shadcn` is a devDependency: it supplies build-time CSS and is not needed by the running server. A build host must install dev dependencies (`npm ci`, not `npm ci --omit=dev`). A production-only install is safe after the build, when running `next start`.
 
-GitHub Actions runs `npm run verify`, `npm run build` and `npm run check:routes` on every pull request and on pushes to `master`. `verify` includes `check:untranslated`, so an English literal or a `<form>` without `method="post"` fails the gate rather than reaching a visitor. Vercel provides the preview deployment; CI is the merge gate.
+GitHub Actions runs `npm run verify`, `npm run build`, `npm run check:routes` and `npm run audit:prod` on every pull request and on pushes to `master`. `verify` includes `check:untranslated`, so an English literal or a `<form>` without `method="post"` fails the gate rather than reaching a visitor. Vercel provides the preview deployment; CI is the merge gate.
+
+## Advisories
+
+`npm run audit:prod` is the gate: it audits production dependencies only and fails on high or critical. It reports zero, and CI runs it on every pull request.
+
+`npm audit` without `--omit=dev` reports 22 findings, all in build and test tooling. Every one of them is a path to a single package, `picomatch`, whose latest release (4.0.7) is still in the vulnerable range, so no fix exists to apply. `npm audit fix` does not reduce the count, and `npm audit fix --force` only reaches it by downgrading `vitest` 5 → 3.1.4 and `shadcn` 4 → 2.10, which is a worse trade than the advisory.
+
+Re-check after `picomatch` publishes a release outside the vulnerable range; `fdir` and `minimatch` already carry fixes that arrive with it. Until then the dev-only count is expected, and a pull request that leaves it unchanged is not a regression.
 
 ## Pull requests and merge gate
 
