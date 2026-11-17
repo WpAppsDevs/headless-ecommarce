@@ -67,14 +67,27 @@ Closing this operationally means setting the webhook to a collector or chat chan
 - Where: `src/app/api/errors/route.ts`, `docs/operations.md`.
 - Impact: low.
 
-## 8. Browser flows have no automated test
+## 8. Browser coverage stops short of checkout
 
-Vitest covers pure logic: order filtering, tracking normalization, currency formatting, shipping fallback, and the session-hint predicate. Checkout, auth reload, cart merge, tracking, and reviews are still verified manually.
+Vitest covers pure logic, and `check:routes` covers language and metadata per route. Playwright (`npm run test:e2e`) now covers what sits behind a session: the account tabs, an order card and its modal, the language switch, Bangla typography, and keyboard entry.
 
-Closing this needs an end-to-end runner against a seeded staging WordPress site. Keep it separate from the unit suite.
+Still uncovered: checkout validation, cart merge on sign-in, review submission, and tracking lookup. Checkout has a test written but it self-skips, because every product is currently sold out and no cart can be filled.
 
-- Where: `vitest.config.ts`, `src/**/*.test.ts`.
+Closing this needs stock in WordPress, plus a seeded staging site so those flows do not depend on live data. Keep it separate from the unit suite.
+
+- Where: `playwright.config.ts`, `e2e/*.spec.ts`, `vitest.config.ts`.
 - Impact: medium for regressions in money and identity flows.
+
+## 8b. Product content has no Bangla version
+
+Product names, descriptions, brand names and review text arrive from WordPress in English, so a Bangla page shows Bangla chrome around English products. The front end cannot fix this: the API exposes no translated fields, and only `store.locale` (from `WPLANG`) is locale-aware.
+
+Taxonomy labels are the exception — `src/i18n/taxonomy.ts` maps term slugs to Bangla (`women` → নারী), because a slug is an identifier rather than copy.
+
+Closing this needs either WPML/Polylang, or a `translations` field plus endpoints in the headless wrapper plugin. The owner has deferred both. See [localization.md](localization.md).
+
+- Where: WordPress (`wpappsdev-headless-wrapper-api`), `src/lib/api/products.ts`, `src/i18n/taxonomy.ts`.
+- Impact: high for the Bangla experience, no frontend workaround.
 
 ## 9. Dark-mode utilities remain dormant
 

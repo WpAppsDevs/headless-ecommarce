@@ -63,6 +63,7 @@ Open pull requests against `master`. Vercel is the preview, not the gate; the re
 
 - The active ruleset is **Main Branch Rule**. It requires `verify` with strict up-to-date checks, and blocks force pushes and branch deletion. Renaming the CI job requires updating the ruleset.
 - Editing `.github/workflows/*` needs the `workflow` token scope. Refresh it with `gh auth refresh -s workflow`.
+- `gh pr merge` occasionally fails with `net/http: TLS handshake timeout` against api.github.com. It is transient: re-run the same command. Confirm with `gh pr view <n> --json state` rather than assuming either outcome.
 - For a stacked pull request, retarget the base to `master` and rebase after the parent merges. Otherwise the child PR still contains the parent's commits.
 - Put a long PR body in a file and pass it with `--body-file`; the repository template is `.github/pull_request_template.md`.
 
