@@ -19,7 +19,8 @@
     "check:tokens": "node scripts/check-tokens.mjs",
     "check:untranslated": "node scripts/check-untranslated.mjs",
     "verify": "npm run typecheck && npm run lint && npm test && npm run check:contrast && npm run check:components && npm run check:tokens && npm run check:untranslated",
-    "verify:full": "npm run verify && npm run build && npm run check:routes"
+    "verify:full": "npm run verify && npm run build && npm run check:routes",
+    "audit:prod": "npm audit --omit=dev --audit-level=high"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.0",

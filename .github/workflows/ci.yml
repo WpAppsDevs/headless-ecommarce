@@ -44,3 +44,6 @@ jobs:
 
       - name: Route render check
         run: npm run check:routes
+
+      - name: Production advisory gate
+        run: npm run audit:prod
