@@ -15,6 +15,7 @@ These docs describe the storefront in this repository. They are written from the
 | Working on auth | [flows/authentication.md](flows/authentication.md) |
 | Working on client state | [state-management.md](state-management.md) |
 | Working on UI | [components.md](components.md), [design-system.md](design-system.md) |
+| Changing copy, translation, or fonts | [localization.md](localization.md) |
 | Reviewing or writing code | [coding-standards.md](coding-standards.md) |
 | Deploying or configuring secrets | [operations.md](operations.md) |
 | Picking up known debt | [known-gaps.md](known-gaps.md) |
