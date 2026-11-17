@@ -1,6 +1,6 @@
 'use client';
 
-import { type ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { X, Home, Printer, Download, RotateCcw, Check } from 'lucide-react';
 import type { Order } from '@/lib/api/orders';
 import { useFormatPrice } from '@/lib/utils/currency';
@@ -106,6 +106,16 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
   const shippingCost = Number(order.shipping_total ?? 0);
   const subtotalMrp  = total + discount - shippingCost;
   const fmt          = useFormatPrice();
+
+  // Escape closes, the way every other overlay in the app behaves. Registered on
+  // the document so it works without focusing a specific control first.
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [onClose]);
 
   const b = order.billing;
   const s = order.shipping;

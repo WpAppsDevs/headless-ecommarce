@@ -83,9 +83,9 @@ test.describe.serial('account screens', () => {
     await expect(modal).not.toContainText('Print Invoice');
     await expect(modal).not.toContainText('Download Invoice');
 
-    // Leave the overlay closed: the tests share one page in serial order, and an
-    // open modal would swallow the next test's clicks.
-    await page.getByRole('button', { name: 'বন্ধ করুন' }).click();
+    // Escape closes it, then the tests share one page in serial order and an open
+    // overlay would swallow the next test's clicks.
+    await page.keyboard.press('Escape');
     await expect(modal).toBeHidden();
   });
 
