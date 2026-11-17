@@ -77,7 +77,7 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="absolute inset-0 z-50 flex items-center bg-white px-4 sm:px-6 lg:px-8">
-      <form onSubmit={onSubmit} className="flex w-full items-center gap-3">
+      <form method="post" onSubmit={onSubmit} className="flex w-full items-center gap-3">
         <Search className="h-5 w-5 shrink-0 text-zinc-400" />
         <input
           ref={inputRef}

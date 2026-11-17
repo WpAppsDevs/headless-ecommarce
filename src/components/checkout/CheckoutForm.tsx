@@ -333,7 +333,7 @@ export function CheckoutForm({ profile, cartItems }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
+    <form method="post" onSubmit={handleSubmit(onSubmit, onError)} noValidate>
       {apiError && (
         <div className="mb-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">
           {apiError}

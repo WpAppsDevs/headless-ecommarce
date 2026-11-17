@@ -1,6 +1,13 @@
 export const en = {
   common: {
     home: 'Home',
+    notFoundTitle: 'Page not found',
+    notFoundBody: "Sorry, we couldn't find what you were looking for.",
+    backHome: 'Back to Home',
+    errorTitle: 'Something went wrong',
+    errorBody: 'An unexpected error occurred. Please try again or return to the homepage.',
+    errorId: 'Error ID:',
+    tryAgain: 'Try Again',
     mainNavigation: 'Main navigation',
     breadcrumb: 'Breadcrumb',
     language: {
@@ -41,6 +48,7 @@ export const en = {
     },
   },
   footer: {
+    cashOnDelivery: 'CASH ON DELIVERY',
     brandParagraph:
       'Authentic Pakistani dresses for women across Bangladesh. Ready stock, pre-order, and wholesale catalog — all from trusted Pakistani manufacturers.',
     helpHeading: 'Help',
@@ -108,6 +116,7 @@ export const en = {
     trackingNumber: 'Tracking #:',
     estimatedDelivery: 'Estimated Delivery:',
     trackShipment: 'Track Shipment',
+    shippingDetails: 'Shipping Details',
     timeline: 'Order Timeline',
     statuses: {
       pending: 'Pending',
@@ -421,6 +430,7 @@ export const en = {
     },
   },
   reviews: {
+    verifiedPurchase: 'Verified Purchase',
     writeReview: 'Write a Review',
     chooseProduct: 'Which product would you like to review?',
     backToSelection: 'Back to product selection',
@@ -527,6 +537,9 @@ export const en = {
     },
     details: {
       title: 'Order Details',
+      printInvoice: 'Print Invoice',
+      downloadInvoice: 'Download Invoice',
+      returnProduct: 'Return Product',
       close: 'Close',
       orderId: 'Order ID: #{id}',
       products: 'Products',
@@ -602,6 +615,7 @@ export const en = {
       buy: 'Buy',
       viewAria: 'View {name}',
       removeAria: 'Remove {name} from wishlist',
+      browseProducts: 'Browse Products',
     },
   },
   cart: {
@@ -621,6 +635,11 @@ export const en = {
     total: 'Total',
     estimatedTotal: 'Estimated total',
     checkout: 'Process To Checkout',
+    drawerTitle: 'Shopping Cart',
+    deliveryDetails: 'Delivery details',
+    viewCart: 'View Cart',
+    checkOut: 'Check Out',
+    totalPrice: 'Total Price',
   },
   checkout: {
     title: 'Checkout',

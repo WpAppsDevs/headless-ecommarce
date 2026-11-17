@@ -83,7 +83,7 @@ export function ComingSoonSection() {
                 <span className="font-medium">{copy.success}</span>
               </div>
             ) : (
-              <form
+              <form method="post"
                 onSubmit={onSubmit}
                 className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row sm:gap-0"
               >

@@ -118,7 +118,7 @@ export function ReviewForm({ productId, productName, orderId, onSuccess, onCance
   const busy = isSubmitting || uploading;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+    <form method="post" onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       {/* Product name */}
       <p className="text-sm text-zinc-500">
         {copy.form.writingFor.split('{name}')[0]}

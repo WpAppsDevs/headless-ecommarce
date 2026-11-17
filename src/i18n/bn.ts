@@ -3,6 +3,13 @@ import type { Dictionary } from './get-dictionary';
 export const bn: Dictionary = {
   common: {
     home: 'হোম',
+    notFoundTitle: 'পাতাটি পাওয়া যায়নি',
+    notFoundBody: 'দুঃখিত, আপনি যা খুঁজছেন তা আমরা খুঁজে পাইনি।',
+    backHome: 'হোমে ফিরে যান',
+    errorTitle: 'কিছু একটা ভুল হয়েছে',
+    errorBody: 'একটি অপ্রত্যাশিত সমস্যা হয়েছে। আবার চেষ্টা করুন, অথবা হোমে ফিরে যান।',
+    errorId: 'ত্রুটি আইডি:',
+    tryAgain: 'আবার চেষ্টা করুন',
     mainNavigation: 'প্রধান মেনু',
     breadcrumb: 'পথনির্দেশ',
     language: {
@@ -43,6 +50,7 @@ export const bn: Dictionary = {
     },
   },
   footer: {
+    cashOnDelivery: 'ক্যাশ অন ডেলিভারি',
     brandParagraph:
       'বাংলাদেশজুড়ে নারীদের জন্য অথেনটিক পাকিস্তানি ড্রেস। রেডি স্টক, প্রি-অর্ডার ও হোলসেল ক্যাটালগ — সবই বিশ্বস্ত পাকিস্তানি ম্যানুফ্যাকচারার থেকে।',
     helpHeading: 'সহায়তা',
@@ -110,6 +118,7 @@ export const bn: Dictionary = {
     trackingNumber: 'ট্র্যাকিং নম্বর:',
     estimatedDelivery: 'আনুমানিক ডেলিভারি:',
     trackShipment: 'শিপমেন্ট ট্র্যাক করুন',
+    shippingDetails: 'শিপিং বিবরণ',
     timeline: 'অর্ডারের অগ্রগতি',
     statuses: {
       pending: 'অপেক্ষমাণ',
@@ -423,6 +432,7 @@ export const bn: Dictionary = {
     },
   },
   reviews: {
+    verifiedPurchase: 'যাচাই করা কেনাকাটা',
     writeReview: 'রিভিউ লিখুন',
     chooseProduct: 'কোন পণ্যটির রিভিউ দিতে চান?',
     backToSelection: 'পণ্য বেছে নেওয়ার জায়গায় ফিরুন',
@@ -529,6 +539,9 @@ export const bn: Dictionary = {
     },
     details: {
       title: 'অর্ডারের বিস্তারিত',
+      printInvoice: 'ইনভয়েস প্রিন্ট করুন',
+      downloadInvoice: 'ইনভয়েস ডাউনলোড করুন',
+      returnProduct: 'পণ্য ফেরত দিন',
       close: 'বন্ধ করুন',
       orderId: 'অর্ডার আইডি: #{id}',
       products: 'পণ্য',
@@ -604,6 +617,7 @@ export const bn: Dictionary = {
       buy: 'কিনুন',
       viewAria: '{name} দেখুন',
       removeAria: 'উইশলিস্ট থেকে {name} সরান',
+      browseProducts: 'পণ্য দেখুন',
     },
   },
   cart: {
@@ -623,6 +637,11 @@ export const bn: Dictionary = {
     total: 'মোট',
     estimatedTotal: 'আনুমানিক মোট',
     checkout: 'চেকআউটে যান',
+    drawerTitle: 'শপিং কার্ট',
+    deliveryDetails: 'ডেলিভারির বিস্তারিত',
+    viewCart: 'কার্ট দেখুন',
+    checkOut: 'চেকআউটে যান',
+    totalPrice: 'সর্বমোট দাম',
   },
   checkout: {
     title: 'চেকআউট',

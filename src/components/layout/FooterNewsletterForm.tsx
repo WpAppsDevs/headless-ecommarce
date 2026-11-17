@@ -48,7 +48,7 @@ export function FooterNewsletterForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-3">
+    <form method="post" onSubmit={onSubmit} className="space-y-3">
       <div className="flex overflow-hidden rounded-2xl border border-brand-border bg-white shadow-sm">
         <label htmlFor="footer-email" className="sr-only">
           {copy.emailLabel}

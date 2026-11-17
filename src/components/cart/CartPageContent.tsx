@@ -52,7 +52,7 @@ export function CartPageContent() {
             href="/products"
             className="rounded-xl bg-zinc-900 px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-700"
           >
-            Continue Shopping
+            {copy.continueShopping}
           </Link>
         </div>
       )}
@@ -76,7 +76,7 @@ export function CartPageContent() {
                       Quantity
                     </th>
                     <th className="py-4 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                      Total Price
+                      {copy.totalPrice}
                     </th>
                     <th className="py-4 pr-5" />
                   </tr>

@@ -8,7 +8,6 @@ import { getDictionary, type Dictionary } from '@/i18n/get-dictionary';
 import { getLocale } from '@/i18n/server';
 import { interpolate } from '@/i18n/interpolate';
 import { formatYear } from '@/i18n/format';
-import { LanguageSwitcher } from '@/i18n/LanguageSwitcher';
 
 const HELP_LINKS: { href: string; key: keyof Dictionary['footer']['help']; Icon: LucideIcon }[] = [
   { href: '/shipping',       key: 'shipping',      Icon: Truck       },
@@ -83,11 +82,21 @@ function AmexBadge() {
   );
 }
 
-function CodBadge() {
+/**
+ * The payment marks beside it are logos, so this one keeps the same treatment:
+ * `COD` set large, with the spelled-out method in the accessible name. The 6.5px
+ * subline it used to carry cannot hold "ক্যাশ অন ডেলিভারি" without overflowing
+ * the badge.
+ */
+function CodBadge({ label }: { label: string }) {
   return (
-    <div className="flex h-9 min-w-[54px] flex-col items-center justify-center rounded-lg bg-zinc-900 px-2.5 shadow-sm">
+    <div
+      title={label}
+      aria-label={label}
+      role="img"
+      className="flex h-9 min-w-[54px] flex-col items-center justify-center rounded-lg bg-zinc-900 px-2.5 shadow-sm"
+    >
       <div className="text-[11px] font-bold leading-none text-white">COD</div>
-      <div className="mt-0.5 text-[6.5px] font-medium leading-none text-zinc-400">CASH ON DELIVERY</div>
     </div>
   );
 }
@@ -177,7 +186,6 @@ export async function Footer() {
                   </li>
                 ))}
               </ul>
-              <LanguageSwitcher className="mt-5" />
             </div>
 
             {/* Column 3 — Newsletter */}
@@ -191,7 +199,7 @@ export async function Footer() {
                 <VisaBadge />
                 <MastercardBadge />
                 <AmexBadge />
-                <CodBadge />
+                <CodBadge label={dictionary.footer.cashOnDelivery} />
               </div>
             </div>
 
