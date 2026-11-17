@@ -10,6 +10,7 @@ import { VariationSelector } from '@/components/product/VariationSelector';
 import { ProductTabs } from '@/components/product/ProductTabs';
 import { RelatedProducts } from '@/components/product/RelatedProducts';
 import { getDictionary } from '@/i18n/get-dictionary';
+import { taxonomyLabel } from '@/i18n/taxonomy';
 import { getLocale } from '@/i18n/server';
 import { interpolate } from '@/i18n/interpolate';
 import { ProductCardSkeleton } from '@/components/product/ProductCardSkeleton';
@@ -73,7 +74,8 @@ export default async function ProductPage({ params }: PageProps) {
   const isOnSale =
     product.on_sale && product.sale_price && product.sale_price !== product.regular_price;
   const primaryCategory = product.categories[0];
-  const dictionary = getDictionary(await getLocale());
+  const locale = await getLocale();
+  const dictionary = getDictionary(locale);
 
   return (
     <>
@@ -106,7 +108,10 @@ export default async function ProductPage({ params }: PageProps) {
           { label: dictionary.common.home, href: '/' },
           { label: dictionary.shop.title, href: '/products' },
           ...(primaryCategory
-            ? [{ label: primaryCategory.name, href: `/products?category=${primaryCategory.slug}` }]
+            ? [{
+                label: taxonomyLabel(locale, primaryCategory.slug, primaryCategory.name),
+                href: `/products?category=${primaryCategory.slug}`,
+              }]
             : []),
           { label: product.name },
         ]}

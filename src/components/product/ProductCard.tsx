@@ -11,7 +11,8 @@ import { AvailabilityBadge } from '@/components/product/AvailabilityBadge';
 import type { Product } from '@/lib/api/products';
 import { getProductBadge, isPurchasable } from '@/lib/product-availability';
 import { useFormatPrice } from '@/lib/utils/currency';
-import { useDictionary } from '@/i18n/LocaleProvider';
+import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
+import { taxonomyLabel } from '@/i18n/taxonomy';
 import { interpolate } from '@/i18n/interpolate';
 
 // The placeholder is an inline SVG data URI, which cannot read CSS variables;
@@ -72,6 +73,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
   const setCartDrawerOpen = useCartStore((s) => s.setCartDrawerOpen);
   const fmt = useFormatPrice();
   const copy = useDictionary().product;
+  const locale = useLocale();
 
   const allImages = (Array.isArray(product.images) ? product.images : []).slice(0, 3);
   const isOnSale =
@@ -79,7 +81,9 @@ export function ProductCard({ product, priority = false }: { product: Product; p
   const badge = getProductBadge(product);
   const purchasable = isPurchasable(product);
   const isVariable = product.type === 'variable';
-  const category = product.categories[0]?.name;
+  const category = product.categories[0]
+    ? taxonomyLabel(locale, product.categories[0].slug, product.categories[0].name)
+    : undefined;
   const displayPrice = isOnSale ? product.sale_price : product.price;
 
   const discount =

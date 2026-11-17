@@ -87,6 +87,10 @@ The account dashboard and auth pages intentionally look more neutral than the pr
 
 ## Typography
 
+Bangla is written with joined conjuncts and floating vowel signs, so **letter-spacing breaks it**: `tracking-[0.3em]` on an eyebrow turns প্রিমিয়াম into প্রি মি য়াম and detaches the signs. `globals.css` resets `letter-spacing` for every element when the document language is `bn`, which is why the tracking utilities stay on the components and work for English only. If you add a new tracked or uppercased eyebrow, nothing extra is needed — the reset covers it.
+
+
+
 Fonts are loaded in `src/app/layout.tsx` through `next/font/google`:
 
 | Variable | Family | Utility |
