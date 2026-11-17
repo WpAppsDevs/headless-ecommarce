@@ -88,6 +88,13 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <LocaleProvider locale={locale} dictionary={getDictionary(locale)}>
+          {/* First focusable thing in the document, so one Tab reaches it. */}
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-brand-accent-strong focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+          >
+            {getDictionary(locale).common.skipToContent}
+          </a>
           <AuthHydrator />
           <CartHydrator />
           <WishlistHydrator />
@@ -97,7 +104,7 @@ export default async function RootLayout({
           <Header navLinks={navLinks} />
           <CartDrawer />
           <Toaster richColors position="top-right" />
-          <main className="flex-1">{children}</main>
+          <main id="main" className="flex-1">{children}</main>
           <Footer />
         </LocaleProvider>
       </body>

@@ -113,14 +113,14 @@ export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProp
             </div>
           </aside>
 
-          {/* Content */}
-          <main className="min-w-0 flex-1">
+          {/* Content — a div, not a second <main>: the root layout owns the landmark. */}
+          <div className="min-w-0 flex-1">
             {activeTab === 'dashboard' && <Dashboard profile={profile} orders={orders} />}
             {activeTab === 'orders'    && <Orders orders={orders} meta={ordersMeta} />}
             {activeTab === 'wishlist'  && <WishlistTab />}
             {activeTab === 'address'   && <Address profile={profile} />}
             {activeTab === 'settings'  && <SettingsTab profile={profile} />}
-          </main>
+          </div>
         </div>
       </div>
     </div>
