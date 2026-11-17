@@ -1,6 +1,7 @@
 export const en = {
   common: {
     home: 'Home',
+    skipToContent: 'Skip to content',
     notFoundTitle: 'Page not found',
     notFoundBody: "Sorry, we couldn't find what you were looking for.",
     backHome: 'Back to Home',

@@ -3,6 +3,7 @@ import type { Dictionary } from './get-dictionary';
 export const bn: Dictionary = {
   common: {
     home: 'হোম',
+    skipToContent: 'মূল কনটেন্টে যান',
     notFoundTitle: 'পাতাটি পাওয়া যায়নি',
     notFoundBody: 'দুঃখিত, আপনি যা খুঁজছেন তা আমরা খুঁজে পাইনি।',
     backHome: 'হোমে ফিরে যান',

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useDialogFocus } from '@/lib/use-dialog-focus';
 import { X, ChevronLeft } from 'lucide-react';
 import { ReviewForm } from '@/components/reviews/ReviewForm';
 import type { Review } from '@/lib/api/reviews';
@@ -45,15 +46,8 @@ export function ReviewModal({ isOpen, onClose, orderId, items, onSuccess }: Revi
     onClose();
   }, [onClose]);
 
-  // Trap focus — close on Escape
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [isOpen, handleClose]);
+  // Focus stays in the panel while it is open, and Escape closes it.
+  const panelRef = useDialogFocus<HTMLDivElement>(handleClose, isOpen);
 
   // Prevent body scroll while open
   useEffect(() => {
@@ -79,7 +73,14 @@ export function ReviewModal({ isOpen, onClose, orderId, items, onSuccess }: Revi
       }}
     >
       {/* Panel */}
-      <div className="relative mx-auto max-w-lg rounded-2xl bg-white shadow-xl">
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="review-modal-title"
+        tabIndex={-1}
+        className="relative mx-auto max-w-lg rounded-2xl bg-white shadow-xl outline-none"
+      >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-4">
           <div className="flex items-center gap-2">
@@ -93,7 +94,9 @@ export function ReviewModal({ isOpen, onClose, orderId, items, onSuccess }: Revi
               </button>
             )}
             <div>
-              <h2 className="text-base font-semibold text-zinc-900">{copy.writeReview}</h2>
+              <h2 id="review-modal-title" className="text-base font-semibold text-zinc-900">
+                {copy.writeReview}
+              </h2>
               {orderId && (
                 <p className="text-xs text-zinc-400">Order #{orderId}</p>
               )}

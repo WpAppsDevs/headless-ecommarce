@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { X, Home, Printer, Download, RotateCcw, Check } from 'lucide-react';
 import type { Order } from '@/lib/api/orders';
 import { useFormatPrice } from '@/lib/utils/currency';
@@ -8,6 +8,7 @@ import { orderStatusStyle } from '@/lib/order-status';
 import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
 import { interpolate } from '@/i18n/interpolate';
 import { intlLocale } from '@/i18n/locales';
+import { useDialogFocus } from '@/lib/use-dialog-focus';
 
 // ── Status config ────────────────────────────────────────────────────────────
 
@@ -107,15 +108,7 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
   const subtotalMrp  = total + discount - shippingCost;
   const fmt          = useFormatPrice();
 
-  // Escape closes, the way every other overlay in the app behaves. Registered on
-  // the document so it works without focusing a specific control first.
-  useEffect(() => {
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') onClose();
-    }
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
-  }, [onClose]);
+  const panelRef = useDialogFocus<HTMLDivElement>(onClose);
 
   const b = order.billing;
   const s = order.shipping;
@@ -125,10 +118,17 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
       className="fixed inset-0 z-50 overflow-y-auto bg-black/50 px-4 py-8"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="mx-auto max-w-2xl">
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="order-details-title"
+        tabIndex={-1}
+        className="mx-auto max-w-2xl outline-none"
+      >
         {/* Modal title bar */}
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-white">{copy.title}</h2>
+          <h2 id="order-details-title" className="text-xl font-bold text-white">{copy.title}</h2>
           <button
             onClick={onClose}
             aria-label={copy.close}

@@ -73,8 +73,19 @@ test.describe.serial('account screens', () => {
   test('order details open with Bangla headings and actions', async () => {
     await page.getByRole('button', { name: BANGLA.viewDetails }).first().click();
 
-    await expect(page.getByText(BANGLA.detailsTitle)).toBeVisible();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toHaveAttribute('aria-modal', 'true');
+    await expect(page.getByRole('heading', { name: BANGLA.detailsTitle })).toBeVisible();
     await expect(page.getByRole('button', { name: BANGLA.printInvoice })).toBeVisible();
+
+    // Focus starts inside the dialog, and Tab never leaves it.
+    for (let i = 0; i < 8; i += 1) {
+      await page.keyboard.press('Tab');
+      await expect
+        .poll(() => dialog.evaluate((el) => el.contains(document.activeElement)))
+        .toBe(true);
+    }
     // The return action appears only for a completed order, so assert the
     // English label is gone rather than requiring a status this account may not have.
     // The modal is a plain fixed overlay, not a role="dialog", so match the
@@ -83,10 +94,12 @@ test.describe.serial('account screens', () => {
     await expect(modal).not.toContainText('Print Invoice');
     await expect(modal).not.toContainText('Download Invoice');
 
-    // Escape closes it, then the tests share one page in serial order and an open
-    // overlay would swallow the next test's clicks.
+    // Escape closes it and hands focus back to the button that opened it, then the
+    // tests share one page in serial order and an open overlay would swallow the
+    // next test's clicks.
     await page.keyboard.press('Escape');
     await expect(modal).toBeHidden();
+    await expect(page.getByRole('button', { name: BANGLA.viewDetails }).first()).toBeFocused();
   });
 
   test('the language flag switches copy without dropping the session', async () => {
