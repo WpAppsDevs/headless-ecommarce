@@ -504,7 +504,7 @@ export const en = {
       dashboard: 'Dashboard',
       orders: 'Your Orders',
       wishlist: 'Wishlist',
-      settings: 'Setting',
+      settings: 'Settings',
     },
     breadcrumb: 'My Account',
     breadcrumbLabel: 'Breadcrumb',
