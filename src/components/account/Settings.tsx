@@ -9,6 +9,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { useDictionary } from '@/i18n/LocaleProvider';
 import { config } from '@/lib/config';
 import { AddressCards } from './Address';
+import { PasswordCard } from './PasswordCard';
 
 interface SettingsTabProps {
   profile: UserProfile | null;
@@ -210,50 +211,37 @@ export function SettingsTab({ profile }: SettingsTabProps) {
       </div>
       <AddressCards profile={profile} />
 
-      <section className="rounded-2xl border border-brand-border bg-white p-5 sm:p-6">
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-brand-text">{copy.settings.passwordTitle}</p>
-          <p className="text-xs leading-relaxed text-brand-text-muted">
-            {copy.settings.passwordBody}{' '}
-            <Link
-              href="/forgot-password"
-              className="font-semibold text-brand-accent-strong hover:underline"
-            >
-              {copy.settings.passwordAction}
-            </Link>
-          </p>
-        </div>
+      <PasswordCard />
 
-        <div className="mt-4 space-y-1.5 border-t border-brand-border pt-4">
-          <p className="text-xs leading-relaxed text-brand-text-muted">
-            {copy.settings.supportLead}{' '}
-            <a
-              href={config.whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold text-brand-accent-strong hover:underline"
-            >
-              WhatsApp
-            </a>{' '}
-            {copy.settings.supportOrEmail}{' '}
-            <a
-              href={`mailto:${config.supportEmail}`}
-              className="font-semibold text-brand-accent-strong hover:underline"
-            >
-              {config.supportEmail}
-            </a>
-          </p>
-          <p className="text-xs leading-relaxed text-brand-text-muted">
-            {copy.settings.noteTail}{' '}
-            <Link
-              href="/privacy-policy"
-              className="font-semibold text-brand-accent-strong hover:underline"
-            >
-              {copy.settings.privacyPolicy}
-            </Link>
-            .
-          </p>
-        </div>
+      <section className="rounded-2xl border border-brand-border bg-white p-5 sm:p-6">
+        <p className="text-xs leading-relaxed text-brand-text-muted">
+          {copy.settings.supportLead}{' '}
+          <a
+            href={config.whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-brand-accent-strong hover:underline"
+          >
+            WhatsApp
+          </a>{' '}
+          {copy.settings.supportOrEmail}{' '}
+          <a
+            href={`mailto:${config.supportEmail}`}
+            className="font-semibold text-brand-accent-strong hover:underline"
+          >
+            {config.supportEmail}
+          </a>
+        </p>
+        <p className="mt-1.5 text-xs leading-relaxed text-brand-text-muted">
+          {copy.settings.noteTail}{' '}
+          <Link
+            href="/privacy-policy"
+            className="font-semibold text-brand-accent-strong hover:underline"
+          >
+            {copy.settings.privacyPolicy}
+          </Link>
+          .
+        </p>
       </section>
     </div>
   );

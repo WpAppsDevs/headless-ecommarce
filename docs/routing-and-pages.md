@@ -140,7 +140,7 @@ Tab behavior:
 - **Dashboard** — greeting with the customer's initials, shortcuts to orders, saved items and support, the active order with its delivery progress, active/delivered/total counts, the three most recent orders, and a wishlist link. Status colors come from `src/lib/order-status.ts`; no component defines its own palette.
 - **Your Orders** — client-side filter tabs, five orders per page, order details modal, review action.
 - **Wishlist** — saved products with removal and product links.
-- **Settings** — the profile (name, email) and both addresses in one page, each editable inline through `PUT /api/account/profile` (the plugin's `PUT /user`). A password row links to `/forgot-password` because the plugin has no authenticated password-change route, and the support channels sit below.
+- **Settings** — the profile (name, email) and both addresses in one page, each editable inline through `PUT /api/account/profile` (the plugin's `PUT /user`). The password card changes the password in place through `POST /api/account/password` (the plugin's `POST /user/password`, which requires the current password and revokes older tokens); a forgotten password still has the `/forgot-password` link. Support channels sit below.
 
 The desktop rail and the content panel share one height: the rail carries identity on top, the menu in the middle and sign-out at the bottom, while the content sits on `--brand-accent-light` so its white cards read as cards.
 
