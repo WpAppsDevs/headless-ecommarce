@@ -3,6 +3,7 @@
 import { Home, Package, Settings, Heart, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { useWishlistStore } from '@/stores/wishlistStore';
 import type { UserProfile } from '@/lib/api/checkout';
@@ -49,6 +50,20 @@ export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProp
   const normalised = requested === 'address' ? 'settings' : requested;
   const activeTab: Tab =
     normalised && MENU_ITEMS.some((item) => item.id === normalised) ? (normalised as Tab) : 'dashboard';
+
+  /**
+   * Keep the current tab visible. Four pills are wider than a phone, and the
+   * active one could sit half off-screen when the tab came from a deep link.
+   */
+  const activePillRef = useRef<HTMLButtonElement | null>(null);
+  useEffect(() => {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    activePillRef.current?.scrollIntoView({
+      block: 'nearest',
+      inline: 'center',
+      behavior: prefersReduced ? 'auto' : 'smooth',
+    });
+  }, [activeTab]);
 
   const selectTab = (tab: Tab) => {
     if (tab === activeTab) return;
@@ -99,6 +114,7 @@ export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProp
             return (
               <button
                 key={id}
+                ref={active ? activePillRef : undefined}
                 type="button"
                 onClick={() => selectTab(id)}
                 aria-current={active ? 'page' : undefined}

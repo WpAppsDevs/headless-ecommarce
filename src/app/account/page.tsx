@@ -21,8 +21,14 @@ const ORDERS_PER_PAGE = 25;
 function AccountSkeleton() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-        <div className="hidden w-60 shrink-0 rounded-xl border border-brand-border bg-white p-3 lg:block">
+      {/* Same shell as the loaded page: mobile pills, full-height rail, tinted content. */}
+      <div className="mb-4 flex gap-1 overflow-hidden rounded-xl border border-brand-border bg-white p-1 lg:hidden">
+        {[0, 1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-9 flex-1 rounded-lg" />
+        ))}
+      </div>
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch">
+        <div className="hidden w-60 shrink-0 rounded-2xl border border-brand-border bg-white p-2.5 lg:block">
           <div className="flex items-center gap-3 border-b border-brand-border pb-4">
             <Skeleton className="h-10 w-10 rounded-full" />
             <div className="flex-1 space-y-2">
@@ -36,15 +42,17 @@ function AccountSkeleton() {
             ))}
           </div>
         </div>
-        <div className="min-w-0 flex-1 space-y-4">
-          <Skeleton className="h-20 w-full rounded-xl" />
-          <Skeleton className="h-36 w-full rounded-xl" />
-          <div className="grid gap-3 sm:grid-cols-3">
-            <Skeleton className="h-24 rounded-xl" />
-            <Skeleton className="h-24 rounded-xl" />
-            <Skeleton className="h-24 rounded-xl" />
+        <div className="min-w-0 flex-1">
+          <div className="h-full space-y-4 rounded-2xl bg-brand-accent-light p-3 sm:p-4 lg:p-5">
+            <Skeleton className="h-20 w-full rounded-2xl" />
+            <Skeleton className="h-36 w-full rounded-2xl" />
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Skeleton className="h-24 rounded-xl" />
+              <Skeleton className="h-24 rounded-xl" />
+              <Skeleton className="h-24 rounded-xl" />
+            </div>
+            <Skeleton className="h-64 w-full rounded-2xl" />
           </div>
-          <Skeleton className="h-64 w-full rounded-xl" />
         </div>
       </div>
     </div>

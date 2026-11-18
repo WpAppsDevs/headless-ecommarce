@@ -100,7 +100,7 @@ export function PasswordCard() {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-brand-border px-3 text-xs font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong"
+            className="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-lg border border-brand-border px-3 text-xs font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong sm:w-auto"
           >
             {copy.passwordChange}
           </button>
