@@ -147,6 +147,43 @@ export async function updateProfile(payload: ProfileUpdate): Promise<UserProfile
   return json.data as UserProfile;
 }
 
+/** POST /wp-json/api/user/password — requires user access token */
+export async function changePassword(payload: {
+  current_password: string;
+  new_password: string;
+}): Promise<void> {
+  const token = tokenCache.get();
+  if (!token) throw new ApiError('no_token', 'Not authenticated');
+
+  const res = await fetch('/api/account/password', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const json = (await res.json()) as {
+    success: boolean;
+    data?: { access_token?: string };
+    code?: string;
+    message?: string;
+  };
+
+  if (!json.success) {
+    throw new ApiError(json.code ?? 'api_error', json.message ?? 'Failed to change password');
+  }
+
+  /**
+   * The change revoked every token issued before it, including the one in the
+   * cache. The proxy stored the replacement pair in the cookies; the in-memory
+   * cache needs the access token, or the next request goes out with a token the
+   * middleware now rejects.
+   */
+  if (json.data?.access_token) tokenCache.set(json.data.access_token);
+}
+
 /** POST /wp-json/api/checkout — requires user access token */
 export async function placeOrder(payload: PlaceOrderPayload): Promise<OrderResult> {
   if (typeof window !== 'undefined') {
