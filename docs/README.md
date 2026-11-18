@@ -38,6 +38,7 @@ Architecture decisions live in [adr/](adr/). Each ADR records the decision, the 
 
 ## Conventions in these docs
 
+- Volatile values live in the code, not in prose: a tab count, an order page size, a meta key or a status list is written once where it is implemented, and the doc points at that file. This page used to state "100 orders", "five tabs" and "read-only settings", and all three were false for weeks.
 - File paths are relative to the repository root.
 - "The storefront" means this Next.js app. "WordPress" means the wrapper API behind `NEXT_PUBLIC_WP_URL`.
 - Code samples are excerpts, not files to paste whole.

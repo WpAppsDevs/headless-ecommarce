@@ -109,6 +109,15 @@ Closing this means tagging wholesale/catalog products with `catalog`, or pointin
 - Where: `src/components/layout/Header.tsx`, `src/components/home/CategoryGrid.tsx`, `src/components/home/WholesaleBanner.tsx`, `src/components/home/HeroSlider.tsx`, WordPress.
 - Impact: high for wholesale buyers.
 
+## 12. Four forms still predate the form standard
+
+`ComingSoonSection`, `FooterNewsletterForm`, the header search and `TrackingForm` keep their fields in `useState`. `docs/coding-standards.md` asks for react-hook-form + zod, and `check:ui-rules` allows these four by name so the rule can be enforced everywhere else; four component files also sit over the 300-line limit and are allowed by name for the same reason.
+
+Closing this means converting those four forms and splitting `OrderDetailsModal`, `Header`, `VariationSelector` and `ShopSidebar`, removing each from the allowlists in `scripts/check-ui-rules.mjs` as it lands.
+
+- Where: `scripts/check-ui-rules.mjs`.
+- Impact: low for behaviour, medium for review load.
+
 ## How to use this list
 
 Pick one item per change. Keep refactors out of feature work unless the feature needs them. When a gap closes, remove it here and update the affected flow doc in the same commit.

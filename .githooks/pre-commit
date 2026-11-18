@@ -1,0 +1,9 @@
+#!/bin/sh
+# Fast pre-commit gate: the checks that catch a broken edit in seconds.
+# The full gate (contrast, tokens, copy, UI rules, build) runs in CI.
+#
+# Enable once per checkout:
+#   git config core.hooksPath .githooks
+set -e
+
+npm run verify:fast

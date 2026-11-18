@@ -18,7 +18,9 @@
     "check:routes": "node scripts/check-routes.mjs",
     "check:tokens": "node scripts/check-tokens.mjs",
     "check:untranslated": "node scripts/check-untranslated.mjs",
-    "verify": "npm run typecheck && npm run lint && npm test && npm run check:contrast && npm run check:components && npm run check:tokens && npm run check:untranslated",
+    "check:ui-rules": "node scripts/check-ui-rules.mjs",
+    "verify:fast": "npm run typecheck && npm run lint && npm test",
+    "verify": "npm run typecheck && npm run lint && npm test && npm run check:contrast && npm run check:components && npm run check:tokens && npm run check:untranslated && npm run check:ui-rules",
     "verify:full": "npm run verify && npm run build && npm run check:routes",
     "audit:prod": "npm audit --omit=dev --audit-level=high",
     "test:e2e": "playwright test"
