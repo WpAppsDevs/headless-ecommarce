@@ -522,7 +522,7 @@ export const en = {
       greetingActive: 'You have {count} orders in progress.',
       greetingIdle: 'No orders in progress right now.',
       shortcutOrders: 'Orders',
-      shortcutWishlist: 'Wishlist',
+      shortcutWishlist: 'View wishlist',
       shortcutSupport: 'Support',
       activeOrder: 'Order in progress',
       itemsCount: '{count} items',

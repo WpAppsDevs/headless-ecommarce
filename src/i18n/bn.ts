@@ -524,7 +524,7 @@ export const bn: Dictionary = {
       greetingActive: 'আপনার {count}টি অর্ডার এখন চলমান।',
       greetingIdle: 'এই মুহূর্তে কোনো অর্ডার চলমান নেই।',
       shortcutOrders: 'অর্ডার',
-      shortcutWishlist: 'উইশলিস্ট',
+      shortcutWishlist: 'উইশলিস্ট দেখুন',
       shortcutSupport: 'সহায়তা',
       activeOrder: 'চলমান অর্ডার',
       itemsCount: '{count}টি পণ্য',
