@@ -11,13 +11,14 @@ Closing this needs a WordPress endpoint that creates an order without a user and
 - Where: `src/app/checkout/page.tsx`, `src/app/api/checkout/route.ts`, WordPress.
 - Impact: medium. The store is account-only by design today.
 
-## 2. Profile, password, and address changes are read-only
+## 2. Password changes go through the reset flow
 
-The account Setting tab shows name, email, phone, and account ID. The address tab shows billing and shipping. Neither can save changes.
+Name, email and both addresses are editable in the account (the Setting tab and the Address tab save through `PUT /api/account/profile`). A password change still means the email reset flow: there is no authenticated "change my password" route in the plugin, so the Setting tab links to `/forgot-password` instead of showing a form with no endpoint behind it.
 
-WordPress exposes `GET /api/user` but the client has no update endpoint. Editing was removed rather than leaving a form that fakes a save.
+Closing this needs a `POST /api/auth/change-password` route that requires the current password, plus a client proxy and a form in `Settings.tsx`.
 
-Closing this needs WordPress endpoints for profile update and password change, plus a client route and `updateProfile` function. Address editing can use the same profile update payload.
+- Where: `src/components/account/Settings.tsx`, `src/app/api/account/profile/route.ts`, WordPress `api/auth`.
+- Impact: low. Customers can already reset a password they control the email for.
 
 - Where: `src/components/account/Settings.tsx`, `src/components/account/Address.tsx`, WordPress.
 - Impact: medium. Customers contact support for changes.

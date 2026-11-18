@@ -72,6 +72,8 @@ Consumers handle errors in three places:
 
 A 401 in the browser triggers one refresh attempt. If the retry is also 401, `authStore` clears the session and redirects only when a real access token existed. A guest cart token must not force a login redirect; that rule is the fix for a previous redirect loop.
 
+**Session restore is one round trip.** `/api/auth/refresh` returns the new token *and* the profile. The plugin includes `user` in its refresh response; the route falls back to `api/user` when an older plugin omits it. `authStore` keeps that profile, so `/account` reads it instead of asking `/api/auth/me` again and only requests its first page of orders (25) — the page used to fire four WordPress calls, three of them in series, before it could paint.
+
 ## Boundaries that carry weight
 
 **WordPress is authoritative.** The front end normalizes shapes but does not compute prices, stock, or order state. If a value is wrong, check WordPress before adding client logic.

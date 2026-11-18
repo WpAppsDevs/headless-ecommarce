@@ -1,119 +1,354 @@
 'use client';
 
-import { Hourglass, PackageX, Package } from 'lucide-react';
+import { useState } from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import {
+  ArrowRight,
+  Check,
+  CheckCheck,
+  Heart,
+  HelpCircle,
+  Package,
+  PackageOpen,
+  ShoppingBag,
+  Timer,
+} from 'lucide-react';
 import type { Order } from '@/lib/api/orders';
 import type { UserProfile } from '@/lib/api/checkout';
 import { filterCheckoutDrafts } from '@/lib/order-utils';
-import { StatsCard } from './StatsCard';
-import { useDictionary } from '@/i18n/LocaleProvider';
+import { orderStatusStyle } from '@/lib/order-status';
+import { OrderDetailsModal } from './OrderDetailsModal';
+import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
+import { intlLocale } from '@/i18n/locales';
+import { interpolate } from '@/i18n/interpolate';
 import { useFormatPrice } from '@/lib/utils/currency';
+import { useWishlistStore } from '@/stores/wishlistStore';
+import { PRE_ORDER_WINDOW_DAYS } from '@/lib/delivery';
+import { formatRange } from '@/i18n/format';
+import { config } from '@/lib/config';
 
 interface DashboardProps {
   profile: UserProfile | null;
   orders: Order[];
 }
 
-/**
- * WooCommerce slugs → dictionary keys. `on-hold` is the only slug that is not a
- * valid identifier, so the mapping exists rather than a lookup by slug.
- */
-const STATUS_KEYS = {
-  pending: 'pending',
-  processing: 'processing',
-  'on-hold': 'onHold',
-  delivery: 'delivery',
-  completed: 'completed',
-  cancelled: 'cancelled',
-  refunded: 'refunded',
-} as const;
+/** Orders that still have a fulfilment step ahead of them. */
+const ACTIVE_STATUSES = ['pending', 'processing', 'on-hold', 'delivery'];
 
-const STATUS_STYLES: Record<string, string> = {
-  pending:    'bg-orange-50 text-orange-500',
-  processing: 'bg-blue-50 text-blue-600',
-  'on-hold':  'bg-amber-50 text-amber-600',
-  delivery:   'bg-purple-50 text-purple-600',
-  completed:  'bg-green-50 text-green-600',
-  cancelled:  'bg-red-50 text-red-500',
-  refunded:   'bg-zinc-100 text-zinc-600',
+/** The visible timeline is the one the order modal already explains, cut to five stages. */
+const STEP_KEYS = ['placed', 'processing', 'packed', 'delivering', 'delivered'] as const;
+
+/** How many of those five stages a status has passed. */
+const COMPLETED_STEPS: Record<string, number> = {
+  pending: 1,
+  processing: 2,
+  'on-hold': 1,
+  delivery: 4,
+  completed: 5,
 };
 
+function fmtDate(value: string | null, locale: string) {
+  if (!value) return '—';
+  return new Date(value).toLocaleDateString(locale, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+}
 
-
-export function Dashboard({ orders }: DashboardProps) {
+export function Dashboard({ profile, orders }: DashboardProps) {
   const copy = useDictionary().account;
-  const visibleOrders   = filterCheckoutDrafts(orders);
-  const totalOrders     = visibleOrders.length;
-  const awaitingPickup  = visibleOrders.filter(o => ['pending', 'processing', 'on-hold'].includes(o.status)).length;
-  const cancelledOrders = visibleOrders.filter(o => o.status === 'cancelled').length;
-  const recentOrders    = visibleOrders.slice(0, 6);
-  const fmt             = useFormatPrice();
+  const language = useLocale();
+  const locale = intlLocale(language);
+  const fmt = useFormatPrice();
+  const router = useRouter();
+  const wishlistCount = useWishlistStore((s) => s.count);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
+  const visibleOrders = filterCheckoutDrafts(orders);
+  const totalOrders = visibleOrders.length;
+  const activeOrders = visibleOrders.filter((order) => ACTIVE_STATUSES.includes(order.status));
+  const completedOrders = visibleOrders.filter((order) => order.status === 'completed').length;
+  const recentOrders = visibleOrders.slice(0, 3);
+  const focusOrder = activeOrders[0] ?? null;
+
+  const name =
+    [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') ||
+    profile?.display_name ||
+    copy.customer;
+  const firstName = name.split(' ')[0] || name;
+  const initial = name.charAt(0).toUpperCase() || '·';
+
+  const goTo = (tab: 'orders' | 'wishlist') => {
+    router.replace(`/account?tab=${tab}`, { scroll: false });
+  };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-zinc-900">{copy.dashboard.title}</h2>
-
-      {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        <StatsCard label={copy.dashboard.awaitingPickup} value={awaitingPickup} icon={Hourglass} />
-        <StatsCard label={copy.dashboard.cancelledOrders} value={cancelledOrders} icon={PackageX} />
-        <StatsCard label={copy.dashboard.totalOrders} value={totalOrders} icon={Package} />
-      </div>
-
-      {/* Recent Orders */}
-      <div className="rounded-xl border border-zinc-200 bg-white">
-        <div className="border-b border-zinc-100 px-6 py-5">
-          <h3 className="text-base font-semibold text-zinc-900">{copy.dashboard.recentOrders}</h3>
-        </div>
-
-        {recentOrders.length === 0 ? (
-          <p className="py-10 text-center text-sm text-zinc-400">{copy.dashboard.noOrders}</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-zinc-100 text-left text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                  <th className="px-6 py-3">{copy.dashboard.colOrder}</th>
-                  <th className="px-6 py-3">{copy.dashboard.colProducts}</th>
-                  <th className="px-6 py-3">{copy.dashboard.colPricing}</th>
-                  <th className="px-6 py-3">{copy.dashboard.colStatus}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-100">
-                {recentOrders.map(order => {
-                  const badgeClass = STATUS_STYLES[order.status] ?? STATUS_STYLES['pending'];
-                  const firstItem  = order.line_items[0];
-                  return (
-                    <tr key={order.id} className="transition-colors hover:bg-zinc-50">
-                      <td className="px-6 py-4 font-medium text-zinc-900">{order.id}</td>
-                      <td className="px-6 py-4">
-                        {firstItem ? (
-                          <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 shrink-0 rounded-lg bg-zinc-100" />
-                            <div>
-                              <p className="line-clamp-1 font-medium text-zinc-900">{firstItem.name}</p>
-                              <p className="text-xs text-zinc-400">Women, Clothing</p>
-                            </div>
-                          </div>
-                        ) : (
-                          <span className="text-zinc-400">—</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-zinc-700">{fmt(Number(order.total))}</td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${badgeClass}`}>
-                          {order.status in STATUS_KEYS
-                            ? copy.statuses[STATUS_KEYS[order.status as keyof typeof STATUS_KEYS]]
-                            : order.status}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+    <div className="space-y-4">
+      {/* Greeting + the three things a customer opens this page to do */}
+      <section className="rounded-2xl border border-brand-border bg-white p-5 sm:p-6">
+        <div className="flex flex-wrap items-center gap-4">
+          <span
+            aria-hidden="true"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-accent-light text-lg font-bold text-brand-accent-strong"
+          >
+            {initial}
+          </span>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-xl font-semibold tracking-tight text-brand-text">
+              {interpolate(copy.dashboard.welcome, { name: firstName })}
+            </h2>
+            <p className="mt-1 text-sm text-brand-text-muted">
+              {activeOrders.length > 0
+                ? interpolate(copy.dashboard.greetingActive, { count: activeOrders.length })
+                : copy.dashboard.greetingIdle}
+            </p>
           </div>
-        )}
+          <div className="flex w-full flex-wrap gap-2 sm:w-auto">
+            <button
+              type="button"
+              onClick={() => goTo('orders')}
+              className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-brand-border px-3.5 text-xs font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong sm:flex-none"
+            >
+              <Package className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" />
+              {copy.dashboard.shortcutOrders}
+            </button>
+            <button
+              type="button"
+              onClick={() => goTo('wishlist')}
+              className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-brand-border px-3.5 text-xs font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong sm:flex-none"
+            >
+              <Heart className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" />
+              {copy.dashboard.shortcutWishlist}
+            </button>
+            <a
+              href={config.whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-brand-border px-3.5 text-xs font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong sm:flex-none"
+            >
+              <HelpCircle className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" />
+              {copy.dashboard.shortcutSupport}
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* The order that is actually moving — the question this page exists to answer */}
+      {focusOrder && (
+        <section className="rounded-2xl border border-brand-border bg-white p-5">
+          <div className="flex flex-wrap items-start gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand-accent-strong">
+                {copy.dashboard.activeOrder}
+              </p>
+              <p className="mt-1.5 flex flex-wrap items-center gap-2 text-base font-semibold text-brand-text">
+                {interpolate(copy.orders.orderId, { id: String(focusOrder.id) })}
+                <span
+                  className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${orderStatusStyle(focusOrder.status).badge}`}
+                >
+                  {copy.statuses[orderStatusStyle(focusOrder.status).key]}
+                </span>
+              </p>
+              <p className="mt-1 text-xs text-brand-text-muted">
+                {fmtDate(focusOrder.date_created, locale)} ·{' '}
+                {interpolate(copy.dashboard.itemsCount, {
+                  count: String(focusOrder.line_items.length),
+                })}{' '}
+                · <span className="font-semibold text-brand-text">{fmt(focusOrder.total)}</span>
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedOrder(focusOrder)}
+              className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-brand-accent-strong px-4 text-xs font-semibold text-white transition-colors hover:bg-brand-accent-strong-hover"
+            >
+              {copy.orders.viewDetails}
+              <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
+            </button>
+          </div>
+
+          <ol className="mt-5 flex">
+            {STEP_KEYS.map((step, index) => {
+              const done = index < (COMPLETED_STEPS[focusOrder.status] ?? 1);
+              const current = index === (COMPLETED_STEPS[focusOrder.status] ?? 1) - 1;
+              const last = index === STEP_KEYS.length - 1;
+              return (
+                <li
+                  key={step}
+                  className={`relative flex flex-1 flex-col items-center text-center text-[10px] leading-tight ${
+                    done ? 'text-brand-text' : 'text-brand-text-muted'
+                  } ${current ? 'font-semibold' : ''}`}
+                >
+                  {!last && (
+                    <span
+                      aria-hidden="true"
+                      className={`absolute left-1/2 top-[9px] h-[1.5px] w-full ${
+                        done ? 'bg-brand-accent-strong' : 'bg-brand-border'
+                      }`}
+                    />
+                  )}
+                  <span
+                    aria-hidden="true"
+                    className={`relative z-10 mb-1.5 flex h-[19px] w-[19px] items-center justify-center rounded-full border-[1.5px] ${
+                      done
+                        ? 'border-brand-accent-strong bg-brand-accent-strong text-white'
+                        : current
+                          ? 'border-brand-accent-strong bg-white ring-[3px] ring-brand-accent-light'
+                          : 'border-brand-border bg-white'
+                    }`}
+                  >
+                    {done && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+                  </span>
+                  {copy.details.steps[step]}
+                </li>
+              );
+            })}
+          </ol>
+
+          <p className="mt-4 flex items-center gap-1.5 border-t border-brand-border pt-3 text-[11px] text-brand-text-muted">
+            <Timer className="h-3.5 w-3.5" strokeWidth={1.6} aria-hidden="true" />
+            {interpolate(copy.dashboard.estimatedDelivery, {
+              range: formatRange(language, PRE_ORDER_WINDOW_DAYS.min, PRE_ORDER_WINDOW_DAYS.max),
+            })}
+          </p>
+        </section>
+      )}
+
+      {/* Counts — cancelled came off this row: it is a filter in Orders, not a headline */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: copy.dashboard.statActive, value: activeOrders.length, Icon: Timer },
+          { label: copy.dashboard.statCompleted, value: completedOrders, Icon: CheckCheck },
+          { label: copy.dashboard.statTotal, value: totalOrders, Icon: Package },
+        ].map(({ label, value, Icon }) => (
+          <div
+            key={label}
+            className="flex flex-col-reverse items-start gap-1 rounded-xl border border-brand-border bg-white p-3.5 sm:flex-row sm:items-start sm:justify-between sm:p-4"
+          >
+            <div>
+              <p className="text-[11px] leading-tight text-brand-text-muted">{label}</p>
+              <p className="mt-1 text-2xl font-semibold tracking-tight text-brand-text sm:mt-1.5">
+                {value}
+              </p>
+            </div>
+            <Icon className="h-4 w-4 shrink-0 text-brand-text-muted sm:mt-1" strokeWidth={1.6} aria-hidden="true" />
+          </div>
+        ))}
       </div>
+
+      {totalOrders === 0 ? (
+        <section className="flex flex-col items-center gap-4 rounded-2xl border border-brand-border bg-white px-6 py-14 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-bg">
+            <ShoppingBag className="h-6 w-6 text-brand-accent-strong" strokeWidth={1.5} aria-hidden="true" />
+          </span>
+          <div className="space-y-1.5">
+            <h3 className="text-base font-semibold text-brand-text">{copy.dashboard.emptyTitle}</h3>
+            <p className="max-w-sm text-sm leading-relaxed text-brand-text-muted">
+              {copy.dashboard.emptyBody}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => router.push('/products')}
+            className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-brand-accent-strong px-5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-strong-hover"
+          >
+            {copy.dashboard.browseShop}
+            <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+          </button>
+        </section>
+      ) : (
+        <section className="overflow-hidden rounded-2xl border border-brand-border bg-white">
+          <div className="flex items-center justify-between border-b border-brand-border px-5 py-3.5">
+            <h3 className="text-sm font-semibold text-brand-text">{copy.dashboard.recentOrders}</h3>
+            <button
+              type="button"
+              onClick={() => goTo('orders')}
+              className="inline-flex items-center gap-1 text-xs font-semibold text-brand-accent-strong hover:underline"
+            >
+              {copy.dashboard.allOrders}
+              <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
+            </button>
+          </div>
+
+          {recentOrders.map((order) => {
+            const firstItem = order.line_items[0];
+            const extraItems = order.line_items.length - 1;
+            return (
+              <button
+                key={order.id}
+                type="button"
+                onClick={() => setSelectedOrder(order)}
+                className="flex w-full items-center gap-3 border-b border-brand-border px-5 py-3 text-left transition-colors last:border-b-0 hover:bg-brand-bg"
+              >
+                <span className="relative h-14 w-12 shrink-0 overflow-hidden rounded-lg bg-brand-card">
+                  {firstItem?.image ? (
+                    <Image
+                      src={firstItem.image}
+                      alt=""
+                      width={48}
+                      height={56}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="flex h-full w-full items-center justify-center">
+                      <PackageOpen className="h-5 w-5 text-brand-text-muted" strokeWidth={1.4} aria-hidden="true" />
+                    </span>
+                  )}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[13px] font-semibold text-brand-text">
+                    {interpolate(copy.orders.orderId, { id: String(order.id) })}
+                    <span className="ml-2 font-normal text-brand-text-muted">
+                      {fmtDate(order.date_created, locale)}
+                    </span>
+                  </span>
+                  <span className="mt-0.5 block truncate text-xs text-brand-text-muted">
+                    {firstItem?.name ?? copy.dashboard.noOrders}
+                    {extraItems > 0 &&
+                      ` · ${interpolate(copy.dashboard.moreItems, { count: String(extraItems) })}`}
+                  </span>
+                </span>
+                <span className="flex shrink-0 flex-col items-end gap-1">
+                  <span className="text-[13px] font-semibold text-brand-text">
+                    {fmt(order.total)}
+                  </span>
+                  <span
+                    className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${orderStatusStyle(order.status).badge}`}
+                  >
+                    {copy.statuses[orderStatusStyle(order.status).key]}
+                  </span>
+                </span>
+              </button>
+            );
+          })}
+        </section>
+      )}
+
+      {/* Wishlist is a count and a door, not a second product grid */}
+      <section className="flex items-center gap-3 rounded-2xl border border-brand-border bg-white px-5 py-3.5">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-accent-light text-brand-accent-strong">
+          <Heart className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" />
+        </span>
+        <p className="min-w-0 flex-1 text-xs text-brand-text-muted">
+          {wishlistCount > 0
+            ? interpolate(copy.dashboard.wishlistSaved, { count: String(wishlistCount) })
+            : copy.dashboard.wishlistEmpty}
+        </p>
+        <button
+          type="button"
+          onClick={() => goTo('wishlist')}
+          className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-brand-accent-strong hover:underline"
+        >
+          {copy.dashboard.wishlistOpen}
+          <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
+        </button>
+      </section>
+
+      {selectedOrder && (
+        <OrderDetailsModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
+      )}
     </div>
   );
 }

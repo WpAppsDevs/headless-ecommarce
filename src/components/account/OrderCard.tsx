@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Eye, Home, PenLine } from 'lucide-react';
+import Image from 'next/image';
+import { Eye, PenLine } from 'lucide-react';
 import type { Order } from '@/lib/api/orders';
 import { useReviewStore } from '@/stores/reviewStore';
 import { ReviewModal } from '@/components/review-modal/ReviewModal';
@@ -10,6 +11,7 @@ import { orderStatusStyle } from '@/lib/order-status';
 import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
 import { intlLocale } from '@/i18n/locales';
 import { useFormatPrice } from '@/lib/utils/currency';
+import { interpolate } from '@/i18n/interpolate';
 
 interface OrderCardProps {
   order: Order;
@@ -28,123 +30,117 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
   const dict = useDictionary().account;
   const copy = dict.orders;
   const locale = intlLocale(useLocale());
-  const sc        = orderStatusStyle(order.status);
-  const isPaid    = PAID_STATUSES.includes(order.status);
+  const sc = orderStatusStyle(order.status);
+  const isPaid = PAID_STATUSES.includes(order.status);
 
   const isReviewed = useReviewStore((s) => s.isReviewed);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
 
   const b = order.billing;
   const s = order.shipping;
-
   const name = b
     ? `${b.first_name} ${b.last_name}`.trim()
-    : s ? `${s.first_name} ${s.last_name}`.trim() : '—';
+    : s
+      ? `${s.first_name} ${s.last_name}`.trim()
+      : '';
+  const city = b?.city || s?.city || '';
 
-  const phone   = b?.phone ?? '';
-  const addrSrc = b ?? s;
-  const address = addrSrc
-    ? [addrSrc.address_1, `${addrSrc.city}, ${addrSrc.state} ${addrSrc.postcode}`.trim()]
-        .filter(Boolean).join(' ')
-    : '—';
-
-  // Eligibility: order must be paid and not fully refunded
   const totalRefunded = (order.refunds ?? []).reduce(
-    (sum, r) => sum + Math.abs(parseFloat(r.total)),
+    (sum, refund) => sum + Math.abs(parseFloat(refund.total)),
     0,
   );
   const isFullyRefunded = totalRefunded >= parseFloat(order.total);
-  const eligibleItems: ReviewableItem[] = isPaid && !isFullyRefunded
-    ? order.line_items
-        .filter((item) => !isReviewed(item.product_id))
-        .map((item) => ({ product_id: item.product_id, name: item.name, image: item.image }))
-    : [];
+  const eligibleItems: ReviewableItem[] =
+    isPaid && !isFullyRefunded
+      ? order.line_items
+          .filter((item) => !isReviewed(item.product_id))
+          .map((item) => ({ product_id: item.product_id, name: item.name, image: item.image }))
+      : [];
   const hasReviewableItems = eligibleItems.length > 0;
+  const thumbs = order.line_items.slice(0, 3);
+  const extraItems = order.line_items.length - thumbs.length;
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm">
-      {/* Row 1 – Order ID + Date */}
-      <div className="flex items-center justify-between px-6 pt-5 pb-4">
-        <span className="text-[13px] text-zinc-800">
-          <span className="font-medium">{copy.orderId.replace('{id}','').trim()} </span>
-          <span className="font-bold">#{order.id}</span>
-        </span>
-        <span className="text-[13px] text-zinc-500">
-          <span className="font-medium text-zinc-600">{copy.date.replace('{date}','').trim()} </span>
-          {fmtDate(order.date_created, locale)}
-        </span>
-      </div>
-
-      <div className="mx-6 border-t border-zinc-100" />
-
-      {/* Row 2 – Address block */}
-      <div className="flex items-start gap-3 px-6 py-4">
-        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-50 ring-1 ring-zinc-200">
-          <Home className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
-        </div>
-        <div className="text-[13px] leading-relaxed text-zinc-600">
-          <p className="font-semibold text-zinc-900">{name}</p>
-          {phone && <p>{phone}</p>}
-          <p>{address}</p>
-        </div>
-      </div>
-
-      <div className="mx-6 border-t border-zinc-100" />
-
-      {/* Row 3 – Amount / Items / Payment */}
-      <div className="flex flex-wrap items-center gap-x-8 gap-y-1 px-6 py-4">
-        <p className="text-[13px] text-zinc-600">
-          {copy.amount}{' '}
-          <span className="font-semibold text-zinc-900">{fmt(order.total)}</span>
-          {isPaid && (
-            <span className="ml-1.5 text-xs font-semibold text-brand-stock">{copy.paid}</span>
+    <article className="rounded-xl border border-brand-border bg-white p-4">
+      <div className="flex flex-wrap items-start gap-3">
+        <div className="flex shrink-0 items-center">
+          {thumbs.map((item, index) => (
+            <span
+              key={item.id}
+              className="relative h-12 w-10 overflow-hidden rounded-md border border-brand-border bg-brand-card"
+              style={{ marginLeft: index === 0 ? 0 : -10 }}
+            >
+              {item.image ? (
+                <Image src={item.image} alt="" width={40} height={48} className="h-full w-full object-cover" />
+              ) : null}
+            </span>
+          ))}
+          {extraItems > 0 && (
+            <span className="ml-1.5 text-[11px] font-semibold text-brand-text-muted">
+              {interpolate(dict.dashboard.moreItems, { count: String(extraItems) })}
+            </span>
           )}
-        </p>
-        <p className="text-[13px] text-zinc-600">
-          {copy.itemsCount} <span className="font-semibold text-zinc-900">{order.line_items.length}</span>
-        </p>
-        <p className="ml-auto text-[13px] text-zinc-600">
-          {copy.payment} <span className="font-semibold text-zinc-900">{order.payment_method_title ?? '—'}</span>
-        </p>
-      </div>
+        </div>
 
-      <div className="mx-6 border-t border-zinc-100" />
+        <div className="min-w-0 flex-1">
+          <p className="text-[13px] font-semibold text-brand-text">
+            {interpolate(copy.orderId, { id: String(order.id) })}
+          </p>
+          <p className="mt-0.5 text-[11px] text-brand-text-muted">
+            {fmtDate(order.date_created, locale)}
+            {' · '}
+            {interpolate(dict.dashboard.itemsCount, { count: String(order.line_items.length) })}
+            {order.payment_method_title ? ` · ${order.payment_method_title}` : ''}
+          </p>
+          {(name || city) && (
+            <p className="mt-0.5 truncate text-[11px] text-brand-text-muted">
+              {[name, city].filter(Boolean).join(' · ')}
+            </p>
+          )}
+        </div>
 
-      {/* Row 4 – Status badge + action buttons */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
-        <div className="flex items-center gap-2">
-          <span className="text-[13px] text-zinc-500">{copy.status}</span>
-          <span className={`rounded-md border px-3 py-0.5 text-[11px] font-semibold ${sc.badge}`}>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <p className="text-[13px] font-semibold text-brand-text">
+            {fmt(order.total)}
+            {isPaid && (
+              <span className="ml-1 text-[10px] font-semibold text-brand-stock">{copy.paid}</span>
+            )}
+          </p>
+          <span
+            className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${sc.badge}`}
+          >
             {dict.statuses[sc.key]}
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          {hasReviewableItems && (
-            <button
-              onClick={() => setReviewModalOpen(true)}
-              className="flex items-center gap-1.5 rounded-lg border border-brand-preorder/40 px-4 py-2 text-[12px] font-semibold text-brand-preorder transition hover:bg-brand-preorder/5"
-            >
-              <PenLine className="h-3.5 w-3.5" strokeWidth={2} />
-              {copy.writeReview}
-            </button>
-          )}
-          <button
-            onClick={onViewDetails}
-            className="flex items-center gap-1.5 rounded-lg bg-brand-wine px-4 py-2 text-[12px] font-semibold text-white transition hover:opacity-90"
-          >
-            <Eye className="h-3.5 w-3.5" strokeWidth={2} />
-            {copy.viewDetails}
-          </button>
-        </div>
       </div>
 
-      {/* Review modal */}
+      <div className="mt-3 flex flex-wrap items-center justify-end gap-2 border-t border-brand-border pt-3">
+        {hasReviewableItems && (
+          <button
+            type="button"
+            onClick={() => setReviewModalOpen(true)}
+            className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-brand-preorder/40 px-3 text-xs font-semibold text-brand-preorder transition hover:bg-brand-preorder/5"
+          >
+            <PenLine className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
+            {copy.writeReview}
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={onViewDetails}
+          className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-brand-accent-strong px-3.5 text-xs font-semibold text-white transition hover:bg-brand-accent-strong-hover"
+        >
+          <Eye className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
+          {copy.viewDetails}
+        </button>
+      </div>
+
       <ReviewModal
         isOpen={reviewModalOpen}
         onClose={() => setReviewModalOpen(false)}
         orderId={order.id}
         items={eligibleItems}
       />
-    </div>
+    </article>
   );
 }

@@ -56,7 +56,7 @@ The mobile menu uses the shadcn `Sheet` primitive. The search overlay is a local
 
 `ShopClient` receives server-rendered products and filters. It does not refetch when filters change; it filters the current page in memory. Server-side filters (category, tag, brand, search) are links, so changing one navigates and reloads the page. When the unfiltered Ready Stock collection is empty it shows a dedicated fallback with Pre-Order and WhatsApp links; a filtered empty result keeps the generic empty state.
 
-Shop surfaces use the brand tokens from `globals.css` rather than zinc or black. Pagination controls and colour swatches keep a 44px hit area, and focus states use the strong accent. Auth and account pages stay on the neutral shadcn surfaces.
+Shop and account surfaces use the brand tokens from `globals.css` rather than zinc or black. Pagination controls and colour swatches keep a 44px hit area, and focus states use the strong accent. Auth pages stay on the neutral shadcn surfaces.
 
 ## Product
 
@@ -104,17 +104,18 @@ The drawer and the cart page are separate implementations with different markup.
 
 | Component | Type | Responsibility |
 | --- | --- | --- |
-| `AccountLayout.tsx` | Client | Tab shell, mobile tab bar, logout. Reads `?tab=` once. |
-| `Dashboard.tsx` | Client | Stats and recent orders. |
-| `StatsCard.tsx` | Client | Label, value, icon. |
+| `AccountLayout.tsx` | Client | Full-height rail (identity, tabs, sign-out pinned at the bottom), sticky mobile tab bar. The tab lives in `?tab=`; switching uses `router.replace`, so refresh, Back and shared links all resolve. |
+| `Dashboard.tsx` | Client | Greeting and shortcuts, the in-progress order with a five-stage progress bar, three counts, three recent orders, and the wishlist count. |
 | `Orders.tsx` | Client | Filter tabs, five per page, details modal. |
-| `OrderCard.tsx` | Client | Order summary, status, and review action. |
+| `OrderCard.tsx` | Client | Compact order row: thumbnails, number, date, items, total, status, review and details actions. |
 | `OrderDetailsModal.tsx` | Client | Products, addresses, and a seven-step status timeline. |
-| `Address.tsx` | Client | Read-only billing and shipping cards. |
-| `Settings.tsx` | Client | Read-only account summary with support channels. |
+| `Address.tsx` | Client | Billing and shipping cards with inline edit. Saves through `PUT /api/account/profile`, which proxies the plugin's `PUT /api/user`; country and district come from `/countries`. |
+| `Settings.tsx` | Client | Name and email editing; phone is edited with the billing address; password change links to the reset flow. |
 | `Wishlist.tsx` | Client | Server wishlist grid with remove. |
 
-Review eligibility lives in `OrderCard`: paid status (`completed` or `processing`), not fully refunded, and not already reviewed in this session.
+The dashboard's progress bar and the modal's timeline share one status → stage heuristic: `pending` and `on-hold` are stage 1, `processing` 2, `delivery` 4, `completed` 5. Changing a slug means changing both.
+
+`OrderCard` also owns review eligibility: paid status (`completed` or `processing`), not fully refunded, and not already reviewed in this session.
 
 ## Reviews
 

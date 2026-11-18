@@ -48,14 +48,14 @@ function WishlistProductCard({ product, onRemove }: { product: Product; onRemove
         type="button"
         onClick={onRemove}
         aria-label={interpolate(copy.removeAria, { name: product.name })}
-        className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md text-zinc-400 transition-colors hover:text-rose-500"
+        className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md text-brand-text-muted transition-colors hover:text-brand-danger"
       >
         <Trash2 className="h-4 w-4" />
       </button>
 
       <div className="flex flex-1 flex-col gap-2 p-3 sm:p-4">
         <Link href={`/products/${product.slug}`}>
-          <h3 className="line-clamp-1 text-sm font-bold text-brand-text transition-colors hover:text-brand-wine sm:text-base">
+          <h3 className="line-clamp-1 text-sm font-bold text-brand-text transition-colors hover:text-brand-accent-strong sm:text-base">
             {product.name}
           </h3>
         </Link>
@@ -67,10 +67,10 @@ function WishlistProductCard({ product, onRemove }: { product: Product; onRemove
         )}
 
         <div className="mt-auto flex items-center justify-between pt-2">
-          <span className="text-base font-bold text-brand-wine">{fmt(price)}</span>
+          <span className="text-base font-bold text-brand-accent-strong">{fmt(price)}</span>
           <Link
             href={`/products/${product.slug}`}
-            className="flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-zinc-700"
+            className="flex items-center gap-1.5 rounded-lg bg-brand-accent-strong px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-brand-accent-strong-hover"
           >
             <ShoppingBag className="h-3.5 w-3.5" />
             {product.type === 'variable' ? copy.options : copy.buy}
@@ -90,16 +90,16 @@ function EmptyWishlist() {
 
   return (
     <div className="flex flex-col items-center justify-center gap-6 py-24 text-center">
-      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-zinc-100">
-        <Heart className="h-9 w-9 text-zinc-300" />
+      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-card">
+        <Heart className="h-9 w-9 text-brand-text-muted/70" />
       </div>
       <div className="space-y-2">
-        <h2 className="text-xl font-semibold text-zinc-900">{copy.emptyTitle}</h2>
-        <p className="text-sm text-zinc-500">{copy.emptyBody}</p>
+        <h2 className="text-xl font-semibold text-brand-text">{copy.emptyTitle}</h2>
+        <p className="text-sm text-brand-text-muted">{copy.emptyBody}</p>
       </div>
       <Link
         href="/products"
-        className="rounded-xl bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700"
+        className="rounded-xl bg-brand-accent-strong px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-strong-hover"
       >
         {copy.browseProducts}
       </Link>
@@ -151,11 +151,11 @@ export function WishlistTab() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-zinc-900">{heading}</h2>
+      <h2 className="text-2xl font-bold text-brand-text">{heading}</h2>
 
       {!ready && (
         <div className="flex min-h-[40vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-brand-text-muted" />
         </div>
       )}
 

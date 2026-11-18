@@ -64,7 +64,8 @@ test.describe.serial('account screens', () => {
 
     const body = page.locator('main, body').first();
     await expect(body).toContainText('অর্ডার আইডি');
-    await expect(body).toContainText('তারিখ');
+    // The compact card prints a formatted date, not the old "Date:" label.
+    await expect(body).toContainText('বিস্তারিত দেখুন');
     // The English labels the card used to print.
     await expect(body).not.toContainText('Amount:');
     await expect(body).not.toContainText('Payment:');

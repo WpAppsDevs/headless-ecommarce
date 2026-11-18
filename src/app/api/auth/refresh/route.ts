@@ -69,8 +69,30 @@ export async function POST() {
       return errResponse;
     }
 
+    /**
+     * The plugin returns the profile with the new token, so most page loads need
+     * no second call. Older plugin versions omit it; then fetch it here. A
+     * failure must not fail the refresh: the token is valid, and the client
+     * falls back to /api/auth/me.
+     */
+    let profile: unknown = json.data?.user ?? null;
+    if (!profile) {
+      try {
+        const meRes = await fetch(`${config.apiBase}/${config.apiNs}/user`, {
+          headers: { Authorization: `Bearer ${newToken}` },
+          cache: 'no-store',
+        });
+        if (meRes.ok) {
+          const meJson = await meRes.json();
+          if (meJson?.success && meJson.data) profile = meJson.data;
+        }
+      } catch {
+        profile = null;
+      }
+    }
+
     const response = NextResponse.json(
-      { success: true, data: { token: newToken } },
+      { success: true, data: { token: newToken, profile } },
       { status: 200 },
     );
 
