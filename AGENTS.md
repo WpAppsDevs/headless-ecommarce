@@ -18,7 +18,9 @@ Read `docs/coding-standards.md` before changing code, `docs/design-system.md` be
 
 ### Working style
 
-Run long commands (`npm run build`, `npm run verify:full`) in the background and continue with other work; the harness reports completion, so read the final output once.
+Run long commands (`npm run build`, `npm run verify:full`) in the background and continue with other work; the harness reports completion, so read the final output once. `npm run verify:fast` (typecheck, lint, unit tests) is the iteration gate; the pre-commit hook runs it when `git config core.hooksPath .githooks` has been set once.
+
+The Studio WordPress checkout at `/Users/saifulislam/Studio/development/wp-content/plugins/wpappsdev-headless-wrapper-api` intermittently disappears for a few seconds (the Studio mount re-syncs). A command that fails with "no such file or directory" for that path should be retried once with the absolute path before treating it as missing.
 
 When a task needs a credential from the user, ask with the secret tool so the value never enters the transcript; a password pasted into the conversation is a password to rotate.
 
