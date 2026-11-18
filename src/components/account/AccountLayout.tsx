@@ -3,7 +3,6 @@
 import { Home, Package, Settings, Heart, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { useWishlistStore } from '@/stores/wishlistStore';
 import type { UserProfile } from '@/lib/api/checkout';
@@ -51,20 +50,6 @@ export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProp
   const activeTab: Tab =
     normalised && MENU_ITEMS.some((item) => item.id === normalised) ? (normalised as Tab) : 'dashboard';
 
-  /**
-   * Keep the current tab visible. Four pills are wider than a phone, and the
-   * active one could sit half off-screen when the tab came from a deep link.
-   */
-  const activePillRef = useRef<HTMLButtonElement | null>(null);
-  useEffect(() => {
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    activePillRef.current?.scrollIntoView({
-      block: 'nearest',
-      inline: 'center',
-      behavior: prefersReduced ? 'auto' : 'smooth',
-    });
-  }, [activeTab]);
-
   const selectTab = (tab: Tab) => {
     if (tab === activeTab) return;
     router.replace(`/account?tab=${tab}`, { scroll: false });
@@ -107,28 +92,27 @@ export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProp
           </ol>
         </nav>
 
-        {/* Mobile tab bar — sticky under the 68px header, horizontal scroll */}
-        <div className="sticky top-24 z-30 mb-2 flex snap-x gap-1 overflow-x-auto rounded-xl border border-brand-border bg-white p-1 lg:hidden">
+        {/* Mobile tabs — four equal cells, so every tab is whole at 320px wide. */}
+        <div className="sticky top-24 z-30 mb-2 grid grid-cols-4 gap-1 rounded-xl border border-brand-border bg-white p-1 lg:hidden">
           {MENU_ITEMS.map(({ id, icon: Icon }) => {
             const active = activeTab === id;
             return (
               <button
                 key={id}
-                ref={active ? activePillRef : undefined}
                 type="button"
                 onClick={() => selectTab(id)}
                 aria-current={active ? 'page' : undefined}
-                className={`relative flex min-h-11 shrink-0 snap-start items-center gap-1.5 rounded-lg px-3 text-xs font-medium transition-colors ${
+                className={`relative flex min-h-12 flex-col items-center justify-center gap-1 rounded-lg px-1 py-1.5 text-[10px] font-medium leading-tight transition-colors ${
                   active
                     ? 'bg-brand-accent-strong text-white'
                     : 'text-brand-text-muted hover:bg-brand-bg hover:text-brand-text'
                 }`}
               >
                 <Icon className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" />
-                {copy.tabs[id]}
+                <span className="text-center">{copy.tabs[id]}</span>
                 {id === 'wishlist' && wishlistCount > 0 && (
                   <span
-                    className={`flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-bold ${
+                    className={`absolute right-1 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-bold ${
                       active ? 'bg-white/25 text-white' : 'bg-brand-accent-strong text-white'
                     }`}
                   >
