@@ -13,7 +13,7 @@ Closing this needs a WordPress endpoint that creates an order without a user and
 
 ## 2. Password changes go through the reset flow
 
-Name, email and both addresses are editable in the account (the Setting tab and the Address tab save through `PUT /api/account/profile`). A password change still means the email reset flow: there is no authenticated "change my password" route in the plugin, so the Setting tab links to `/forgot-password` instead of showing a form with no endpoint behind it.
+Name, email and both addresses are editable in the account, in one Settings tab, through `PUT /api/account/profile`. A password change still means the email reset flow: there is no authenticated "change my password" route in the plugin, so the Setting tab links to `/forgot-password` instead of showing a form with no endpoint behind it.
 
 Closing this needs a `POST /api/auth/change-password` route that requires the current password, plus a client proxy and a form in `Settings.tsx`.
 

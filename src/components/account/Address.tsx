@@ -94,7 +94,7 @@ function countryLabel(countries: Country[], code: string): string {
   return countries.find((country) => country.code === code)?.name ?? code;
 }
 
-export function Address({ profile }: AddressProps) {
+export function AddressCards({ profile }: AddressProps) {
   const copy = useDictionary().account;
   const setProfile = useAuthStore((s) => s.setProfile);
 
@@ -294,41 +294,32 @@ export function Address({ profile }: AddressProps) {
   );
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="text-xl font-semibold tracking-tight text-brand-text">
-          {copy.address.title}
-        </h2>
-        <p className="mt-1 text-sm text-brand-text-muted">{copy.address.note}</p>
-      </div>
+    <div className="grid gap-4 sm:grid-cols-2">
+      {(['billing', 'shipping'] as AddressType[]).map((type) => (
+        <section
+          key={type}
+          className="flex flex-col rounded-2xl border border-brand-border bg-white p-5"
+        >
+          <div className="mb-4 flex items-center gap-2">
+            <MapPin className="h-4 w-4 text-brand-text-muted" strokeWidth={1.6} aria-hidden="true" />
+            <h3 className="flex-1 text-sm font-semibold text-brand-text">
+              {type === 'billing' ? copy.address.billingTitle : copy.address.shippingTitle}
+            </h3>
+            {editing !== type && (
+              <button
+                type="button"
+                onClick={() => startEditing(type)}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-brand-border px-2.5 py-1.5 text-xs font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong"
+              >
+                <Pencil className="h-3 w-3" strokeWidth={2} aria-hidden="true" />
+                {copy.address.edit}
+              </button>
+            )}
+          </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        {(['billing', 'shipping'] as AddressType[]).map((type) => (
-          <section
-            key={type}
-            className="flex flex-col rounded-2xl border border-brand-border bg-white p-5"
-          >
-            <div className="mb-4 flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-brand-text-muted" strokeWidth={1.6} aria-hidden="true" />
-              <h3 className="flex-1 text-sm font-semibold text-brand-text">
-                {type === 'billing' ? copy.address.billingTitle : copy.address.shippingTitle}
-              </h3>
-              {editing !== type && (
-                <button
-                  type="button"
-                  onClick={() => startEditing(type)}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-brand-border px-2.5 py-1.5 text-xs font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong"
-                >
-                  <Pencil className="h-3 w-3" strokeWidth={2} aria-hidden="true" />
-                  {copy.address.edit}
-                </button>
-              )}
-            </div>
-
-            {editing === type ? renderForm(type) : renderReadBlock(type)}
-          </section>
-        ))}
-      </div>
+          {editing === type ? renderForm(type) : renderReadBlock(type)}
+        </section>
+      ))}
     </div>
   );
 }

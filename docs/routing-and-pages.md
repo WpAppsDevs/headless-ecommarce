@@ -131,17 +131,18 @@ The page shows a completed or pending state, the transaction ID when present, an
 
 ## Account
 
-`src/app/account/page.tsx` waits for `authStore.hydrated`. If the user is not authenticated, it redirects to `/login`. Otherwise it fetches profile and up to 100 orders in parallel.
+`src/app/account/page.tsx` waits for `authStore.hydrated` and redirects to `/login` when signed out. A signed-in visit is one round trip: `/api/auth/refresh` returns `{ token, profile }`, so the page reads the profile from the store instead of calling `/api/auth/me` again, and it fetches 25 orders alongside it (the Orders tab pages five at a time and the dashboard shows three).
 
-`AccountLayout` switches five tabs: Dashboard, Your Orders, Wishlist, My Address, Setting. `?tab=wishlist` selects the wishlist tab on first render; clicking tabs does not update the URL. The wishlist link in the header relies on this initial value.
+`AccountLayout` switches four tabs: Dashboard, Your Orders, Wishlist, Settings. The tab lives in the URL (`?tab=orders`), written with `router.replace` so a refresh keeps it, Back returns to the previous tab, and a link can point at one tab. A pre-merge `?tab=address` link now lands on Settings.
 
 Tab behavior:
 
-- **Dashboard** — counts pending/processing/on-hold, cancelled, and total visible orders. Recent orders table.
+- **Dashboard** — greeting with the customer's initials, shortcuts to orders, saved items and support, the active order with its delivery progress, active/delivered/total counts, the three most recent orders, and a wishlist link. Status colors come from `src/lib/order-status.ts`; no component defines its own palette.
 - **Your Orders** — client-side filter tabs, five orders per page, order details modal, review action.
-- **Wishlist** — fetches up to 100 products, shows removal and product links.
-- **My Address** — displays billing and shipping from the profile, read-only until WordPress exposes an address update endpoint.
-- **Setting** — read-only account summary (name, email, phone, account ID) with support channels for changes. No fake save action.
+- **Wishlist** — saved products with removal and product links.
+- **Settings** — the profile (name, email) and both addresses in one page, each editable inline through `PUT /api/account/profile` (the plugin's `PUT /user`). A password row links to `/forgot-password` because the plugin has no authenticated password-change route, and the support channels sit below.
+
+The desktop rail and the content panel share one height: the rail carries identity on top, the menu in the middle and sign-out at the bottom, while the content sits on `--brand-accent-light` so its white cards read as cards.
 
 ## Tracking
 

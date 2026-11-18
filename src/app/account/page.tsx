@@ -31,7 +31,7 @@ function AccountSkeleton() {
             </div>
           </div>
           <div className="mt-3 space-y-2">
-            {[0, 1, 2, 3, 4].map((i) => (
+            {[0, 1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-9 w-full rounded-lg" />
             ))}
           </div>

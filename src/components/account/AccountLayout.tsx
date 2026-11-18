@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Package, MapPin, Settings, Heart, LogOut } from 'lucide-react';
+import { Home, Package, Settings, Heart, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
@@ -9,12 +9,11 @@ import type { UserProfile } from '@/lib/api/checkout';
 import type { Order, OrdersMeta } from '@/lib/api/orders';
 import { Dashboard } from './Dashboard';
 import { Orders } from './Orders';
-import { Address } from './Address';
 import { SettingsTab } from './Settings';
 import { WishlistTab } from './Wishlist';
 import { useDictionary } from '@/i18n/LocaleProvider';
 
-type Tab = 'dashboard' | 'orders' | 'address' | 'settings' | 'wishlist';
+type Tab = 'dashboard' | 'orders' | 'settings' | 'wishlist';
 
 interface AccountLayoutProps {
   profile: UserProfile | null;
@@ -26,7 +25,6 @@ const MENU_ITEMS = [
   { id: 'dashboard' as Tab, icon: Home },
   { id: 'orders' as Tab, icon: Package },
   { id: 'wishlist' as Tab, icon: Heart },
-  { id: 'address' as Tab, icon: MapPin },
   { id: 'settings' as Tab, icon: Settings },
 ];
 
@@ -42,10 +40,14 @@ export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProp
    * returns to the previous tab, and `/account?tab=orders` is a link a customer
    * can be sent. `replace` keeps the history clean: five tabs are five views of
    * one page, not five pages.
+   *
+   * `address` was an old tab of its own; the addresses now live inside
+   * settings, and an old shared link still lands somewhere sensible.
    */
-  const requested = searchParams.get('tab') as Tab | null;
+  const requested = searchParams.get('tab');
+  const normalised = requested === 'address' ? 'settings' : requested;
   const activeTab: Tab =
-    requested && MENU_ITEMS.some((item) => item.id === requested) ? requested : 'dashboard';
+    normalised && MENU_ITEMS.some((item) => item.id === normalised) ? (normalised as Tab) : 'dashboard';
 
   const selectTab = (tab: Tab) => {
     if (tab === activeTab) return;
@@ -132,11 +134,11 @@ export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProp
           </button>
         </div>
 
-        {/* Desktop two-column layout */}
-        <div className="flex items-start gap-6">
+        {/* Desktop two-column layout — both columns share the same height */}
+        <div className="flex flex-col gap-4 lg:flex-row lg:gap-6">
           {/* Full-height rail: identity on top, menu in the middle, sign-out at the bottom */}
           <aside className="hidden w-60 shrink-0 lg:block">
-            <div className="lg:sticky lg:top-[84px] flex h-[calc(100vh-104px)] flex-col overflow-hidden rounded-2xl border border-brand-border bg-white">
+            <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-brand-border bg-white">
               <div className="flex items-center gap-3 border-b border-brand-border px-4 py-4">
                 <span
                   aria-hidden="true"
@@ -196,11 +198,12 @@ export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProp
 
           {/* Content — a div, not a second <main>: the root layout owns the landmark. */}
           <div className="min-w-0 flex-1">
-            {activeTab === 'dashboard' && <Dashboard profile={profile} orders={orders} />}
-            {activeTab === 'orders' && <Orders orders={orders} meta={ordersMeta} />}
-            {activeTab === 'wishlist' && <WishlistTab />}
-            {activeTab === 'address' && <Address profile={profile} />}
-            {activeTab === 'settings' && <SettingsTab profile={profile} />}
+            <div className="h-full rounded-2xl bg-brand-accent-light p-3 sm:p-4 lg:p-5">
+              {activeTab === 'dashboard' && <Dashboard profile={profile} orders={orders} />}
+              {activeTab === 'orders' && <Orders orders={orders} meta={ordersMeta} />}
+              {activeTab === 'wishlist' && <WishlistTab />}
+              {activeTab === 'settings' && <SettingsTab profile={profile} />}
+            </div>
           </div>
         </div>
       </div>
