@@ -105,15 +105,18 @@ The drawer and the cart page are separate implementations with different markup.
 | Component | Type | Responsibility |
 | --- | --- | --- |
 | `AccountLayout.tsx` | Client | Full-height rail (identity, tabs, sign-out pinned at the bottom), sticky mobile tab bar. The tab lives in `?tab=`; switching uses `router.replace`, so refresh, Back and shared links all resolve. |
-| `Dashboard.tsx` | Client | Greeting and shortcuts, the in-progress order with a five-stage progress bar, three counts, three recent orders, and the wishlist count. |
+| `Dashboard.tsx` | Client | Greeting with initials and shortcuts, the in-progress order with its compact progress bar, three counts, three recent orders, and the wishlist count. Navigation is a `<Link>`, not a button with a router call. |
 | `Orders.tsx` | Client | Filter tabs, five per page, details modal. |
 | `OrderCard.tsx` | Client | Compact order row: thumbnails, number, date, items, total, status, review and details actions. |
-| `OrderDetailsModal.tsx` | Client | Products, addresses, and a seven-step status timeline. |
-| `Address.tsx` | Client | Billing and shipping cards with inline edit. Saves through `PUT /api/account/profile`, which proxies the plugin's `PUT /api/user`; country and district come from `/countries`. |
-| `Settings.tsx` | Client | Name and email editing; phone is edited with the billing address; password change links to the reset flow. |
+| `OrderDetailsModal.tsx` | Client | Products, addresses, and a seven-step status timeline. Print invoice is the only action: no invoice download or return button exists, because no endpoint backs them. |
+| `AddressCards.tsx` | Client | Fetches `/countries` once and renders the billing and shipping cards. |
+| `AddressCard.tsx` | Client | One address: read view and a react-hook-form + zod edit form. Saves through `PUT /api/account/profile`, which proxies the plugin's `PUT /api/user`. |
+| `ProfileCard.tsx` | Client | Name and email, edited in place with react-hook-form + zod; the same form refreshes `authStore.user` so the header follows. |
+| `PasswordCard.tsx` | Client | Three-field password change through `/api/account/password` (the plugin's `POST /api/user/password`); the reset link is only for a forgotten password. |
+| `Settings.tsx` | Client | The one settings page: profile, both addresses, password, support. |
 | `Wishlist.tsx` | Client | Server wishlist grid with remove. |
 
-The dashboard's progress bar and the modal's timeline share one status → stage heuristic: `pending` and `on-hold` are stage 1, `processing` 2, `delivery` 4, `completed` 5. Changing a slug means changing both.
+`src/lib/order-progress.ts` owns the status → stage map for both surfaces. `orderTimelineStep()` feeds the modal's seven steps, `orderCompactStep()` the dashboard's four (placed, processing, delivering, delivered), and `showsPreOrderWindow()` decides whether the 15–25 day estimate still applies — it does not once the order is out for delivery. The step an order is in is marked *current*, never done.
 
 `OrderCard` also owns review eligibility: paid status (`completed` or `processing`), not fully refunded, and not already reviewed in this session.
 

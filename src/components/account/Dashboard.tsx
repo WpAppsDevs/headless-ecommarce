@@ -1,16 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   ArrowRight,
-  Check,
   CheckCheck,
   Heart,
   HelpCircle,
   Package,
-  PackageOpen,
   ShoppingBag,
   Timer,
 } from 'lucide-react';
@@ -18,7 +15,10 @@ import type { Order } from '@/lib/api/orders';
 import type { UserProfile } from '@/lib/api/checkout';
 import { filterCheckoutDrafts } from '@/lib/order-utils';
 import { orderStatusStyle } from '@/lib/order-status';
+import { isActiveOrder, showsPreOrderWindow } from '@/lib/order-progress';
 import { OrderDetailsModal } from './OrderDetailsModal';
+import { OrderProgress } from './OrderProgress';
+import { RecentOrders } from './RecentOrders';
 import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
 import { intlLocale } from '@/i18n/locales';
 import { interpolate } from '@/i18n/interpolate';
@@ -26,6 +26,7 @@ import { useFormatPrice } from '@/lib/utils/currency';
 import { useWishlistStore } from '@/stores/wishlistStore';
 import { PRE_ORDER_WINDOW_DAYS } from '@/lib/delivery';
 import { formatRange } from '@/i18n/format';
+import { personInitials, personName } from '@/lib/user-name';
 import { config } from '@/lib/config';
 
 interface DashboardProps {
@@ -33,56 +34,33 @@ interface DashboardProps {
   orders: Order[];
 }
 
-/** Orders that still have a fulfilment step ahead of them. */
-const ACTIVE_STATUSES = ['pending', 'processing', 'on-hold', 'delivery'];
-
-/** The visible timeline is the one the order modal already explains, cut to five stages. */
-const STEP_KEYS = ['placed', 'processing', 'packed', 'delivering', 'delivered'] as const;
-
-/** How many of those five stages a status has passed. */
-const COMPLETED_STEPS: Record<string, number> = {
-  pending: 1,
-  processing: 2,
-  'on-hold': 1,
-  delivery: 4,
-  completed: 5,
-};
-
-function fmtDate(value: string | null, locale: string) {
-  if (!value) return '—';
-  return new Date(value).toLocaleDateString(locale, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
-
 export function Dashboard({ profile, orders }: DashboardProps) {
   const copy = useDictionary().account;
   const language = useLocale();
   const locale = intlLocale(language);
   const fmt = useFormatPrice();
-  const router = useRouter();
   const wishlistCount = useWishlistStore((s) => s.count);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   const visibleOrders = filterCheckoutDrafts(orders);
   const totalOrders = visibleOrders.length;
-  const activeOrders = visibleOrders.filter((order) => ACTIVE_STATUSES.includes(order.status));
+  const activeOrders = visibleOrders.filter((order) => isActiveOrder(order.status));
   const completedOrders = visibleOrders.filter((order) => order.status === 'completed').length;
   const recentOrders = visibleOrders.slice(0, 3);
   const focusOrder = activeOrders[0] ?? null;
 
-  const name =
-    [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') ||
-    profile?.display_name ||
-    copy.customer;
+  const name = personName(profile, copy.customer);
   const firstName = name.split(' ')[0] || name;
-  const initial = name.charAt(0).toUpperCase() || '·';
+  const initials = personInitials(profile, '·');
 
-  const goTo = (tab: 'orders' | 'wishlist') => {
-    router.replace(`/account?tab=${tab}`, { scroll: false });
-  };
+  const fmtDate = (value: string | null) =>
+    value
+      ? new Date(value).toLocaleDateString(locale, {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        })
+      : '—';
 
   return (
     <div className="space-y-4">
@@ -93,7 +71,7 @@ export function Dashboard({ profile, orders }: DashboardProps) {
             aria-hidden="true"
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-accent-light text-lg font-bold text-brand-accent-strong"
           >
-            {initial}
+            {initials}
           </span>
           <div className="min-w-0 flex-1">
             <h2 className="text-xl font-semibold tracking-tight text-brand-text">
@@ -106,22 +84,20 @@ export function Dashboard({ profile, orders }: DashboardProps) {
             </p>
           </div>
           <div className="flex w-full flex-wrap gap-2 sm:w-auto">
-            <button
-              type="button"
-              onClick={() => goTo('orders')}
+            <Link
+              href="/account?tab=orders"
               className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-brand-border px-3.5 text-xs font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong sm:flex-none"
             >
               <Package className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" />
               {copy.dashboard.shortcutOrders}
-            </button>
-            <button
-              type="button"
-              onClick={() => goTo('wishlist')}
+            </Link>
+            <Link
+              href="/account?tab=wishlist"
               className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-brand-border px-3.5 text-xs font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong sm:flex-none"
             >
               <Heart className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" />
               {copy.dashboard.shortcutWishlist}
-            </button>
+            </Link>
             <a
               href={config.whatsappUrl}
               target="_blank"
@@ -152,7 +128,7 @@ export function Dashboard({ profile, orders }: DashboardProps) {
                 </span>
               </p>
               <p className="mt-1 text-xs text-brand-text-muted">
-                {fmtDate(focusOrder.date_created, locale)} ·{' '}
+                {fmtDate(focusOrder.date_created)} ·{' '}
                 {interpolate(copy.dashboard.itemsCount, {
                   count: String(focusOrder.line_items.length),
                 })}{' '}
@@ -169,50 +145,16 @@ export function Dashboard({ profile, orders }: DashboardProps) {
             </button>
           </div>
 
-          <ol className="mt-5 flex">
-            {STEP_KEYS.map((step, index) => {
-              const done = index < (COMPLETED_STEPS[focusOrder.status] ?? 1);
-              const current = index === (COMPLETED_STEPS[focusOrder.status] ?? 1) - 1;
-              const last = index === STEP_KEYS.length - 1;
-              return (
-                <li
-                  key={step}
-                  className={`relative flex flex-1 flex-col items-center text-center text-[10px] leading-tight ${
-                    done ? 'text-brand-text' : 'text-brand-text-muted'
-                  } ${current ? 'font-semibold' : ''}`}
-                >
-                  {!last && (
-                    <span
-                      aria-hidden="true"
-                      className={`absolute left-1/2 top-[9px] h-[1.5px] w-full ${
-                        done ? 'bg-brand-accent-strong' : 'bg-brand-border'
-                      }`}
-                    />
-                  )}
-                  <span
-                    aria-hidden="true"
-                    className={`relative z-10 mb-1.5 flex h-[19px] w-[19px] items-center justify-center rounded-full border-[1.5px] ${
-                      done
-                        ? 'border-brand-accent-strong bg-brand-accent-strong text-white'
-                        : current
-                          ? 'border-brand-accent-strong bg-white ring-[3px] ring-brand-accent-light'
-                          : 'border-brand-border bg-white'
-                    }`}
-                  >
-                    {done && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
-                  </span>
-                  {copy.details.steps[step]}
-                </li>
-              );
-            })}
-          </ol>
+          <OrderProgress status={focusOrder.status} />
 
-          <p className="mt-4 flex items-center gap-1.5 border-t border-brand-border pt-3 text-[11px] text-brand-text-muted">
-            <Timer className="h-3.5 w-3.5" strokeWidth={1.6} aria-hidden="true" />
-            {interpolate(copy.dashboard.estimatedDelivery, {
-              range: formatRange(language, PRE_ORDER_WINDOW_DAYS.min, PRE_ORDER_WINDOW_DAYS.max),
-            })}
-          </p>
+          {showsPreOrderWindow(focusOrder.status) && (
+            <p className="mt-4 flex items-center gap-1.5 border-t border-brand-border pt-3 text-[11px] text-brand-text-muted">
+              <Timer className="h-3.5 w-3.5" strokeWidth={1.6} aria-hidden="true" />
+              {interpolate(copy.dashboard.estimatedDelivery, {
+                range: formatRange(language, PRE_ORDER_WINDOW_DAYS.min, PRE_ORDER_WINDOW_DAYS.max),
+              })}
+            </p>
+          )}
         </section>
       )}
 
@@ -249,81 +191,16 @@ export function Dashboard({ profile, orders }: DashboardProps) {
               {copy.dashboard.emptyBody}
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => router.push('/products')}
+          <Link
+            href="/products"
             className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-brand-accent-strong px-5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-strong-hover"
           >
             {copy.dashboard.browseShop}
             <ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-          </button>
+          </Link>
         </section>
       ) : (
-        <section className="overflow-hidden rounded-2xl border border-brand-border bg-white">
-          <div className="flex items-center justify-between border-b border-brand-border px-5 py-3.5">
-            <h3 className="text-sm font-semibold text-brand-text">{copy.dashboard.recentOrders}</h3>
-            <button
-              type="button"
-              onClick={() => goTo('orders')}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-brand-accent-strong hover:underline"
-            >
-              {copy.dashboard.allOrders}
-              <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
-            </button>
-          </div>
-
-          {recentOrders.map((order) => {
-            const firstItem = order.line_items[0];
-            const extraItems = order.line_items.length - 1;
-            return (
-              <button
-                key={order.id}
-                type="button"
-                onClick={() => setSelectedOrder(order)}
-                className="flex w-full items-center gap-3 border-b border-brand-border px-5 py-3 text-left transition-colors last:border-b-0 hover:bg-brand-bg"
-              >
-                <span className="relative h-14 w-12 shrink-0 overflow-hidden rounded-lg bg-brand-card">
-                  {firstItem?.image ? (
-                    <Image
-                      src={firstItem.image}
-                      alt=""
-                      width={48}
-                      height={56}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <span className="flex h-full w-full items-center justify-center">
-                      <PackageOpen className="h-5 w-5 text-brand-text-muted" strokeWidth={1.4} aria-hidden="true" />
-                    </span>
-                  )}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[13px] font-semibold text-brand-text">
-                    {interpolate(copy.orders.orderId, { id: String(order.id) })}
-                    <span className="ml-2 font-normal text-brand-text-muted">
-                      {fmtDate(order.date_created, locale)}
-                    </span>
-                  </span>
-                  <span className="mt-0.5 block truncate text-xs text-brand-text-muted">
-                    {firstItem?.name ?? copy.dashboard.noOrders}
-                    {extraItems > 0 &&
-                      ` · ${interpolate(copy.dashboard.moreItems, { count: String(extraItems) })}`}
-                  </span>
-                </span>
-                <span className="flex shrink-0 flex-col items-end gap-1">
-                  <span className="text-[13px] font-semibold text-brand-text">
-                    {fmt(order.total)}
-                  </span>
-                  <span
-                    className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${orderStatusStyle(order.status).badge}`}
-                  >
-                    {copy.statuses[orderStatusStyle(order.status).key]}
-                  </span>
-                </span>
-              </button>
-            );
-          })}
-        </section>
+        <RecentOrders orders={recentOrders} locale={locale} onOpen={setSelectedOrder} />
       )}
 
       {/* Wishlist is a count and a door, not a second product grid */}
@@ -336,14 +213,13 @@ export function Dashboard({ profile, orders }: DashboardProps) {
             ? interpolate(copy.dashboard.wishlistSaved, { count: String(wishlistCount) })
             : copy.dashboard.wishlistEmpty}
         </p>
-        <button
-          type="button"
-          onClick={() => goTo('wishlist')}
+        <Link
+          href="/account?tab=wishlist"
           className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-brand-accent-strong hover:underline"
         >
           {copy.dashboard.wishlistOpen}
           <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
-        </button>
+        </Link>
       </section>
 
       {selectedOrder && (

@@ -1,6 +1,7 @@
 import { apiClient, tokenCache } from './client';
 import { config } from '@/lib/config';
 import { ApiError } from '@/lib/errors';
+import { normalizeUserProfile } from '@/lib/user-profile';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -109,7 +110,7 @@ export async function getUser(): Promise<UserProfile> {
     if (!json.success) {
       throw new ApiError(json.code ?? 'api_error', json.message ?? 'Failed to load user');
     }
-    return json.data as UserProfile;
+    return requireProfile(json.data);
   }
   return apiClient<UserProfile>(`${config.apiNs}/user`);
 }
@@ -120,6 +121,14 @@ export async function getUser(): Promise<UserProfile> {
  * The WordPress plugin already accepts the profile and both addresses on this
  * route, so account editing is real, not a support-request stand-in.
  */
+function requireProfile(value: unknown): UserProfile {
+  const profile = normalizeUserProfile(value);
+  if (!profile) {
+    throw new ApiError('invalid_response', 'The profile response was not a profile');
+  }
+  return profile;
+}
+
 export async function updateProfile(payload: ProfileUpdate): Promise<UserProfile> {
   const token = tokenCache.get();
   if (!token) throw new ApiError('no_token', 'Not authenticated');
@@ -144,7 +153,7 @@ export async function updateProfile(payload: ProfileUpdate): Promise<UserProfile
     throw new ApiError(json.code ?? 'api_error', json.message ?? 'Failed to update profile');
   }
 
-  return json.data as UserProfile;
+  return requireProfile(json.data);
 }
 
 /** POST /wp-json/api/user/password — requires user access token */

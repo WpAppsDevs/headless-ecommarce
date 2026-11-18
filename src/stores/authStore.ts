@@ -4,6 +4,8 @@ import { useCartStore } from '@/stores/cartStore';
 import { useWishlistStore } from '@/stores/wishlistStore';
 import { useReviewStore } from '@/stores/reviewStore';
 import { shouldAttemptAuthHydration } from '@/lib/auth-session';
+import { normalizeUserProfile } from '@/lib/user-profile';
+import { personName } from '@/lib/user-name';
 import type { UserProfile } from '@/lib/api/checkout';
 
 // ---------------------------------------------------------------------------
@@ -97,7 +99,22 @@ export const useAuthStore = create<AuthState>((set) => {
   return {
     user: null,
     profile: null,
-    setProfile: (profile) => set({ profile }),
+    /**
+     * Store the fresh profile and keep the header identity in step: the rail,
+     * the greeting and the header all read the same account, so a name or email
+     * saved in Settings must not leave the header showing the old one.
+     */
+    setProfile: (profile) =>
+      set((state) => ({
+        profile,
+        user: profile
+          ? {
+              id: profile.id,
+              email: profile.email,
+              display_name: personName(profile, state.user?.display_name ?? ''),
+            }
+          : state.user,
+      })),
     isAuthenticated: false,
     loading: false,
     hydrated: false,
@@ -212,44 +229,23 @@ export const useAuthStore = create<AuthState>((set) => {
 
         tokenCache.set(newToken);
 
-        // The refresh route returns the profile on the same hop. When it does,
-        // the account page needs no second request.
-        const profile = (refreshJson.data?.profile ?? null) as UserProfile | null;
+        /**
+         * The refresh route returns the profile on the same hop, and it fetches
+         * it from WordPress when an older plugin omits it. That is why there is
+         * no second `/api/auth/me` call here: the route already made it.
+         */
+        const profile = normalizeUserProfile(refreshJson.data?.profile);
+        if (!profile) return;
 
-        if (profile) {
-          set({
-            user: {
-              id: profile.id,
-              email: profile.email,
-              display_name: profile.display_name,
-            },
-            profile,
-            isAuthenticated: true,
-          });
-          return;
-        }
-
-        // Fallback for a plugin/site whose refresh response omits the profile.
-        const userRes = await fetch('/api/auth/me', {
-          headers: { Authorization: `Bearer ${newToken}` },
+        set({
+          user: {
+            id: profile.id,
+            email: profile.email,
+            display_name: personName(profile, profile.email),
+          },
+          profile,
+          isAuthenticated: true,
         });
-        if (!userRes.ok) return;
-
-        const userJson = await userRes.json();
-        const fallback = (userJson.data?.user ?? userJson.data) as
-          | (AuthUser & Partial<UserProfile>)
-          | undefined;
-        if (fallback) {
-          set({
-            user: {
-              id: fallback.id,
-              email: fallback.email,
-              display_name: fallback.display_name,
-            },
-            profile: 'billing' in fallback ? (fallback as UserProfile) : null,
-            isAuthenticated: true,
-          });
-        }
       } catch {
         // Not authenticated — keep default state
       } finally {

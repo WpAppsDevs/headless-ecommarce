@@ -137,7 +137,7 @@ The page shows a completed or pending state, the transaction ID when present, an
 
 Tab behavior:
 
-- **Dashboard** — greeting with the customer's initials, shortcuts to orders, saved items and support, the active order with its delivery progress, active/delivered/total counts, the three most recent orders, and a wishlist link. Status colors come from `src/lib/order-status.ts`; no component defines its own palette.
+- **Dashboard** — greeting with up to two initials, shortcuts to orders, saved items and support, the active order with its four-stage delivery progress (the pre-order window shows only before dispatch), active/delivered/total counts, the three most recent orders, and a wishlist link. Status colors come from `src/lib/order-status.ts`; no component defines its own palette.
 - **Your Orders** — client-side filter tabs, five orders per page, order details modal, review action.
 - **Wishlist** — saved products with removal and product links.
 - **Settings** — the profile (name, email) and both addresses in one page, each editable inline through `PUT /api/account/profile` (the plugin's `PUT /user`). The password card changes the password in place through `POST /api/account/password` (the plugin's `POST /user/password`, which requires the current password and revokes older tokens); a forgotten password still has the `/forgot-password` link. Support channels sit below.

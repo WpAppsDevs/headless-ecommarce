@@ -1,7 +1,7 @@
 'use client';
 
 import { type ReactNode } from 'react';
-import { X, Home, Printer, Download, RotateCcw, Check } from 'lucide-react';
+import { X, Home, Printer, Check } from 'lucide-react';
 import type { Order } from '@/lib/api/orders';
 import { useFormatPrice } from '@/lib/utils/currency';
 import { orderStatusStyle } from '@/lib/order-status';
@@ -9,25 +9,12 @@ import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
 import { interpolate } from '@/i18n/interpolate';
 import { intlLocale } from '@/i18n/locales';
 import { useDialogFocus } from '@/lib/use-dialog-focus';
+import { ORDER_TIMELINE_STEPS, orderTimelineStep } from '@/lib/order-progress';
 
 // ── Status config ────────────────────────────────────────────────────────────
 
 // ── Timeline steps ───────────────────────────────────────────────────────────
 
-const TIMELINE_STEPS = [
-  'placed',
-  'processing',
-  'packing',
-  'packed',
-  'delivering',
-  'payment',
-  'delivered',
-] as const;
-
-const STATUS_STEP_COUNT: Record<string, number> = {
-  pending: 1, processing: 2, 'on-hold': 1, delivery: 5,
-  completed: 7, cancelled: 0, refunded: 0, failed: 0,
-};
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -101,7 +88,7 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
   const copy         = dict.details;
   const locale       = intlLocale(useLocale());
   const sc           = orderStatusStyle(order.status);
-  const doneSteps    = STATUS_STEP_COUNT[order.status] ?? 1;
+  const reachedStep  = orderTimelineStep(order.status) ?? 0;
   const total        = Number(order.total);
   const discount     = Number(order.discount_total ?? 0);
   const shippingCost = Number(order.shipping_total ?? 0);
@@ -240,9 +227,9 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
           {/* 5 – Timeline */}
           <SectionCard title={copy.timeline}>
             <div className="space-y-0">
-              {TIMELINE_STEPS.map((step, i) => {
-                const done   = i < doneSteps;
-                const isLast = i === TIMELINE_STEPS.length - 1;
+              {ORDER_TIMELINE_STEPS.map((step, i) => {
+                const done   = i < reachedStep;
+                const isLast = i === ORDER_TIMELINE_STEPS.length - 1;
                 return (
                   <div key={i} className="flex gap-3">
                     {/* Date column */}
@@ -328,16 +315,6 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
               <Printer className="h-4 w-4" strokeWidth={2} />
               {copy.printInvoice}
             </button>
-            <button className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-accent-strong px-5 py-3 text-[13px] font-semibold text-white shadow-sm transition hover:opacity-90 sm:flex-none">
-              <Download className="h-4 w-4" strokeWidth={2} />
-              {copy.downloadInvoice}
-            </button>
-            {order.status === 'completed' && (
-              <button className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-danger px-5 py-3 text-[13px] font-semibold text-white shadow-sm transition hover:opacity-90 sm:flex-none">
-                <RotateCcw className="h-4 w-4" strokeWidth={2} />
-                {copy.returnProduct}
-              </button>
-            )}
           </div>
 
         </div>
