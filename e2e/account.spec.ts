@@ -16,7 +16,7 @@ const PASSWORD = process.env.E2E_PASSWORD;
 test.skip(!EMAIL || !PASSWORD, 'E2E_EMAIL and E2E_PASSWORD are not set');
 
 const BANGLA = {
-  tabs: ['ড্যাশবোর্ড', 'আপনার অর্ডার', 'উইশলিস্ট', 'আমার ঠিকানা', 'সেটিংস'],
+  tabs: ['ড্যাশবোর্ড', 'আপনার অর্ডার', 'উইশলিস্ট', 'সেটিংস'],
   orderId: /অর্ডার আইডি/,
   viewDetails: 'বিস্তারিত দেখুন',
   detailsTitle: 'অর্ডারের বিস্তারিত',

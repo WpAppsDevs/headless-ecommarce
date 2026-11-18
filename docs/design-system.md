@@ -83,7 +83,7 @@ Used by auth pages and the account shell.
 - `Button`, `Input`, `Label`, `Card`, `Badge`.
 - Utilitarian rather than editorial.
 
-Auth pages (`/login`, `/register`, `/forgot-password`, `/reset-password`) stay on neutral gray. Account surfaces follow the storefront palette instead: `--brand-bg` page, white cards on `--brand-border` hairlines, `--brand-accent-strong` for the active tab, links, badges and primary actions. The account is dense and task-first, so it keeps Geist and small radii and never uses Playfair — but it no longer reads as a different product from the shop it belongs to.
+Auth pages (`/login`, `/register`, `/forgot-password`, `/reset-password`) stay on neutral gray. Account surfaces follow the storefront palette instead: `--brand-bg` page, white cards on `--brand-border` hairlines, `--brand-accent-strong` for the active tab, links, badges and primary actions. The account is dense and task-first, so it keeps Geist and small radii and never uses Playfair — but it no longer reads as a different product from the shop it belongs to. Inside the shell the content column sits on `--brand-accent-light` so its white cards read as cards, and it shares one height with the white navigation rail; do not give either column its own scroll container or viewport height, or the two stop lining up.
 
 ## Typography
 

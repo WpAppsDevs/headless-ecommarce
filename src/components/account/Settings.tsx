@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Check, Loader2, Mail, Pencil, Phone, ShieldCheck, User } from 'lucide-react';
+import { Check, Loader2, Mail, Phone, ShieldCheck, User, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { updateProfile, type UserProfile } from '@/lib/api/checkout';
 import { useAuthStore } from '@/stores/authStore';
 import { useDictionary } from '@/i18n/LocaleProvider';
 import { config } from '@/lib/config';
+import { AddressCards } from './Address';
 
 interface SettingsTabProps {
   profile: UserProfile | null;
@@ -25,7 +25,6 @@ function Value({ label, value }: { label: string; value?: string | null }) {
 
 export function SettingsTab({ profile }: SettingsTabProps) {
   const copy = useDictionary().account;
-  const router = useRouter();
   const setProfile = useAuthStore((s) => s.setProfile);
 
   const [editing, setEditing] = useState(false);
@@ -191,18 +190,7 @@ export function SettingsTab({ profile }: SettingsTabProps) {
             </div>
             <div className="flex items-start gap-2.5">
               <Phone className="mt-0.5 h-4 w-4 shrink-0 text-brand-text-muted" strokeWidth={1.6} aria-hidden="true" />
-              <div>
-                <Value label={copy.settings.phone} value={profile?.billing?.phone} />
-                <button
-                  type="button"
-                  onClick={() => {
-                    router.replace('/account?tab=address', { scroll: false });
-                  }}
-                  className="mt-1 text-[11px] font-semibold text-brand-accent-strong hover:underline"
-                >
-                  {copy.settings.editInAddress}
-                </button>
-              </div>
+              <Value label={copy.settings.phone} value={profile?.billing?.phone} />
             </div>
             <div className="flex items-start gap-2.5">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-brand-text-muted" strokeWidth={1.6} aria-hidden="true" />
@@ -213,8 +201,17 @@ export function SettingsTab({ profile }: SettingsTabProps) {
             </div>
           </div>
         )}
+      </section>
 
-        <div className="mt-6 space-y-2 border-t border-brand-border pt-4">
+      {/* Addresses live here too: one tab for everything a customer can change. */}
+      <div className="pt-1">
+        <h3 className="text-sm font-semibold text-brand-text">{copy.address.title}</h3>
+        <p className="mt-0.5 text-xs text-brand-text-muted">{copy.address.note}</p>
+      </div>
+      <AddressCards profile={profile} />
+
+      <section className="rounded-2xl border border-brand-border bg-white p-5 sm:p-6">
+        <div className="space-y-2">
           <p className="text-sm font-medium text-brand-text">{copy.settings.passwordTitle}</p>
           <p className="text-xs leading-relaxed text-brand-text-muted">
             {copy.settings.passwordBody}{' '}
