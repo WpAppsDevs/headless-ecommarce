@@ -137,12 +137,13 @@ Raw API images may use `src` or `url`. Always run them through `normalizeImage()
 | --- | --- | --- |
 | `POST /api/auth/login` | `api/auth/login` | Sets `access_token` (1 h), `refresh_token` (14 d), and readable `session_hint` cookies; returns user and access token. |
 | `POST /api/auth/register` | `api/auth/register` | Same cookies; returns 201. |
-| `POST /api/auth/refresh` | `api/auth/refresh` | Reads the refresh cookie; accepts `access_token` or `token` in the response; rotates the refresh cookie if the plugin returns one; expires cookies on failure. |
+| `POST /api/auth/refresh` | `api/auth/refresh` | Reads the refresh cookie; accepts `access_token` or `token` in the response; returns the profile the plugin includes with the new token (falling back to `api/user`); rotates the refresh cookie if the plugin returns one; expires cookies on failure. |
 | `POST /api/auth/logout` | none | Expires the access, refresh, and session hint cookies. Does not call WordPress. |
 | `GET /api/auth/me` | `api/user` | Requires an `Authorization` header. |
 | `POST /api/auth/forgot-password` | `api/auth/forgot-password` | Pure proxy. |
 | `POST /api/auth/reset-password` | `api/auth/reset-password` | Pure proxy. |
 | `POST /api/checkout` | `api/checkout` | Requires a token; forwards the body. |
+| `PUT /api/account/profile` | `api/user` | Requires a token; forwards the body to the plugin's profile update. |
 | `GET /api/account/orders` | `api/orders` | Requires a token; filters drafts; repairs pagination. |
 | `GET/POST /api/wishlist` | `api/wishlist` | Requires a token for meaningful results; forwards query. |
 | `DELETE /api/wishlist/:id` | `api/wishlist/:id` | Requires a token. |

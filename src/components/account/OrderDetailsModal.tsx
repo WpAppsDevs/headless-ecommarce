@@ -52,9 +52,9 @@ function fmtShort(d: string | null, locale: string) {
 
 function SectionCard({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm">
-      <div className="border-b border-zinc-100 px-6 py-4">
-        <h3 className="text-[15px] font-bold text-zinc-900">{title}</h3>
+    <div className="rounded-2xl border border-brand-border bg-white shadow-sm">
+      <div className="border-b border-brand-border px-6 py-4">
+        <h3 className="text-[15px] font-bold text-brand-text">{title}</h3>
       </div>
       <div className="px-6 py-5">{children}</div>
     </div>
@@ -75,11 +75,11 @@ function AddressBlock({ name, phone, address1, address2, city, state, postcode }
   const cityLine = [city, state, postcode].filter(Boolean).join(', ');
   return (
     <div className="flex items-start gap-3">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-50 ring-1 ring-zinc-200">
-        <Home className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-bg ring-1 ring-brand-border">
+        <Home className="h-4 w-4 text-brand-text-muted" strokeWidth={1.5} />
       </div>
-      <div className="text-[13px] leading-relaxed text-zinc-600">
-        <p className="font-semibold text-zinc-900">{name}</p>
+      <div className="text-[13px] leading-relaxed text-brand-text-muted">
+        <p className="font-semibold text-brand-text">{name}</p>
         {phone && <p>{phone}</p>}
         {address1 && <p>{address1}</p>}
         {address2 && <p>{address2}</p>}
@@ -141,16 +141,16 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
         <div className="space-y-4 pb-6">
 
           {/* 1 – Order header card */}
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-brand-border bg-white p-6 shadow-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-[15px] font-bold text-zinc-900">
+                <h3 className="text-[15px] font-bold text-brand-text">
                   {interpolate(copy.orderId, { id: order.id })}
                 </h3>
-                <p className="mt-1 text-[13px] text-zinc-500">
+                <p className="mt-1 text-[13px] text-brand-text-muted">
                   {fmtDateTime(order.date_created, locale)}
                   {order.payment_method_title && (
-                    <> &bull; <span className="font-medium text-zinc-700">{order.payment_method_title}</span></>
+                    <> &bull; <span className="font-medium text-brand-text">{order.payment_method_title}</span></>
                   )}
                 </p>
               </div>
@@ -162,37 +162,37 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
 
           {/* 2 – Products */}
           <SectionCard title={copy.products}>
-            <div className="divide-y divide-zinc-100">
+            <div className="divide-y divide-brand-border">
               {order.line_items.map((item, i) => {
                 const unitPrice = item.quantity > 0 ? Number(item.total) / item.quantity : 0;
                 return (
                   <div key={i} className="flex items-start gap-4 py-4 first:pt-0 last:pb-0">
-                    <div className="h-16 w-16 shrink-0 rounded-xl bg-zinc-100" />
+                    <div className="h-16 w-16 shrink-0 rounded-xl bg-brand-card" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-[12px] text-zinc-400">{copy.vendor}</p>
-                      <p className="mt-0.5 text-[13px] font-semibold leading-snug text-zinc-900">{item.name}</p>
+                      <p className="text-[12px] text-brand-text-muted">{copy.vendor}</p>
+                      <p className="mt-0.5 text-[13px] font-semibold leading-snug text-brand-text">{item.name}</p>
                     </div>
                     <div className="shrink-0 space-y-0.5 text-right text-[12px]">
-                      <div className="flex justify-between gap-6 text-zinc-500">
+                      <div className="flex justify-between gap-6 text-brand-text-muted">
                         <span>{copy.price}</span>
-                        <span className="font-medium text-zinc-700">{fmt(unitPrice)}</span>
+                        <span className="font-medium text-brand-text">{fmt(unitPrice)}</span>
                       </div>
-                      <div className="flex justify-between gap-6 text-zinc-500">
+                      <div className="flex justify-between gap-6 text-brand-text-muted">
                         <span>{copy.qty}</span>
-                        <span className="font-medium text-zinc-700">{item.quantity}</span>
+                        <span className="font-medium text-brand-text">{item.quantity}</span>
                       </div>
-                      <div className="flex justify-between gap-6 text-zinc-500">
+                      <div className="flex justify-between gap-6 text-brand-text-muted">
                         <span>{copy.total}</span>
-                        <span className="font-semibold text-zinc-900">{fmt(Number(item.total))}</span>
+                        <span className="font-semibold text-brand-text">{fmt(Number(item.total))}</span>
                       </div>
                     </div>
                   </div>
                 );
               })}
             </div>
-            <div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-4">
-              <span className="text-[13px] font-semibold text-zinc-700">{copy.totalAmount}</span>
-              <span className="text-[15px] font-bold text-brand-wine">{fmt(total)}</span>
+            <div className="mt-4 flex items-center justify-between border-t border-brand-border pt-4">
+              <span className="text-[13px] font-semibold text-brand-text">{copy.totalAmount}</span>
+              <span className="text-[15px] font-bold text-brand-accent-strong">{fmt(total)}</span>
             </div>
           </SectionCard>
 
@@ -218,7 +218,7 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
                 postcode={b.postcode}
               />
             ) : (
-              <p className="text-[13px] text-zinc-400">{copy.noShippingAddress}</p>
+              <p className="text-[13px] text-brand-text-muted">{copy.noShippingAddress}</p>
             )}
           </SectionCard>
 
@@ -247,7 +247,7 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
                   <div key={i} className="flex gap-3">
                     {/* Date column */}
                     <div className="w-[68px] shrink-0 pt-1 text-right">
-                      <span className="text-[10px] leading-tight text-zinc-400">
+                      <span className="text-[10px] leading-tight text-brand-text-muted">
                         {done ? fmtShort(order.date_created, locale) : ''}
                       </span>
                     </div>
@@ -255,21 +255,21 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
                     {/* Circle + connector */}
                     <div className="flex flex-col items-center">
                       <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                        done ? 'border-brand-stock bg-brand-stock' : 'border-zinc-300 bg-white'
+                        done ? 'border-brand-stock bg-brand-stock' : 'border-brand-border bg-white'
                       }`}>
                         {done && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
                       </div>
                       {!isLast && (
-                        <div className={`mt-1 w-0.5 min-h-[44px] flex-1 ${done ? 'bg-brand-stock/30' : 'bg-zinc-200'}`} />
+                        <div className={`mt-1 w-0.5 min-h-[44px] flex-1 ${done ? 'bg-brand-stock/30' : 'bg-brand-card'}`} />
                       )}
                     </div>
 
                     {/* Step content */}
                     <div className="min-w-0 flex-1 pb-4">
-                      <p className={`text-[13px] font-semibold ${done ? 'text-zinc-900' : 'text-zinc-400'}`}>
+                      <p className={`text-[13px] font-semibold ${done ? 'text-brand-text' : 'text-brand-text-muted'}`}>
                         {copy.steps[`${step}`]}
                       </p>
-                      <p className={`mt-0.5 text-[12px] leading-relaxed ${done ? 'text-zinc-500' : 'text-zinc-300'}`}>
+                      <p className={`mt-0.5 text-[12px] leading-relaxed ${done ? 'text-brand-text-muted' : 'text-brand-text-muted/70'}`}>
                         {copy.steps[`${step}Desc` as keyof typeof copy.steps]}
                       </p>
                     </div>
@@ -280,41 +280,41 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
           </SectionCard>
 
           {/* 6 – Order Summary */}
-          <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm">
-            <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-4">
-              <h3 className="text-[15px] font-bold text-zinc-900">{copy.orderSummary}</h3>
+          <div className="rounded-2xl border border-brand-border bg-white shadow-sm">
+            <div className="flex items-center justify-between border-b border-brand-border px-6 py-4">
+              <h3 className="text-[15px] font-bold text-brand-text">{copy.orderSummary}</h3>
               <span className={`rounded-lg border px-3 py-1 text-[12px] font-semibold ${sc.badge}`}>
                 {dict.statuses[sc.key]}
               </span>
             </div>
             <div className="space-y-3 px-6 py-5">
-              <div className="flex justify-between text-[13px] text-zinc-600">
+              <div className="flex justify-between text-[13px] text-brand-text-muted">
                 <span>{copy.orderIdLabel}</span>
-                <span className="font-medium text-zinc-800">#{order.id}</span>
+                <span className="font-medium text-brand-text">#{order.id}</span>
               </div>
-              <div className="flex justify-between text-[13px] text-zinc-600">
+              <div className="flex justify-between text-[13px] text-brand-text-muted">
                 <span>{copy.orderAt}</span>
-                <span className="font-medium text-zinc-800">{fmtDate(order.date_created, locale)}</span>
+                <span className="font-medium text-brand-text">{fmtDate(order.date_created, locale)}</span>
               </div>
-              <div className="flex justify-between text-[13px] text-zinc-600">
+              <div className="flex justify-between text-[13px] text-brand-text-muted">
                 <span>{copy.subtotal}</span>
-                <span className="font-medium text-zinc-800">{fmt(subtotalMrp)}</span>
+                <span className="font-medium text-brand-text">{fmt(subtotalMrp)}</span>
               </div>
               {discount > 0 && (
-                <div className="flex justify-between text-[13px] text-zinc-600">
+                <div className="flex justify-between text-[13px] text-brand-text-muted">
                   <span>{copy.discount}</span>
                   <span className="font-medium text-brand-danger">-{fmt(discount)}</span>
                 </div>
               )}
-              <div className="flex justify-between text-[13px] text-zinc-600">
+              <div className="flex justify-between text-[13px] text-brand-text-muted">
                 <span>{copy.deliveryCharge}</span>
                 <span className={`font-medium ${shippingCost === 0 ? 'text-brand-stock' : 'text-brand-text'}`}>
                   {shippingCost === 0 ? copy.free : fmt(shippingCost)}
                 </span>
               </div>
-              <div className="flex items-center justify-between border-t border-zinc-100 pt-4">
-                <span className="text-[14px] font-bold text-zinc-900">{copy.amountPaid}</span>
-                <span className="text-[16px] font-bold text-brand-wine">{fmt(total)}</span>
+              <div className="flex items-center justify-between border-t border-brand-border pt-4">
+                <span className="text-[14px] font-bold text-brand-text">{copy.amountPaid}</span>
+                <span className="text-[16px] font-bold text-brand-accent-strong">{fmt(total)}</span>
               </div>
             </div>
           </div>
@@ -328,7 +328,7 @@ export function OrderDetailsModal({ order, onClose }: OrderDetailsModalProps) {
               <Printer className="h-4 w-4" strokeWidth={2} />
               {copy.printInvoice}
             </button>
-            <button className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-wine px-5 py-3 text-[13px] font-semibold text-white shadow-sm transition hover:opacity-90 sm:flex-none">
+            <button className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-accent-strong px-5 py-3 text-[13px] font-semibold text-white shadow-sm transition hover:opacity-90 sm:flex-none">
               <Download className="h-4 w-4" strokeWidth={2} />
               {copy.downloadInvoice}
             </button>

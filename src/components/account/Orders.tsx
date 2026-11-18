@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, PackageSearch } from 'lucide-react';
 import type { Order, OrdersMeta } from '@/lib/api/orders';
 import { useDictionary } from '@/i18n/LocaleProvider';
 import { filterCheckoutDrafts } from '@/lib/order-utils';
@@ -35,31 +35,37 @@ export function Orders({ orders }: OrdersProps) {
 
   const visibleOrders = filterCheckoutDrafts(orders);
 
-  const filtered = activeFilter === 'all'
-    ? visibleOrders
-    : visibleOrders.filter(o => o.status === activeFilter);
+  const filtered =
+    activeFilter === 'all'
+      ? visibleOrders
+      : visibleOrders.filter((order) => order.status === activeFilter);
 
-  const totalPages  = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const currentPage = Math.min(page, totalPages);
-  const paged       = filtered.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
+  const paged = filtered.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
 
-  const handleFilter = (f: OrderFilter) => { setActiveFilter(f); setPage(1); };
+  const handleFilter = (filter: OrderFilter) => {
+    setActiveFilter(filter);
+    setPage(1);
+  };
 
   return (
     <>
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-zinc-900">{copy.title}</h2>
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold tracking-tight text-brand-text">{copy.title}</h2>
 
         {/* Filter tabs */}
-        <div className="flex gap-5 overflow-x-auto border-b border-zinc-200">
+        <div className="flex gap-5 overflow-x-auto border-b border-brand-border">
           {FILTERS.map((id) => (
             <button
               key={id}
+              type="button"
               onClick={() => handleFilter(id)}
-              className={`whitespace-nowrap pb-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
+              aria-pressed={activeFilter === id}
+              className={`-mb-px min-h-10 whitespace-nowrap border-b-2 pb-2 text-sm font-medium transition-colors ${
                 activeFilter === id
-                  ? 'border-brand-wine text-brand-wine'
-                  : 'border-transparent text-zinc-400 hover:text-zinc-700'
+                  ? 'border-brand-accent-strong text-brand-accent-strong'
+                  : 'border-transparent text-brand-text-muted hover:text-brand-text'
               }`}
             >
               {FILTER_LABELS[id]}
@@ -68,18 +74,17 @@ export function Orders({ orders }: OrdersProps) {
         </div>
 
         {/* Orders list */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {paged.length === 0 ? (
-            <div className="rounded-2xl border border-zinc-200 p-10 text-center">
-              <p className="text-sm text-zinc-400">{copy.noOrders}</p>
+            <div className="flex flex-col items-center gap-3 rounded-2xl border border-brand-border bg-white px-6 py-14 text-center">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-bg">
+                <PackageSearch className="h-5 w-5 text-brand-accent-strong" strokeWidth={1.5} aria-hidden="true" />
+              </span>
+              <p className="text-sm text-brand-text-muted">{copy.noOrders}</p>
             </div>
           ) : (
-            paged.map(order => (
-              <OrderCard
-                key={order.id}
-                order={order}
-                onViewDetails={() => setSelectedOrder(order)}
-              />
+            paged.map((order) => (
+              <OrderCard key={order.id} order={order} onViewDetails={() => setSelectedOrder(order)} />
             ))
           )}
         </div>
@@ -88,22 +93,25 @@ export function Orders({ orders }: OrdersProps) {
         {totalPages > 1 && (
           <div className="flex items-center justify-center gap-1.5">
             <button
-              onClick={() => setPage(p => Math.max(1, p - 1))}
+              type="button"
+              onClick={() => setPage((current) => Math.max(1, current - 1))}
               disabled={currentPage === 1}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 text-zinc-500 transition hover:bg-zinc-50 disabled:opacity-40"
+              className="flex h-11 w-11 items-center justify-center rounded-lg border border-brand-border text-brand-text-muted transition hover:bg-white disabled:opacity-40"
               aria-label={dict.pagination.previousPage}
             >
-              <ChevronLeft className="h-4 w-4" strokeWidth={2} />
+              <ChevronLeft className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
             </button>
 
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
               <button
                 key={n}
+                type="button"
                 onClick={() => setPage(n)}
-                className={`flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-medium transition ${
+                aria-current={currentPage === n ? 'page' : undefined}
+                className={`flex h-11 w-11 items-center justify-center rounded-lg border text-sm font-medium transition ${
                   currentPage === n
-                    ? 'border-brand-wine bg-brand-wine text-white'
-                    : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50'
+                    ? 'border-brand-accent-strong bg-brand-accent-strong text-white'
+                    : 'border-brand-border bg-white text-brand-text hover:border-brand-accent-strong'
                 }`}
               >
                 {n}
@@ -111,12 +119,13 @@ export function Orders({ orders }: OrdersProps) {
             ))}
 
             <button
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              type="button"
+              onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
               disabled={currentPage === totalPages}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 text-zinc-500 transition hover:bg-zinc-50 disabled:opacity-40"
+              className="flex h-11 w-11 items-center justify-center rounded-lg border border-brand-border text-brand-text-muted transition hover:bg-white disabled:opacity-40"
               aria-label={dict.pagination.nextPage}
             >
-              <ChevronRight className="h-4 w-4" strokeWidth={2} />
+              <ChevronRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
             </button>
           </div>
         )}

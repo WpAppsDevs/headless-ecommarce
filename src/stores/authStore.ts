@@ -4,6 +4,7 @@ import { useCartStore } from '@/stores/cartStore';
 import { useWishlistStore } from '@/stores/wishlistStore';
 import { useReviewStore } from '@/stores/reviewStore';
 import { shouldAttemptAuthHydration } from '@/lib/auth-session';
+import type { UserProfile } from '@/lib/api/checkout';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -17,6 +18,13 @@ export interface AuthUser {
 
 interface AuthState {
   user: AuthUser | null;
+  /**
+   * Full profile, including both addresses. Hydration already receives it, so
+   * the account page reads it from here instead of fetching the same payload a
+   * second time. Null until a load or an update fills it.
+   */
+  profile: UserProfile | null;
+  setProfile: (profile: UserProfile | null) => void;
   isAuthenticated: boolean;
   loading: boolean;
   hydrated: boolean;
@@ -67,7 +75,7 @@ export const useAuthStore = create<AuthState>((set) => {
       // localStorage and CartHydrator re-fetched it on every page load.
       const hadSession = !!tokenCache.get();
       tokenCache.set(undefined);
-      set({ user: null, isAuthenticated: false });
+      set({ user: null, profile: null, isAuthenticated: false });
 
       const cart = useCartStore.getState();
       cart.clearCart();
@@ -88,6 +96,8 @@ export const useAuthStore = create<AuthState>((set) => {
 
   return {
     user: null,
+    profile: null,
+    setProfile: (profile) => set({ profile }),
     isAuthenticated: false,
     loading: false,
     hydrated: false,
@@ -148,7 +158,7 @@ export const useAuthStore = create<AuthState>((set) => {
       tokenCache.set(undefined);
       // Fire-and-forget — clear httpOnly cookies server-side
       await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
-      set({ user: null, isAuthenticated: false });
+      set({ user: null, profile: null, isAuthenticated: false });
       useCartStore.getState().clearCart();
       useWishlistStore.getState().clear();
       useReviewStore.getState().clear();
@@ -202,16 +212,43 @@ export const useAuthStore = create<AuthState>((set) => {
 
         tokenCache.set(newToken);
 
-        // Fetch the user profile with the fresh token
+        // The refresh route returns the profile on the same hop. When it does,
+        // the account page needs no second request.
+        const profile = (refreshJson.data?.profile ?? null) as UserProfile | null;
+
+        if (profile) {
+          set({
+            user: {
+              id: profile.id,
+              email: profile.email,
+              display_name: profile.display_name,
+            },
+            profile,
+            isAuthenticated: true,
+          });
+          return;
+        }
+
+        // Fallback for a plugin/site whose refresh response omits the profile.
         const userRes = await fetch('/api/auth/me', {
           headers: { Authorization: `Bearer ${newToken}` },
         });
         if (!userRes.ok) return;
 
         const userJson = await userRes.json();
-        if (userJson.data?.user ?? userJson.data) {
-          const user: AuthUser = userJson.data?.user ?? userJson.data;
-          set({ user, isAuthenticated: true });
+        const fallback = (userJson.data?.user ?? userJson.data) as
+          | (AuthUser & Partial<UserProfile>)
+          | undefined;
+        if (fallback) {
+          set({
+            user: {
+              id: fallback.id,
+              email: fallback.email,
+              display_name: fallback.display_name,
+            },
+            profile: 'billing' in fallback ? (fallback as UserProfile) : null,
+            isAuthenticated: true,
+          });
         }
       } catch {
         // Not authenticated — keep default state

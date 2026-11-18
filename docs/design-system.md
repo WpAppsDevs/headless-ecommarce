@@ -77,13 +77,13 @@ Product-detail components used to hardcode a maroon and navy pair (`#9E2F45`, `#
 
 ### 2. shadcn / base-nova
 
-Used by auth pages, account pages, and some account modals.
+Used by auth pages and the account shell.
 
-- Geist sans, neutral zinc grays, small radii, standard shadcn spacing.
+- Geist sans, small radii, standard shadcn spacing.
 - `Button`, `Input`, `Label`, `Card`, `Badge`.
-- Less editorial, more utilitarian.
+- Utilitarian rather than editorial.
 
-The account dashboard and auth pages intentionally look more neutral than the product pages. Keep them separate unless a product decision changes that.
+Auth pages (`/login`, `/register`, `/forgot-password`, `/reset-password`) stay on neutral gray. Account surfaces follow the storefront palette instead: `--brand-bg` page, white cards on `--brand-border` hairlines, `--brand-accent-strong` for the active tab, links, badges and primary actions. The account is dense and task-first, so it keeps Geist and small radii and never uses Playfair — but it no longer reads as a different product from the shop it belongs to.
 
 ## Typography
 
@@ -95,14 +95,14 @@ Fonts are loaded in `src/app/layout.tsx` through `next/font/google`:
 
 | Variable | Family | Utility |
 | --- | --- | --- |
-| `--font-geist-sans` | Geist | `font-geist` (auth and account only) |
+| `--font-geist-sans` | Geist | `font-geist` (auth and account) |
 | `--font-geist-mono` | Geist Mono | `font-mono` |
 | `--font-playfair` | Playfair Display | `font-serif` |
 | `--font-inter` | Inter | `font-sans` (global body) and `font-ui` |
 | `--font-bengali` | Noto Sans Bengali | every Bangla glyph, behind Inter in the sans and geist stacks |
 | `--font-serif-bengali` | Noto Serif Bengali | Bangla headings, immediately after Playfair in `font-serif` |
 
-The global sans maps to Inter: Playfair Display for headings plus Inter for body is the "Classic Elegant" pairing the editorial surfaces were always documented to use. `font-geist` keeps the neutral shadcn look on `/login`, `/register`, `/forgot-password`, `/reset-password`, and `/account`.
+The global sans maps to Inter: Playfair Display for headings plus Inter for body is the "Classic Elegant" pairing the editorial surfaces were always documented to use. `font-geist` keeps the neutral shadcn look on `/login`, `/register`, `/forgot-password` and `/reset-password`; the account shell also uses Geist, but on the brand palette rather than neutral gray.
 
 `font-serif` is mapped to Playfair with a Georgia fallback. `font-ui` is scoped to the product detail section and similar dense UI.
 
@@ -163,7 +163,7 @@ The logo is `public/images/Najifa's Shop Logo.png`. The apostrophe and space in 
 1. Use `cn()` for conditional classes.
 2. Use `class-variance-authority` for variants only when a component has three or more variants. Existing `Button` and `Badge` do.
 3. Use the existing spacing scale and color tokens for one-offs.
-4. Keep focus states visible. Shop controls use the `focus-brand` utility, which draws a 2px strong-accent outline with an offset; auth and account keep the neutral shadcn ring.
+4. Keep focus states visible. Shop controls use the `focus-brand` utility, which draws a 2px strong-accent outline with an offset; account forms use the strong accent for their focus border and ring. Auth pages keep the neutral shadcn ring.
 5. Keep layout decisions in components, not `globals.css`.
 6. When a design calls for a token that does not exist, add it to `:root` and `@theme inline` in the same change.
 

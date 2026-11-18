@@ -8,7 +8,10 @@ import { ApiError } from '@/lib/errors';
 
 export interface AddressFields {
   first_name: string;
+  last_name?: string;
+  company?: string;
   address_1: string;
+  address_2?: string;
   city: string;
   state: string;
   postcode: string;
@@ -58,6 +61,31 @@ export interface Country {
   states: Array<{ code: string; name: string }>;
 }
 
+/** Address fields PUT /api/user accepts. Every key is optional: send only what changed. */
+export interface AddressUpdate {
+  first_name?: string;
+  last_name?: string;
+  company?: string;
+  address_1?: string;
+  address_2?: string;
+  city?: string;
+  state?: string;
+  postcode?: string;
+  country?: string;
+  /** Billing only — WooCommerce keeps contact details on the billing address. */
+  email?: string;
+  phone?: string;
+}
+
+export interface ProfileUpdate {
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  display_name?: string;
+  billing?: AddressUpdate;
+  shipping?: AddressUpdate;
+}
+
 // ---------------------------------------------------------------------------
 // API functions
 // ---------------------------------------------------------------------------
@@ -84,6 +112,39 @@ export async function getUser(): Promise<UserProfile> {
     return json.data as UserProfile;
   }
   return apiClient<UserProfile>(`${config.apiNs}/user`);
+}
+
+/**
+ * PUT /wp-json/api/user — requires user access token.
+ *
+ * The WordPress plugin already accepts the profile and both addresses on this
+ * route, so account editing is real, not a support-request stand-in.
+ */
+export async function updateProfile(payload: ProfileUpdate): Promise<UserProfile> {
+  const token = tokenCache.get();
+  if (!token) throw new ApiError('no_token', 'Not authenticated');
+
+  const res = await fetch('/api/account/profile', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const json = (await res.json()) as {
+    success: boolean;
+    data?: UserProfile;
+    code?: string;
+    message?: string;
+  };
+
+  if (!json.success) {
+    throw new ApiError(json.code ?? 'api_error', json.message ?? 'Failed to update profile');
+  }
+
+  return json.data as UserProfile;
 }
 
 /** POST /wp-json/api/checkout — requires user access token */
