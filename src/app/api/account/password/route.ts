@@ -1,14 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { config } from '@/lib/config';
-
-const IS_PROD = process.env.NODE_ENV === 'production';
-
-const COOKIE_BASE = {
-  httpOnly: true,
-  secure: IS_PROD,
-  sameSite: 'lax' as const,
-  path: '/',
-};
+import { applyAuthCookies } from '@/lib/auth-cookies';
 
 /**
  * Proxy for POST /wp-json/api/user/password — the change-password route.
@@ -55,22 +47,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Same lifetime and flags as login: the old pair no longer works.
+    // Same cookies as login: the pair issued before the change no longer works.
     const response = NextResponse.json({ success: true, data: { access_token } });
-
-    response.cookies.set('access_token', access_token, {
-      ...COOKIE_BASE,
-      maxAge: 3600,
-    });
-    response.cookies.set('refresh_token', refresh_token, {
-      ...COOKIE_BASE,
-      maxAge: 14 * 24 * 60 * 60,
-    });
-    response.cookies.set('session_hint', '1', {
-      ...COOKIE_BASE,
-      httpOnly: false,
-      maxAge: 14 * 24 * 60 * 60,
-    });
+    applyAuthCookies(response, { accessToken: access_token, refreshToken: refresh_token });
 
     return response;
   } catch {

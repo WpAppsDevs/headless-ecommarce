@@ -12,6 +12,7 @@ import { Orders } from './Orders';
 import { SettingsTab } from './Settings';
 import { WishlistTab } from './Wishlist';
 import { useDictionary } from '@/i18n/LocaleProvider';
+import { personInitials, personName } from '@/lib/user-name';
 
 type Tab = 'dashboard' | 'orders' | 'settings' | 'wishlist';
 
@@ -61,11 +62,8 @@ export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProp
     router.push('/');
   };
 
-  const fullName =
-    [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') ||
-    profile?.display_name ||
-    copy.customer;
-  const initial = fullName.charAt(0).toUpperCase() || '·';
+  const fullName = personName(profile, copy.customer);
+  const initials = personInitials(profile, '·');
 
   const wishlistBadge = wishlistCount > 0 && (
     <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-accent-strong px-1.5 text-[10px] font-bold text-white">
@@ -95,7 +93,7 @@ export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProp
         </nav>
 
         {/* Mobile tab bar — sticky under the 68px header, horizontal scroll */}
-        <div className="sticky top-[68px] z-30 mb-4 flex snap-x gap-1 overflow-x-auto rounded-xl border border-brand-border bg-white p-1 lg:hidden">
+        <div className="sticky top-24 z-30 mb-2 flex snap-x gap-1 overflow-x-auto rounded-xl border border-brand-border bg-white p-1 lg:hidden">
           {MENU_ITEMS.map(({ id, icon: Icon }) => {
             const active = activeTab === id;
             return (
@@ -124,10 +122,14 @@ export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProp
               </button>
             );
           })}
+        </div>
+
+        {/* Sign-out sits apart from the tabs: it leaves the account, the tabs move inside it. */}
+        <div className="mb-4 flex justify-end lg:hidden">
           <button
             type="button"
             onClick={handleLogout}
-            className="ml-auto flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg px-3 text-xs font-medium text-brand-text-muted transition-colors hover:bg-brand-bg hover:text-brand-text"
+            className="flex min-h-11 items-center gap-1.5 rounded-lg border border-brand-border bg-white px-3 text-xs font-medium text-brand-text-muted transition-colors hover:bg-brand-bg hover:text-brand-text"
           >
             <LogOut className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" />
             {copy.logout}
@@ -144,7 +146,7 @@ export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProp
                   aria-hidden="true"
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-accent-light text-sm font-bold text-brand-accent-strong"
                 >
-                  {initial}
+                  {initials}
                 </span>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-brand-text">{fullName}</p>
@@ -154,7 +156,7 @@ export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProp
                 </div>
               </div>
 
-              <nav aria-label={copy.navLabel} className="min-h-0 flex-1 overflow-y-auto p-2">
+              <nav aria-label={copy.navLabel} className="flex-1 p-2">
                 {MENU_ITEMS.map(({ id, icon: Icon }) => {
                   const active = activeTab === id;
                   return (

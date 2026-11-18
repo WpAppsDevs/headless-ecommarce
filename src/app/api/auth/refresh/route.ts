@@ -1,26 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { config } from '@/lib/config';
-
-const IS_PROD = process.env.NODE_ENV === 'production';
-
-const COOKIE_BASE = {
-  httpOnly: true,
-  secure: IS_PROD,
-  sameSite: 'lax' as const,
-  path: '/',
-};
-
-/** Expire auth cookies — called when refresh token is invalid/expired. */
-function expireAuthCookies(response: NextResponse): void {
-  response.cookies.set('access_token', '', { ...COOKIE_BASE, maxAge: 0 });
-  response.cookies.set('refresh_token', '', { ...COOKIE_BASE, maxAge: 0 });
-  response.cookies.set('session_hint', '', {
-    ...COOKIE_BASE,
-    httpOnly: false,
-    maxAge: 0,
-  });
-}
+import { applyAuthCookies, expireAuthCookies } from '@/lib/auth-cookies';
 
 export async function POST() {
   try {
@@ -70,10 +51,10 @@ export async function POST() {
     }
 
     /**
-     * The plugin returns the profile with the new token, so most page loads need
-     * no second call. Older plugin versions omit it; then fetch it here. A
-     * failure must not fail the refresh: the token is valid, and the client
-     * falls back to /api/auth/me.
+     * The plugin returns the profile with the new token, so the client needs no
+     * second call. Older plugin versions omit it; then fetch it here, which is
+     * why the client has no /api/auth/me fallback of its own. A failure must not
+     * fail the refresh: the token is still valid.
      */
     let profile: unknown = json.data?.user ?? null;
     if (!profile) {
@@ -96,21 +77,12 @@ export async function POST() {
       { status: 200 },
     );
 
-    response.cookies.set('access_token', newToken, { ...COOKIE_BASE, maxAge: 3600 });
-    response.cookies.set('session_hint', '1', {
-      ...COOKIE_BASE,
-      httpOnly: false,
-      maxAge: 14 * 24 * 60 * 60,
+    // The plugin may rotate the refresh token; keep the current one when it does not.
+    const currentRefreshToken = cookieStore.get('refresh_token')?.value ?? '';
+    applyAuthCookies(response, {
+      accessToken: newToken,
+      refreshToken: json.data?.refresh_token ?? currentRefreshToken,
     });
-
-    // Persist a new refresh_token when the WP plugin uses rotating tokens.
-    const newRefreshToken: string | undefined = json.data?.refresh_token;
-    if (newRefreshToken) {
-      response.cookies.set('refresh_token', newRefreshToken, {
-        ...COOKIE_BASE,
-        maxAge: 14 * 24 * 60 * 60,
-      });
-    }
 
     return response;
   } catch {

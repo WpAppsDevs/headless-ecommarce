@@ -1,14 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { config } from '@/lib/config';
-
-const IS_PROD = process.env.NODE_ENV === 'production';
-
-const COOKIE_BASE = {
-  httpOnly: true,
-  secure: IS_PROD,
-  sameSite: 'lax' as const,
-  path: '/',
-};
+import { applyAuthCookies } from '@/lib/auth-cookies';
 
 export async function POST(req: NextRequest) {
   try {
@@ -37,23 +29,8 @@ export async function POST(req: NextRequest) {
       { status: 200 },
     );
 
-    response.cookies.set('access_token', access_token, {
-      ...COOKIE_BASE,
-      maxAge: 3600, // 1 hour
-    });
-
-    response.cookies.set('refresh_token', refresh_token, {
-      ...COOKIE_BASE,
-      maxAge: 14 * 24 * 60 * 60, // 14 days
-    });
-
-    // Readable, non-secret hint so the client knows a refresh token may exist.
-    // The refresh token itself stays httpOnly.
-    response.cookies.set('session_hint', '1', {
-      ...COOKIE_BASE,
-      httpOnly: false,
-      maxAge: 14 * 24 * 60 * 60,
-    });
+    // 1-hour access token, 14-day refresh token, plus the readable session hint.
+    applyAuthCookies(response, { accessToken: access_token, refreshToken: refresh_token });
 
     return response;
   } catch {

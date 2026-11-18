@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Check, KeyRound, Loader2, X } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { toast } from 'sonner';
 import { ApiError } from '@/lib/errors';
 import { changePassword } from '@/lib/api/checkout';
@@ -21,49 +24,50 @@ const INPUT_CLASS =
 export function PasswordCard() {
   const copy = useDictionary().account.settings;
   const [open, setOpen] = useState(false);
-  const [current, setCurrent] = useState('');
-  const [next, setNext] = useState('');
-  const [confirm, setConfirm] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const schema = z
+    .object({
+      current: z.string().min(1, copy.passwordRequired),
+      next: z.string().min(8, copy.passwordTooShort),
+      confirm: z.string().min(1, copy.passwordRequired),
+    })
+    .refine((values) => values.next !== values.current, {
+      path: ['next'],
+      message: copy.passwordSame,
+    })
+    .refine((values) => values.next === values.confirm, {
+      path: ['confirm'],
+      message: copy.passwordMismatch,
+    });
+
+  type FormValues = z.infer<typeof schema>;
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { current: '', next: '', confirm: '' },
+  });
 
   const close = () => {
     setOpen(false);
-    setCurrent('');
-    setNext('');
-    setConfirm('');
-    setError(null);
+    reset();
+    setFormError(null);
   };
 
-  const submit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!current || !next || !confirm) {
-      setError(copy.passwordRequired);
-      return;
-    }
-    if (next.length < 8) {
-      setError(copy.passwordTooShort);
-      return;
-    }
-    if (next === current) {
-      setError(copy.passwordSame);
-      return;
-    }
-    if (next !== confirm) {
-      setError(copy.passwordMismatch);
-      return;
-    }
-
-    setSaving(true);
-    setError(null);
+  const onSubmit = async (values: FormValues) => {
+    setFormError(null);
     try {
-      await changePassword({ current_password: current, new_password: next });
+      await changePassword({ current_password: values.current, new_password: values.next });
       toast.success(copy.passwordSaved);
       close();
     } catch (caught) {
       const code = caught instanceof ApiError ? caught.code : '';
-      setError(
+      setFormError(
         code === 'invalid_password'
           ? copy.passwordWrongCurrent
           : code === 'weak_password'
@@ -72,10 +76,10 @@ export function PasswordCard() {
               ? copy.passwordSame
               : copy.saveFailed,
       );
-    } finally {
-      setSaving(false);
     }
   };
+
+  const fieldError = errors.current?.message ?? errors.next?.message ?? errors.confirm?.message;
 
   return (
     <section className="rounded-2xl border border-brand-border bg-white p-5 sm:p-6">
@@ -96,7 +100,6 @@ export function PasswordCard() {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            aria-expanded={false}
             className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-brand-border px-3 text-xs font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong"
           >
             {copy.passwordChange}
@@ -105,48 +108,40 @@ export function PasswordCard() {
       </div>
 
       {open && (
-        <form method="post" onSubmit={submit} className="mt-5 space-y-3">
+        <form method="post" onSubmit={handleSubmit(onSubmit)} className="mt-5 space-y-3" noValidate>
           <div className="grid gap-3 sm:grid-cols-3">
             <label className="space-y-1 text-xs font-medium text-brand-text-muted">
               <span>{copy.currentPassword}</span>
               <input
+                {...register('current')}
                 type="password"
-                value={current}
-                onChange={(event) => setCurrent(event.target.value)}
                 autoComplete="current-password"
-                required
                 className={INPUT_CLASS}
               />
             </label>
             <label className="space-y-1 text-xs font-medium text-brand-text-muted">
               <span>{copy.newPassword}</span>
               <input
+                {...register('next')}
                 type="password"
-                value={next}
-                onChange={(event) => setNext(event.target.value)}
                 autoComplete="new-password"
-                minLength={8}
-                required
                 className={INPUT_CLASS}
               />
             </label>
             <label className="space-y-1 text-xs font-medium text-brand-text-muted">
               <span>{copy.confirmPassword}</span>
               <input
+                {...register('confirm')}
                 type="password"
-                value={confirm}
-                onChange={(event) => setConfirm(event.target.value)}
                 autoComplete="new-password"
-                minLength={8}
-                required
                 className={INPUT_CLASS}
               />
             </label>
           </div>
 
-          {error && (
+          {(fieldError || formError) && (
             <p role="alert" className="text-xs font-medium text-brand-danger">
-              {error}
+              {fieldError ?? formError}
             </p>
           )}
 
@@ -155,15 +150,15 @@ export function PasswordCard() {
           <div className="flex flex-wrap items-center gap-2 pt-1">
             <button
               type="submit"
-              disabled={saving}
+              disabled={isSubmitting}
               className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-brand-accent-strong px-4 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-strong-hover disabled:opacity-60"
             >
-              {saving ? (
+              {isSubmitting ? (
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
               ) : (
                 <Check className="h-4 w-4" strokeWidth={2.4} aria-hidden="true" />
               )}
-              {saving ? copy.passwordSaving : copy.passwordSave}
+              {isSubmitting ? copy.passwordSaving : copy.passwordSave}
             </button>
             <button
               type="button"
