@@ -124,18 +124,8 @@ export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProp
           })}
         </div>
 
-        {/* Sign-out sits apart from the tabs: it leaves the account, the tabs move inside it. */}
-        <div className="mb-4 flex justify-end lg:hidden">
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="flex min-h-11 items-center gap-1.5 rounded-lg border border-brand-border bg-white px-3 text-xs font-medium text-brand-text-muted transition-colors hover:bg-brand-bg hover:text-brand-text"
-          >
-            <LogOut className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" />
-            {copy.logout}
-          </button>
-        </div>
-
+        {/* Sign-out is desktop-only: on a phone the rail is not rendered, and the
+            owner asked for the standalone row to be gone there. */}
         {/* Desktop two-column layout — both columns share the same height */}
         <div className="flex flex-col gap-4 lg:flex-row lg:gap-6">
           {/* Full-height rail: identity on top, menu in the middle, sign-out at the bottom */}
