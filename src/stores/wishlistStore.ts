@@ -50,7 +50,11 @@ interface WishlistState {
 
 interface WishlistActions {
   /** Toggle wishlist state for a product with optimistic update. */
-  toggle: (productId: number, productName?: string) => Promise<void>;
+  toggle: (
+    productId: number,
+    productName?: string,
+    options?: { silent?: boolean },
+  ) => Promise<void>;
   /** Remove a product from the wishlist with optimistic update. */
   remove: (productId: number) => Promise<void>;
   /** Returns true if the product is currently in the wishlist. */
@@ -86,8 +90,11 @@ export const useWishlistStore = create<WishlistState & WishlistActions>((set, ge
   isPending: (productId) => get().pendingIds.has(productId),
 
   // ── toggle ─────────────────────────────────────────────────────────────────
-  toggle: async (productId, productName) => {
+  toggle: async (productId, productName, options) => {
     if (get().pendingIds.has(productId)) return;
+    // An undo restores a row on a screen that already says what happened, so
+    // it passes `silent` and skips the "added to wishlist" toast.
+    const silent = options?.silent === true;
 
     const prevIds = get().ids;
     const wasWishlisted = prevIds.includes(productId);
@@ -112,13 +119,15 @@ export const useWishlistStore = create<WishlistState & WishlistActions>((set, ge
         next.delete(productId);
         return { pendingIds: next };
       });
-      toast.success(
-        wasWishlisted
-          ? 'Removed from wishlist'
-          : productName
-          ? `"${productName}" saved to wishlist`
-          : 'Added to wishlist',
-      );
+      if (!silent) {
+        toast.success(
+          wasWishlisted
+            ? 'Removed from wishlist'
+            : productName
+            ? `"${productName}" saved to wishlist`
+            : 'Added to wishlist',
+        );
+      }
       return;
     }
 
@@ -130,13 +139,15 @@ export const useWishlistStore = create<WishlistState & WishlistActions>((set, ge
         ? [...get().ids.filter((id) => id !== productId), productId]
         : get().ids.filter((id) => id !== productId);
       set({ ids: reconciledIds, count: result.count });
-      toast.success(
-        result.in_wishlist
-          ? productName
-            ? `"${productName}" saved to wishlist`
-            : 'Added to wishlist'
-          : 'Removed from wishlist',
-      );
+      if (!silent) {
+        toast.success(
+          result.in_wishlist
+            ? productName
+              ? `"${productName}" saved to wishlist`
+              : 'Added to wishlist'
+            : 'Removed from wishlist',
+        );
+      }
     } catch (e) {
       // Revert
       set({ ids: prevIds, count: prevIds.length });

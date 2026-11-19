@@ -129,9 +129,11 @@ export function Dashboard({ profile, orders }: DashboardProps) {
               </p>
               <p className="mt-1 text-xs text-brand-text-muted">
                 {fmtDate(focusOrder.date_created)} ·{' '}
-                {interpolate(copy.dashboard.itemsCount, {
-                  count: String(focusOrder.line_items.length),
-                })}{' '}
+                {focusOrder.line_items.length === 1
+                  ? copy.dashboard.itemSingle
+                  : interpolate(copy.dashboard.itemsCount, {
+                      count: String(focusOrder.line_items.length),
+                    })}{' '}
                 · <span className="font-semibold text-brand-text">{fmt(focusOrder.total)}</span>
               </p>
             </div>

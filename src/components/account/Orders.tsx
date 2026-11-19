@@ -1,139 +1,220 @@
 'use client';
 
-import { useState } from 'react';
-import { ChevronLeft, ChevronRight, PackageSearch } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { ChevronDown, Loader2, PackageSearch, RotateCw } from 'lucide-react';
+import { getOrders } from '@/lib/api/orders';
 import type { Order, OrdersMeta } from '@/lib/api/orders';
+import { ApiError } from '@/lib/errors';
 import { useDictionary } from '@/i18n/LocaleProvider';
-import { filterCheckoutDrafts } from '@/lib/order-utils';
+import { interpolate } from '@/i18n/interpolate';
+import { ORDER_FILTERS, statusForFilter } from '@/lib/order-filters';
+import type { OrderFilterId } from '@/lib/order-filters';
 import { OrderCard } from './OrderCard';
 import { OrderDetailsModal } from './OrderDetailsModal';
+import { Skeleton } from '@/components/ui/skeleton';
 
-interface OrdersProps {
-  orders: Order[];
-  meta: OrdersMeta;
+/** One page of the history. Small enough that "Load more" appears where it is useful. */
+const PER_PAGE = 8;
+
+function OrdersSkeleton() {
+  return (
+    <div className="space-y-3" aria-hidden="true">
+      {[0, 1, 2].map((i) => (
+        <div key={i} className="rounded-xl border border-brand-border bg-white p-4">
+          <div className="flex gap-3">
+            <Skeleton className="h-14 w-11 shrink-0 rounded-lg" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-3.5 w-32" />
+              <Skeleton className="h-3 w-48" />
+              <Skeleton className="h-3 w-40" />
+            </div>
+          </div>
+          <Skeleton className="mt-4 h-6 w-full" />
+        </div>
+      ))}
+    </div>
+  );
 }
 
-type OrderFilter = 'all' | 'pending' | 'delivery' | 'completed' | 'cancelled';
-
-const FILTERS: OrderFilter[] = ['all', 'pending', 'delivery', 'completed', 'cancelled'];
-
-const PER_PAGE = 5;
-
-export function Orders({ orders }: OrdersProps) {
-  const dict = useDictionary().account;
-  const copy = dict.orders;
-  const FILTER_LABELS = {
-    all: copy.filterAll,
-    pending: copy.filterPending,
-    delivery: copy.filterDelivery,
-    completed: copy.filterCompleted,
-    cancelled: copy.filterCancelled,
-  };
-  const [activeFilter, setActiveFilter] = useState<OrderFilter>('all');
+/**
+ * One filter's history. It is mounted with `key={filter}`, so switching tabs
+ * starts from a clean slate instead of resetting state inside an effect, and
+ * only the rows of the tab in front of the customer are ever requested.
+ */
+function OrdersList({ filter }: { filter: OrderFilterId }) {
+  const router = useRouter();
+  const copy = useDictionary().account.orders;
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [meta, setMeta] = useState<OrdersMeta | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [page, setPage] = useState(1);
 
-  const visibleOrders = filterCheckoutDrafts(orders);
+  useEffect(() => {
+    let cancelled = false;
 
-  const filtered =
-    activeFilter === 'all'
-      ? visibleOrders
-      : visibleOrders.filter((order) => order.status === activeFilter);
+    getOrders(1, PER_PAGE, statusForFilter(filter))
+      .then((result) => {
+        if (cancelled) return;
+        setOrders(result.orders);
+        setMeta(result.meta);
+        setFailed(false);
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        // An expired session belongs to the account page, which owns the
+        // logout redirect; here any other failure is "the list did not load".
+        if (error instanceof ApiError && error.code === 'session_expired') {
+          router.replace('/login');
+          return;
+        }
+        // A store that does not register this status has no orders in it, which
+        // is an empty tab, not a broken one.
+        if (error instanceof ApiError && error.code === 'invalid_status') {
+          setOrders([]);
+          setMeta(null);
+          return;
+        }
+        setFailed(true);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
-  const currentPage = Math.min(page, totalPages);
-  const paged = filtered.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
+    return () => {
+      cancelled = true;
+    };
+  }, [filter, attempt, router]);
 
-  const handleFilter = (filter: OrderFilter) => {
-    setActiveFilter(filter);
-    setPage(1);
+  const loadMore = useCallback(async () => {
+    if (!meta || loadingMore || loading) return;
+    setLoadingMore(true);
+    setFailed(false);
+    try {
+      const next = await getOrders(meta.page + 1, PER_PAGE, statusForFilter(filter));
+      setOrders((current) => [...current, ...next.orders]);
+      setMeta(next.meta);
+    } catch {
+      setFailed(true);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [filter, loading, loadingMore, meta]);
+
+  const retry = () => {
+    setLoading(true);
+    setFailed(false);
+    setAttempt((value) => value + 1);
   };
+
+  const hasMore = meta ? meta.page < meta.total_pages : false;
 
   return (
-    <>
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold tracking-tight text-brand-text">{copy.title}</h2>
+    <div className="space-y-4">
+      {meta && meta.total > 0 && (
+        <p className="text-xs text-brand-text-muted">
+          {interpolate(copy.showingCount, {
+            shown: String(orders.length),
+            total: String(meta.total),
+          })}
+        </p>
+      )}
 
-        {/* Filter tabs */}
-        <div className="flex gap-5 overflow-x-auto border-b border-brand-border">
-          {FILTERS.map((id) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => handleFilter(id)}
-              aria-pressed={activeFilter === id}
-              className={`-mb-px min-h-10 whitespace-nowrap border-b-2 pb-2 text-sm font-medium transition-colors ${
-                activeFilter === id
-                  ? 'border-brand-accent-strong text-brand-accent-strong'
-                  : 'border-transparent text-brand-text-muted hover:text-brand-text'
-              }`}
-            >
-              {FILTER_LABELS[id]}
-            </button>
+      {loading && <OrdersSkeleton />}
+
+      {!loading && failed && orders.length === 0 && (
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-brand-border bg-white px-6 py-12 text-center">
+          <p className="text-sm text-brand-text-muted">{copy.loadFailed}</p>
+          <button
+            type="button"
+            onClick={retry}
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-brand-border px-4 text-sm font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong"
+          >
+            <RotateCw className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
+            {copy.retry}
+          </button>
+        </div>
+      )}
+
+      {!loading && orders.length === 0 && !failed && (
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-brand-border bg-white px-6 py-14 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-bg">
+            <PackageSearch className="h-5 w-5 text-brand-accent-strong" strokeWidth={1.5} aria-hidden="true" />
+          </span>
+          <p className="text-sm text-brand-text-muted">{copy.noOrders}</p>
+        </div>
+      )}
+
+      {!loading && orders.length > 0 && (
+        <div className="space-y-3">
+          {orders.map((order) => (
+            <OrderCard key={order.id} order={order} onViewDetails={() => setSelectedOrder(order)} />
           ))}
         </div>
+      )}
 
-        {/* Orders list */}
-        <div className="space-y-3">
-          {paged.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 rounded-2xl border border-brand-border bg-white px-6 py-14 text-center">
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-bg">
-                <PackageSearch className="h-5 w-5 text-brand-accent-strong" strokeWidth={1.5} aria-hidden="true" />
-              </span>
-              <p className="text-sm text-brand-text-muted">{copy.noOrders}</p>
-            </div>
-          ) : (
-            paged.map((order) => (
-              <OrderCard key={order.id} order={order} onViewDetails={() => setSelectedOrder(order)} />
-            ))
-          )}
+      {!loading && hasMore && (
+        <div className="flex flex-col items-center gap-2 pt-1">
+          {failed && <p className="text-xs text-brand-danger">{copy.loadFailed}</p>}
+          <button
+            type="button"
+            onClick={() => void loadMore()}
+            disabled={loadingMore}
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-brand-border bg-white px-5 text-sm font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong disabled:opacity-60"
+          >
+            {loadingMore ? (
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            ) : (
+              <ChevronDown className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+            )}
+            {loadingMore ? copy.loadingMore : copy.loadMore}
+          </button>
         </div>
-
-        {/* Numbered pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => setPage((current) => Math.max(1, current - 1))}
-              disabled={currentPage === 1}
-              className="flex h-11 w-11 items-center justify-center rounded-lg border border-brand-border text-brand-text-muted transition hover:bg-white disabled:opacity-40"
-              aria-label={dict.pagination.previousPage}
-            >
-              <ChevronLeft className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-            </button>
-
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
-              <button
-                key={n}
-                type="button"
-                onClick={() => setPage(n)}
-                aria-current={currentPage === n ? 'page' : undefined}
-                className={`flex h-11 w-11 items-center justify-center rounded-lg border text-sm font-medium transition ${
-                  currentPage === n
-                    ? 'border-brand-accent-strong bg-brand-accent-strong text-white'
-                    : 'border-brand-border bg-white text-brand-text hover:border-brand-accent-strong'
-                }`}
-              >
-                {n}
-              </button>
-            ))}
-
-            <button
-              type="button"
-              onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
-              disabled={currentPage === totalPages}
-              className="flex h-11 w-11 items-center justify-center rounded-lg border border-brand-border text-brand-text-muted transition hover:bg-white disabled:opacity-40"
-              aria-label={dict.pagination.nextPage}
-            >
-              <ChevronRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-            </button>
-          </div>
-        )}
-      </div>
+      )}
 
       {selectedOrder && (
         <OrderDetailsModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
       )}
-    </>
+    </div>
+  );
+}
+
+export function Orders() {
+  const copy = useDictionary().account.orders;
+  const [activeFilter, setActiveFilter] = useState<OrderFilterId>('all');
+
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold tracking-tight text-brand-text">{copy.title}</h2>
+
+      {/* Filter pills — each one is a server-side status, so the count is real.
+          Pills wrap instead of scrolling: at 390px six underlined tabs hid two
+          filters past the right edge with nothing on screen saying so. */}
+      <div role="group" aria-label={copy.filterLabel} className="flex flex-wrap gap-2">
+        {ORDER_FILTERS.map((filter) => {
+          const active = activeFilter === filter.id;
+          return (
+            <button
+              key={filter.id}
+              type="button"
+              onClick={() => setActiveFilter(filter.id)}
+              aria-pressed={active}
+              className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-lg border px-3.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent-strong ${
+                active
+                  ? 'border-brand-accent-strong bg-brand-accent-strong text-white'
+                  : 'border-brand-border bg-white text-brand-text-muted hover:border-brand-accent-strong hover:text-brand-text'
+              }`}
+            >
+              {copy[filter.labelKey]}
+            </button>
+          );
+        })}
+      </div>
+
+      <OrdersList key={activeFilter} filter={activeFilter} />
+    </div>
   );
 }

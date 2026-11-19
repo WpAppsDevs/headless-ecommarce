@@ -88,15 +88,25 @@ export interface OrdersResult {
  * GET /wp-json/api/orders — paginated order history.
  * Uses raw fetch (not apiClient) to preserve the `meta` pagination field.
  * Throws ApiError on 401 so the caller can redirect to /login.
+ *
+ * `status` is one WooCommerce status (`pending`, `processing`, `delivery`,
+ * `completed`, `cancelled`, …). WordPress filters server-side, so the counts
+ * and pages stay honest past the first page; omit it for every order.
  */
-export async function getOrders(page = 1, perPage = 10): Promise<OrdersResult> {
+export async function getOrders(
+  page = 1,
+  perPage = 10,
+  status?: string,
+): Promise<OrdersResult> {
   const token = tokenCache.get();
   const isClient = typeof window !== 'undefined';
+  const query = new URLSearchParams({ page: String(page), per_page: String(perPage) });
+  if (status) query.set('status', status);
 
   // Browser: proxy through /api/account/orders to avoid CORS with external API
   const url = isClient
-    ? `/api/account/orders?page=${page}&per_page=${perPage}`
-    : `${config.apiBase}/${config.apiNs}/orders?page=${page}&per_page=${perPage}`;
+    ? `/api/account/orders?${query.toString()}`
+    : `${config.apiBase}/${config.apiNs}/orders?${query.toString()}`;
 
   const res = await fetch(url, {
     headers: {

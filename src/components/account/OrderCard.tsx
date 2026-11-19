@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Eye, PenLine } from 'lucide-react';
+import { ChevronRight, PenLine } from 'lucide-react';
 import type { Order } from '@/lib/api/orders';
 import { useReviewStore } from '@/stores/reviewStore';
 import { ReviewModal } from '@/components/review-modal/ReviewModal';
@@ -12,6 +12,7 @@ import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
 import { intlLocale } from '@/i18n/locales';
 import { useFormatPrice } from '@/lib/utils/currency';
 import { interpolate } from '@/i18n/interpolate';
+import { OrderProgress } from './OrderProgress';
 
 interface OrderCardProps {
   order: Order;
@@ -59,62 +60,78 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
   const hasReviewableItems = eligibleItems.length > 0;
   const thumbs = order.line_items.slice(0, 3);
   const extraItems = order.line_items.length - thumbs.length;
+  const firstItem = order.line_items[0];
+  const itemCount =
+    order.line_items.length === 1
+      ? dict.dashboard.itemSingle
+      : interpolate(dict.dashboard.itemsCount, { count: String(order.line_items.length) });
 
   return (
-    <article className="rounded-xl border border-brand-border bg-white p-4">
-      <div className="flex flex-wrap items-start gap-3">
-        <div className="flex shrink-0 items-center">
+    <article className="rounded-xl border border-brand-border bg-white p-4 sm:p-5">
+      <div className="flex items-start gap-3">
+        <div className="flex shrink-0 items-center" aria-hidden="true">
           {thumbs.map((item, index) => (
             <span
               key={item.id}
-              className="relative h-12 w-10 overflow-hidden rounded-md border border-brand-border bg-brand-card"
+              className="relative h-14 w-11 overflow-hidden rounded-lg border border-brand-border bg-brand-card"
               style={{ marginLeft: index === 0 ? 0 : -10 }}
             >
               {item.image ? (
-                <Image src={item.image} alt="" width={40} height={48} className="h-full w-full object-cover" />
+                <Image src={item.image} alt="" width={44} height={56} className="h-full w-full object-cover" />
               ) : null}
             </span>
           ))}
-          {extraItems > 0 && (
-            <span className="ml-1.5 text-[11px] font-semibold text-brand-text-muted">
-              {interpolate(dict.dashboard.moreItems, { count: String(extraItems) })}
-            </span>
-          )}
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-semibold text-brand-text">
-            {interpolate(copy.orderId, { id: String(order.id) })}
-          </p>
-          <p className="mt-0.5 text-[11px] text-brand-text-muted">
-            {fmtDate(order.date_created, locale)}
-            {' · '}
-            {interpolate(dict.dashboard.itemsCount, { count: String(order.line_items.length) })}
-            {order.payment_method_title ? ` · ${order.payment_method_title}` : ''}
-          </p>
-          {(name || city) && (
-            <p className="mt-0.5 truncate text-[11px] text-brand-text-muted">
-              {[name, city].filter(Boolean).join(' · ')}
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+            <p className="text-[13px] font-semibold text-brand-text">
+              {interpolate(copy.orderId, { id: String(order.id) })}
+              <span className="ml-2 font-normal text-brand-text-muted">
+                {fmtDate(order.date_created, locale)}
+              </span>
             </p>
-          )}
-        </div>
+            <p className="text-sm font-semibold text-brand-text">
+              {fmt(order.total)}
+              {isPaid && <span className="ml-1 text-[10px] font-semibold text-brand-stock">{copy.paid}</span>}
+            </p>
+          </div>
 
-        <div className="flex shrink-0 flex-col items-end gap-1">
-          <p className="text-[13px] font-semibold text-brand-text">
-            {fmt(order.total)}
-            {isPaid && (
-              <span className="ml-1 text-[10px] font-semibold text-brand-stock">{copy.paid}</span>
+          {/* What was bought — the question the row exists to answer */}
+          <p className="mt-1 truncate text-xs text-brand-text">
+            {firstItem?.name ?? copy.noOrders}
+            {extraItems > 0 && (
+              <span className="text-brand-text-muted">
+                {' '}
+                {interpolate(dict.dashboard.moreItems, { count: String(extraItems) })}
+              </span>
             )}
           </p>
-          <span
-            className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${sc.badge}`}
-          >
-            {dict.statuses[sc.key]}
-          </span>
+
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-brand-text-muted">
+            <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${sc.badge}`}>
+              {dict.statuses[sc.key]}
+            </span>
+            <span>{itemCount}</span>
+            {order.payment_method_title && (
+              <>
+                <span aria-hidden="true">·</span>
+                <span>{order.payment_method_title}</span>
+              </>
+            )}
+            {(name || city) && (
+              <>
+                <span aria-hidden="true" className="hidden sm:inline">·</span>
+                <span className="hidden truncate sm:inline">{[name, city].filter(Boolean).join(' · ')}</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center justify-end gap-2 border-t border-brand-border pt-3">
+      <OrderProgress status={order.status} />
+
+      <div className="mt-4 flex flex-wrap items-center justify-end gap-2 border-t border-brand-border pt-3">
         {hasReviewableItems && (
           <button
             type="button"
@@ -130,8 +147,8 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
           onClick={onViewDetails}
           className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-brand-accent-strong px-3.5 text-xs font-semibold text-white transition hover:bg-brand-accent-strong-hover"
         >
-          <Eye className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
           {copy.viewDetails}
+          <ChevronRight className="h-3.5 w-3.5" strokeWidth={2.2} aria-hidden="true" />
         </button>
       </div>
 

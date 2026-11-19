@@ -43,7 +43,7 @@ function AccountSkeleton() {
           </div>
         </div>
         <div className="min-w-0 flex-1">
-          <div className="h-full space-y-4 rounded-2xl bg-brand-accent-light p-3 sm:p-4 lg:p-5">
+          <div className="h-full space-y-4">
             <Skeleton className="h-20 w-full rounded-2xl" />
             <Skeleton className="h-36 w-full rounded-2xl" />
             <div className="grid gap-3 sm:grid-cols-3">
@@ -133,7 +133,6 @@ export default function AccountPage() {
     <AccountLayout
       profile={profile}
       orders={ordersResult?.orders ?? []}
-      ordersMeta={ordersResult?.meta ?? { page: 1, per_page: ORDERS_PER_PAGE, total: 0, total_pages: 0 }}
     />
   );
 }
