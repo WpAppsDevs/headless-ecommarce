@@ -1,105 +1,50 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Heart, Loader2, Trash2, ShoppingBag } from 'lucide-react';
+import { Heart, RotateCw } from 'lucide-react';
+import { toast } from 'sonner';
 import { useWishlistStore } from '@/stores/wishlistStore';
 import { apiGetWishlist } from '@/lib/api/wishlist';
-import { ApiError } from '@/lib/errors';
 import type { Product } from '@/lib/api/products';
-import { useFormatPrice } from '@/lib/utils/currency';
-import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
-import { taxonomyLabel } from '@/i18n/taxonomy';
+import { useDictionary } from '@/i18n/LocaleProvider';
 import { interpolate } from '@/i18n/interpolate';
+import { WishlistCard } from './WishlistCard';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const PLACEHOLDER =
-  'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22%3E%3Crect width=%22400%22 height=%22500%22 fill=%22%23FBF7F5%22/%3E%3C/svg%3E';
-
-// ---------------------------------------------------------------------------
-// Wishlist product card
-// ---------------------------------------------------------------------------
-
-function WishlistProductCard({ product, onRemove }: { product: Product; onRemove: () => void }) {
-  const image = product.images[0];
-  const price = product.sale_price || product.price;
-  const fmt = useFormatPrice();
-  const copy = useDictionary().account.wishlist;
-  const locale = useLocale();
-
+function WishlistSkeleton() {
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-brand-border bg-white shadow-sm transition-shadow hover:shadow-md">
-      <Link
-        href={`/products/${product.slug}`}
-        className="relative block aspect-[3/4] overflow-hidden bg-brand-card"
-        aria-label={interpolate(copy.viewAria, { name: product.name })}
-        tabIndex={-1}
-      >
-        <Image
-          src={image?.src || PLACEHOLDER}
-          alt={image?.alt || product.name}
-          fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-      </Link>
-
-      <button
-        type="button"
-        onClick={onRemove}
-        aria-label={interpolate(copy.removeAria, { name: product.name })}
-        className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md text-brand-text-muted transition-colors hover:text-brand-danger"
-      >
-        <Trash2 className="h-4 w-4" />
-      </button>
-
-      <div className="flex flex-1 flex-col gap-2 p-3 sm:p-4">
-        <Link href={`/products/${product.slug}`}>
-          <h3 className="line-clamp-1 text-sm font-bold text-brand-text transition-colors hover:text-brand-accent-strong sm:text-base">
-            {product.name}
-          </h3>
-        </Link>
-
-        {product.categories[0] && (
-          <p className="text-xs text-brand-text-muted">
-            {taxonomyLabel(locale, product.categories[0].slug, product.categories[0].name)}
-          </p>
-        )}
-
-        <div className="mt-auto flex items-center justify-between pt-2">
-          <span className="text-base font-bold text-brand-accent-strong">{fmt(price)}</span>
-          <Link
-            href={`/products/${product.slug}`}
-            className="flex items-center gap-1.5 rounded-lg bg-brand-accent-strong px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-brand-accent-strong-hover"
-          >
-            <ShoppingBag className="h-3.5 w-3.5" />
-            {product.type === 'variable' ? copy.options : copy.buy}
-          </Link>
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3" aria-hidden="true">
+      {[0, 1, 2].map((i) => (
+        <div key={i} className="overflow-hidden rounded-xl border border-brand-border bg-white">
+          <Skeleton className="aspect-[3/4] w-full rounded-none" />
+          <div className="space-y-2 p-3 sm:p-4">
+            <Skeleton className="h-4 w-4/5" />
+            <Skeleton className="h-3 w-1/3" />
+            <Skeleton className="mt-2 h-5 w-1/2" />
+            <Skeleton className="mt-2 h-10 w-full rounded-lg" />
+          </div>
         </div>
-      </div>
-    </article>
+      ))}
+    </div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Empty state
-// ---------------------------------------------------------------------------
 
 function EmptyWishlist() {
   const copy = useDictionary().account.wishlist;
 
   return (
-    <div className="flex flex-col items-center justify-center gap-6 py-24 text-center">
-      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-card">
-        <Heart className="h-9 w-9 text-brand-text-muted/70" />
+    <div className="flex flex-col items-center justify-center gap-5 rounded-xl border border-brand-border bg-white px-6 py-16 text-center">
+      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-accent-light">
+        <Heart className="h-7 w-7 text-brand-accent-strong" strokeWidth={1.6} aria-hidden="true" />
       </div>
-      <div className="space-y-2">
-        <h2 className="text-xl font-semibold text-brand-text">{copy.emptyTitle}</h2>
-        <p className="text-sm text-brand-text-muted">{copy.emptyBody}</p>
+      <div className="space-y-1.5">
+        <h2 className="text-lg font-semibold text-brand-text">{copy.emptyTitle}</h2>
+        <p className="max-w-sm text-sm text-brand-text-muted">{copy.emptyBody}</p>
       </div>
       <Link
         href="/products"
-        className="rounded-xl bg-brand-accent-strong px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-strong-hover"
+        className="inline-flex min-h-11 items-center rounded-lg bg-brand-accent-strong px-5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-strong-hover"
       >
         {copy.browseProducts}
       </Link>
@@ -107,42 +52,81 @@ function EmptyWishlist() {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Wishlist tab (used inside AccountLayout — user is always authenticated here)
-// ---------------------------------------------------------------------------
-
 export function WishlistTab() {
   const copy = useDictionary().account.wishlist;
-  const { remove } = useWishlistStore();
+  const remove = useWishlistStore((s) => s.remove);
+  const toggle = useWishlistStore((s) => s.toggle);
   const [products, setProducts] = useState<Product[]>([]);
   const [ready, setReady] = useState(false);
   // A flag, not the sentence, so a language switch fixes a visible message
   // without refetching the wishlist.
   const [failed, setFailed] = useState(false);
+  const [reloadToken, setReloadToken] = useState(0);
 
   useEffect(() => {
-    async function load() {
-      try {
-        const { products: items } = await apiGetWishlist(1, 100);
+    let cancelled = false;
+
+    apiGetWishlist(1, 100)
+      .then(({ products: items }) => {
+        if (cancelled) return;
         setProducts(items);
         setFailed(false);
-      } catch (e) {
-        if (e instanceof ApiError) {
-          setFailed(true);
-        } else {
-          setFailed(true);
-        }
-      } finally {
-        setReady(true);
-      }
-    }
-    void load();
-  }, []);
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      })
+      .finally(() => {
+        if (!cancelled) setReady(true);
+      });
 
-  async function handleRemove(productId: number) {
-    await remove(productId);
-    setProducts((prev) => prev.filter((p) => p.id !== productId));
-  }
+    return () => {
+      cancelled = true;
+    };
+  }, [reloadToken]);
+
+  /**
+   * Removal is optimistic and undoable. The card leaves the grid at once; if
+   * the server refuses, the store restores it and the toast never appears, so
+   * an "Undo" is only ever offered for a removal that happened.
+   */
+  const handleRemove = useCallback(
+    async (product: Product) => {
+      const index = products.findIndex((item) => item.id === product.id);
+      setProducts((prev) => prev.filter((item) => item.id !== product.id));
+
+      await remove(product.id);
+
+      if (useWishlistStore.getState().ids.includes(product.id)) {
+        setProducts((prev) => {
+          if (prev.some((item) => item.id === product.id)) return prev;
+          const next = [...prev];
+          next.splice(Math.max(0, Math.min(index, next.length)), 0, product);
+          return next;
+        });
+        return;
+      }
+
+      toast(copy.removed, {
+        duration: 6000,
+        action: {
+          label: copy.undo,
+          onClick: () => {
+            void (async () => {
+              await toggle(product.id, product.name, { silent: true });
+              if (!useWishlistStore.getState().ids.includes(product.id)) return;
+              setProducts((prev) => {
+                if (prev.some((item) => item.id === product.id)) return prev;
+                const next = [...prev];
+                next.splice(Math.max(0, Math.min(index, next.length)), 0, product);
+                return next;
+              });
+            })();
+          },
+        },
+      });
+    },
+    [copy.removed, copy.undo, products, remove, toggle],
+  );
 
   const heading =
     ready && products.length > 0
@@ -150,28 +134,43 @@ export function WishlistTab() {
       : copy.heading;
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-brand-text">{heading}</h2>
+    <div className="space-y-4">
+      <div className="space-y-1">
+        <h2 className="text-xl font-semibold tracking-tight text-brand-text">{heading}</h2>
+        {ready && products.length > 0 && (
+          <p className="text-xs text-brand-text-muted">{copy.subtitle}</p>
+        )}
+      </div>
 
-      {!ready && (
-        <div className="flex min-h-[40vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-brand-text-muted" />
-        </div>
-      )}
+      {!ready && <WishlistSkeleton />}
 
       {ready && failed && (
-        <p className="text-center text-sm text-red-600">{copy.failed}</p>
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-brand-border bg-white px-6 py-12 text-center">
+          <p className="text-sm text-brand-text-muted">{copy.failed}</p>
+          <button
+            type="button"
+            onClick={() => {
+              setReady(false);
+              setFailed(false);
+              setReloadToken((token) => token + 1);
+            }}
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-brand-border px-4 text-sm font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong"
+          >
+            <RotateCw className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
+            {copy.retry}
+          </button>
+        </div>
       )}
 
       {ready && !failed && products.length === 0 && <EmptyWishlist />}
 
       {ready && !failed && products.length > 0 && (
-        <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
           {products.map((product) => (
-            <WishlistProductCard
+            <WishlistCard
               key={product.id}
               product={product}
-              onRemove={() => void handleRemove(product.id)}
+              onRemove={() => void handleRemove(product)}
             />
           ))}
         </div>

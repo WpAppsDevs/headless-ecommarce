@@ -22,7 +22,7 @@ export function OrderProgress({ status }: { status: string }) {
           <li
             key={step}
             aria-current={current ? 'step' : undefined}
-            className={`relative flex flex-1 flex-col items-center text-center text-[10px] leading-tight ${
+            className={`relative flex flex-1 flex-col items-center text-center text-[11px] leading-tight ${
               done || current ? 'text-brand-text' : 'text-brand-text-muted'
             } ${current ? 'font-semibold' : ''}`}
           >

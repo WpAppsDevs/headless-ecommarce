@@ -16,9 +16,14 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const page = searchParams.get('page') ?? '1';
     const per_page = searchParams.get('per_page') ?? '10';
+    // WordPress filters by one status per request and rejects an unknown one.
+    // Forward it only when the caller asks, so the unfiltered list stays the default.
+    const status = searchParams.get('status');
+    const query = new URLSearchParams({ page, per_page });
+    if (status) query.set('status', status);
 
     const wpRes = await fetch(
-      `${config.apiBase}/${config.apiNs}/orders?page=${page}&per_page=${per_page}`,
+      `${config.apiBase}/${config.apiNs}/orders?${query.toString()}`,
       {
         headers: {
           'Content-Type': 'application/json',

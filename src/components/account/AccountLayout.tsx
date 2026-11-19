@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { useWishlistStore } from '@/stores/wishlistStore';
 import type { UserProfile } from '@/lib/api/checkout';
-import type { Order, OrdersMeta } from '@/lib/api/orders';
+import type { Order } from '@/lib/api/orders';
 import { Dashboard } from './Dashboard';
 import { Orders } from './Orders';
 import { SettingsTab } from './Settings';
@@ -19,7 +19,6 @@ type Tab = 'dashboard' | 'orders' | 'settings' | 'wishlist';
 interface AccountLayoutProps {
   profile: UserProfile | null;
   orders: Order[];
-  ordersMeta: OrdersMeta;
 }
 
 const MENU_ITEMS = [
@@ -29,7 +28,7 @@ const MENU_ITEMS = [
   { id: 'settings' as Tab, icon: Settings },
 ];
 
-export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProps) {
+export function AccountLayout({ profile, orders }: AccountLayoutProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const wishlistCount = useWishlistStore((s) => s.count);
@@ -188,14 +187,14 @@ export function AccountLayout({ profile, orders, ordersMeta }: AccountLayoutProp
             </div>
           </aside>
 
-          {/* Content — a div, not a second <main>: the root layout owns the landmark. */}
+          {/* Content — a div, not a second <main>: the root layout owns the landmark.
+              It sits on the page background: the cards carry their own white
+              surface and hairline, so a tinted slab only added an empty block. */}
           <div className="min-w-0 flex-1">
-            <div className="h-full rounded-2xl bg-brand-accent-light p-3 sm:p-4 lg:p-5">
-              {activeTab === 'dashboard' && <Dashboard profile={profile} orders={orders} />}
-              {activeTab === 'orders' && <Orders orders={orders} meta={ordersMeta} />}
-              {activeTab === 'wishlist' && <WishlistTab />}
-              {activeTab === 'settings' && <SettingsTab profile={profile} />}
-            </div>
+            {activeTab === 'dashboard' && <Dashboard profile={profile} orders={orders} />}
+            {activeTab === 'orders' && <Orders />}
+            {activeTab === 'wishlist' && <WishlistTab />}
+            {activeTab === 'settings' && <SettingsTab profile={profile} />}
           </div>
         </div>
       </div>
