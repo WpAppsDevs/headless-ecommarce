@@ -8,17 +8,16 @@ import { useWishlistStore } from '@/stores/wishlistStore';
 import { apiGetWishlist } from '@/lib/api/wishlist';
 import type { Product } from '@/lib/api/products';
 import { useDictionary } from '@/i18n/LocaleProvider';
-import { interpolate } from '@/i18n/interpolate';
 import { WishlistCard } from './WishlistCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AccountHeading } from './AccountHeading';
 
 function WishlistSkeleton() {
   return (
-    <div className="space-y-2.5" aria-hidden="true">
-      {[0, 1, 2].map((i) => (
-        <div key={i} className="flex items-center gap-3 rounded-2xl border border-brand-border bg-white p-3 sm:gap-4 sm:p-3.5">
-          <Skeleton className="h-[96px] w-[76px] shrink-0 rounded-xl sm:h-[116px] sm:w-[92px]" />
+    <div className="grid gap-2.5 sm:grid-cols-2" aria-hidden="true">
+      {[0, 1, 2, 3].map((i) => (
+        <div key={i} className="flex items-center gap-3 rounded-2xl border border-brand-border bg-white p-3">
+          <Skeleton className="h-[92px] w-[72px] shrink-0 rounded-xl" />
           <div className="flex-1 space-y-2">
             <Skeleton className="h-3 w-24" />
             <Skeleton className="h-4 w-3/5" />
@@ -129,14 +128,9 @@ export function WishlistTab() {
     [copy.removed, copy.undo, products, remove, toggle],
   );
 
-  const heading =
-    ready && products.length > 0
-      ? interpolate(copy.headingCount, { count: products.length })
-      : copy.heading;
-
   return (
     <div className="space-y-4">
-      <AccountHeading title={heading} description={copy.subtitle} />
+      <AccountHeading title={copy.heading} description={copy.subtitle} />
 
       {!ready && <WishlistSkeleton />}
 
@@ -161,7 +155,7 @@ export function WishlistTab() {
       {ready && !failed && products.length === 0 && <EmptyWishlist />}
 
       {ready && !failed && products.length > 0 && (
-        <div className="space-y-2.5">
+        <div className="grid gap-2.5 sm:grid-cols-2">
           {products.map((product) => (
             <WishlistCard
               key={product.id}

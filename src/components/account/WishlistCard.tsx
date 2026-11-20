@@ -22,11 +22,12 @@ interface WishlistCardProps {
 }
 
 /**
- * One saved product as a row, not a tile.
+ * One saved product, sized for a two-column grid.
  *
- * A row gives the name its full width and puts the price and the cart action
- * where the eye already is, which a four-across grid could not: every name was
- * truncated to the same handful of letters and the only action was "Buy".
+ * The card stays a row — image left, words right — because that is what keeps
+ * the name readable and the height low. The thumbnail is small on purpose: a
+ * wishlist is a shortlist to scan, not a catalogue to browse, so the name and
+ * the price carry the card and the picture only identifies it.
  */
 export function WishlistCard({ product, onRemove }: WishlistCardProps) {
   const image = product.images[0];
@@ -58,7 +59,7 @@ export function WishlistCard({ product, onRemove }: WishlistCardProps) {
     product.type === 'variable' ? (
       <Link
         href={href}
-        className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-brand-accent-strong/40 px-3 text-[11px] font-semibold text-brand-accent-strong transition-colors hover:bg-brand-accent-light"
+        className="inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-brand-accent-strong/40 px-2.5 text-[11px] font-semibold text-brand-accent-strong transition-colors hover:bg-brand-accent-light"
       >
         <ShoppingBag className="h-3.5 w-3.5" strokeWidth={1.8} aria-hidden="true" />
         {copy.options}
@@ -68,7 +69,7 @@ export function WishlistCard({ product, onRemove }: WishlistCardProps) {
         type="button"
         onClick={() => void handleAdd()}
         disabled={adding}
-        className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-brand-accent-strong px-3 text-[11px] font-semibold text-white transition-colors hover:bg-brand-accent-strong-hover disabled:opacity-70"
+        className="inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-lg bg-brand-accent-strong px-2.5 text-[11px] font-semibold text-white transition-colors hover:bg-brand-accent-strong-hover disabled:opacity-70"
       >
         {adding ? (
           <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
@@ -82,17 +83,18 @@ export function WishlistCard({ product, onRemove }: WishlistCardProps) {
     <button
       type="button"
       disabled
-      className="inline-flex min-h-9 w-full cursor-not-allowed items-center justify-center rounded-lg bg-brand-bg px-3 text-[11px] font-semibold text-brand-text-muted"
+      aria-disabled="true"
+      className="inline-flex min-h-9 w-full cursor-not-allowed items-center justify-center rounded-lg bg-brand-bg px-2.5 text-[11px] font-semibold text-brand-text-muted"
     >
       {copy.soldOut}
     </button>
   );
 
   return (
-    <article className="group relative flex items-center gap-3 rounded-2xl border border-brand-border bg-white p-3 sm:gap-4 sm:p-3.5">
+    <article className="group relative flex gap-3 rounded-2xl border border-brand-border bg-white p-2.5">
       <Link
         href={href}
-        className="relative block h-[96px] w-[76px] shrink-0 overflow-hidden rounded-xl bg-brand-card sm:h-[116px] sm:w-[92px]"
+        className="relative block h-[92px] w-[72px] shrink-0 overflow-hidden rounded-xl bg-brand-card"
         aria-label={interpolate(copy.viewAria, { name: product.name })}
         tabIndex={-1}
       >
@@ -100,21 +102,21 @@ export function WishlistCard({ product, onRemove }: WishlistCardProps) {
           src={image?.src || PLACEHOLDER}
           alt={image?.alt || product.name}
           fill
-          sizes="(max-width: 640px) 76px, 92px"
+          sizes="72px"
           className={`object-cover transition-transform duration-500 group-hover:scale-105 ${
             purchasable ? '' : 'opacity-60'
           }`}
         />
         {badge && (
-          <span className="absolute left-1.5 top-1.5">
-            <AvailabilityBadge badge={badge} className="px-2 py-0.5 text-[9px] shadow-sm" />
+          <span className="absolute left-1 top-1">
+            <AvailabilityBadge badge={badge} className="px-1.5 py-0.5 text-[8px] shadow-sm" />
           </span>
         )}
       </Link>
 
-      <div className="flex min-w-0 flex-1 flex-col pr-10 sm:pr-0">
+      <div className="flex min-w-0 flex-1 flex-col pr-8">
         <Link href={href}>
-          <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-brand-text transition-colors hover:text-brand-accent-strong sm:text-[15px]">
+          <h3 className="line-clamp-2 text-[13px] font-semibold leading-snug text-brand-text transition-colors hover:text-brand-accent-strong">
             {product.name}
           </h3>
         </Link>
@@ -125,37 +127,23 @@ export function WishlistCard({ product, onRemove }: WishlistCardProps) {
           </p>
         )}
 
-        <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-          <span className="text-sm font-semibold text-brand-accent-strong">{fmt(displayPrice)}</span>
+        <div className="mt-1 flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+          <span className="text-[13px] font-semibold text-brand-accent-strong">{fmt(displayPrice)}</span>
           {onSale && product.regular_price && (
-            <span className="text-[11px] text-brand-text-muted line-through">{fmt(product.regular_price)}</span>
+            <span className="text-[10px] text-brand-text-muted line-through">{fmt(product.regular_price)}</span>
           )}
         </div>
 
-        <div className="mt-2 flex flex-wrap items-center gap-1.5 sm:hidden">{cartButton}</div>
-      </div>
-
-      {/* Desktop: the cart action sits in one column at the bottom-right, clear of
-          the remove button in the corner. */}
-      <div className="hidden w-[142px] shrink-0 flex-col justify-end gap-1.5 self-stretch sm:flex">
-        {cartButton}
-        {purchasable && (
-          <Link
-            href={href}
-            className="inline-flex min-h-9 items-center justify-center rounded-lg border border-brand-border px-3 text-[11px] font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong"
-          >
-            {copy.viewProduct}
-          </Link>
-        )}
+        <div className="mt-auto pt-2">{cartButton}</div>
       </div>
 
       <button
         type="button"
         onClick={onRemove}
         aria-label={interpolate(copy.removeAria, { name: product.name })}
-        className="absolute right-1.5 top-1.5 flex h-11 w-11 items-center justify-center rounded-full text-brand-text-muted transition-colors hover:bg-brand-bg hover:text-brand-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent-strong"
+        className="absolute right-1 top-1 flex h-9 w-9 items-center justify-center rounded-full text-brand-text-muted transition-colors hover:bg-brand-bg hover:text-brand-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent-strong"
       >
-        <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+        <X className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
       </button>
     </article>
   );
