@@ -314,7 +314,7 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
                     {dictionary.header.wishlist}
                     {wishlistCount > 0 && (
                       <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-wine px-1 text-[10px] font-bold text-white">
-                        {wishlistCount}
+                        {badge(wishlistCount)}
                       </span>
                     )}
                   </Link>

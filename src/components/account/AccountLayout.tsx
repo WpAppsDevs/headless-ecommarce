@@ -11,7 +11,8 @@ import { Dashboard } from './Dashboard';
 import { Orders } from './Orders';
 import { SettingsTab } from './Settings';
 import { WishlistTab } from './Wishlist';
-import { useDictionary } from '@/i18n/LocaleProvider';
+import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
+import { formatNumber } from '@/i18n/format';
 import { personInitials, personName } from '@/lib/user-name';
 
 type Tab = 'dashboard' | 'orders' | 'settings' | 'wishlist';
@@ -33,7 +34,11 @@ export function AccountLayout({ profile, orders }: AccountLayoutProps) {
   const searchParams = useSearchParams();
   const wishlistCount = useWishlistStore((s) => s.count);
   const dictionary = useDictionary();
+  const locale = useLocale();
   const copy = dictionary.account;
+  // The badge counts products, so it takes the reading language's digits —
+  // a Bengali page showing "4" next to a Bengali heading reads as a bug.
+  const wishlistCountLabel = formatNumber(locale, wishlistCount);
 
   /**
    * The tab lives in the URL, so a refresh keeps it, the browser's Back button
@@ -93,7 +98,7 @@ export function AccountLayout({ profile, orders }: AccountLayoutProps) {
         activeTab === 'wishlist' ? 'bg-white text-brand-accent-strong' : 'bg-brand-accent-strong text-white'
       }`}
     >
-      {wishlistCount}
+      {wishlistCountLabel}
     </span>
   );
 
@@ -155,7 +160,7 @@ export function AccountLayout({ profile, orders }: AccountLayoutProps) {
                           active ? 'bg-white/25 text-white' : 'bg-brand-accent-strong text-white'
                         }`}
                       >
-                        {wishlistCount}
+                        {wishlistCountLabel}
                       </span>
                     )}
                   </button>
