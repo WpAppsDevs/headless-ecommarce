@@ -698,6 +698,7 @@ export const en = {
       removed: 'Removed from wishlist',
       undo: 'Undo',
       viewAria: 'View {name}',
+      viewProduct: 'View product',
       removeAria: 'Remove {name} from wishlist',
       browseProducts: 'Browse Products',
     },

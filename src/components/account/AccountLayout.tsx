@@ -91,110 +91,131 @@ export function AccountLayout({ profile, orders }: AccountLayoutProps) {
           </ol>
         </nav>
 
-        {/* Mobile tabs — four equal cells, so every tab is whole at 320px wide. */}
-        <div className="sticky top-24 z-30 mb-2 grid grid-cols-4 gap-1 rounded-xl border border-brand-border bg-white p-1 lg:hidden">
-          {MENU_ITEMS.map(({ id, icon: Icon }) => {
-            const active = activeTab === id;
-            return (
+        {/*
+         * The account canvas. Everything — identity, tabs, rail, cards — sits on
+         * one tinted surface, so the page reads as one place rather than a
+         * column of white boxes on a white page. The content keeps a floor
+         * height so a short tab does not collapse the shell the moment it loads.
+         */}
+        <div className="mt-1 rounded-[26px] bg-brand-accent-light p-3 sm:p-4 lg:p-5">
+          {/* Mobile: identity band, then the four tabs. The tab row sticks below
+              the site header so switching stays available while scrolling. */}
+          <div className="lg:hidden">
+            <div className="relative rounded-2xl bg-brand-accent-strong px-4 pb-5 pt-6 text-center">
               <button
-                key={id}
                 type="button"
-                onClick={() => selectTab(id)}
-                aria-current={active ? 'page' : undefined}
-                className={`relative flex min-h-12 flex-col items-center justify-center gap-1 rounded-lg px-1 py-1.5 text-[10px] font-medium leading-tight transition-colors ${
-                  active
-                    ? 'bg-brand-accent-strong text-white'
-                    : 'text-brand-text-muted hover:bg-brand-bg hover:text-brand-text'
-                }`}
+                onClick={handleLogout}
+                aria-label={copy.logout}
+                className="absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/15 hover:text-white"
               >
-                <Icon className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" />
-                <span className="text-center">{copy.tabs[id]}</span>
-                {id === 'wishlist' && wishlistCount > 0 && (
-                  <span
-                    className={`absolute right-1 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-bold ${
-                      active ? 'bg-white/25 text-white' : 'bg-brand-accent-strong text-white'
+                <LogOut className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
+              </button>
+              <span
+                aria-hidden="true"
+                className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white/15 text-lg font-bold text-white ring-2 ring-white/20"
+              >
+                {initials}
+              </span>
+              <p className="mt-2.5 truncate text-[13px] font-bold uppercase text-white">{fullName}</p>
+              <p className="mt-0.5 truncate text-xs text-white/65">{profile?.email ?? copy.noEmail}</p>
+            </div>
+
+            <div className="sticky top-24 z-30 mt-2 grid grid-cols-4 gap-1 rounded-xl border border-brand-border bg-white p-1">
+              {MENU_ITEMS.map(({ id, icon: Icon }) => {
+                const active = activeTab === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => selectTab(id)}
+                    aria-current={active ? 'page' : undefined}
+                    className={`relative flex min-h-12 flex-col items-center justify-center gap-1 rounded-lg px-1 py-1.5 text-[10px] font-medium leading-tight transition-colors ${
+                      active
+                        ? 'bg-brand-accent-strong text-white'
+                        : 'text-brand-text-muted hover:bg-brand-bg hover:text-brand-text'
                     }`}
                   >
-                    {wishlistCount}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
+                    <Icon className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" />
+                    <span className="text-center">{copy.tabs[id]}</span>
+                    {id === 'wishlist' && wishlistCount > 0 && (
+                      <span
+                        className={`absolute right-1 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-bold ${
+                          active ? 'bg-white/25 text-white' : 'bg-brand-accent-strong text-white'
+                        }`}
+                      >
+                        {wishlistCount}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-        {/* Sign-out is desktop-only: on a phone the rail is not rendered, and the
-            owner asked for the standalone row to be gone there. */}
-        {/* Desktop two-column layout — both columns share the same height */}
-        <div className="flex flex-col gap-4 lg:flex-row lg:gap-6">
-          {/* Full-height rail: identity on top, menu in the middle, sign-out at the bottom */}
-          <aside className="hidden w-60 shrink-0 lg:block">
-            <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-brand-border bg-white">
-              <div className="flex items-center gap-3 border-b border-brand-border px-4 py-4">
-                <span
-                  aria-hidden="true"
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-accent-light text-sm font-bold text-brand-accent-strong"
-                >
-                  {initials}
-                </span>
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-brand-text">{fullName}</p>
-                  <p className="truncate text-xs text-brand-text-muted">
-                    {profile?.email ?? copy.noEmail}
-                  </p>
+          {/* Desktop: rail and content share one height, inside the canvas. */}
+          <div className="mt-3 flex flex-col gap-3 lg:mt-0 lg:flex-row lg:gap-5">
+            <aside className="hidden w-60 shrink-0 self-stretch lg:block">
+              <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-brand-border bg-white">
+                {/* Identity, stacked and centred: avatar, name, email. */}
+                <div className="bg-brand-accent-strong px-4 pb-6 pt-7 text-center">
+                  <span
+                    aria-hidden="true"
+                    className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white/15 text-xl font-bold text-white ring-2 ring-white/20"
+                  >
+                    {initials}
+                  </span>
+                  <p className="mt-3 truncate text-[13px] font-bold uppercase text-white">{fullName}</p>
+                  <p className="mt-1 truncate text-xs text-white/65">{profile?.email ?? copy.noEmail}</p>
+                </div>
+
+                <nav aria-label={copy.navLabel} className="flex-1 p-2">
+                  {MENU_ITEMS.map(({ id, icon: Icon }) => {
+                    const active = activeTab === id;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => selectTab(id)}
+                        aria-current={active ? 'page' : undefined}
+                        className={`relative flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-sm transition-colors ${
+                          active
+                            ? 'bg-brand-accent-light font-semibold text-brand-accent-strong'
+                            : 'font-medium text-brand-text-muted hover:bg-brand-bg hover:text-brand-text'
+                        }`}
+                      >
+                        {active && (
+                          <span
+                            aria-hidden="true"
+                            className="absolute bottom-2.5 left-0 top-2.5 w-[2.5px] rounded-full bg-brand-accent-strong"
+                          />
+                        )}
+                        <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.6} aria-hidden="true" />
+                        {copy.tabs[id]}
+                        {id === 'wishlist' && wishlistBadge}
+                      </button>
+                    );
+                  })}
+                </nav>
+
+                <div className="border-t border-brand-border p-2">
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium text-brand-text-muted transition-colors hover:bg-brand-bg hover:text-brand-text"
+                  >
+                    <LogOut className="h-[18px] w-[18px] shrink-0" strokeWidth={1.6} aria-hidden="true" />
+                    {copy.logout}
+                  </button>
                 </div>
               </div>
+            </aside>
 
-              <nav aria-label={copy.navLabel} className="flex-1 p-2">
-                {MENU_ITEMS.map(({ id, icon: Icon }) => {
-                  const active = activeTab === id;
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => selectTab(id)}
-                      aria-current={active ? 'page' : undefined}
-                      className={`relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
-                        active
-                          ? 'bg-brand-accent-light font-semibold text-brand-accent-strong'
-                          : 'font-medium text-brand-text-muted hover:bg-brand-bg hover:text-brand-text'
-                      }`}
-                    >
-                      {active && (
-                        <span
-                          aria-hidden="true"
-                          className="absolute left-0 top-2 bottom-2 w-[2.5px] rounded-full bg-brand-accent-strong"
-                        />
-                      )}
-                      <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.6} aria-hidden="true" />
-                      {copy.tabs[id]}
-                      {id === 'wishlist' && wishlistBadge}
-                    </button>
-                  );
-                })}
-              </nav>
-
-              <div className="border-t border-brand-border p-2">
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-brand-text-muted transition-colors hover:bg-brand-bg hover:text-brand-text"
-                >
-                  <LogOut className="h-[18px] w-[18px] shrink-0" strokeWidth={1.6} aria-hidden="true" />
-                  {copy.logout}
-                </button>
-              </div>
+            <div className="min-h-[480px] min-w-0 flex-1 lg:min-h-[640px]">
+              {activeTab === 'dashboard' && <Dashboard profile={profile} orders={orders} />}
+              {activeTab === 'orders' && <Orders />}
+              {activeTab === 'wishlist' && <WishlistTab />}
+              {activeTab === 'settings' && <SettingsTab profile={profile} />}
             </div>
-          </aside>
-
-          {/* Content — a div, not a second <main>: the root layout owns the landmark.
-              It sits on the page background: the cards carry their own white
-              surface and hairline, so a tinted slab only added an empty block. */}
-          <div className="min-w-0 flex-1">
-            {activeTab === 'dashboard' && <Dashboard profile={profile} orders={orders} />}
-            {activeTab === 'orders' && <Orders />}
-            {activeTab === 'wishlist' && <WishlistTab />}
-            {activeTab === 'settings' && <SettingsTab profile={profile} />}
           </div>
         </div>
       </div>

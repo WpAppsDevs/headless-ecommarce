@@ -699,6 +699,7 @@ export const bn: Dictionary = {
       removed: 'উইশলিস্ট থেকে সরানো হয়েছে',
       undo: 'ফিরিয়ে আনুন',
       viewAria: '{name} দেখুন',
+      viewProduct: 'পণ্য দেখুন',
       removeAria: 'উইশলিস্ট থেকে {name} সরান',
       browseProducts: 'পণ্য দেখুন',
     },
