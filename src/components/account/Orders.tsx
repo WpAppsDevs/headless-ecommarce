@@ -163,7 +163,7 @@ function OrdersList({ filter }: { filter: OrderFilterId }) {
             type="button"
             onClick={() => void loadMore()}
             disabled={loadingMore}
-            className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-brand-border bg-white px-5 text-sm font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong disabled:opacity-60"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-brand-border bg-white px-5 text-sm font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong disabled:opacity-60"
           >
             {loadingMore ? (
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -202,7 +202,7 @@ export function Orders() {
               type="button"
               onClick={() => setActiveFilter(filter.id)}
               aria-pressed={active}
-              className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-lg border px-3.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent-strong ${
+              className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-full border px-4 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent-strong ${
                 active
                   ? 'border-brand-accent-strong bg-brand-accent-strong text-white'
                   : 'border-brand-border bg-white text-brand-text-muted hover:border-brand-accent-strong hover:text-brand-text'

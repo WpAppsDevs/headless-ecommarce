@@ -4,7 +4,13 @@ import { Check } from 'lucide-react';
 import { COMPACT_ORDER_STEPS, orderCompactStep } from '@/lib/order-progress';
 import { useDictionary } from '@/i18n/LocaleProvider';
 
-/** Four stages, one per real status; the stage the order is in is marked current, not done. */
+/**
+ * Four stages, one per real status, on a quiet strip inside the order row.
+ *
+ * The stage the order is in is filled and marked current, the stages behind it
+ * carry a check, and the ones ahead stay numbered: a customer scanning the
+ * list sees how far the parcel has travelled without opening the order.
+ */
 export function OrderProgress({ status }: { status: string }) {
   const copy = useDictionary().account;
   const reached = orderCompactStep(status);
@@ -12,44 +18,49 @@ export function OrderProgress({ status }: { status: string }) {
   if (reached === null) return null;
 
   return (
-    <ol className="mt-5 flex">
-      {COMPACT_ORDER_STEPS.map((step, index) => {
-        const done = index < reached;
-        const current = index === reached;
-        const last = index === COMPACT_ORDER_STEPS.length - 1;
+    <div className="mt-3.5 rounded-xl bg-brand-bg px-3 py-2.5">
+      <ol className="grid grid-cols-4">
+        {COMPACT_ORDER_STEPS.map((step, index) => {
+          const done = index < reached;
+          const current = index === reached;
 
-        return (
-          <li
-            key={step}
-            aria-current={current ? 'step' : undefined}
-            className={`relative flex flex-1 flex-col items-center text-center text-[11px] leading-tight ${
-              done || current ? 'text-brand-text' : 'text-brand-text-muted'
-            } ${current ? 'font-semibold' : ''}`}
-          >
-            {!last && (
+          return (
+            <li
+              key={step}
+              aria-current={current ? 'step' : undefined}
+              className="relative flex flex-col items-center text-center"
+            >
+              {index > 0 && (
+                <span
+                  aria-hidden="true"
+                  className={`absolute right-1/2 top-[9px] h-px w-full ${
+                    index <= reached ? 'bg-brand-accent-strong/40' : 'bg-brand-border'
+                  }`}
+                />
+              )}
               <span
                 aria-hidden="true"
-                className={`absolute left-1/2 top-[9px] h-[1.5px] w-full ${
-                  done ? 'bg-brand-accent-strong' : 'bg-brand-border'
+                className={`relative z-10 flex h-[18px] w-[18px] items-center justify-center rounded-full text-[9px] font-bold ${
+                  current
+                    ? 'bg-brand-accent-strong text-white'
+                    : done
+                      ? 'bg-brand-accent-light text-brand-accent-strong'
+                      : 'bg-white text-brand-text-muted ring-1 ring-brand-border'
                 }`}
-              />
-            )}
-            <span
-              aria-hidden="true"
-              className={`relative z-10 mb-1.5 flex h-[19px] w-[19px] items-center justify-center rounded-full border-[1.5px] ${
-                done
-                  ? 'border-brand-accent-strong bg-brand-accent-strong text-white'
-                  : current
-                    ? 'border-brand-accent-strong bg-white ring-[3px] ring-brand-accent-light'
-                    : 'border-brand-border bg-white'
-              }`}
-            >
-              {done && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
-            </span>
-            {copy.details.steps[step]}
-          </li>
-        );
-      })}
-    </ol>
+              >
+                {done ? <Check className="h-2.5 w-2.5" strokeWidth={3} /> : index + 1}
+              </span>
+              <span
+                className={`mt-1.5 block text-[11px] leading-tight ${
+                  current ? 'font-bold text-brand-text' : 'text-brand-text-muted'
+                }`}
+              >
+                {copy.details.steps[step]}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
   );
 }

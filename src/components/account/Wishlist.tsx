@@ -14,15 +14,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 function WishlistSkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3" aria-hidden="true">
+    <div className="space-y-2.5" aria-hidden="true">
       {[0, 1, 2].map((i) => (
-        <div key={i} className="overflow-hidden rounded-xl border border-brand-border bg-white">
-          <Skeleton className="aspect-[3/4] w-full rounded-none" />
-          <div className="space-y-2 p-3 sm:p-4">
-            <Skeleton className="h-4 w-4/5" />
+        <div key={i} className="flex items-center gap-3 rounded-2xl border border-brand-border bg-white p-3 sm:gap-4 sm:p-3.5">
+          <Skeleton className="h-[96px] w-[76px] shrink-0 rounded-xl sm:h-[116px] sm:w-[92px]" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-4 w-3/5" />
             <Skeleton className="h-3 w-1/3" />
-            <Skeleton className="mt-2 h-5 w-1/2" />
-            <Skeleton className="mt-2 h-10 w-full rounded-lg" />
+            <Skeleton className="h-4 w-24" />
           </div>
         </div>
       ))}
@@ -135,7 +135,7 @@ export function WishlistTab() {
 
   return (
     <div className="space-y-4">
-      <div className="space-y-1">
+      <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-2">
         <h2 className="text-xl font-semibold tracking-tight text-brand-text">{heading}</h2>
         {ready && products.length > 0 && (
           <p className="text-xs text-brand-text-muted">{copy.subtitle}</p>
@@ -165,7 +165,7 @@ export function WishlistTab() {
       {ready && !failed && products.length === 0 && <EmptyWishlist />}
 
       {ready && !failed && products.length > 0 && (
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
+        <div className="space-y-2.5">
           {products.map((product) => (
             <WishlistCard
               key={product.id}
