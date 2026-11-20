@@ -545,6 +545,7 @@ export const bn: Dictionary = {
     },
     orders: {
       title: 'আমার অর্ডার',
+      subtitle: 'আপনার প্রতিটি অর্ডার, কোথায় পৌঁছেছে আর কত খরচ হয়েছে — সব এক জায়গায়।',
       noOrders: 'কোনো অর্ডার পাওয়া যায়নি',
       filterAll: 'সব অর্ডার',
       filterPending: 'অপেক্ষমাণ',

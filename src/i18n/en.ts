@@ -543,6 +543,7 @@ export const en = {
     },
     orders: {
       title: 'My Orders',
+      subtitle: 'Every order, where it has reached and what you spent — in one place.',
       noOrders: 'No orders found',
       filterAll: 'All Orders',
       filterPending: 'Pending',

@@ -11,6 +11,7 @@ import { useDictionary } from '@/i18n/LocaleProvider';
 import { interpolate } from '@/i18n/interpolate';
 import { WishlistCard } from './WishlistCard';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AccountHeading } from './AccountHeading';
 
 function WishlistSkeleton() {
   return (
@@ -135,12 +136,7 @@ export function WishlistTab() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-2">
-        <h2 className="text-xl font-semibold tracking-tight text-brand-text">{heading}</h2>
-        {ready && products.length > 0 && (
-          <p className="text-xs text-brand-text-muted">{copy.subtitle}</p>
-        )}
-      </div>
+      <AccountHeading title={heading} description={copy.subtitle} />
 
       {!ready && <WishlistSkeleton />}
 
