@@ -13,6 +13,8 @@ import type { OrderFilterId } from '@/lib/order-filters';
 import { OrderCard } from './OrderCard';
 import { OrderDetailsModal } from './OrderDetailsModal';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AccountHeading } from './AccountHeading';
+import { OrderFilterMenu } from './OrderFilterMenu';
 
 /** One page of the history. Small enough that "Load more" appears where it is useful. */
 const PER_PAGE = 8;
@@ -188,12 +190,22 @@ export function Orders() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold tracking-tight text-brand-text">{copy.title}</h2>
+      <AccountHeading title={copy.title} description={copy.subtitle} />
 
-      {/* Filter pills — each one is a server-side status, so the count is real.
-          Pills wrap instead of scrolling: at 390px six underlined tabs hid two
-          filters past the right edge with nothing on screen saying so. */}
-      <div role="group" aria-label={copy.filterLabel} className="flex flex-wrap gap-2">
+      {/* Phones get one field and a panel of the six statuses; tablets and
+          desktops keep the pill row, which shows every status at a glance. */}
+      <OrderFilterMenu
+        label={copy.filterLabel}
+        value={activeFilter}
+        onChange={(id) => setActiveFilter(id as OrderFilterId)}
+        options={ORDER_FILTERS.map((filter) => ({ id: filter.id, label: copy[filter.labelKey] }))}
+      />
+
+      <div
+        role="group"
+        aria-label={copy.filterLabel}
+        className="hidden flex-wrap gap-2 sm:flex"
+      >
         {ORDER_FILTERS.map((filter) => {
           const active = activeFilter === filter.id;
           return (

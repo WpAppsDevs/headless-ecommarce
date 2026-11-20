@@ -64,8 +64,35 @@ export function AccountLayout({ profile, orders }: AccountLayoutProps) {
   const fullName = personName(profile, copy.customer);
   const initials = personInitials(profile, '·');
 
+  /**
+   * The trail belongs to the identity block, under the email: it says what this
+   * place is before the menu says where you can go, and it reads the same on
+   * the mobile band as on the rail.
+   */
+  const breadcrumb = (
+    <nav aria-label={copy.breadcrumbLabel} className="mt-3">
+      <ol className="flex flex-wrap items-center justify-center gap-1.5 text-[11px] leading-none text-white/70">
+        <li>
+          <Link href="/" className="transition-colors hover:text-white">
+            {dictionary.common.home}
+          </Link>
+        </li>
+        <li aria-hidden="true" className="select-none text-white/40">
+          ›
+        </li>
+        <li aria-current="page" className="font-medium text-white">
+          {copy.breadcrumb}
+        </li>
+      </ol>
+    </nav>
+  );
+
   const wishlistBadge = wishlistCount > 0 && (
-    <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-accent-strong px-1.5 text-[10px] font-bold text-white">
+    <span
+      className={`ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[10px] font-bold ${
+        activeTab === 'wishlist' ? 'bg-white text-brand-accent-strong' : 'bg-brand-accent-strong text-white'
+      }`}
+    >
       {wishlistCount}
     </span>
   );
@@ -75,29 +102,13 @@ export function AccountLayout({ profile, orders }: AccountLayoutProps) {
       <div className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6 lg:px-8 lg:pt-8">
         <h1 className="sr-only">{copy.breadcrumb}</h1>
 
-        <nav aria-label={copy.breadcrumbLabel} className="mb-4">
-          <ol className="flex flex-wrap items-center gap-2 text-xs text-brand-text-muted">
-            <li>
-              <Link href="/" className="transition-colors hover:text-brand-text">
-                {dictionary.common.home}
-              </Link>
-            </li>
-            <li aria-hidden="true" className="select-none text-brand-border">
-              ›
-            </li>
-            <li aria-current="page" className="font-medium text-brand-text">
-              {copy.breadcrumb}
-            </li>
-          </ol>
-        </nav>
-
         {/*
          * The account canvas. Everything — identity, tabs, rail, cards — sits on
          * one tinted surface, so the page reads as one place rather than a
          * column of white boxes on a white page. The content keeps a floor
          * height so a short tab does not collapse the shell the moment it loads.
          */}
-        <div className="mt-1 rounded-[26px] bg-brand-accent-light p-3 sm:p-4 lg:p-5">
+        <div className="rounded-[26px] bg-brand-accent-light p-3 sm:p-4 lg:p-5">
           {/* Mobile: identity band, then the four tabs. The tab row sticks below
               the site header so switching stays available while scrolling. */}
           <div className="lg:hidden">
@@ -118,9 +129,10 @@ export function AccountLayout({ profile, orders }: AccountLayoutProps) {
               </span>
               <p className="mt-2.5 truncate text-[13px] font-bold uppercase text-white">{fullName}</p>
               <p className="mt-0.5 truncate text-xs text-white/65">{profile?.email ?? copy.noEmail}</p>
+              {breadcrumb}
             </div>
 
-            <div className="sticky top-24 z-30 mt-2 grid grid-cols-4 gap-1 rounded-xl border border-brand-border bg-white p-1">
+            <div className="sticky top-24 z-30 mt-2 grid grid-cols-4 gap-1.5 rounded-xl border border-brand-border bg-white p-1.5">
               {MENU_ITEMS.map(({ id, icon: Icon }) => {
                 const active = activeTab === id;
                 return (
@@ -132,7 +144,7 @@ export function AccountLayout({ profile, orders }: AccountLayoutProps) {
                     className={`relative flex min-h-12 flex-col items-center justify-center gap-1 rounded-lg px-1 py-1.5 text-[10px] font-medium leading-tight transition-colors ${
                       active
                         ? 'bg-brand-accent-strong text-white'
-                        : 'text-brand-text-muted hover:bg-brand-bg hover:text-brand-text'
+                        : 'bg-brand-bg text-brand-text-muted hover:bg-brand-accent-light hover:text-brand-accent-strong'
                     }`}
                   >
                     <Icon className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" />
@@ -166,9 +178,10 @@ export function AccountLayout({ profile, orders }: AccountLayoutProps) {
                   </span>
                   <p className="mt-3 truncate text-[13px] font-bold uppercase text-white">{fullName}</p>
                   <p className="mt-1 truncate text-xs text-white/65">{profile?.email ?? copy.noEmail}</p>
+                  {breadcrumb}
                 </div>
 
-                <nav aria-label={copy.navLabel} className="flex-1 p-2">
+                <nav aria-label={copy.navLabel} className="flex-1 space-y-2 p-2.5">
                   {MENU_ITEMS.map(({ id, icon: Icon }) => {
                     const active = activeTab === id;
                     return (
@@ -177,18 +190,12 @@ export function AccountLayout({ profile, orders }: AccountLayoutProps) {
                         type="button"
                         onClick={() => selectTab(id)}
                         aria-current={active ? 'page' : undefined}
-                        className={`relative flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-sm transition-colors ${
+                        className={`flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-sm transition-colors ${
                           active
-                            ? 'bg-brand-accent-light font-semibold text-brand-accent-strong'
-                            : 'font-medium text-brand-text-muted hover:bg-brand-bg hover:text-brand-text'
+                            ? 'bg-brand-accent-strong font-semibold text-white shadow-sm'
+                            : 'bg-brand-bg font-medium text-brand-text-muted hover:bg-brand-accent-light hover:text-brand-accent-strong'
                         }`}
                       >
-                        {active && (
-                          <span
-                            aria-hidden="true"
-                            className="absolute bottom-2.5 left-0 top-2.5 w-[2.5px] rounded-full bg-brand-accent-strong"
-                          />
-                        )}
                         <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.6} aria-hidden="true" />
                         {copy.tabs[id]}
                         {id === 'wishlist' && wishlistBadge}
@@ -197,7 +204,7 @@ export function AccountLayout({ profile, orders }: AccountLayoutProps) {
                   })}
                 </nav>
 
-                <div className="border-t border-brand-border p-2">
+                <div className="border-t border-brand-border p-2.5">
                   <button
                     type="button"
                     onClick={handleLogout}

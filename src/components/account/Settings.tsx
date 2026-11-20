@@ -7,6 +7,7 @@ import { AddressCards } from './AddressCards';
 import { PasswordCard } from './PasswordCard';
 import { ProfileCard } from './ProfileCard';
 import { SupportContactLinks } from '@/components/policies/SupportContactLinks';
+import { AccountHeading } from './AccountHeading';
 
 interface SettingsTabProps {
   profile: UserProfile | null;
@@ -18,12 +19,7 @@ export function SettingsTab({ profile }: SettingsTabProps) {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h2 className="text-xl font-semibold tracking-tight text-brand-text">
-          {copy.settings.title}
-        </h2>
-        <p className="mt-1 text-sm text-brand-text-muted">{copy.settings.note}</p>
-      </div>
+      <AccountHeading title={copy.settings.title} description={copy.settings.note} />
 
       <ProfileCard profile={profile} />
       <AddressCards profile={profile} />
