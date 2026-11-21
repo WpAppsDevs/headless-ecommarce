@@ -143,7 +143,10 @@ test.describe('checkout validation', () => {
     let added = false;
     for (const href of hrefs) {
       await page.goto(href);
-      const addToCart = page.getByRole('button', { name: 'কার্টে যোগ করুন' });
+      // `.first()` is the product's own CTA: related-product cards sit further
+      // down the page and also offer an add button, so an unscoped locator
+      // would match several and throw in strict mode.
+      const addToCart = page.getByRole('button', { name: 'কার্টে যোগ করুন' }).first();
       if (!(await addToCart.isVisible().catch(() => false))) continue;
       if (!(await addToCart.isEnabled().catch(() => false))) continue;
 
@@ -156,7 +159,11 @@ test.describe('checkout validation', () => {
       }
 
       await addToCart.click();
-      await expect(page.getByRole('button', { name: /কার্ট — [1-9]/ })).toBeVisible();
+      // The badge counts in the reading language, so a Bangla page shows ১, not
+      // 1 — the ASCII-only pattern this test started with never matched.
+      await expect(page.getByRole('button', { name: /কার্ট — [1-9১-৯]/ })).toBeVisible({
+        timeout: 10_000,
+      });
       added = true;
       break;
     }

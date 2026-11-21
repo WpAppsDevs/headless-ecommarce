@@ -923,7 +923,7 @@ export const en = {
       loading: 'Loading product…',
       errors: {
         nameRequired: 'Give the product a name of at least two characters.',
-        priceInvalid: 'Enter a price of zero or more, using digits and a dot.',
+        priceInvalid: 'Enter a price greater than zero, using digits and a dot.',
         sellAboveRegular: 'The sell price cannot be higher than the regular price.',
         categoryRequired: 'Choose at least one category.',
         imageRequired: 'Add a main image.',

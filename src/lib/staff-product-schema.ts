@@ -42,11 +42,13 @@ export function buildStaffProductSchema(copy: StaffFormCopy) {
       const regular = parsePrice(values.regularPrice);
       const sell = parsePrice(values.sellPrice);
 
-      if (regular === null || regular < 0) {
+      // Zero is refused, not stored: a zero sell price becomes a 0.00 sale
+      // price in WooCommerce and the product sells for nothing.
+      if (regular === null || regular <= 0) {
         ctx.addIssue({ code: 'custom', path: ['regularPrice'], message: copy.priceInvalid });
       }
 
-      if (sell === null || sell < 0) {
+      if (sell === null || sell <= 0) {
         ctx.addIssue({ code: 'custom', path: ['sellPrice'], message: copy.priceInvalid });
       }
 
