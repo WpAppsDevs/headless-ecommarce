@@ -274,17 +274,26 @@ export function ProductCard({ product, priority = false }: { product: Product; p
                   <span>{copy.selectOptions}</span>
                 </Link>
               ) : (
+                // A sold-out card used to keep an enabled button whose handler
+                // returned early, so the click did nothing at all. Say why.
                 <button
                   type="button"
                   onClick={handleAddToCart}
-                  disabled={adding}
+                  disabled={adding || !purchasable}
                   className={cn(
                     'flex w-full items-center justify-center gap-2 rounded-lg bg-brand-wine py-3 text-xs font-semibold text-white transition-colors hover:bg-brand-accent-strong-hover disabled:opacity-70 sm:flex-1 sm:gap-1.5 sm:py-2 sm:text-sm sm:px-3',
+                    !purchasable && 'bg-brand-border text-brand-text-muted',
                     adding && 'opacity-70',
                   )}
                 >
                   <ShoppingBag className="h-4 w-4 shrink-0 sm:h-3.5 sm:w-3.5" />
-                  <span className="truncate">{adding ? copy.adding : copy.addToCart}</span>
+                  <span className="truncate">
+                    {!purchasable
+                      ? copy.badge.soldOut
+                      : adding
+                        ? copy.adding
+                        : copy.addToCart}
+                  </span>
                 </button>
               )}
             </>
