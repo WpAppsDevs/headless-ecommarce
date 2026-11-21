@@ -14,6 +14,7 @@ import { AUTH_CONTROL_CLASS } from '@/components/auth/styles';
 import { useDictionary } from '@/i18n/LocaleProvider';
 import { ApiError } from '@/lib/errors';
 import { getStaffAccess } from '@/lib/api/staff-products';
+import { staffAccessOutcome } from '@/lib/staff-access-outcome';
 
 const buildSchema = (copy: { usernameRequired: string; passwordRequired: string }) =>
   z.object({
@@ -60,8 +61,17 @@ export function StaffLoginForm() {
       router.replace('/studio/products');
     } catch (e) {
       const code = e instanceof ApiError ? e.code : '';
+
+      // A 404 here means the WordPress plugin on this site predates the staff
+      // routes. That is not a wrong password, so say what it is and keep the
+      // session: retyping the password cannot add a missing endpoint.
+      if (staffAccessOutcome(code) === 'unavailable') {
+        setFormError(copy.unavailable);
+        return;
+      }
+
       await logout();
-      setFormError(code === 'forbidden' ? copy.noAccess : copy.failed);
+      setFormError(copy.noAccess);
     }
   };
 

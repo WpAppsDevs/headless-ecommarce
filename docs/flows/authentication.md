@@ -138,6 +138,8 @@ Three layers decide access, in order:
 
 No role is stored in the browser: `UserProfile` carries no role, and the dashboard re-asks on every load. A token whose role is revoked loses the dashboard at the next page load.
 
+The dashboard needs the plugin at 1.1.0 or later. On an older site the login itself succeeds and `GET /api/staff/access` answers `404 rest_no_route`, because the `/api/staff` prefix reaches `JwtMiddleware` before route matching — an unauthenticated probe always sees `401 missing_token`, never the 404. The sign-in form reports that as "the product service is not available on this site" and keeps the session instead of blaming the password.
+
 Staff keep their ordinary `/account`; nothing there is shared with the dashboard.
 
 ## Where to change auth
