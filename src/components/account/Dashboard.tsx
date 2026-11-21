@@ -19,7 +19,7 @@ import { interpolate } from '@/i18n/interpolate';
 import { useFormatPrice } from '@/lib/utils/currency';
 import { useWishlistStore } from '@/stores/wishlistStore';
 import { PRE_ORDER_WINDOW_DAYS } from '@/lib/delivery';
-import { formatRange } from '@/i18n/format';
+import { formatNumber, formatRange } from '@/i18n/format';
 import { personInitials, personName } from '@/lib/user-name';
 
 interface DashboardProps {
@@ -76,7 +76,9 @@ export function Dashboard({ profile, orders }: DashboardProps) {
             </h2>
             <p className="mt-1 text-sm text-brand-text-muted">
               {activeOrders.length > 0
-                ? interpolate(copy.dashboard.greetingActive, { count: activeOrders.length })
+                ? interpolate(copy.dashboard.greetingActive, {
+                    count: formatNumber(language, activeOrders.length),
+                  })
                 : copy.dashboard.greetingIdle}
             </p>
           </div>
@@ -105,7 +107,7 @@ export function Dashboard({ profile, orders }: DashboardProps) {
                 {focusOrder.line_items.length === 1
                   ? copy.dashboard.itemSingle
                   : interpolate(copy.dashboard.itemsCount, {
-                      count: String(focusOrder.line_items.length),
+                      count: formatNumber(language, focusOrder.line_items.length),
                     })}{' '}
                 · <span className="font-semibold text-brand-text">{fmt(focusOrder.total)}</span>
               </p>
@@ -160,7 +162,7 @@ export function Dashboard({ profile, orders }: DashboardProps) {
           </Link>
         </section>
       ) : (
-        <RecentOrders orders={recentOrders} locale={locale} onOpen={setSelectedOrder} />
+        <RecentOrders orders={recentOrders} language={language} onOpen={setSelectedOrder} />
       )}
 
       {/* Wishlist is a count and a door, not a second product grid */}

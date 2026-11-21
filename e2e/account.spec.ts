@@ -55,6 +55,14 @@ test.describe.serial('account screens', () => {
     await expect(page.getByRole('button', { name: 'সাইন আউট' })).toBeVisible();
   });
 
+  test('dashboard counts use Bengali digits', async () => {
+    // A count is copy: the dashboard once showed 2, 1, 3 beside ২টি because the
+    // stat tiles rendered raw numbers. formatNumber is the single path.
+    for (const key of ['active', 'completed', 'total']) {
+      await expect(page.getByTestId(`dashboard-stat-${key}`)).toHaveText(/[০-৯]/);
+    }
+  });
+
   test('an order card shows Bangla labels, not raw API fields', async () => {
     await page.getByRole('button', { name: 'আপনার অর্ডার' }).click();
 

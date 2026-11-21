@@ -24,11 +24,16 @@ This page is the durable record. It says what is translated, what is not, why, a
 
 `Record<Locale, …>` types are used rather than optional keys, so adding a third language turns every call site into a type error instead of silently rendering English.
 
+## Numbers and identifiers
+
+- **Counts and step numbers follow the reading language.** Tabs, badges, stat tiles, "more" counts and the stage numbers on an order's progress strip render through `formatNumber(locale, n)`; `e2e/account.spec.ts` asserts Bengali digits on the dashboard, because a Bangla page showing `2` beside `২টি` reads as a bug.
+- **Money keeps Western digits in both languages** (`৳ 2,750.00`). Locale-derived Bengali numerals were offered and declined for money, so prices go through `useFormatPrice` and never through `formatNumber`.
+- **Order ids stay Western.** They are identifiers, not counts, and a customer reads them back to support.
+
 ## What stays English, by decision
 
 - **Product content** — names, descriptions, brand names, review bodies. WordPress has no multilingual fields (no WPML/Polylang; the plugin only exposes `store.locale` from `WPLANG`). The owner declined that work for now. Brand names are proper nouns and would not be translated even with it.
 - **Courier status sentences** come from the carrier's API. Translating them would misquote the carrier.
-- **Prices keep Western digits in both languages** (`৳ 2,750.00`). Locale-derived Bengali numerals were offered and declined for money.
 - **Delivery window is a single constant**: `PRE_ORDER_WINDOW_DAYS` in `src/lib/delivery.ts`, rendered through `formatRange`. 15–25 days, everywhere, in both languages.
 
 ## Typography rules

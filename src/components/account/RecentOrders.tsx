@@ -7,18 +7,21 @@ import type { Order } from '@/lib/api/orders';
 import { orderStatusStyle } from '@/lib/order-status';
 import { useDictionary } from '@/i18n/LocaleProvider';
 import { interpolate } from '@/i18n/interpolate';
+import { formatNumber } from '@/i18n/format';
+import { intlLocale, type Locale } from '@/i18n/locales';
 import { useFormatPrice } from '@/lib/utils/currency';
 
 interface RecentOrdersProps {
   orders: Order[];
-  locale: string;
+  language: Locale;
   onOpen: (order: Order) => void;
 }
 
 /** The last three orders as compact rows; the whole list lives in the Orders tab. */
-export function RecentOrders({ orders, locale, onOpen }: RecentOrdersProps) {
+export function RecentOrders({ orders, language, onOpen }: RecentOrdersProps) {
   const copy = useDictionary().account;
   const fmt = useFormatPrice();
+  const locale = intlLocale(language);
 
   const fmtDate = (value: string | null) =>
     value
@@ -83,7 +86,7 @@ export function RecentOrders({ orders, locale, onOpen }: RecentOrdersProps) {
               )}
               {extraItems > 0 && (
                 <span className="absolute bottom-0 right-0 rounded-tl-md bg-brand-text/80 px-1.5 py-0.5 text-[9px] font-semibold leading-none text-white">
-                  +{extraItems}
+                  +{formatNumber(language, extraItems)}
                 </span>
               )}
             </span>
@@ -98,7 +101,9 @@ export function RecentOrders({ orders, locale, onOpen }: RecentOrdersProps) {
               <span className="mt-1 block truncate text-xs text-brand-text-muted">
                 {firstItem?.name ?? copy.dashboard.noOrders}
                 {extraItems > 0 &&
-                  ` · ${interpolate(copy.dashboard.moreItems, { count: String(extraItems) })}`}
+                  ` · ${interpolate(copy.dashboard.moreItems, {
+                    count: formatNumber(language, extraItems),
+                  })}`}
               </span>
             </span>
 
