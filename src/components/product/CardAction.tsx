@@ -16,12 +16,13 @@ interface CardActionProps {
 const BASE_CLASS =
   'flex w-full items-center justify-center gap-2 rounded-lg bg-brand-wine py-3 text-xs font-semibold text-white transition-colors hover:bg-brand-accent-strong-hover sm:flex-1 sm:gap-1.5 sm:py-2 sm:text-sm sm:px-3';
 
+const BASE_ACTION_ROUTE =
+  'flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-brand-border bg-brand-card py-2.5 text-xs font-semibold text-brand-text transition-colors hover:border-brand-wine hover:text-brand-wine sm:min-h-0 sm:flex-1 sm:py-2 sm:text-sm';
+
 /**
- * The card's single action: a link for a variable product, a button otherwise —
- * and a disabled "Sold Out" once the product cannot be bought.
- *
- * A sold-out card used to keep an enabled button whose handler returned early,
- * so the click did nothing at all: no message, no cart change.
+ * The card's single action, in three states: a link to the product for a
+ * variable product, an add button, or — when nothing can be bought — a link to
+ * the product page instead of a button that would do nothing.
  */
 export function CardAction({ slug, isVariable, purchasable, adding, onAdd }: CardActionProps) {
   const copy = useDictionary().product;
@@ -35,22 +36,23 @@ export function CardAction({ slug, isVariable, purchasable, adding, onAdd }: Car
     );
   }
 
+  if (!purchasable) {
+    return (
+      <Link href={`/products/${slug}`} className={cn(BASE_ACTION_ROUTE)}>
+        {copy.viewProduct}
+      </Link>
+    );
+  }
+
   return (
     <button
       type="button"
       onClick={onAdd}
-      disabled={adding || !purchasable}
-      className={cn(
-        BASE_CLASS,
-        'disabled:opacity-70',
-        !purchasable && 'bg-brand-border text-brand-text-muted',
-        adding && 'opacity-70',
-      )}
+      disabled={adding}
+      className={cn(BASE_CLASS, 'disabled:opacity-70', adding && 'opacity-70')}
     >
       <ShoppingBag className="h-4 w-4 shrink-0 sm:h-3.5 sm:w-3.5" />
-      <span className="truncate">
-        {!purchasable ? copy.badge.soldOut : adding ? copy.adding : copy.addToCart}
-      </span>
+      <span className="truncate">{adding ? copy.adding : copy.addToCart}</span>
     </button>
   );
 }

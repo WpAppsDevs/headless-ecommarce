@@ -229,50 +229,40 @@ export function ProductCard({ product, priority = false }: { product: Product; p
 
         {/* ── Qty + Action ──────────────────────────────────────────────── */}
         <div className="mt-1 flex flex-col gap-2 sm:flex-row sm:items-center">
-          {!purchasable ? (
-            <Link
-              href={`/products/${product.slug}`}
-              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-brand-border bg-brand-card py-2.5 text-xs font-semibold text-brand-text transition-colors hover:border-brand-wine hover:text-brand-wine sm:min-h-0 sm:flex-1 sm:py-2 sm:text-sm"
-            >
-              {copy.viewProduct}
-            </Link>
-          ) : (
-            <>
-              {/* Quantity selector */}
-              <div className="flex w-full items-center justify-center overflow-hidden rounded-lg border border-brand-border sm:w-auto">
-                <button
-                  type="button"
-                  onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  aria-label={copy.decreaseQuantity}
-                  className="flex h-10 w-10 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text sm:h-9 sm:w-8"
-                >
-                  −
-                </button>
-                <span
-                  className="w-8 select-none text-center text-sm font-semibold text-brand-text sm:w-7"
-                  aria-live="polite"
-                >
-                  {qty}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setQty((q) => q + 1)}
-                  aria-label={copy.increaseQuantity}
-                  className="flex h-10 w-10 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text sm:h-9 sm:w-8"
-                >
-                  +
-                </button>
-              </div>
-
-              <CardAction
-                slug={product.slug}
-                isVariable={isVariable}
-                purchasable={purchasable}
-                adding={adding}
-                onAdd={handleAddToCart}
-              />
-            </>
+          {purchasable && (
+            <div className="flex w-full items-center justify-center overflow-hidden rounded-lg border border-brand-border sm:w-auto">
+              <button
+                type="button"
+                onClick={() => setQty((q) => Math.max(1, q - 1))}
+                aria-label={copy.decreaseQuantity}
+                className="flex h-10 w-10 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text sm:h-9 sm:w-8"
+              >
+                −
+              </button>
+              <span
+                className="w-8 select-none text-center text-sm font-semibold text-brand-text sm:w-7"
+                aria-live="polite"
+              >
+                {qty}
+              </span>
+              <button
+                type="button"
+                onClick={() => setQty((q) => q + 1)}
+                aria-label={copy.increaseQuantity}
+                className="flex h-10 w-10 items-center justify-center text-brand-text-muted transition-colors hover:bg-brand-card hover:text-brand-text sm:h-9 sm:w-8"
+              >
+                +
+              </button>
+            </div>
           )}
+
+          <CardAction
+            slug={product.slug}
+            isVariable={isVariable}
+            purchasable={purchasable}
+            adding={adding}
+            onAdd={handleAddToCart}
+          />
         </div>
       </div>
     </article>
