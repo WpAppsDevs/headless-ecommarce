@@ -2,20 +2,14 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import {
-  ArrowRight,
-  CheckCheck,
-  Heart,
-  HelpCircle,
-  Package,
-  ShoppingBag,
-  Timer,
-} from 'lucide-react';
+import { ArrowRight, Heart, ShoppingBag, Timer } from 'lucide-react';
 import type { Order } from '@/lib/api/orders';
 import type { UserProfile } from '@/lib/api/checkout';
 import { filterCheckoutDrafts } from '@/lib/order-utils';
 import { orderStatusStyle } from '@/lib/order-status';
 import { isActiveOrder, showsPreOrderWindow } from '@/lib/order-progress';
+import { DashboardShortcuts } from './DashboardShortcuts';
+import { DashboardStats } from './DashboardStats';
 import { OrderDetailsModal } from './OrderDetailsModal';
 import { OrderProgress } from './OrderProgress';
 import { RecentOrders } from './RecentOrders';
@@ -27,7 +21,6 @@ import { useWishlistStore } from '@/stores/wishlistStore';
 import { PRE_ORDER_WINDOW_DAYS } from '@/lib/delivery';
 import { formatRange } from '@/i18n/format';
 import { personInitials, personName } from '@/lib/user-name';
-import { config } from '@/lib/config';
 
 interface DashboardProps {
   profile: UserProfile | null;
@@ -65,16 +58,20 @@ export function Dashboard({ profile, orders }: DashboardProps) {
   return (
     <div className="space-y-4">
       {/* Greeting + the three things a customer opens this page to do */}
-      <section className="rounded-2xl border border-brand-border bg-white p-5 sm:p-6">
-        <div className="flex flex-wrap items-center gap-4">
+      <section className="relative overflow-hidden rounded-2xl border border-brand-border bg-white p-5 sm:p-6">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-brand-accent-light/70 via-brand-accent-light/25 to-transparent"
+        />
+        <div className="relative flex flex-wrap items-center gap-4">
           <span
             aria-hidden="true"
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-accent-light text-lg font-bold text-brand-accent-strong"
+            className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-brand-accent-strong text-lg font-bold text-white ring-4 ring-brand-accent-light"
           >
             {initials}
           </span>
           <div className="min-w-0 flex-1">
-            <h2 className="text-xl font-semibold tracking-tight text-brand-text">
+            <h2 className="text-xl font-semibold tracking-tight text-brand-text sm:text-2xl">
               {interpolate(copy.dashboard.welcome, { name: firstName })}
             </h2>
             <p className="mt-1 text-sm text-brand-text-muted">
@@ -83,31 +80,7 @@ export function Dashboard({ profile, orders }: DashboardProps) {
                 : copy.dashboard.greetingIdle}
             </p>
           </div>
-          <div className="flex w-full flex-wrap gap-2 sm:w-auto">
-            <Link
-              href="/account?tab=orders"
-              className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-brand-border px-3.5 text-xs font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong sm:flex-none"
-            >
-              <Package className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" />
-              {copy.dashboard.shortcutOrders}
-            </Link>
-            <Link
-              href="/account?tab=wishlist"
-              className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-brand-border px-3.5 text-xs font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong sm:flex-none"
-            >
-              <Heart className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" />
-              {copy.dashboard.shortcutWishlist}
-            </Link>
-            <a
-              href={config.whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-brand-border px-3.5 text-xs font-semibold text-brand-text transition-colors hover:border-brand-accent-strong hover:text-brand-accent-strong sm:flex-none"
-            >
-              <HelpCircle className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" />
-              {copy.dashboard.shortcutSupport}
-            </a>
-          </div>
+          <DashboardShortcuts wishlistCount={wishlistCount} />
         </div>
       </section>
 
@@ -161,26 +134,11 @@ export function Dashboard({ profile, orders }: DashboardProps) {
       )}
 
       {/* Counts — cancelled came off this row: it is a filter in Orders, not a headline */}
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          { label: copy.dashboard.statActive, value: activeOrders.length, Icon: Timer },
-          { label: copy.dashboard.statCompleted, value: completedOrders, Icon: CheckCheck },
-          { label: copy.dashboard.statTotal, value: totalOrders, Icon: Package },
-        ].map(({ label, value, Icon }) => (
-          <div
-            key={label}
-            className="flex flex-col-reverse items-start gap-1 rounded-xl border border-brand-border bg-white p-3.5 sm:flex-row sm:items-start sm:justify-between sm:p-4"
-          >
-            <div>
-              <p className="text-[11px] leading-tight text-brand-text-muted">{label}</p>
-              <p className="mt-1 text-2xl font-semibold tracking-tight text-brand-text sm:mt-1.5">
-                {value}
-              </p>
-            </div>
-            <Icon className="h-4 w-4 shrink-0 text-brand-text-muted sm:mt-1" strokeWidth={1.6} aria-hidden="true" />
-          </div>
-        ))}
-      </div>
+      <DashboardStats
+        activeOrders={activeOrders.length}
+        completedOrders={completedOrders}
+        totalOrders={totalOrders}
+      />
 
       {totalOrders === 0 ? (
         <section className="flex flex-col items-center gap-4 rounded-2xl border border-brand-border bg-white px-6 py-14 text-center">
