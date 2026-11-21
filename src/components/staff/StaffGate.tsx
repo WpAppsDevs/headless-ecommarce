@@ -7,10 +7,11 @@ import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/authStore';
 import { useDictionary } from '@/i18n/LocaleProvider';
 import { getStaffAccess, type StaffAccess } from '@/lib/api/staff-products';
+import { staffAccessOutcome } from '@/lib/staff-access-outcome';
 import { ApiError } from '@/lib/errors';
 import { StaffShell } from '@/components/staff/StaffShell';
 
-type GateState = 'checking' | 'allowed' | 'denied' | 'failed';
+type GateState = 'checking' | 'allowed' | 'denied' | 'unavailable';
 
 const StaffAccessContext = createContext<StaffAccess | null>(null);
 
@@ -59,7 +60,7 @@ export function StaffGate({ children }: { children: React.ReactNode }) {
       .catch((error: unknown) => {
         if (cancelled) return;
         const code = error instanceof ApiError ? error.code : '';
-        setState(code === 'forbidden' || code === 'no_token' ? 'denied' : 'failed');
+        setState(staffAccessOutcome(code) === 'denied' ? 'denied' : 'unavailable');
       });
 
     return () => {
@@ -94,10 +95,10 @@ export function StaffGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (state === 'failed') {
+  if (state === 'unavailable') {
     return (
       <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center gap-4 text-center">
-        <p className="text-sm text-brand-text-muted">{copy.errorBody}</p>
+        <p className="text-sm text-brand-text-muted">{copy.unavailableBody}</p>
         <Button type="button" variant="outline" onClick={handleRetry}>
           {copy.retry}
         </Button>

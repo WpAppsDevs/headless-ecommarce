@@ -809,6 +809,8 @@ export const en = {
     signOut: 'Sign out',
     loading: 'Checking access…',
     errorBody: 'The dashboard could not be opened. Check the connection and try again.',
+    unavailableBody:
+      'The product service is not available on this site yet. Ask an administrator to update the WordPress plugin, then reload.',
     retry: 'Try again',
     noAccessTitle: 'No access',
     noAccessBody:
@@ -824,6 +826,8 @@ export const en = {
       invalidCredentials: 'Invalid email or password.',
       failed: 'Sign in failed. Try again.',
       noAccess: 'This account cannot open the product dashboard.',
+      unavailable:
+        'You are signed in, but the product service is not available on this site yet. Ask an administrator to update the WordPress plugin.',
       usernameRequired: 'Email or username is required',
       passwordRequired: 'Password is required',
     },
