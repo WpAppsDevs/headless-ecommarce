@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingBag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cartStore';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { AvailabilityBadge } from '@/components/product/AvailabilityBadge';
 import type { Product } from '@/lib/api/products';
 import { getProductBadge, isPurchasable } from '@/lib/product-availability';
+import { CardAction } from '@/components/product/CardAction';
 import { useFormatPrice } from '@/lib/utils/currency';
 import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
 import { taxonomyLabel } from '@/i18n/taxonomy';
@@ -264,38 +264,13 @@ export function ProductCard({ product, priority = false }: { product: Product; p
                 </button>
               </div>
 
-              {/* Add to Cart (simple) / Select Options (variable) */}
-              {isVariable ? (
-                <Link
-                  href={`/products/${product.slug}`}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-wine py-3 text-xs font-semibold text-white transition-colors hover:bg-brand-accent-strong-hover sm:flex-1 sm:gap-1.5 sm:py-2 sm:text-sm sm:px-3"
-                >
-                  <ShoppingBag className="h-4 w-4 shrink-0 sm:h-3.5 sm:w-3.5" />
-                  <span>{copy.selectOptions}</span>
-                </Link>
-              ) : (
-                // A sold-out card used to keep an enabled button whose handler
-                // returned early, so the click did nothing at all. Say why.
-                <button
-                  type="button"
-                  onClick={handleAddToCart}
-                  disabled={adding || !purchasable}
-                  className={cn(
-                    'flex w-full items-center justify-center gap-2 rounded-lg bg-brand-wine py-3 text-xs font-semibold text-white transition-colors hover:bg-brand-accent-strong-hover disabled:opacity-70 sm:flex-1 sm:gap-1.5 sm:py-2 sm:text-sm sm:px-3',
-                    !purchasable && 'bg-brand-border text-brand-text-muted',
-                    adding && 'opacity-70',
-                  )}
-                >
-                  <ShoppingBag className="h-4 w-4 shrink-0 sm:h-3.5 sm:w-3.5" />
-                  <span className="truncate">
-                    {!purchasable
-                      ? copy.badge.soldOut
-                      : adding
-                        ? copy.adding
-                        : copy.addToCart}
-                  </span>
-                </button>
-              )}
+              <CardAction
+                slug={product.slug}
+                isVariable={isVariable}
+                purchasable={purchasable}
+                adding={adding}
+                onAdd={handleAddToCart}
+              />
             </>
           )}
         </div>
