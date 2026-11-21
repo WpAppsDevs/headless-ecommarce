@@ -57,6 +57,7 @@ Server Components in this codebase do not read auth cookies. Authenticated scree
 - Use `apiClient` for the standard `{ success, data }` contract.
 - Use raw `fetch` when you need pagination `meta`, a status code, multipart, or a non-standard body. Document why in a comment.
 - Choose the right runtime branch: browser → proxy, server → direct. Keep both branches unless the function is server-only.
+- An authenticated browser call goes to this site's own `/api/*` route, never to WordPress cross-origin: the bearer token stays same-origin and no CORS preflight is involved. A path passed to `apiClient` never starts with `/`; `resolveApiUrl` strips one, because `…/wp-json//api/…` is a `404 rest_no_route` while the same path without the extra slash 401s — a mismatch that reads like a missing plugin.
 - Normalize at the boundary. The API may return `{}` for empty arrays or `url` instead of `src`; handle it once in the API module.
 - Set a revalidation policy deliberately. If the data should be fresh, use `cache: 'no-store'`; if it is catalog data, use ISR.
 - Catch and degrade on server pages. Empty products, empty filters, and missing menus are recoverable; a thrown error is not.
@@ -154,7 +155,7 @@ throw new ApiError('out_of_stock', 'This item is out of stock');
 - Test pure logic first: normalizers, formatters, filters, and fallback selection. These need no browser and no WordPress instance.
 - `npm test` runs once; `npm run test:watch` watches.
 - Fix the bug first, then add the test that keeps it fixed.
-- Browser flows (add to cart, login reload, checkout, tracking, reviews) are still verified manually against the local WordPress site that serves as staging. When you add an end-to-end runner, keep it out of the unit suite and document how to seed the backend.
+- Browser flows live in `e2e/` (Playwright) and self-skip without credentials. A skipped test is not coverage: exercise a new spec once against real data before trusting it, and say in the spec what it needs. Two traps that cost a day: a self-skipping checkout spec hid a broken `/checkout` redirect for as long as no product was buyable, and its locators silently matched related-product cards.
 
 ## Git
 

@@ -89,6 +89,19 @@ Closing this needs either WPML/Polylang, or a `translations` field plus endpoint
 - Where: WordPress (`wpappsdev-headless-wrapper-api`), `src/lib/api/products.ts`, `src/i18n/taxonomy.ts`.
 - Impact: high for the Bangla experience, no frontend workaround.
 
+## 8c. The staff dashboard is deliberately narrow
+
+`/studio` covers one job: simple products. What it does not do, and why:
+
+- **No restore from Trash.** A trashed product disappears from the list; WordPress admin restores it. `DELETE` is a trash, never a permanent delete.
+- **No staff management.** Users are created in WordPress admin and given the `product_uploader` role; the dashboard cannot invite anyone, by design.
+- **No brand or tag creation.** Both are chosen from what exists. Brands are hidden entirely while the `product_brand` taxonomy is empty.
+- **Alt text is optional.** Images upload and save without it; the image endpoint can correct it later.
+- **No stock/order sections yet.** The shell and guard are ready for them.
+
+- Where: `src/app/(staff)/`, `src/components/staff/`, `includes/Staff/` in the plugin.
+- Impact: low — each is a decision, not a defect.
+
 ## 9. Dark-mode utilities remain dormant
 
 The `.dark` token block was removed and no toggle applies the class. Some shadcn primitives still carry `dark:` utilities, which only activate under a `.dark` ancestor, so they are inert.
