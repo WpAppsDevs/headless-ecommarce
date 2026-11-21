@@ -4,9 +4,9 @@
 
 | URL | File | Rendering | Auth |
 | --- | --- | --- | --- |
-| `/` | `src/app/(shop)/page.tsx` | Server, ISR 60 s | Public |
-| `/products` | `src/app/(shop)/products/page.tsx` | Server, ISR 60 s | Public |
-| `/products/[slug]` | `src/app/(shop)/products/[slug]/page.tsx` | Server, ISR 60 s | Public |
+| `/` | `src/app/(storefront)/(shop)/page.tsx` | Server, ISR 60 s | Public |
+| `/products` | `src/app/(storefront)/(shop)/products/page.tsx` | Server, ISR 60 s | Public |
+| `/products/[slug]` | `src/app/(storefront)/(shop)/products/[slug]/page.tsx` | Server, ISR 60 s | Public |
 | `/cart` | `src/app/cart/page.tsx` | Static shell + client content | Public |
 | `/contact` | `src/app/contact/page.tsx` | Static | Public |
 | `/checkout` | `src/app/checkout/page.tsx` | Client | Required |
@@ -17,7 +17,7 @@
 | `/reset-password` | `src/app/reset-password/page.tsx` | Static shell | Public |
 | `/order-confirmation/[id]` | `src/app/order-confirmation/[id]/page.tsx` | Client | Public (assumes checkout context) |
 | `/track-order` | `src/app/track-order/page.tsx` | Client | Public, richer when signed in |
-| `/wishlist` | `src/app/(shop)/wishlist/page.tsx` | Server redirect | Public |
+| `/wishlist` | `src/app/(storefront)/(shop)/wishlist/page.tsx` | Server redirect | Public |
 | `/shipping` | `src/app/shipping/page.tsx` | Static | Public |
 | `/returns` | `src/app/returns/page.tsx` | Static | Public |
 | `/privacy-policy` | `src/app/privacy-policy/page.tsx` | Static | Public |
@@ -25,21 +25,32 @@
 
 There are no `/about`, `/faq`, or `/collections` pages. The header fallback includes `/contact`, which resolves to the static support page. The WordPress menu can replace the fallback links at runtime.
 
-## Root layout
+## Layouts
 
-`src/app/layout.tsx` runs for every page:
+There is one root layout and two surface layouts. A page lives in exactly one
+route group, so it inherits exactly one of them.
+
+**`src/app/layout.tsx` — the document shell.** Runs for every page:
 
 1. Loads Geist, Geist Mono, Playfair Display, and Inter through `next/font/google`.
-2. Fetches the `primary` WordPress menu with `getMenuByLocation`.
-3. Renders, in order: `AuthHydrator`, `CartHydrator`, `WishlistHydrator`, `CurrencyHydrator`, `ErrorReporter`, `AnnouncementBar`, `Header`, `CartDrawer`, `Toaster`, `main`, `Footer`.
+2. Reads the `locale` cookie and provides it through `LocaleProvider`.
+3. Renders `AuthHydrator`, `CartHydrator`, `WishlistHydrator`, `CurrencyHydrator`, `ErrorReporter` and `Toaster`.
+
+It owns `<html>`, `<body>` and nothing else visual.
+
+**`src/app/(storefront)/layout.tsx` — the shop.** Fetches the `primary` WordPress menu with `getMenuByLocation`, then renders the skip link, `AnnouncementBar`, `Header`, `CartDrawer`, `<main id="main">` and `Footer`. Every public page — home, catalog, cart, checkout, account, auth, policies, tracking, the dev preview — lives under `(storefront)/`.
+
+**`src/app/(staff)/layout.tsx` — the staff surface.** Chrome-free on purpose: no announcement bar, cart, wishlist or shop footer. The `/studio` dashboard lives here and brings its own shell.
 
 `getMenuByLocation` never throws and returns `[]` on failure. The header then uses its static links. That means a WordPress outage degrades navigation instead of breaking the layout.
 
-The layout is a Server Component but the header is a Client Component. `navLinks` is serialized across the boundary.
+The layouts are Server Components but the header is a Client Component. `navLinks` is serialized across the boundary.
+
+`src/app/not-found.tsx` remains at the root for URLs that match no route; `(storefront)/not-found.tsx` re-exports it so an in-app `notFound()` (a missing product) keeps the storefront chrome.
 
 ## Home page
 
-`src/app/(shop)/page.tsx` composes sections in this order:
+`src/app/(storefront)/(shop)/page.tsx` composes sections in this order:
 
 `HeroSlider` → `CategoryBanners` → `CategoryGrid` → `PreOrderSteps` → featured products → `WholesaleBanner` → `TestimonialsSection` → `ComingSoonSection` → `FeaturesStrip` → `WhatsAppCTA`.
 
@@ -47,7 +58,7 @@ The home page makes one bounded catalogue request (up to 100 products) and passe
 
 ## Shop page
 
-`src/app/(shop)/products/page.tsx` reads `page`, `category`, `search`, `tag`, and `brand` from `searchParams`. It clamps the page to at least 1 and trims the other values.
+`src/app/(storefront)/(shop)/products/page.tsx` reads `page`, `category`, `search`, `tag`, and `brand` from `searchParams`. It clamps the page to at least 1 and trims the other values.
 
 It fetches products and filters in parallel with `Promise.all`. Both promises catch and fall back to empty data. A failed API call therefore renders an empty shop, not an error page.
 
@@ -69,7 +80,7 @@ Pagination is a full navigation. Client-side filter state resets when the page c
 
 ## Product page
 
-`src/app/(shop)/products/[slug]/page.tsx`:
+`src/app/(storefront)/(shop)/products/[slug]/page.tsx`:
 
 1. `generateStaticParams()` fetches every product slug. It returns `[]` when `NEXT_PUBLIC_WP_URL` is missing.
 2. `generateMetadata()` fetches the product and uses its name and stripped short description.

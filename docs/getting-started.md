@@ -110,7 +110,7 @@ The default gates live in [coding-standards.md](coding-standards.md#definition-o
 
 ## A five-minute tour
 
-1. `src/app/layout.tsx` — fonts, metadata, hydrators, header, cart drawer, footer.
+1. `src/app/layout.tsx` — fonts, metadata, locale provider, hydrators, toaster; `(storefront)/layout.tsx` — announcement bar, header, cart drawer, footer.
 2. `src/app/(shop)/page.tsx` — home page composition; most sections are static components, products come from `getProducts`.
 3. `src/app/(shop)/products/page.tsx` — server page that loads products and filters, then hands them to `ShopClient`.
 4. `src/lib/api/products.ts` — the best example of the API layer: raw types, normalization, and ISR.

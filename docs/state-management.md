@@ -93,7 +93,7 @@ Use the custom formatter for prices. Store settings define separators and decima
 
 ## Hydration order
 
-`src/app/layout.tsx` mounts the hydrators before the header. The dependency that matters is explicit:
+`src/app/layout.tsx` mounts the hydrators above both surface layouts, so they run before the header. The dependency that matters is explicit:
 
 - `CartHydrator` and `WishlistHydrator` wait for `authStore.hydrated`.
 - `CurrencyHydrator` is independent.
