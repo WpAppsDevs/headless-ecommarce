@@ -71,6 +71,8 @@ Vitest covers pure logic, and `check:routes` covers language and metadata per ro
 
 Still uncovered: checkout validation, cart merge on sign-in, review submission, and tracking lookup. Checkout has a test written but it self-skips, because every product is currently sold out and no cart can be filled.
 
+The staff dashboard has a spec too (`e2e/staff-products.spec.ts`): sign in at `/studio/login`, create a draft with a real image, find it under Drafts, trash it. It needs a `product_uploader` account and skips without `E2E_STAFF_EMAIL` / `E2E_STAFF_PASSWORD`, so CI stays green until those secrets exist.
+
 Closing this needs stock in WordPress, plus a seeded staging site so those flows do not depend on live data. Keep it separate from the unit suite.
 
 - Where: `playwright.config.ts`, `e2e/*.spec.ts`, `vitest.config.ts`.
