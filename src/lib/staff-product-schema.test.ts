@@ -59,6 +59,16 @@ describe('staff product schema', () => {
     expect(schema.safeParse(values({ sellPrice: '1200' })).success).toBe(true);
   });
 
+  it('rejects a zero sell price', () => {
+    // This shipped once: 0 was read as "no discount" and the product went live
+    // at ৳0.00 while its regular price still read 2500.
+    expect(issuePaths(values({ sellPrice: '0' }))).toContain('sellPrice');
+  });
+
+  it('rejects a zero regular price', () => {
+    expect(issuePaths(values({ regularPrice: '0' }))).toContain('regularPrice');
+  });
+
   it('rejects a malformed price', () => {
     expect(issuePaths(values({ regularPrice: '12,00' }))).toContain('regularPrice');
   });

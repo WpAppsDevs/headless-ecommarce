@@ -923,7 +923,7 @@ export const bn: Dictionary = {
       loading: 'প্রোডাক্ট লোড হচ্ছে…',
       errors: {
         nameRequired: 'কমপক্ষে দুই অক্ষরের নাম দিন।',
-        priceInvalid: 'শূন্য বা তার বেশি দাম লিখুন, সংখ্যা ও ডট দিয়ে।',
+        priceInvalid: 'শূন্যের বেশি দাম লিখুন, সংখ্যা ও ডট দিয়ে।',
         sellAboveRegular: 'বিক্রয় মূল্য নিয়মিত দামের চেয়ে বেশি হতে পারে না।',
         categoryRequired: 'কমপক্ষে একটা ক্যাটাগরি বাছুন।',
         imageRequired: 'একটা প্রধান ছবি যোগ করুন।',
