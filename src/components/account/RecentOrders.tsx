@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, PackageOpen } from 'lucide-react';
+import { ArrowRight, ChevronRight, PackageOpen, ReceiptText } from 'lucide-react';
 import type { Order } from '@/lib/api/orders';
 import { orderStatusStyle } from '@/lib/order-status';
 import { useDictionary } from '@/i18n/LocaleProvider';
@@ -31,43 +31,63 @@ export function RecentOrders({ orders, locale, onOpen }: RecentOrdersProps) {
 
   return (
     <section className="overflow-hidden rounded-2xl border border-brand-border bg-white">
-      <div className="flex items-center justify-between border-b border-brand-border px-5 py-3.5">
-        <h3 className="text-sm font-semibold text-brand-text">{copy.dashboard.recentOrders}</h3>
+      <div className="flex items-center gap-2.5 border-b border-brand-border px-4 py-3.5 sm:px-5">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-accent-light text-brand-accent-strong">
+          <ReceiptText className="h-4 w-4" strokeWidth={1.7} aria-hidden="true" />
+        </span>
+        <h3 className="min-w-0 flex-1 truncate text-sm font-semibold text-brand-text">
+          {copy.dashboard.recentOrders}
+        </h3>
         <Link
           href="/account?tab=orders"
-          className="inline-flex items-center gap-1 text-xs font-semibold text-brand-accent-strong hover:underline"
+          className="group inline-flex shrink-0 items-center gap-1 rounded-full border border-brand-border px-3 py-1.5 text-[11px] font-semibold text-brand-accent-strong transition-colors hover:border-brand-accent-strong/40 hover:bg-brand-accent-light"
         >
           {copy.dashboard.allOrders}
-          <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
+          <ArrowRight
+            className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+            strokeWidth={2}
+            aria-hidden="true"
+          />
         </Link>
       </div>
 
       {orders.map((order) => {
         const firstItem = order.line_items[0];
         const extraItems = order.line_items.length - 1;
+        const status = orderStatusStyle(order.status);
 
         return (
           <button
             key={order.id}
             type="button"
             onClick={() => onOpen(order)}
-            className="flex w-full items-center gap-3 border-b border-brand-border px-5 py-3 text-left transition-colors last:border-b-0 hover:bg-brand-bg"
+            className="group flex w-full items-center gap-3 border-b border-brand-border px-4 py-3.5 text-left transition-colors last:border-b-0 hover:bg-brand-bg/70 sm:gap-3.5 sm:px-5"
           >
-            <span className="relative h-14 w-12 shrink-0 overflow-hidden rounded-lg bg-brand-card">
+            <span className="relative h-16 w-14 shrink-0 overflow-hidden rounded-xl bg-brand-card ring-1 ring-brand-border/70">
               {firstItem?.image ? (
                 <Image
                   src={firstItem.image}
                   alt=""
-                  width={48}
-                  height={56}
-                  className="h-full w-full object-cover"
+                  width={56}
+                  height={64}
+                  className="h-full w-full object-cover transition-transform duration-300 motion-safe:group-hover:scale-105"
                 />
               ) : (
                 <span className="flex h-full w-full items-center justify-center">
-                  <PackageOpen className="h-5 w-5 text-brand-text-muted" strokeWidth={1.4} aria-hidden="true" />
+                  <PackageOpen
+                    className="h-5 w-5 text-brand-text-muted"
+                    strokeWidth={1.4}
+                    aria-hidden="true"
+                  />
+                </span>
+              )}
+              {extraItems > 0 && (
+                <span className="absolute bottom-0 right-0 rounded-tl-md bg-brand-text/80 px-1.5 py-0.5 text-[9px] font-semibold leading-none text-white">
+                  +{extraItems}
                 </span>
               )}
             </span>
+
             <span className="min-w-0 flex-1">
               <span className="block text-[13px] font-semibold text-brand-text">
                 {interpolate(copy.orders.orderId, { id: String(order.id) })}
@@ -75,20 +95,29 @@ export function RecentOrders({ orders, locale, onOpen }: RecentOrdersProps) {
                   {fmtDate(order.date_created)}
                 </span>
               </span>
-              <span className="mt-0.5 block truncate text-xs text-brand-text-muted">
+              <span className="mt-1 block truncate text-xs text-brand-text-muted">
                 {firstItem?.name ?? copy.dashboard.noOrders}
                 {extraItems > 0 &&
                   ` · ${interpolate(copy.dashboard.moreItems, { count: String(extraItems) })}`}
               </span>
             </span>
-            <span className="flex shrink-0 flex-col items-end gap-1">
-              <span className="text-[13px] font-semibold text-brand-text">{fmt(order.total)}</span>
+
+            <span className="flex shrink-0 flex-col items-end gap-1.5">
+              <span className="text-[13px] font-semibold text-brand-text nums-lining">
+                {fmt(order.total)}
+              </span>
               <span
-                className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${orderStatusStyle(order.status).badge}`}
+                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${status.chip}`}
               >
-                {copy.statuses[orderStatusStyle(order.status).key]}
+                {copy.statuses[status.key]}
               </span>
             </span>
+
+            <ChevronRight
+              className="hidden h-4 w-4 shrink-0 text-brand-border transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-brand-accent-strong sm:block"
+              strokeWidth={1.8}
+              aria-hidden="true"
+            />
           </button>
         );
       })}
