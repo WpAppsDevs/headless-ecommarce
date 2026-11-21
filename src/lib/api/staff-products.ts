@@ -8,7 +8,7 @@
  * @see docs/architecture.md — route handlers are proxies, WordPress authorizes
  */
 
-import { apiClient, tokenCache } from './client';
+import { tokenCache } from './client';
 import { ApiError } from '@/lib/errors';
 
 export interface StaffAccess {
@@ -119,14 +119,31 @@ function normalizeOptions(raw: unknown): StaffOptions {
   };
 }
 
+/**
+ * Call a route on this site, never WordPress.
+ *
+ * The dashboard is authenticated: the bearer token must not leave for
+ * WordPress from the browser, and a cross-origin call would depend on CORS.
+ * `/api/staff/*` forwards the token server-side, exactly like every other
+ * authenticated surface.
+ */
+async function staffFetch(path: string, init: RequestInit = {}): Promise<unknown> {
+  const res = await fetch(path, {
+    ...init,
+    headers: { ...(init.headers ?? {}), ...authHeader() },
+  });
+
+  return parseResponse(res);
+}
+
 /** Whether this token may open the staff dashboard. Throws on failure. */
 export async function getStaffAccess(): Promise<StaffAccess> {
-  return normalizeAccess(await apiClient<unknown>('/api/staff/access'));
+  return normalizeAccess(await staffFetch('/api/staff/access'));
 }
 
 /** Categories, tags, brands, availability ids and the form limits. */
 export async function getStaffOptions(): Promise<StaffOptions> {
-  return normalizeOptions(await apiClient<unknown>('/api/staff/options'));
+  return normalizeOptions(await staffFetch('/api/staff/options'));
 }
 
 
@@ -311,7 +328,7 @@ export async function listStaffProducts(query: StaffProductQuery = {}): Promise<
   if (query.status) params.set('status', query.status);
   if (query.search) params.set('search', query.search);
 
-  const raw = await apiClient<unknown>(`/api/staff/products?${params.toString()}`);
+  const raw = await staffFetch(`/api/staff/products?${params.toString()}`);
   const page = isRecord(raw) ? raw : {};
   const items = Array.isArray(page.items) ? page.items : [];
 
@@ -325,7 +342,7 @@ export async function listStaffProducts(query: StaffProductQuery = {}): Promise<
 }
 
 export async function getStaffProduct(id: number): Promise<StaffProduct> {
-  return normalizeStaffProduct(await apiClient<unknown>(`/api/staff/products/${id}`));
+  return normalizeStaffProduct(await staffFetch(`/api/staff/products/${id}`));
 }
 
 export async function createStaffProduct(

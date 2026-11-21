@@ -122,6 +122,25 @@ function buildHeaders(
 }
 
 // ---------------------------------------------------------------------------
+// URL building
+// ---------------------------------------------------------------------------
+
+/**
+ * Join a path onto the WordPress base.
+ *
+ * A leading slash used to be a silent 404: `apiClient('/api/staff/access')`
+ * produced `…/wp-json//api/staff/access`, which WordPress answers with
+ * `rest_no_route` while its JWT middleware still 401s the bare path — a
+ * mismatch that looked like a missing plugin. Normalising here means callers
+ * cannot express that URL.
+ */
+export function resolveApiUrl(path: string): string {
+  if (path.startsWith('http')) return path;
+
+  return `${config.apiBase}/${path.replace(/^\/+/, '')}`;
+}
+
+// ---------------------------------------------------------------------------
 // Main export
 // ---------------------------------------------------------------------------
 
@@ -137,9 +156,7 @@ export async function apiClient<T = unknown>(
     explicitToken ??
     (typeof window !== 'undefined' ? tokenCache.get() : undefined);
 
-  const url = path.startsWith('http')
-    ? path
-    : `${config.apiBase}/${path}`;
+  const url = resolveApiUrl(path);
 
   const makeOpts = (t?: string): RequestInit => ({
     ...rest,
