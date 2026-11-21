@@ -12,7 +12,12 @@
 import { spawn } from 'node:child_process';
 
 const PORT = Number(process.env.PORT ?? 3210);
-const BASE = `http://127.0.0.1:${PORT}`;
+// A CI runner occasionally resolves a freshly started server on one loopback
+// name and not the other, which looked like "the server never started" even
+// though Next had printed Ready. Try both before giving up.
+const BASES = [`http://127.0.0.1:${PORT}`, `http://localhost:${PORT}`];
+/** The loopback name that actually answered; every later request uses it. */
+let BASE = BASES[0];
 
 /**
  * Each case names a route, the cookie it is requested with, the language the
@@ -66,15 +71,24 @@ function decodeEntities(text) {
 
 async function waitForServer(deadline) {
   while (Date.now() < deadline) {
-    try {
-      const response = await fetch(BASE, { signal: AbortSignal.timeout(5000) });
-      if (response.ok) return;
-    } catch {
-      // not listening yet
+    for (const candidate of BASES) {
+      try {
+        const response = await fetch(candidate, { signal: AbortSignal.timeout(5000) });
+        // Any HTTP answer means the server is listening; a 404 or 500 is the
+        // app's business, not a startup failure.
+        if (response.status > 0) {
+          if (candidate !== BASE) console.log(`server answered on ${candidate}`);
+          BASE = candidate;
+          return;
+        }
+      } catch {
+        // not listening yet
+      }
     }
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
-  throw new Error(`server did not answer on ${BASE} within 30s`);
+
+  throw new Error(`server did not answer on ${BASES.join(' or ')} within 30s`);
 }
 
 /**

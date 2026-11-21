@@ -48,6 +48,8 @@ $ E2E_EMAIL=… E2E_PASSWORD=… npm run test:e2e
 - Credentials come from `E2E_EMAIL` / `E2E_PASSWORD` only. With either missing every test skips, so a checkout without the secret stays green rather than failing for the wrong reason. The same applies in CI: add the two repository secrets to enable the job's browser step.
 - The suite reads a live WordPress. The account test asserts that an order exists, never how many, and the checkout test walks the shop until a product can be added, skipping if none can. Hard-coded ids would rot against real data.
 - `e2e-open` status on the shop means the test cannot run: when every product is sold out there is no way to fill a cart.
+- `e2e/staff-products.spec.ts` covers the staff dashboard: it signs in at `/studio/login`, creates a draft with a real image, finds it under Drafts and trashes it. It needs `E2E_STAFF_EMAIL` / `E2E_STAFF_PASSWORD` (a `product_uploader` account) and skips without them.
+- Do not start the suite while a WordPress plugin deploy is running: the deploy swaps the plugin directory, so REST calls fail for a few seconds and unrelated login assertions go red.
 
 ## Advisories
 
@@ -121,6 +123,8 @@ The route treats "Member Exists" as success. It does not double opt-in; the memb
 ## Caching and revalidation
 
 Cache layers and TTLs live in [architecture.md](architecture.md#caching). After a WordPress content change, expect up to the TTL before the storefront reflects it. To force a refresh, redeploy or wait; there is no on-demand revalidation webhook.
+
+On the WordPress host, keep `wp-json/api/*` out of the page cache (LiteSpeed: **Do Not Cache URIs**). Those are authenticated responses; a cached 404 or 401 outlives the deploy that fixed it and makes a working endpoint look broken.
 
 ## Monitoring
 
