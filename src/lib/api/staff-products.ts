@@ -8,7 +8,8 @@
  * @see docs/architecture.md — route handlers are proxies, WordPress authorizes
  */
 
-import { apiClient } from './client';
+import { apiClient, tokenCache } from './client';
+import { ApiError } from '@/lib/errors';
 
 export interface StaffAccess {
   allowed: boolean;
@@ -126,4 +127,239 @@ export async function getStaffAccess(): Promise<StaffAccess> {
 /** Categories, tags, brands, availability ids and the form limits. */
 export async function getStaffOptions(): Promise<StaffOptions> {
   return normalizeOptions(await apiClient<unknown>('/api/staff/options'));
+}
+
+
+export interface StaffImage {
+  id: number;
+  url: string;
+  alt: string;
+  mimeType: string;
+  width: number;
+  height: number;
+}
+
+export interface StaffProduct {
+  id: number;
+  name: string;
+  status: string;
+  sku: string;
+  regularPrice: string;
+  salePrice: string;
+  price: string;
+  stockStatus: string;
+  stockQuantity: number | null;
+  manageStock: boolean;
+  backorders: string;
+  availability: string;
+  categories: StaffTerm[];
+  brands: StaffTerm[];
+  tags: StaffTerm[];
+  image: StaffImage | null;
+  gallery: StaffImage[];
+  authorId: number;
+  description: string;
+  canEdit: boolean;
+}
+
+export interface StaffProductPage {
+  items: StaffProduct[];
+  total: number;
+  page: number;
+  perPage: number;
+  totalPages: number;
+}
+
+export interface StaffProductPayload {
+  name: string;
+  description: string;
+  regular_price: string;
+  sell_price: string;
+  sku: string;
+  stock_mode: 'managed' | 'status';
+  stock_quantity: number;
+  backorders: string;
+  stock_status: string;
+  category_ids: number[];
+  brand_ids: number[];
+  tag_ids: number[];
+  availability: string;
+  image_id: number;
+  gallery_ids: number[];
+  status: 'draft' | 'publish';
+}
+
+export function normalizeStaffImage(raw: unknown): StaffImage {
+  const image = isRecord(raw) ? raw : {};
+
+  return {
+    id: asNumber(image.id),
+    url: asString(image.url),
+    alt: asString(image.alt),
+    mimeType: asString(image.mime_type),
+    width: asNumber(image.width),
+    height: asNumber(image.height),
+  };
+}
+
+function normalizeStaffImages(raw: unknown): StaffImage[] {
+  return Array.isArray(raw) ? raw.map(normalizeStaffImage) : [];
+}
+
+function normalizeStaffProduct(raw: unknown): StaffProduct {
+  const product = isRecord(raw) ? raw : {};
+  const image = isRecord(product.image) ? normalizeStaffImage(product.image) : null;
+
+  return {
+    id: asNumber(product.id),
+    name: asString(product.name),
+    status: asString(product.status),
+    sku: asString(product.sku),
+    regularPrice: asString(product.regular_price),
+    salePrice: asString(product.sale_price),
+    price: asString(product.price),
+    stockStatus: asString(product.stock_status, 'instock'),
+    stockQuantity: asNullableNumber(product.stock_quantity),
+    manageStock: asBoolean(product.manage_stock),
+    backorders: asString(product.backorders, 'no'),
+    availability: asString(product.availability),
+    categories: normalizeTerms(product.categories),
+    brands: normalizeTerms(product.brands),
+    tags: normalizeTerms(product.tags),
+    image,
+    gallery: normalizeStaffImages(product.gallery),
+    authorId: asNumber(product.author_id),
+    description: asString(product.description),
+    canEdit: asBoolean(product.can_edit, true),
+  };
+}
+
+function authHeader(): Record<string, string> {
+  const token = tokenCache.get();
+
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+function unwrap(json: unknown): unknown {
+  return isRecord(json) && 'data' in json ? json.data : json;
+}
+
+/** Parse a proxy response, turning both error shapes into an ApiError. */
+async function parseResponse(res: Response): Promise<unknown> {
+  const json: unknown = await res.json().catch(() => null);
+  const failure = isRecord(json) && json.success === false ? json : null;
+
+  if (failure) {
+    throw new ApiError(
+      asString(failure.code, 'api_error'),
+      asString(failure.message, `HTTP ${res.status}`),
+    );
+  }
+
+  if (!res.ok) {
+    const error = isRecord(json) ? json : {};
+    throw new ApiError(asString(error.code, 'http_error'), asString(error.message, `HTTP ${res.status}`));
+  }
+
+  return unwrap(json);
+}
+
+/** Upload one product image. Resolves with the attachment the product will reference. */
+export async function uploadStaffImage(file: File, alt = ''): Promise<StaffImage> {
+  const form = new FormData();
+  form.append('file', file);
+
+  if (alt) form.append('alt', alt);
+
+  // No Content-Type: the browser adds the multipart boundary.
+  const res = await fetch('/api/staff/media', {
+    method: 'POST',
+    headers: authHeader(),
+    body: form,
+  });
+
+  return normalizeStaffImage(await parseResponse(res));
+}
+
+export async function deleteStaffImage(id: number): Promise<void> {
+  await parseResponse(
+    await fetch(`/api/staff/media/${id}`, { method: 'DELETE', headers: authHeader() }),
+  );
+}
+
+export async function updateStaffImageAlt(id: number, alt: string): Promise<StaffImage> {
+  const res = await fetch(`/api/staff/media/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...authHeader() },
+    body: JSON.stringify({ alt }),
+  });
+
+  return normalizeStaffImage(await parseResponse(res));
+}
+
+export interface StaffProductQuery {
+  page?: number;
+  perPage?: number;
+  status?: 'publish' | 'draft' | 'trash';
+  search?: string;
+}
+
+export async function listStaffProducts(query: StaffProductQuery = {}): Promise<StaffProductPage> {
+  const params = new URLSearchParams();
+  if (query.page) params.set('page', String(query.page));
+  if (query.perPage) params.set('per_page', String(query.perPage));
+  if (query.status) params.set('status', query.status);
+  if (query.search) params.set('search', query.search);
+
+  const raw = await apiClient<unknown>(`/api/staff/products?${params.toString()}`);
+  const page = isRecord(raw) ? raw : {};
+  const items = Array.isArray(page.items) ? page.items : [];
+
+  return {
+    items: items.map(normalizeStaffProduct),
+    total: asNumber(page.total),
+    page: asNumber(page.page, 1),
+    perPage: asNumber(page.per_page, 20),
+    totalPages: asNumber(page.total_pages),
+  };
+}
+
+export async function getStaffProduct(id: number): Promise<StaffProduct> {
+  return normalizeStaffProduct(await apiClient<unknown>(`/api/staff/products/${id}`));
+}
+
+export async function createStaffProduct(
+  payload: StaffProductPayload,
+  idempotencyKey: string,
+): Promise<StaffProduct> {
+  const res = await fetch('/api/staff/products', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Idempotency-Key': idempotencyKey,
+      ...authHeader(),
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return normalizeStaffProduct(await parseResponse(res));
+}
+
+export async function updateStaffProduct(
+  id: number,
+  payload: StaffProductPayload,
+): Promise<StaffProduct> {
+  const res = await fetch(`/api/staff/products/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...authHeader() },
+    body: JSON.stringify(payload),
+  });
+
+  return normalizeStaffProduct(await parseResponse(res));
+}
+
+export async function trashStaffProduct(id: number): Promise<void> {
+  await parseResponse(
+    await fetch(`/api/staff/products/${id}`, { method: 'DELETE', headers: authHeader() }),
+  );
 }

@@ -25,6 +25,8 @@
 | `/studio` | `src/app/(staff)/studio/page.tsx` | Server redirect → `/studio/products` | Staff |
 | `/studio/login` | `src/app/(staff)/studio/login/page.tsx` | Static shell + client form | Public |
 | `/studio/products` | `src/app/(staff)/studio/products/page.tsx` | Client shell inside a server page | Staff |
+| `/studio/products/new` | `src/app/(staff)/studio/products/new/page.tsx` | Client form inside a server page | Staff |
+| `/studio/products/[id]/edit` | `src/app/(staff)/studio/products/[id]/edit/page.tsx` | Client form inside a server page | Staff |
 
 There are no `/about`, `/faq`, or `/collections` pages. The header fallback includes `/contact`, which resolves to the static support page. The WordPress menu can replace the fallback links at runtime.
 
