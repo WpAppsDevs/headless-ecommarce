@@ -6,13 +6,20 @@ import { Loader2 } from 'lucide-react';
 import { CheckoutForm } from '@/components/checkout/CheckoutForm';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { getUser, type UserProfile } from '@/lib/api/checkout';
+import { useAuthStore } from '@/stores/authStore';
 import { useCartStore } from '@/stores/cartStore';
+import { checkoutStart } from '@/lib/checkout-start';
 import { ApiError } from '@/lib/errors';
 import { useDictionary } from '@/i18n/LocaleProvider';
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { items } = useCartStore();
+  // A full page load starts with an empty cart that has not been read yet.
+  // Redirecting on `items.length === 0` before the first read sent anyone who
+  // reloaded /checkout — or opened it directly — straight back to /cart.
+  const authHydrated = useAuthStore((s) => s.hydrated);
+  const cartHydrated = useCartStore((s) => s.hydrated);
   const dictionary = useDictionary();
   const copy = dictionary.checkout;
 
@@ -21,6 +28,8 @@ export default function CheckoutPage() {
   const [initError, setInitError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (checkoutStart(authHydrated, cartHydrated, items.length) === 'wait') return;
+
     async function init() {
       // 1. Verify auth + get profile for form pre-fill
       try {
@@ -37,7 +46,7 @@ export default function CheckoutPage() {
         // Profile fetch failed for another reason — show form unpre-filled
       }
 
-      // 2. Cart should already be loaded by CartHydrator
+      // 2. The cart is known now — either it has lines or it is empty.
       if (useCartStore.getState().items.length === 0) {
         router.replace('/cart');
         return;
@@ -47,8 +56,9 @@ export default function CheckoutPage() {
     }
 
     init().catch(() => setInitError(copy.loadFailed));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // Runs once, after both stores are settled.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authHydrated, cartHydrated]);
 
   if (initError) {
     return (
