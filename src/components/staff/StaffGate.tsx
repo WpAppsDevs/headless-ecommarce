@@ -1,16 +1,28 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/authStore';
 import { useDictionary } from '@/i18n/LocaleProvider';
-import { getStaffAccess } from '@/lib/api/staff-products';
+import { getStaffAccess, type StaffAccess } from '@/lib/api/staff-products';
 import { ApiError } from '@/lib/errors';
 import { StaffShell } from '@/components/staff/StaffShell';
 
 type GateState = 'checking' | 'allowed' | 'denied' | 'failed';
+
+const StaffAccessContext = createContext<StaffAccess | null>(null);
+
+/**
+ * The capability flags WordPress returned for this session.
+ *
+ * Null outside the gate. A component uses it to decide what to *show*; the
+ * plugin still decides what may actually happen.
+ */
+export function useStaffAccess(): StaffAccess | null {
+  return useContext(StaffAccessContext);
+}
 
 /**
  * The dashboard's door.
@@ -25,6 +37,7 @@ export function StaffGate({ children }: { children: React.ReactNode }) {
   const copy = useDictionary().staff;
   const { hydrated, isAuthenticated } = useAuthStore();
   const [state, setState] = useState<GateState>('checking');
+  const [access, setAccess] = useState<StaffAccess | null>(null);
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
@@ -38,8 +51,10 @@ export function StaffGate({ children }: { children: React.ReactNode }) {
     let cancelled = false;
 
     getStaffAccess()
-      .then(() => {
-        if (!cancelled) setState('allowed');
+      .then((next) => {
+        if (cancelled) return;
+        setAccess(next);
+        setState('allowed');
       })
       .catch((error: unknown) => {
         if (cancelled) return;
@@ -90,5 +105,9 @@ export function StaffGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  return <StaffShell>{children}</StaffShell>;
+  return (
+    <StaffAccessContext.Provider value={access}>
+      <StaffShell>{children}</StaffShell>
+    </StaffAccessContext.Provider>
+  );
 }

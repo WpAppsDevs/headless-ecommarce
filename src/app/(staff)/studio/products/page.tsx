@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import { StaffGate } from '@/components/staff/StaffGate';
+import { ProductList } from '@/components/staff/ProductList';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { getDictionary } from '@/i18n/get-dictionary';
@@ -29,10 +30,7 @@ export default async function StudioProductsPage() {
         </Link>
       </section>
 
-      <div className="rounded-[18px] border border-brand-border bg-white p-8 text-center">
-        <h2 className="text-lg font-semibold text-brand-text">{copy.emptyTitle}</h2>
-        <p className="mt-1 text-sm text-brand-text-muted">{copy.emptyBody}</p>
-      </div>
+      <ProductList />
     </StaffGate>
   );
 }
