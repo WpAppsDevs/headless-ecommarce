@@ -109,6 +109,7 @@ Raw API images may use `src` or `url`. Always run them through `normalizeImage()
 - `getStaffAccess()` asks WordPress whether this token holds `edit_products`; the dashboard calls it on every mount and never stores a role in the browser.
 - `getStaffOptions()` returns categories, tags (availability tags excluded), brands, the two availability term ids and the form limits.
 - Both go through `/api/staff/*` proxies, which forward the bearer token and return the upstream status. A 403 is a normal answer, not an error to retry.
+- `resolveApiUrl()` in `client.ts` strips a leading slash before joining `config.apiBase`. Without it, `apiClient('/api/staff/access')` produced `…/wp-json//api/staff/access`, which WordPress answers with `404 rest_no_route` while its JWT middleware still 401s the bare path — a mismatch that looked exactly like "the plugin is not deployed".
 - Payloads are normalized with guards (`normalizeAccess`, `normalizeOptions`, `normalizeStaffProduct`, `normalizeStaffImage`); nothing is cast.
 - `uploadStaffImage(file)` posts multipart to `/api/staff/media` and must not set `Content-Type`; `deleteStaffImage(id)` and `updateStaffImageAlt(id, alt)` act on one attachment.
 - `listStaffProducts`, `getStaffProduct`, `createStaffProduct`, `updateStaffProduct`, `trashStaffProduct` are the product calls. Create takes an `Idempotency-Key` derived from the form's `useId()`, so a double submit replays the first product.
