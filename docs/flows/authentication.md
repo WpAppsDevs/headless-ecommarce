@@ -126,6 +126,20 @@ The WordPress plugin builds the reset link. Its configured reset URL must point 
 
 `src/proxy.ts` (Next.js 16's middleware replacement) also guards both paths. It checks for `refresh_token` or `session_hint` and redirects to `/login?redirect=<path>` when both are absent. The check is presence-only; it is not an authorization boundary. WordPress still authorizes every data request, and the client redirect remains the fallback for expired sessions.
 
+## The staff dashboard
+
+`/studio` is a second surface with the same identity but a different door. It is not a separate login system: a staff member is a WordPress user with the `product_uploader` role, and `/studio/login` posts to the same `/api/auth/login`.
+
+Three layers decide access, in order:
+
+1. `src/proxy.ts` redirects `/studio/*` (except `/studio/login`) to `/studio/login` when neither session cookie is present. Presence only, exactly like `/account`.
+2. `StaffGate` waits for `hydrated`, redirects a signed-out visitor to `/studio/login`, then calls `GET /api/staff/access` once per mount.
+3. That call is a proxy to WordPress, which requires `edit_products`. A customer account that signs in at `/studio/login` therefore gets a 403, and the form signs it out with a "no access" message instead of letting it in.
+
+No role is stored in the browser: `UserProfile` carries no role, and the dashboard re-asks on every load. A token whose role is revoked loses the dashboard at the next page load.
+
+Staff keep their ordinary `/account`; nothing there is shared with the dashboard.
+
 ## Where to change auth
 
 | Change | File |
@@ -134,7 +148,8 @@ The WordPress plugin builds the reset link. Its configured reset URL must point 
 | Client login, logout, hydration | `src/stores/authStore.ts` |
 | 401 retry and token cache | `src/lib/api/client.ts` |
 | Login/register UI | `src/components/auth/` |
-| Protected page redirects | `src/app/account/page.tsx`, `src/app/checkout/page.tsx` |
+| Protected page redirects | `src/app/(storefront)/account/page.tsx`, `src/app/(storefront)/checkout/page.tsx` |
+| Staff dashboard guard | `src/components/staff/StaffGate.tsx`, `src/app/api/staff/access/route.ts` |
 
 ## Test cases to keep green
 

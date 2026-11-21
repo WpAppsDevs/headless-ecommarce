@@ -26,6 +26,7 @@ Third parties are narrow: Stripe.js tokenizes cards in the browser, and Mailchim
 | Checkout and profile | Browser → `/api/checkout`, `/api/auth/me` → WordPress `api/*` | Avoids CORS preflight failures on authenticated POSTs |
 | Orders | Browser → `/api/account/orders` → WordPress `api/orders` | Proxy forwards the optional `status` filter, removes `checkout-draft` rows and repairs pagination |
 | Wishlist | Browser → `/api/wishlist/*` → WordPress `api/wishlist` | Authenticated, CORS-sensitive |
+| Staff dashboard | Browser → `/api/staff/*` → WordPress `api/staff/*` | Authenticated; WordPress checks the role |
 | Reviews (read) | Browser → `/api/reviews/*` → WordPress `wpadhlwrapi/v1/reviews/*` | CORS-safe read; the server-rendered product page calls the aggregate directly |
 | Reviews (write, media, delete) | Browser → `/api/reviews/*` → WordPress `api/reviews/*` | Bearer token and multipart uploads |
 | Tracking (guest) | Browser → `/api/tracking/search` → WordPress `api/tracking/search` | Public POST with email |
