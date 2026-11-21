@@ -11,7 +11,7 @@ The storefront is a Next.js 16 App Router application. It renders every page its
 Three tiers:
 
 1. **Browser.** React 19 client components plus five Zustand stores. The browser holds the access token in memory, the guest cart token and guest wishlist IDs in `localStorage`, and the order result for the confirmation page in `sessionStorage`.
-2. **Next.js server.** Server Components fetch catalog data during render. Route handlers under `src/app/api/` proxy endpoints that need CORS handling, cookie handling, or response normalization. `fetch`-level revalidation caches the WordPress reads; the pages themselves render per request because the root layout reads the locale cookie.
+2. **Next.js server.** Server Components fetch catalog data during render. Route handlers under `src/app/api/` proxy endpoints that need CORS handling, cookie handling, or response normalization. `fetch`-level revalidation caches the WordPress reads; the pages themselves render per request because the document shell reads the locale cookie.
 3. **WordPress.** The wrapper plugin exposes WooCommerce data under `/wp-json`. It owns products, carts, orders, users, reviews, and tracking. It is the source of truth.
 
 Third parties are narrow: Stripe.js tokenizes cards in the browser, and Mailchimp receives newsletter signups through a Next.js route. WordPress performs the actual charge through its Stripe integration.

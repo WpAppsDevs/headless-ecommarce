@@ -27,13 +27,13 @@ const PROPER_NOUNS = new Set(["Najifa's Shop", "Najifa's Shop — Pakistani Coll
 
 /** Files whose English literals are deliberate, with the reason. */
 const TEXT_ALLOW = new Map([
-  ['src/app/shipping/content/En.tsx', 'English half of a bilingual page'],
-  ['src/app/returns/content/En.tsx', 'English half of a bilingual page'],
-  ['src/app/terms/content/En.tsx', 'English half of a bilingual page'],
-  ['src/app/privacy-policy/content/En.tsx', 'English half of a bilingual page'],
-  ['src/app/track-order/content/En.tsx', 'English half of a bilingual page'],
-  ['src/app/contact/content/ContactBeforeEn.tsx', 'English half of a bilingual page'],
-  ['src/app/contact/content/ContactIntroEn.tsx', 'English half of a bilingual page'],
+  ['src/app/(storefront)/shipping/content/En.tsx', 'English half of a bilingual page'],
+  ['src/app/(storefront)/returns/content/En.tsx', 'English half of a bilingual page'],
+  ['src/app/(storefront)/terms/content/En.tsx', 'English half of a bilingual page'],
+  ['src/app/(storefront)/privacy-policy/content/En.tsx', 'English half of a bilingual page'],
+  ['src/app/(storefront)/track-order/content/En.tsx', 'English half of a bilingual page'],
+  ['src/app/(storefront)/contact/content/ContactBeforeEn.tsx', 'English half of a bilingual page'],
+  ['src/app/(storefront)/contact/content/ContactIntroEn.tsx', 'English half of a bilingual page'],
 ]);
 
 /** Two or more Latin words inside a JSX text node. */

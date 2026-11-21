@@ -8,18 +8,13 @@ import {
   Noto_Serif_Bengali,
 } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { AuthHydrator } from "@/components/layout/AuthHydrator";
 import { CartHydrator } from "@/components/layout/CartHydrator";
 import { WishlistHydrator } from "@/components/layout/WishlistHydrator";
 import { CurrencyHydrator } from "@/components/layout/CurrencyHydrator";
 import { ErrorReporter } from "@/components/layout/ErrorReporter";
 import { Toaster } from "sonner";
-import { CartDrawer } from "@/components/cart/CartDrawer";
 import { config } from "@/lib/config";
-import { AnnouncementBar } from "@/components/home/AnnouncementBar";
-import { getMenuByLocation } from "@/lib/api/menus";
 import { LocaleProvider } from "@/i18n/LocaleProvider";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/server";
@@ -73,12 +68,20 @@ export const metadata: Metadata = {
   description: "Headless eCommerce powered by WooCommerce",
 };
 
+/**
+ * Document shell only: html/body, fonts, the locale provider, the hydrators and
+ * the toast outlet. Storefront chrome (announcement bar, header, cart drawer,
+ * footer) lives in `(storefront)/layout.tsx`, and the staff dashboard brings its
+ * own shell in `(staff)/layout.tsx`.
+ *
+ * Splitting here keeps one root layout, so no route needs a second `<html>`,
+ * and a surface can be chrome-free without a pathname check.
+ */
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const navLinks = await getMenuByLocation('primary');
   const locale = await getLocale();
 
   return (
@@ -88,24 +91,13 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <LocaleProvider locale={locale} dictionary={getDictionary(locale)}>
-          {/* First focusable thing in the document, so one Tab reaches it. */}
-          <a
-            href="#main"
-            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-brand-accent-strong focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
-          >
-            {getDictionary(locale).common.skipToContent}
-          </a>
           <AuthHydrator />
           <CartHydrator />
           <WishlistHydrator />
           <CurrencyHydrator />
           <ErrorReporter />
-          <AnnouncementBar />
-          <Header navLinks={navLinks} />
-          <CartDrawer />
           <Toaster richColors position="top-right" />
-          <main id="main" className="flex-1">{children}</main>
-          <Footer />
+          {children}
         </LocaleProvider>
       </body>
     </html>
