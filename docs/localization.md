@@ -9,6 +9,7 @@ This page is the durable record. It says what is translated, what is not, why, a
 - **The `locale` cookie** (`en` or `bn`), one year, `SameSite=Lax`, not httpOnly — the switcher writes it.
 - **English when the cookie is absent**, including for a crawler.
 - **No locale in the URL.** One URL per page, two languages. The trade-off — the other language is invisible to search — was accepted deliberately; see [ADR-0008](adr/0008-locale-cookie-not-url.md).
+- **Staff dashboard copy** lives in the dictionary's `staff` group (`staff.form`, `staff.list`, `staff.media`, `staff.editor`) in both languages; product content entered there is WordPress data and is never translated.
 - **Read on the server.** `getLocale()` (`src/i18n/server.ts`) reads the cookie, the root layout sets `<html lang>`, and `LocaleProvider` hands the dictionary to client components. Reading the cookie opts every route into per-request rendering; the ADR records that cost and the Cache Components route out of it.
 
 ## Where the copy lives

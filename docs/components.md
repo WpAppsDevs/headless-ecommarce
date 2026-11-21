@@ -198,3 +198,5 @@ Known weak spots: the image carousel dots rely on hover for visibility, and some
 6. Use brand tokens, not raw hex values, unless you are matching a one-off approved design.
 
 Done when the component renders its empty, loading, and error states and the change passes the definition of done.
+
+**The staff surface is its own shell.** `src/components/staff/` holds everything under `/studio`, and none of it reuses the shop chrome: `StaffGate` waits for the session, asks WordPress for the staff capability (`GET /api/staff/access`) and provides the flags through `useStaffAccess()`; `StaffShell` is the dashboard's header and section nav; `ProductList` filters, searches and paginates server-side and hides edit/trash where this token may not use them; `ProductForm` composes `ProductDetailsFields`, `ProductOrganisationFields`, `MediaUploader` and `RichTextEditor`. The form mirrors the plugin's rules in `src/lib/staff-product-schema.ts`, but the plugin still validates every request — the client copy exists to fail fast, not to be trusted.
