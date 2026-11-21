@@ -2,7 +2,8 @@
 
 import { Check } from 'lucide-react';
 import { COMPACT_ORDER_STEPS, orderCompactStep } from '@/lib/order-progress';
-import { useDictionary } from '@/i18n/LocaleProvider';
+import { useDictionary, useLocale } from '@/i18n/LocaleProvider';
+import { formatNumber } from '@/i18n/format';
 
 /**
  * Four stages, one per real status, on a quiet strip inside the order row.
@@ -13,6 +14,7 @@ import { useDictionary } from '@/i18n/LocaleProvider';
  */
 export function OrderProgress({ status }: { status: string }) {
   const copy = useDictionary().account;
+  const locale = useLocale();
   const reached = orderCompactStep(status);
 
   if (reached === null) return null;
@@ -48,7 +50,11 @@ export function OrderProgress({ status }: { status: string }) {
                       : 'bg-white text-brand-text-muted ring-1 ring-brand-border'
                 }`}
               >
-                {done ? <Check className="h-2.5 w-2.5" strokeWidth={3} /> : index + 1}
+                {done ? (
+                  <Check className="h-2.5 w-2.5" strokeWidth={3} />
+                ) : (
+                  formatNumber(locale, index + 1)
+                )}
               </span>
               <span
                 className={`mt-1.5 block text-[11px] leading-tight ${
