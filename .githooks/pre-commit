@@ -6,4 +6,14 @@
 #   git config core.hooksPath .githooks
 set -e
 
+# `next dev` rewrites next-env.d.ts to point at .next/dev/types, a directory that
+# only exists while a dev server runs. Committing that diff breaks typecheck for
+# everyone else, so fail before the slow checks.
+if ! git diff --cached --quiet -- next-env.d.ts &&
+  git diff --cached -- next-env.d.ts | grep -q '\.next/dev/'; then
+  echo 'next-env.d.ts was rewritten by `next dev`; restore it before committing:' >&2
+  echo '  git checkout -- next-env.d.ts' >&2
+  exit 1
+fi
+
 npm run verify:fast
