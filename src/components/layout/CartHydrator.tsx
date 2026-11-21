@@ -18,6 +18,7 @@ export function CartHydrator() {
   const hydrated = useAuthStore((s) => s.hydrated);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const fetchCart = useCartStore((s) => s.fetchCart);
+  const markHydrated = useCartStore((s) => s.markHydrated);
   const didFetch = useRef(false);
 
   useEffect(() => {
@@ -26,12 +27,17 @@ export function CartHydrator() {
     const hasGuestToken =
       typeof window !== 'undefined' && !!localStorage.getItem('cart_token');
 
-    // Nothing to restore for a brand-new visitor with no session
-    if (!isAuthenticated && !hasGuestToken) return;
+    // Nothing to restore for a brand-new visitor with no session. The cart is
+    // settled as empty, which is what lets /checkout tell "empty" from
+    // "not loaded yet".
+    if (!isAuthenticated && !hasGuestToken) {
+      markHydrated();
+      return;
+    }
 
     didFetch.current = true;
     fetchCart();
-  }, [hydrated, isAuthenticated, fetchCart]);
+  }, [hydrated, isAuthenticated, fetchCart, markHydrated]);
 
   return null;
 }

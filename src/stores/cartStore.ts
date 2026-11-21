@@ -33,11 +33,22 @@ interface CartState {
   cartDrawerOpen: boolean;
   /** Timestamp of the last successful cart read, used to avoid double fetches. */
   lastFetchedAt: number | null;
+  /**
+   * Whether the cart has been read once (or there was nothing to read).
+   *
+   * `items: []` means two very different things before and after the first
+   * read: "not loaded yet" and "genuinely empty". Pages that redirect on an
+   * empty cart — checkout — must wait for this flag, or a full page load
+   * bounces them to /cart before the cart arrives.
+   */
+  hydrated: boolean;
 }
 
 interface CartActions {
   /** Fetch the current cart (guest or user). */
   fetchCart: () => Promise<void>;
+  /** Record that the cart is settled — used when there is nothing to fetch. */
+  markHydrated: () => void;
   /** Add a product to the cart. Saves guest_token on the very first add. */
   addItem: (productId: number, variationId: number, quantity: number, attributes?: Record<string, string>) => Promise<void>;
   /** Set a new absolute quantity for an existing line item. */
@@ -80,6 +91,7 @@ export const useCartStore = create<CartState & CartActions>((set, get) => ({
   error: null,
   cartDrawerOpen: false,
   lastFetchedAt: null,
+  hydrated: false,
 
   // ── Actions ───────────────────────────────────────────────────────────────
 
@@ -98,11 +110,14 @@ export const useCartStore = create<CartState & CartActions>((set, get) => ({
         chosenShippingMethod: data.chosen_shipping_method,
         loading: false,
         lastFetchedAt: Date.now(),
+        hydrated: true,
       });
     } catch (e) {
-      set({ error: toErrorMsg(e, 'Failed to fetch cart'), loading: false });
+      set({ error: toErrorMsg(e, 'Failed to fetch cart'), loading: false, hydrated: true });
     }
   },
+
+  markHydrated: () => set({ hydrated: true }),
 
   addItem: async (productId, variationId, quantity, attributes) => {
     // Optimistic update — immediately add a placeholder item so the cart
