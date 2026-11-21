@@ -800,4 +800,38 @@ export const en = {
     viewMyOrders: 'View My Orders',
     continueShopping: 'Continue Shopping',
   },
+  staff: {
+    brand: 'Studio',
+    navLabel: 'Dashboard sections',
+    nav: {
+      products: 'Products',
+    },
+    signOut: 'Sign out',
+    loading: 'Checking access…',
+    errorBody: 'The dashboard could not be opened. Check the connection and try again.',
+    retry: 'Try again',
+    noAccessTitle: 'No access',
+    noAccessBody:
+      'This account cannot open the product dashboard. Ask an administrator for the Product Uploader role.',
+    login: {
+      title: 'Studio sign in',
+      description: 'Sign in to add products to the shop',
+      metadataTitle: 'Studio Sign In',
+      usernameLabel: 'Email or username',
+      passwordLabel: 'Password',
+      submit: 'Sign in',
+      submitting: 'Signing in…',
+      invalidCredentials: 'Invalid email or password.',
+      failed: 'Sign in failed. Try again.',
+      noAccess: 'This account cannot open the product dashboard.',
+      usernameRequired: 'Email or username is required',
+      passwordRequired: 'Password is required',
+    },
+    products: {
+      title: 'Products',
+      subtitle: 'Everything you add to the shop is listed here.',
+      emptyTitle: 'No products yet',
+      emptyBody: 'Products you add will appear here.',
+    },
+  },
 };

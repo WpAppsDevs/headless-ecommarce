@@ -7,21 +7,24 @@
 | `/` | `src/app/(storefront)/(shop)/page.tsx` | Server, ISR 60 s | Public |
 | `/products` | `src/app/(storefront)/(shop)/products/page.tsx` | Server, ISR 60 s | Public |
 | `/products/[slug]` | `src/app/(storefront)/(shop)/products/[slug]/page.tsx` | Server, ISR 60 s | Public |
-| `/cart` | `src/app/cart/page.tsx` | Static shell + client content | Public |
-| `/contact` | `src/app/contact/page.tsx` | Static | Public |
-| `/checkout` | `src/app/checkout/page.tsx` | Client | Required |
-| `/account` | `src/app/account/page.tsx` | Client | Required |
-| `/login` | `src/app/login/page.tsx` | Static shell + client form | Public |
-| `/register` | `src/app/register/page.tsx` | Static shell + client form | Public |
-| `/forgot-password` | `src/app/forgot-password/page.tsx` | Static shell | Public |
-| `/reset-password` | `src/app/reset-password/page.tsx` | Static shell | Public |
-| `/order-confirmation/[id]` | `src/app/order-confirmation/[id]/page.tsx` | Client | Public (assumes checkout context) |
-| `/track-order` | `src/app/track-order/page.tsx` | Client | Public, richer when signed in |
+| `/cart` | `src/app/(storefront)/cart/page.tsx` | Static shell + client content | Public |
+| `/contact` | `src/app/(storefront)/contact/page.tsx` | Static | Public |
+| `/checkout` | `src/app/(storefront)/checkout/page.tsx` | Client | Required |
+| `/account` | `src/app/(storefront)/account/page.tsx` | Client | Required |
+| `/login` | `src/app/(storefront)/login/page.tsx` | Static shell + client form | Public |
+| `/register` | `src/app/(storefront)/register/page.tsx` | Static shell + client form | Public |
+| `/forgot-password` | `src/app/(storefront)/forgot-password/page.tsx` | Static shell | Public |
+| `/reset-password` | `src/app/(storefront)/reset-password/page.tsx` | Static shell | Public |
+| `/order-confirmation/[id]` | `src/app/(storefront)/order-confirmation/[id]/page.tsx` | Client | Public (assumes checkout context) |
+| `/track-order` | `src/app/(storefront)/track-order/page.tsx` | Client | Public, richer when signed in |
 | `/wishlist` | `src/app/(storefront)/(shop)/wishlist/page.tsx` | Server redirect | Public |
-| `/shipping` | `src/app/shipping/page.tsx` | Static | Public |
-| `/returns` | `src/app/returns/page.tsx` | Static | Public |
-| `/privacy-policy` | `src/app/privacy-policy/page.tsx` | Static | Public |
-| `/terms` | `src/app/terms/page.tsx` | Static | Public |
+| `/shipping` | `src/app/(storefront)/shipping/page.tsx` | Static | Public |
+| `/returns` | `src/app/(storefront)/returns/page.tsx` | Static | Public |
+| `/privacy-policy` | `src/app/(storefront)/privacy-policy/page.tsx` | Static | Public |
+| `/terms` | `src/app/(storefront)/terms/page.tsx` | Static | Public |
+| `/studio` | `src/app/(staff)/studio/page.tsx` | Server redirect → `/studio/products` | Staff |
+| `/studio/login` | `src/app/(staff)/studio/login/page.tsx` | Static shell + client form | Public |
+| `/studio/products` | `src/app/(staff)/studio/products/page.tsx` | Client shell inside a server page | Staff |
 
 There are no `/about`, `/faq`, or `/collections` pages. The header fallback includes `/contact`, which resolves to the static support page. The WordPress menu can replace the fallback links at runtime.
 
@@ -111,7 +114,7 @@ Coupons, free shipping, and cart expiry are not implemented. Their UI was remove
 
 ## Checkout
 
-`src/app/checkout/page.tsx` is a client page with an initialization gate:
+`src/app/(storefront)/checkout/page.tsx` is a client page with an initialization gate:
 
 1. `getUser()` loads the profile. `session_expired` or `invalid_token` redirects to `/login?redirect=/checkout`.
 2. If no profile but a non-auth error occurred, the form renders without prefill.
@@ -134,7 +137,7 @@ Guest checkout is not implemented. The page requires a user token, and `src/prox
 
 ## Order confirmation
 
-`src/app/order-confirmation/[id]/page.tsx` reads `sessionStorage['order_<id>']`, which the checkout form writes before redirecting. The value stays in the tab, so a refresh keeps the status and payment reference.
+`src/app/(storefront)/order-confirmation/[id]/page.tsx` reads `sessionStorage['order_<id>']`, which the checkout form writes before redirecting. The value stays in the tab, so a refresh keeps the status and payment reference.
 
 When the stored result is missing, the page waits for auth hydration and, for a signed-in user, loads recent orders and finds the matching ID. WordPress remains the source of truth. If neither path finds the order, the page shows a next step instead of an empty heading.
 
@@ -142,7 +145,7 @@ The page shows a completed or pending state, the transaction ID when present, an
 
 ## Account
 
-`src/app/account/page.tsx` waits for `authStore.hydrated` and redirects to `/login` when signed out. A signed-in visit is one round trip: `/api/auth/refresh` returns `{ token, profile }`, so the page reads the profile from the store instead of calling `/api/auth/me` again, and it fetches 25 orders alongside it (the Orders tab pages five at a time and the dashboard shows three).
+`src/app/(storefront)/account/page.tsx` waits for `authStore.hydrated` and redirects to `/login` when signed out. A signed-in visit is one round trip: `/api/auth/refresh` returns `{ token, profile }`, so the page reads the profile from the store instead of calling `/api/auth/me` again, and it fetches 25 orders alongside it (the Orders tab pages five at a time and the dashboard shows three).
 
 `AccountLayout` switches four tabs: Dashboard, Your Orders, Wishlist, Settings. The tab lives in the URL (`?tab=orders`), written with `router.replace` so a refresh keeps it, Back returns to the previous tab, and a link can point at one tab. A pre-merge `?tab=address` link now lands on Settings.
 

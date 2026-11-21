@@ -37,6 +37,8 @@ const CASES = [
   { discoverFrom: '/products', cookie: 'locale=bn', lang: 'bn', body: 'রিভিউ লিখতে সাইন ইন করুন' },
   { route: '/login', cookie: '', lang: 'en', title: 'Sign In' },
   { route: '/login', cookie: 'locale=bn', lang: 'bn', title: 'সাইন ইন' },
+  { route: '/studio/login', cookie: '', lang: 'en', title: 'Studio Sign In' },
+  { route: '/studio/login', cookie: 'locale=bn', lang: 'bn', title: 'স্টুডিও সাইন ইন' },
   { route: '/register', cookie: 'locale=bn', lang: 'bn', title: 'অ্যাকাউন্ট খোলা' },
   { route: '/forgot-password', cookie: 'locale=bn', lang: 'bn', title: 'পাসওয়ার্ড ভুলে গেছেন' },
   { route: '/cart', cookie: '', lang: 'en', title: 'Shopping Cart' },

@@ -104,6 +104,13 @@ Raw API images may use `src` or `url`. Always run them through `normalizeImage()
 - `uploadReviewMedia` uploads one file per request. It must not set `Content-Type`; the browser adds the multipart boundary.
 - Aggregate and random endpoints return `null`/`[]` on failure instead of throwing. The product page treats a missing aggregate as "no reviews".
 
+### `staff-products.ts`
+
+- `getStaffAccess()` asks WordPress whether this token holds `edit_products`; the dashboard calls it on every mount and never stores a role in the browser.
+- `getStaffOptions()` returns categories, tags (availability tags excluded), brands, the two availability term ids and the form limits.
+- Both go through `/api/staff/*` proxies, which forward the bearer token and return the upstream status. A 403 is a normal answer, not an error to retry.
+- Payloads are normalized with guards (`normalizeAccess`, `normalizeOptions`); nothing is cast.
+
 ### `tracking.ts`
 
 - `searchTracking({ email, order_id })` posts to `/api/tracking/search`.

@@ -69,6 +69,23 @@ _Avoid_: Catalog
 
 **Checkout draft** — a WooCommerce order with status `checkout-draft`. These are incomplete records and are filtered out of every order-facing view by `src/lib/order-utils.ts`.
 
+**Regular price** — the list price of a product, shown struck through when the product is discounted.
+
+**Sell price** — the price a customer actually pays. It equals the regular price when there is no discount.
+_Avoid_: Selling price, discounted price
+
+**Product brand** — the maker or label a product belongs to. A brand is always chosen from the existing list; staff never invent one per product.
+_Avoid_: Band
+
+## Staff dashboard
+
+**Staff member** — a WordPress user with the `product_uploader` role, allowed to add products and manage the ones they created. Not a shop manager.
+_Avoid_: Admin, shop manager, editor
+
+**Product uploader** — the staff member's job: creating and correcting simple products from the staff dashboard.
+
+**Staff dashboard** — the chrome-free staff surface under `/studio`. It is not part of the storefront and shows no cart, wishlist or announcement bar.
+
 ## Cart and orders
 
 **Cart line** — one row in the cart API response (`CartItem`). IDs are strings in the API type but numeric in update/remove calls; callers convert.
