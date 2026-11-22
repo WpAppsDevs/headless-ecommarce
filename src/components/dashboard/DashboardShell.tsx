@@ -54,8 +54,8 @@ export function DashboardShell({
   children,
 }: DashboardShellProps) {
   return (
-    <div className="min-h-screen bg-brand-bg font-geist">
-      <div className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6 lg:px-8 lg:pt-8">
+    <div className="bg-brand-bg font-geist">
+      <div className="mx-auto max-w-6xl px-4 pb-10 pt-6 sm:px-6 lg:px-8 lg:pt-8">
         <h1 className="sr-only">{surface}</h1>
 
         {/* The canvas: one tinted surface under identity, nav and content. */}
