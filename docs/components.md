@@ -7,6 +7,8 @@ Component conventions live in [coding-standards.md](coding-standards.md). This f
 | Component | Type | Responsibility |
 | --- | --- | --- |
 | `layout/Header.tsx` | Client | Sticky header, logo, desktop/mobile nav, search overlay, account menu, wishlist badge, cart button, mobile sheet. |
+| `layout/AccountMenuList.tsx` | Client | The account menu's row list and panel surface: dashboard, orders, wishlist, settings, sign out. Shared by the storefront header, the mobile sheet and `StudioHeader`, so the three menus stay one component. |
+| `layout/AccountMenu.tsx` | Client | The signed-in and signed-out item sets the storefront header feeds to `AccountMenuList`. |
 | `layout/HeaderDesktopNav.tsx` | Client | Desktop nav with the active item resolved after hydration. |
 | `layout/HeaderDesktopNavFallback.tsx` | Client | Desktop nav rendered during Suspense without an active item. |
 | `layout/HeaderMobileNav.tsx` | Client | Mobile nav links inside the sheet, with the same active behaviour. |

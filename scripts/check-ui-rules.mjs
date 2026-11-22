@@ -26,7 +26,6 @@ const APP = 'src/app';
 const LONG_FILE_ALLOW = new Map([
   ['src/components/checkout/CheckoutForm.tsx', 'documented exception in coding-standards.md'],
   ['src/components/account/OrderDetailsModal.tsx', 'pre-existing; split when next touched'],
-  ['src/components/layout/Header.tsx', 'pre-existing; split when next touched'],
   ['src/components/product/VariationSelector.tsx', 'pre-existing; split when next touched'],
   ['src/components/shop/ShopSidebar.tsx', 'pre-existing; split when next touched'],
 ]);

@@ -1,10 +1,14 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, LayoutDashboard, Store, User } from 'lucide-react';
 import { SiteLogo } from '@/components/layout/SiteLogo';
+import {
+  AccountMenuList,
+  accountMenuPanel,
+  type AccountMenuItem,
+} from '@/components/layout/AccountMenuList';
 import { LanguageSwitcher } from '@/i18n/LanguageSwitcher';
 import { useAuthStore } from '@/stores/authStore';
 import { useDictionary } from '@/i18n/LocaleProvider';
@@ -34,9 +38,29 @@ export function StudioHeader() {
         setOpen(false);
       }
     }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setOpen(false);
+    }
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
+
+  const items: AccountMenuItem[] = [
+    { label: copy.nav.dashboard, icon: LayoutDashboard, href: '/studio' },
+    { label: copy.viewShop, icon: Store, href: '/' },
+    {
+      label: copy.signOut,
+      icon: LogOut,
+      tone: 'danger',
+      onSelect: () => {
+        void logout().then(() => router.replace('/login'));
+      },
+    },
+  ];
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-brand-border bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
@@ -58,36 +82,12 @@ export function StudioHeader() {
             </button>
 
             {open && (
-              <div className="absolute right-0 top-full z-50 mt-2 w-44 rounded-xl border border-brand-border bg-white p-3 shadow-xl">
-                <div className="flex flex-col gap-2">
-                  <Link
-                    href="/studio"
-                    onClick={() => setOpen(false)}
-                    className="text-sm font-medium text-brand-text transition-colors hover:text-brand-accent-strong"
-                  >
-                    {copy.nav.dashboard}
-                  </Link>
-                  <Link
-                    href="/"
-                    onClick={() => setOpen(false)}
-                    className="text-sm text-brand-text-muted transition-colors hover:text-brand-text"
-                  >
-                    {copy.viewShop}
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      setOpen(false);
-                      await logout();
-                      router.replace('/login');
-                    }}
-                    className="flex items-center gap-2 text-left text-sm font-medium text-brand-danger transition-colors hover:opacity-80"
-                  >
-                    <LogOut className="h-4 w-4" aria-hidden="true" />
-                    {copy.signOut}
-                  </button>
-                </div>
-              </div>
+              <nav
+                aria-label={dictionary.header.account}
+                className={`absolute right-0 top-full z-50 mt-2 w-60 ${accountMenuPanel}`}
+              >
+                <AccountMenuList items={items} onNavigate={() => setOpen(false)} />
+              </nav>
             )}
           </div>
         </div>
