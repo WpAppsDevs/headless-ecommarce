@@ -45,7 +45,7 @@ It owns `<html>`, `<body>` and nothing else visual.
 
 **`src/app/(storefront)/layout.tsx` — the shop.** Fetches the `primary` WordPress menu with `getMenuByLocation`, then renders the skip link, `AnnouncementBar`, `Header`, `CartDrawer`, `<main id="main">` and `Footer`. Every public page — home, catalog, cart, checkout, account, auth, policies, tracking, the dev preview — lives under `(storefront)/`.
 
-**`src/app/(staff)/layout.tsx` — the staff surface.** Chrome-free on purpose: no announcement bar, cart, wishlist or shop footer. The `/studio` dashboard lives here and brings its own shell; the shell's canvas, identity card and navigation are the same component the account dashboard uses (`src/components/dashboard/DashboardShell.tsx`).
+**`src/app/(staff)/layout.tsx` — the staff surface.** It keeps the shop's frame: `StudioHeader` (wordmark + language switch only — no menu, search, cart, wishlist or account icons) and the shop's `Footer` unchanged. The `/studio` dashboard lives inside and brings its own shell; the shell's canvas, identity card and navigation are the same component the account dashboard uses (`src/components/dashboard/DashboardShell.tsx`).
 
 `getMenuByLocation` never throws and returns `[]` on failure. The header then uses its static links. That means a WordPress outage degrades navigation instead of breaking the layout.
 

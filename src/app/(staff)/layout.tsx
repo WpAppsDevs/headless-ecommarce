@@ -1,10 +1,13 @@
+import { StudioHeader } from '@/components/layout/StudioHeader';
+import { Footer } from '@/components/layout/Footer';
+
 /**
- * The staff surface shell. Deliberately chrome-free: no announcement bar, no
- * cart, no wishlist and no shop footer, because none of it belongs to the person
- * uploading products.
+ * The staff surface shell.
  *
- * The dashboard's own navigation and guard are added with the first `/studio`
- * route; this file exists so the group owns its `<main>` from the start.
+ * It keeps the shop's frame — wordmark header and the full footer — so the
+ * dashboard does not read as a different website. What the header drops are
+ * the storefront jobs: menu, search, cart, wishlist and account icons. The
+ * footer is the shop's, unchanged.
  */
 export default function StaffLayout({
   children,
@@ -12,8 +15,12 @@ export default function StaffLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main id="main" className="flex-1 bg-brand-bg">
-      {children}
-    </main>
+    <>
+      <StudioHeader />
+      <main id="main" className="flex-1 bg-brand-bg">
+        {children}
+      </main>
+      <Footer />
+    </>
   );
 }
