@@ -128,12 +128,30 @@ function normalizeOptions(raw: unknown): StaffOptions {
  * authenticated surface.
  */
 async function staffFetch(path: string, init: RequestInit = {}): Promise<unknown> {
-  const res = await fetch(path, {
+  return parseResponse(await fetchStaff(path, init));
+}
+
+/**
+ * The whole envelope, for endpoints that paginate.
+ *
+ * WordPress answers a collection as `{ success, data: [...], meta: { page,
+ * per_page, total, total_pages } }`. The meta is outside `data`, so a caller
+ * that unwraps first loses the counts — which reads as "no products".
+ */
+async function staffEnvelope(
+  path: string,
+  init: RequestInit = {},
+): Promise<Record<string, unknown>> {
+  const json = await readJson(await fetchStaff(path, init));
+
+  return isRecord(json) ? json : {};
+}
+
+async function fetchStaff(path: string, init: RequestInit): Promise<Response> {
+  return fetch(path, {
     ...init,
     headers: { ...(init.headers ?? {}), ...authHeader() },
   });
-
-  return parseResponse(res);
 }
 
 /** Whether this token may open the staff dashboard. Throws on failure. */
@@ -263,6 +281,11 @@ function unwrap(json: unknown): unknown {
 
 /** Parse a proxy response, turning both error shapes into an ApiError. */
 async function parseResponse(res: Response): Promise<unknown> {
+  return unwrap(await readJson(res));
+}
+
+/** Parse a proxied response once, turning both error shapes into an ApiError. */
+async function readJson(res: Response): Promise<unknown> {
   const json: unknown = await res.json().catch(() => null);
   const failure = isRecord(json) && json.success === false ? json : null;
 
@@ -278,7 +301,7 @@ async function parseResponse(res: Response): Promise<unknown> {
     throw new ApiError(asString(error.code, 'http_error'), asString(error.message, `HTTP ${res.status}`));
   }
 
-  return unwrap(json);
+  return json;
 }
 
 /** Upload one product image. Resolves with the attachment the product will reference. */
@@ -328,16 +351,34 @@ export async function listStaffProducts(query: StaffProductQuery = {}): Promise<
   if (query.status) params.set('status', query.status);
   if (query.search) params.set('search', query.search);
 
-  const raw = await staffFetch(`/api/staff/products?${params.toString()}`);
-  const page = isRecord(raw) ? raw : {};
-  const items = Array.isArray(page.items) ? page.items : [];
+  return normalizeStaffProductPage(
+    await staffEnvelope(`/api/staff/products?${params.toString()}`),
+  );
+}
+
+/**
+ * Read a product page from either envelope WordPress has used.
+ *
+ * Current: `{ data: [...], meta: { total, total_pages } }`. Older plugin
+ * builds nested the pagination inside `data`. Both are accepted so a plugin
+ * rollback does not empty the dashboard.
+ */
+export function normalizeStaffProductPage(json: unknown): StaffProductPage {
+  const envelope = isRecord(json) ? json : {};
+  const data = envelope.data;
+  const meta = isRecord(envelope.meta) ? envelope.meta : isRecord(data) ? data : {};
+  const rawItems = Array.isArray(data)
+    ? data
+    : isRecord(data) && Array.isArray(data.items)
+      ? data.items
+      : [];
 
   return {
-    items: items.map(normalizeStaffProduct),
-    total: asNumber(page.total),
-    page: asNumber(page.page, 1),
-    perPage: asNumber(page.per_page, 20),
-    totalPages: asNumber(page.total_pages),
+    items: rawItems.map(normalizeStaffProduct),
+    total: asNumber(meta.total),
+    page: asNumber(meta.page, 1),
+    perPage: asNumber(meta.per_page, 20),
+    totalPages: asNumber(meta.total_pages),
   };
 }
 
