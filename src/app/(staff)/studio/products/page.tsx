@@ -13,8 +13,13 @@ export async function generateMetadata() {
   return { title: copy.title };
 }
 
-export default async function StudioProductsPage() {
+export default async function StudioProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
   const copy = getDictionary(await getLocale()).staff.products;
+  const { status } = await searchParams;
 
   return (
     <StaffGate>
@@ -30,7 +35,9 @@ export default async function StudioProductsPage() {
         </Link>
       </section>
 
-      <ProductList />
+      <ProductList
+        initialStatus={status === 'draft' || status === 'trash' ? status : 'publish'}
+      />
     </StaffGate>
   );
 }

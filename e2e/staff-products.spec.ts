@@ -3,8 +3,8 @@ import { test, expect, type Page } from '@playwright/test';
 /**
  * The staff dashboard, end to end.
  *
- * The staff account is provisioned in WordPress with the `product_uploader`
- * role, so credentials come from the environment and never live here:
+ * The staff account is provisioned in WordPress with the `ns_staff` role
+ * ("NS Shop Staff"), so credentials come from the environment and never live here:
  *
  *   E2E_STAFF_EMAIL=… E2E_STAFF_PASSWORD=… npm run test:e2e
  *
@@ -41,11 +41,11 @@ async function signIn(page: Page) {
   await page.context().addCookies([
     { name: 'locale', value: 'en', url: 'http://127.0.0.1:3211' },
   ]);
-  await page.goto('/studio/login');
+  await page.goto('/login?redirect=/studio');
   await page.getByLabel(COPY.username).fill(EMAIL!);
   await page.getByLabel(COPY.password).fill(PASSWORD!);
   await page.getByRole('button', { name: COPY.signIn }).click();
-  await expect(page).toHaveURL(/\/studio\/products/);
+  await expect(page).toHaveURL(/\/studio$/);
 }
 
 test.describe.serial('staff dashboard', () => {
@@ -60,9 +60,13 @@ test.describe.serial('staff dashboard', () => {
     await page.close();
   });
 
-  test('the product list opens behind the staff door', async () => {
-    await expect(page.getByRole('heading', { name: 'Products', level: 1 })).toBeVisible();
+  test('the dashboard and the product list open behind the staff door', async () => {
+    await expect(page.getByRole('heading', { name: 'NS Studio' })).toBeAttached();
     await expect(page.getByRole('link', { name: COPY.newProduct })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Products' }).first().click();
+    await expect(page).toHaveURL(/\/studio\/products$/);
+    await expect(page.getByRole('heading', { name: 'Products', level: 1 })).toBeVisible();
   });
 
   test('a product is created as a draft and appears under Drafts', async () => {

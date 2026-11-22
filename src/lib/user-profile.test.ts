@@ -16,6 +16,20 @@ describe('normalizeUserProfile', () => {
     expect(profile?.id).toBe(12);
     expect(profile?.billing.phone).toBe('+880');
     expect(profile?.shipping.city).toBe('Dhaka');
+    expect(profile?.roles).toEqual([]);
+  });
+
+  it('keeps the role slugs WordPress returned', () => {
+    const profile = normalizeUserProfile({ id: 12, roles: ['customer', 'ns_staff'] });
+
+    expect(profile?.roles).toEqual(['customer', 'ns_staff']);
+  });
+
+  it('ignores a malformed roles value', () => {
+    expect(normalizeUserProfile({ id: 12, roles: 'ns_staff' })?.roles).toEqual([]);
+    expect(normalizeUserProfile({ id: 12, roles: ['ns_staff', 4, null] })?.roles).toEqual([
+      'ns_staff',
+    ]);
   });
 
   it('fills missing address fields instead of throwing', () => {

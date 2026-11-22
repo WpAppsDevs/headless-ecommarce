@@ -16,6 +16,7 @@ const profile: UserProfile = {
   display_name: 'Md Rahman',
   first_name: 'Md',
   last_name: 'Rahman',
+  roles: ['customer'],
   billing: {
     first_name: 'Md',
     last_name: 'Rahman',

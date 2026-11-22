@@ -1,3 +1,4 @@
+import { normalizeRoles } from '@/lib/roles';
 import type { AddressFields, BillingAddress, UserProfile } from '@/lib/api/checkout';
 
 /**
@@ -58,6 +59,7 @@ export function normalizeUserProfile(value: unknown): UserProfile | null {
     display_name: text(source.display_name),
     first_name: text(source.first_name),
     last_name: text(source.last_name),
+    roles: normalizeRoles(source.roles),
     billing: billingAddress(source.billing),
     shipping: address(source.shipping),
   };

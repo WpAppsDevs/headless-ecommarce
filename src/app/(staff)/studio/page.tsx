@@ -1,10 +1,23 @@
-import { redirect } from 'next/navigation';
+import { StaffGate } from '@/components/staff/StaffGate';
+import { StudioDashboard } from '@/components/staff/StudioDashboard';
+import { getDictionary } from '@/i18n/get-dictionary';
+import { getLocale } from '@/i18n/server';
+
+export async function generateMetadata() {
+  const copy = getDictionary(await getLocale()).staff;
+
+  return { title: copy.identityLabel };
+}
 
 /**
- * The dashboard opens on the product list. Until there is more than one section
- * this is a plain redirect, so `/studio` never renders a second landing page
- * that could drift from the list.
+ * The staff landing page. Products live one route down; this page answers
+ * "where is everything" and offers the next action, the way the account
+ * dashboard does for orders.
  */
 export default function StudioIndexPage() {
-  redirect('/studio/products');
+  return (
+    <StaffGate>
+      <StudioDashboard />
+    </StaffGate>
+  );
 }

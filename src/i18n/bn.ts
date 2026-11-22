@@ -802,8 +802,14 @@ export const bn: Dictionary = {
   },
   staff: {
     brand: 'স্টুডিও',
+    identityLabel: 'এনএস স্টুডিও',
     navLabel: 'ড্যাশবোর্ডের বিভাগ',
+    breadcrumbLabel: 'স্টুডিওর ঠিকানা',
+    viewShop: 'দোকান দেখুন',
+    memberFallback: 'স্টাফ',
+    noEmail: 'ইমেইল নেই',
     nav: {
+      dashboard: 'ড্যাশবোর্ড',
       products: 'প্রোডাক্ট',
     },
     signOut: 'সাইন আউট',
@@ -814,22 +820,16 @@ export const bn: Dictionary = {
     retry: 'আবার চেষ্টা করুন',
     noAccessTitle: 'প্রবেশাধিকার নেই',
     noAccessBody:
-      'এই অ্যাকাউন্ট প্রোডাক্ট ড্যাশবোর্ড খুলতে পারবে না। অ্যাডমিনের কাছে Product Uploader রোল চাইুন।',
-    login: {
-      title: 'স্টুডিও সাইন ইন',
-      description: 'দোকানে প্রোডাক্ট যোগ করতে সাইন ইন করুন',
-      metadataTitle: 'স্টুডিও সাইন ইন',
-      usernameLabel: 'ইমেইল বা ইউজারনেম',
-      passwordLabel: 'পাসওয়ার্ড',
-      submit: 'সাইন ইন',
-      submitting: 'সাইন ইন হচ্ছে…',
-      invalidCredentials: 'ইমেইল বা পাসওয়ার্ড সঠিক নয়।',
-      failed: 'সাইন ইন ব্যর্থ হয়েছে। আবার চেষ্টা করুন।',
-      noAccess: 'এই অ্যাকাউন্ট প্রোডাক্ট ড্যাশবোর্ড খুলতে পারবে না।',
-      unavailable:
-        'সাইন ইন হয়েছে, কিন্তু এই সাইটে প্রোডাক্ট সার্ভিস এখনো চালু নেই। অ্যাডমিনকে WordPress প্লাগিন হালনাগাদ করতে বলুন।',
-      usernameRequired: 'ইমেইল বা ইউজারনেম লাগবে',
-      passwordRequired: 'পাসওয়ার্ড লাগবে',
+      'এই অ্যাকাউন্ট প্রোডাক্ট ড্যাশবোর্ড খুলতে পারবে না। অ্যাডমিনের কাছে NS Shop Staff রোল চাইুন।',
+    home: {
+      greeting: 'স্বাগতম, {name}',
+      summaryClear: 'কিছু বাকি নেই — সব প্রোডাক্ট প্রকাশিত।',
+      summaryDrafts: '{count}টি প্রোডাক্ট ড্রাফটে আছে, একবার দেখে নিন।',
+      emptyBody: 'প্রথম প্রোডাক্ট যোগ করুন, সেটা স্ট্যাটাসসহ এখানে দেখা যাবে।',
+      recentTitle: 'সাম্প্রতিক প্রোডাক্ট',
+      viewAll: 'সব প্রোডাক্ট দেখুন',
+      loading: 'আপনার দোকান লোড হচ্ছে…',
+      loadFailed: 'ড্যাশবোর্ড লোড করা যায়নি।',
     },
     products: {
       title: 'প্রোডাক্ট',

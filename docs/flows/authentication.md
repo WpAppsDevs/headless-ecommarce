@@ -30,14 +30,40 @@ LoginForm
   → route returns { user, access_token }
   → tokenCache.set(access_token)
   → clearGuestToken()
-  → authStore sets user
+  → authStore sets user (with roles)
   → cartStore.fetchCart()
   → wishlistStore.syncGuestWishlist()
 ```
 
 The login route returns the access token in JSON, but not the refresh token. The refresh cookie is set on the same response.
 
-`LoginForm` reads `redirect` from the query string and pushes there, defaulting to `/account`. A `reset=success` query string shows the "password updated" banner.
+### Where a sign-in lands
+
+`src/lib/login-redirect.ts` owns the decision, so the login form, the tests and
+a future second entry point cannot disagree:
+
+| Roles | No `redirect` | `redirect=/checkout` | `redirect=/studio` | `redirect=/account` |
+| --- | --- | --- | --- | --- |
+| `customer` | `/account` | `/checkout` | `/account` (dropped) | `/account` |
+| `ns_staff` / `administrator` | `/studio` | `/checkout` | `/studio` | `/studio` (dropped) |
+
+A `redirect` wins only when it is a single-slash internal path (`isSafeRedirect`
+rejects `//host`, `http(s)://…`, `javascript:` and backslash tricks) **and**
+`canOpenPath` says the role may open it. Studio is staff-only; the account is
+customer-only, because the account page bounces staff to `/studio`.
+
+A `reset=success` query string still shows the "password updated" banner.
+
+### Roles
+
+`GET /api/auth/login`, `/api/auth/refresh` and `GET /api/user` return
+`roles: string[]` — the WordPress role slugs (for example
+`['customer', 'ns_staff']`). The profile keeps them, and `authStore` mirrors
+them on the signed-in user so the header and the landing decision need no extra
+call. Roles are read from the database on every request and are deliberately
+absent from the JWT: a role removed in wp-admin takes effect on the next
+request, not when the token expires. A user may hold several roles; the
+storefront matches membership in the array.
 
 ## Registration
 
@@ -55,8 +81,8 @@ hydrate()
   POST /api/auth/refresh
   if not ok → stop (stay logged out)
   tokenCache.set(new token)
-  GET /api/auth/me
-  if ok → set user, isAuthenticated
+  profile = normalizeUserProfile(data.profile)   # refresh already returns it
+  if profile → set user (with roles), profile, isAuthenticated
   finally → hydrated = true
 ```
 
@@ -128,19 +154,34 @@ The WordPress plugin builds the reset link. Its configured reset URL must point 
 
 ## The staff dashboard
 
-`/studio` is a second surface with the same identity but a different door. It is not a separate login system: a staff member is a WordPress user with the `product_uploader` role, and `/studio/login` posts to the same `/api/auth/login`.
+There is one login for everybody. `/studio/login` no longer renders a form: it
+redirects to `/login?redirect=/studio`, and the role in the profile decides
+where the person lands.
+
+`/studio` is a separate surface with the same identity. A staff member is a
+WordPress user with the `ns_staff` role ("NS Shop Staff"); administrators reach
+it too, so the owner can never lock themselves out of the surface they
+provision staff for. A shop manager holding `edit_products` is **not** staff.
 
 Three layers decide access, in order:
 
-1. `src/proxy.ts` redirects `/studio/*` (except `/studio/login`) to `/studio/login` when neither session cookie is present. Presence only, exactly like `/account`.
-2. `StaffGate` waits for `hydrated`, redirects a signed-out visitor to `/studio/login`, then calls `GET /api/staff/access` once per mount.
-3. That call is a proxy to WordPress, which requires `edit_products`. A customer account that signs in at `/studio/login` therefore gets a 403, and the form signs it out with a "no access" message instead of letting it in.
+1. `src/proxy.ts` redirects `/studio/*` to `/login?redirect=<path>` when neither
+   session cookie is present. Presence only, exactly like `/account`.
+2. `StaffGate` waits for `hydrated`, then reads `roles` from the profile. A
+   signed-out visitor goes to `/login?redirect=<path>`; a signed-in customer
+   sees the no-access screen without any request.
+3. A staff profile then calls `GET /api/staff/access` once per mount. The plugin
+   checks the role (`ns_staff` or `administrator`) and answers `403 forbidden`
+   otherwise, which catches a role revoked while the session is still valid.
 
-No role is stored in the browser: `UserProfile` carries no role, and the dashboard re-asks on every load. A token whose role is revoked loses the dashboard at the next page load.
+Outcomes stay distinct: `401`/`no_token`/`invalid_token` means the session
+ended → back to `/login`; `403` means no access → the no-access screen with
+sign-out; anything else (`404 rest_no_route` on an older plugin, a 5xx, a
+network failure) is "the product service is not available", and the session is
+kept.
 
-The dashboard needs the plugin at 1.1.0 or later. On an older site the login itself succeeds and `GET /api/staff/access` answers `404 rest_no_route`, because the `/api/staff` prefix reaches `JwtMiddleware` before route matching — an unauthenticated probe always sees `401 missing_token`, never the 404. The sign-in form reports that as "the product service is not available on this site" and keeps the session instead of blaming the password.
-
-Staff keep their ordinary `/account`; nothing there is shared with the dashboard.
+Staff do not use `/account`: the account page sends a signed-in staff member to
+`/studio` before loading orders.
 
 ## Where to change auth
 

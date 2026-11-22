@@ -30,6 +30,8 @@ export interface UserProfile {
   display_name: string;
   first_name: string;
   last_name: string;
+  /** WordPress role slugs, e.g. `['customer']` or `['customer', 'ns_staff']`. */
+  roles: string[];
   billing: BillingAddress;
   shipping: AddressFields;
 }

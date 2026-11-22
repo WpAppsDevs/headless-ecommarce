@@ -5,6 +5,7 @@ import { useWishlistStore } from '@/stores/wishlistStore';
 import { useReviewStore } from '@/stores/reviewStore';
 import { shouldAttemptAuthHydration } from '@/lib/auth-session';
 import { normalizeUserProfile } from '@/lib/user-profile';
+import { normalizeRoles } from '@/lib/roles';
 import { personName } from '@/lib/user-name';
 import type { UserProfile } from '@/lib/api/checkout';
 
@@ -16,6 +17,8 @@ export interface AuthUser {
   id: number;
   email: string;
   display_name: string;
+  /** WordPress role slugs; drives which dashboard the person lands on. */
+  roles: string[];
 }
 
 interface AuthState {
@@ -61,6 +64,25 @@ async function postJson(url: string, body: Record<string, unknown>) {
   });
 }
 
+/**
+ * The identity the header and the role routing need, from an untrusted login
+ * payload. The full profile (addresses) arrives on refresh.
+ */
+function toAuthUser(value: unknown): AuthUser | null {
+  if (typeof value !== 'object' || value === null) return null;
+
+  const raw = value as Record<string, unknown>;
+  const id = Number(raw.id);
+  if (!Number.isFinite(id) || id <= 0) return null;
+
+  return {
+    id,
+    email: typeof raw.email === 'string' ? raw.email : '',
+    display_name: typeof raw.display_name === 'string' ? raw.display_name : '',
+    roles: normalizeRoles(raw.roles),
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Store
 // ---------------------------------------------------------------------------
@@ -89,9 +111,12 @@ export const useAuthStore = create<AuthState>((set) => {
         return;
       }
 
-      // Avoid reloading the login page when we're already there.
+      // Avoid reloading the login page when we're already there. Otherwise
+      // keep the current page as the landing so a studio or checkout session
+      // that expires returns to where the person was.
       if (window.location.pathname !== '/login') {
-        window.location.replace('/login');
+        const target = `${window.location.pathname}${window.location.search}`;
+        window.location.replace(`/login?redirect=${encodeURIComponent(target)}`);
       }
     });
   }
@@ -112,6 +137,7 @@ export const useAuthStore = create<AuthState>((set) => {
               id: profile.id,
               email: profile.email,
               display_name: personName(profile, state.user?.display_name ?? ''),
+              roles: normalizeRoles(profile.roles),
             }
           : state.user,
       })),
@@ -135,7 +161,7 @@ export const useAuthStore = create<AuthState>((set) => {
         tokenCache.set(json.data.access_token);
         // Guest cart was merged into the user cart on login
         clearGuestToken();
-        set({ user: json.data.user, isAuthenticated: true, loading: false });
+        set({ user: toAuthUser(json.data.user), isAuthenticated: true, loading: false });
         // Refresh cart and sync guest wishlist to server in parallel
         void useCartStore.getState().fetchCart();
         void useWishlistStore.getState().syncGuestWishlist();
@@ -161,7 +187,7 @@ export const useAuthStore = create<AuthState>((set) => {
         }
         tokenCache.set(json.data.access_token);
         clearGuestToken();
-        set({ user: json.data.user, isAuthenticated: true, loading: false });
+        set({ user: toAuthUser(json.data.user), isAuthenticated: true, loading: false });
         void useCartStore.getState().fetchCart();
         void useWishlistStore.getState().syncGuestWishlist();
       } catch (e) {
@@ -242,6 +268,7 @@ export const useAuthStore = create<AuthState>((set) => {
             id: profile.id,
             email: profile.email,
             display_name: personName(profile, profile.email),
+            roles: normalizeRoles(profile.roles),
           },
           profile,
           isAuthenticated: true,

@@ -7,12 +7,14 @@ describe('staffAccessOutcome', () => {
     expect(staffAccessOutcome(null)).toBe('granted');
   });
 
-  it('treats a customer token as denied', () => {
+  it('treats a customer or other role as denied', () => {
     expect(staffAccessOutcome('forbidden')).toBe('denied');
   });
 
-  it('treats an expired session as denied', () => {
-    expect(staffAccessOutcome('no_token')).toBe('denied');
+  it('treats a missing or expired session as expired, not as no access', () => {
+    expect(staffAccessOutcome('no_token')).toBe('expired');
+    expect(staffAccessOutcome('missing_token')).toBe('expired');
+    expect(staffAccessOutcome('invalid_token')).toBe('expired');
   });
 
   it('treats a missing staff route as an unavailable backend, not a bad password', () => {
