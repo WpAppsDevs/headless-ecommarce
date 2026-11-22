@@ -15,6 +15,7 @@ import {
 import { useAuthStore } from '@/stores/authStore';
 import { useCartStore } from '@/stores/cartStore';
 import { useWishlistStore } from '@/stores/wishlistStore';
+import { SiteLogo } from '@/components/layout/SiteLogo';
 import { HeaderDesktopNav } from '@/components/layout/HeaderDesktopNav';
 import { HeaderDesktopNavFallback } from '@/components/layout/HeaderDesktopNavFallback';
 import { HeaderMobileNav } from '@/components/layout/HeaderMobileNav';
@@ -37,23 +38,6 @@ const STATIC_NAV_LINKS: NavLink[] = [
   { href: '/products?tag=catalog', label: 'CATALOG / WHOLESALE', target: '_self' },
   { href: '/contact', label: 'CONTACT', target: '_self' },
 ];
-
-// ── Site Logo ───────────────────────────────────────────────────────────────
-function SiteLogo() {
-  return (
-    <Link href="/" className="flex shrink-0 items-center" aria-label="Najifa's Shop — Pakistani Collection">
-      <Image
-        src="/images/Najifa's Shop Logo.png"
-        alt="Najifa's Shop"
-        width={140}
-        height={48}
-        className="h-12 object-contain"
-        style={{ width: 'auto' }}
-        priority
-      />
-    </Link>
-  );
-}
 
 // ── Search overlay ───────────────────────────────────────────────────────────
 function SearchOverlay({ onClose }: { onClose: () => void }) {
