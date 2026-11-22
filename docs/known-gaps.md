@@ -126,9 +126,9 @@ Closing this means tagging wholesale/catalog products with `catalog`, or pointin
 
 ## 12. Four forms still predate the form standard
 
-`ComingSoonSection`, `FooterNewsletterForm`, the header search and `TrackingForm` keep their fields in `useState`. `docs/coding-standards.md` asks for react-hook-form + zod, and `check:ui-rules` allows these four by name so the rule can be enforced everywhere else; four component files also sit over the 300-line limit and are allowed by name for the same reason.
+`ComingSoonSection`, `FooterNewsletterForm`, the header search and `TrackingForm` keep their fields in `useState`. `docs/coding-standards.md` asks for react-hook-form + zod, and `check:ui-rules` allows these four by name so the rule can be enforced everywhere else; three component files also sit over the 300-line limit and are allowed by name for the same reason.
 
-Closing this means converting those four forms and splitting `OrderDetailsModal`, `Header`, `VariationSelector` and `ShopSidebar`, removing each from the allowlists in `scripts/check-ui-rules.mjs` as it lands.
+Closing this means converting those four forms and splitting `OrderDetailsModal`, `VariationSelector` and `ShopSidebar`, removing each from the allowlists in `scripts/check-ui-rules.mjs` as it lands.
 
 - Where: `scripts/check-ui-rules.mjs`.
 - Impact: low for behaviour, medium for review load.

@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Suspense, useState, useRef, useEffect } from 'react';
 import { ShoppingCart, Menu, X, Search, User, Heart } from 'lucide-react';
+import { AccountMenu } from '@/components/layout/AccountMenu';
+import { accountMenuPanel } from '@/components/layout/AccountMenuList';
 import {
   Sheet,
   SheetContent,
@@ -12,7 +14,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { useAuthStore } from '@/stores/authStore';
 import { useCartStore } from '@/stores/cartStore';
 import { useWishlistStore } from '@/stores/wishlistStore';
 import { SiteLogo } from '@/components/layout/SiteLogo';
@@ -78,44 +79,6 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
   );
 }
 
-// ── Auth dropdown content ────────────────────────────────────────────────────
-function UserMenu({ onClose }: { onClose?: () => void }) {
-  const { isAuthenticated, logout } = useAuthStore();
-  const dictionary = useDictionary();
-
-  if (isAuthenticated) {
-    return (
-      <div className="flex flex-col gap-2">
-        <Link href="/account" onClick={onClose}
-          className="text-sm font-medium text-zinc-700 hover:text-zinc-900 transition-colors">
-          {dictionary.header.myAccount}
-        </Link>
-        <Link href="/account" onClick={onClose}
-          className="text-sm text-zinc-500 hover:text-zinc-700 transition-colors">
-          {dictionary.header.orders}
-        </Link>
-        <button onClick={async () => { await logout(); onClose?.(); }}
-          className="text-left text-sm font-medium text-rose-500 hover:text-rose-600 transition-colors">
-          {dictionary.header.signOut}
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-col gap-2">
-      <Link href="/login" onClick={onClose}
-        className="text-sm font-medium text-zinc-900 hover:text-zinc-600 transition-colors">
-        {dictionary.header.signIn}
-      </Link>
-      <Link href="/register" onClick={onClose}
-        className="text-sm text-zinc-500 hover:text-zinc-700 transition-colors">
-        {dictionary.header.createAccount}
-      </Link>
-    </div>
-  );
-}
-
 // ── Main Header ──────────────────────────────────────────────────────────────
 export function Header({ navLinks }: { navLinks?: NavLink[] }) {
   const dictionary = useDictionary();
@@ -133,15 +96,22 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
   /** Badge text, with the digits of the reading language and a capped `99+`. */
   const badge = (count: number) => (count > 99 ? `${formatNumber(locale, 99)}+` : formatNumber(locale, count));
 
-  // Close account dropdown on outside click
+  // Close the account menu on an outside click or Escape.
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (accountRef.current && !accountRef.current.contains(e.target as Node)) {
         setAccountOpen(false);
       }
     }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setAccountOpen(false);
+    }
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   return (
@@ -181,9 +151,12 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
               <User className="h-[19px] w-[19px]" strokeWidth={1.8} />
             </button>
             {accountOpen && (
-              <div className="absolute right-0 top-full mt-2 w-44 rounded-xl border border-zinc-100 bg-white p-3 shadow-xl z-50">
-                <UserMenu onClose={() => setAccountOpen(false)} />
-              </div>
+              <nav
+                aria-label={dictionary.header.account}
+                className={`absolute right-0 top-full z-50 mt-2 w-60 ${accountMenuPanel}`}
+              >
+                <AccountMenu onClose={() => setAccountOpen(false)} />
+              </nav>
             )}
           </div>
 
@@ -306,7 +279,7 @@ export function Header({ navLinks }: { navLinks?: NavLink[] }) {
                 <hr className="border-zinc-100" />
                 <div>
                   <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-400">{dictionary.header.account}</p>
-                  <UserMenu onClose={() => setMobileOpen(false)} />
+                  <AccountMenu onClose={() => setMobileOpen(false)} />
                 </div>
               </div>
             </SheetContent>
