@@ -48,7 +48,7 @@ $ E2E_EMAIL=… E2E_PASSWORD=… npm run test:e2e
 - Credentials come from `E2E_EMAIL` / `E2E_PASSWORD` only. With either missing every test skips, so a checkout without the secret stays green rather than failing for the wrong reason. The same applies in CI: add the two repository secrets to enable the job's browser step.
 - The suite reads a live WordPress. The account test asserts that an order exists, never how many, and the checkout test walks the shop until a product can be added, skipping if none can. Hard-coded ids would rot against real data.
 - `e2e-open` status on the shop means the test cannot run: when every product is sold out there is no way to fill a cart.
-- `e2e/staff-products.spec.ts` covers the staff dashboard: it signs in at `/studio/login`, creates a draft with a real image, finds it under Drafts and trashes it. It needs `E2E_STAFF_EMAIL` / `E2E_STAFF_PASSWORD` (a `product_uploader` account) and skips without them.
+- `e2e/staff-products.spec.ts` covers the staff dashboard: it signs in at `/login?redirect=/studio`, lands on the studio dashboard, opens Products, creates a draft with a real image, finds it under Drafts and trashes it. It needs `E2E_STAFF_EMAIL` / `E2E_STAFF_PASSWORD` (an `ns_staff` account) and skips without them.
 - Do not start the suite while a WordPress plugin deploy is running: the deploy swaps the plugin directory, so REST calls fail for a few seconds and unrelated login assertions go red.
 
 ## Advisories

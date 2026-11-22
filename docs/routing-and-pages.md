@@ -22,8 +22,8 @@
 | `/returns` | `src/app/(storefront)/returns/page.tsx` | Static | Public |
 | `/privacy-policy` | `src/app/(storefront)/privacy-policy/page.tsx` | Static | Public |
 | `/terms` | `src/app/(storefront)/terms/page.tsx` | Static | Public |
-| `/studio` | `src/app/(staff)/studio/page.tsx` | Server redirect → `/studio/products` | Staff |
-| `/studio/login` | `src/app/(staff)/studio/login/page.tsx` | Static shell + client form | Public |
+| `/studio` | `src/app/(staff)/studio/page.tsx` | Client dashboard inside a server page | Staff |
+| `/studio/login` | `src/app/(staff)/studio/login/page.tsx` | Server redirect → `/login?redirect=/studio` | Public |
 | `/studio/products` | `src/app/(staff)/studio/products/page.tsx` | Client shell inside a server page | Staff |
 | `/studio/products/new` | `src/app/(staff)/studio/products/new/page.tsx` | Client form inside a server page | Staff |
 | `/studio/products/[id]/edit` | `src/app/(staff)/studio/products/[id]/edit/page.tsx` | Client form inside a server page | Staff |
@@ -45,7 +45,7 @@ It owns `<html>`, `<body>` and nothing else visual.
 
 **`src/app/(storefront)/layout.tsx` — the shop.** Fetches the `primary` WordPress menu with `getMenuByLocation`, then renders the skip link, `AnnouncementBar`, `Header`, `CartDrawer`, `<main id="main">` and `Footer`. Every public page — home, catalog, cart, checkout, account, auth, policies, tracking, the dev preview — lives under `(storefront)/`.
 
-**`src/app/(staff)/layout.tsx` — the staff surface.** Chrome-free on purpose: no announcement bar, cart, wishlist or shop footer. The `/studio` dashboard lives here and brings its own shell.
+**`src/app/(staff)/layout.tsx` — the staff surface.** Chrome-free on purpose: no announcement bar, cart, wishlist or shop footer. The `/studio` dashboard lives here and brings its own shell; the shell's canvas, identity card and navigation are the same component the account dashboard uses (`src/components/dashboard/DashboardShell.tsx`).
 
 `getMenuByLocation` never throws and returns `[]` on failure. The header then uses its static links. That means a WordPress outage degrades navigation instead of breaking the layout.
 
@@ -149,7 +149,7 @@ The page shows a completed or pending state, the transaction ID when present, an
 
 `src/app/(storefront)/account/page.tsx` waits for `authStore.hydrated` and redirects to `/login` when signed out. A signed-in visit is one round trip: `/api/auth/refresh` returns `{ token, profile }`, so the page reads the profile from the store instead of calling `/api/auth/me` again, and it fetches 25 orders alongside it (the Orders tab pages five at a time and the dashboard shows three).
 
-`AccountLayout` switches four tabs: Dashboard, Your Orders, Wishlist, Settings. The tab lives in the URL (`?tab=orders`), written with `router.replace` so a refresh keeps it, Back returns to the previous tab, and a link can point at one tab. A pre-merge `?tab=address` link now lands on Settings.
+`AccountLayout` switches four tabs over the shared `DashboardShell`: Dashboard, Your Orders, Wishlist, Settings. The tab lives in the URL (`?tab=orders`), written with `router.replace` so a refresh keeps it, Back returns to the previous tab, and a link can point at one tab. A pre-merge `?tab=address` link now lands on Settings.
 
 Tab behavior:
 

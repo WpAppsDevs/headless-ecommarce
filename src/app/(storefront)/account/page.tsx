@@ -6,6 +6,7 @@ import { ApiError } from '@/lib/errors';
 import { getUser } from '@/lib/api/checkout';
 import { getOrders, type OrdersResult } from '@/lib/api/orders';
 import { useAuthStore } from '@/stores/authStore';
+import { isStaff } from '@/lib/roles';
 import { AccountLayout } from '@/components/account/AccountLayout';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDictionary } from '@/i18n/LocaleProvider';
@@ -77,6 +78,14 @@ export default function AccountPage() {
     // If definitely not authenticated after hydration, redirect immediately
     if (!isAuthenticated) {
       router.replace('/login');
+      return;
+    }
+
+    // Staff have their own surface; the account dashboard is for customers.
+    // Roles arrive with the hydrated profile, so this needs no request.
+    const roles = useAuthStore.getState().profile?.roles ?? useAuthStore.getState().user?.roles ?? [];
+    if (isStaff(roles)) {
+      router.replace('/studio');
       return;
     }
 

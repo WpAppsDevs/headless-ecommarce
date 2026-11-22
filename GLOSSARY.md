@@ -79,10 +79,12 @@ _Avoid_: Band
 
 ## Staff dashboard
 
-**Staff member** — a WordPress user with the `product_uploader` role, allowed to add products and manage the ones they created. Not a shop manager.
-_Avoid_: Admin, shop manager, editor
+**Staff member** — a WordPress user with the `ns_staff` role ("NS Shop Staff"), allowed to add products and manage the ones they created. Administrators reach the dashboard too. Not a shop manager, and a shop manager is not staff.
+_Avoid_: Product Uploader (the old role name), admin, shop manager, editor
 
-**Product uploader** — the staff member's job: creating and correcting simple products from the staff dashboard.
+**Product uploader** — the staff member's job: creating and correcting simple products from the staff dashboard. A description of the work, not a role name.
+
+**NS Studio** — the name the staff dashboard shows for its own surface, under the signed-in staff member's identity.
 
 **Staff dashboard** — the chrome-free staff surface under `/studio`. It is not part of the storefront and shows no cart, wishlist or announcement bar.
 

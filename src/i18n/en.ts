@@ -802,8 +802,14 @@ export const en = {
   },
   staff: {
     brand: 'Studio',
+    identityLabel: 'NS Studio',
     navLabel: 'Dashboard sections',
+    breadcrumbLabel: 'Studio location',
+    viewShop: 'View shop',
+    memberFallback: 'Staff',
+    noEmail: 'No email',
     nav: {
+      dashboard: 'Dashboard',
       products: 'Products',
     },
     signOut: 'Sign out',
@@ -814,22 +820,16 @@ export const en = {
     retry: 'Try again',
     noAccessTitle: 'No access',
     noAccessBody:
-      'This account cannot open the product dashboard. Ask an administrator for the Product Uploader role.',
-    login: {
-      title: 'Studio sign in',
-      description: 'Sign in to add products to the shop',
-      metadataTitle: 'Studio Sign In',
-      usernameLabel: 'Email or username',
-      passwordLabel: 'Password',
-      submit: 'Sign in',
-      submitting: 'Signing in…',
-      invalidCredentials: 'Invalid email or password.',
-      failed: 'Sign in failed. Try again.',
-      noAccess: 'This account cannot open the product dashboard.',
-      unavailable:
-        'You are signed in, but the product service is not available on this site yet. Ask an administrator to update the WordPress plugin.',
-      usernameRequired: 'Email or username is required',
-      passwordRequired: 'Password is required',
+      'This account cannot open the product dashboard. Ask an administrator for the NS Shop Staff role.',
+    home: {
+      greeting: 'Welcome, {name}',
+      summaryClear: 'Nothing waiting — every product is published.',
+      summaryDrafts: '{count} product drafts need a look.',
+      emptyBody: 'Add your first product and it will show up here with its status.',
+      recentTitle: 'Latest products',
+      viewAll: 'View all products',
+      loading: 'Loading your shop…',
+      loadFailed: 'The dashboard could not be loaded.',
     },
     products: {
       title: 'Products',

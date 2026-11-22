@@ -71,7 +71,7 @@ Vitest covers pure logic, and `check:routes` covers language and metadata per ro
 
 Still uncovered: checkout validation, cart merge on sign-in, review submission, and tracking lookup. Checkout has a test written but it self-skips, because every product is currently sold out and no cart can be filled.
 
-The staff dashboard has a spec too (`e2e/staff-products.spec.ts`): sign in at `/studio/login`, create a draft with a real image, find it under Drafts, trash it. It needs a `product_uploader` account and skips without `E2E_STAFF_EMAIL` / `E2E_STAFF_PASSWORD`, so CI stays green until those secrets exist.
+The staff dashboard has a spec too (`e2e/staff-products.spec.ts`): sign in at `/login?redirect=/studio`, create a draft with a real image, find it under Drafts, trash it. It needs an `ns_staff` account and skips without `E2E_STAFF_EMAIL` / `E2E_STAFF_PASSWORD`, so CI stays green until those secrets exist.
 
 Closing this needs stock in WordPress, plus a seeded staging site so those flows do not depend on live data. Keep it separate from the unit suite.
 
@@ -94,7 +94,7 @@ Closing this needs either WPML/Polylang, or a `translations` field plus endpoint
 `/studio` covers one job: simple products. What it does not do, and why:
 
 - **No restore from Trash.** A trashed product disappears from the list; WordPress admin restores it. `DELETE` is a trash, never a permanent delete.
-- **No staff management.** Users are created in WordPress admin and given the `product_uploader` role; the dashboard cannot invite anyone, by design.
+- **No staff management.** Users are created in WordPress admin and given the `ns_staff` role; the dashboard cannot invite anyone, by design.
 - **No brand or tag creation.** Both are chosen from what exists. Brands are hidden entirely while the `product_brand` taxonomy is empty.
 - **Alt text is optional.** Images upload and save without it; the image endpoint can correct it later.
 - **No stock/order sections yet.** The shell and guard are ready for them.

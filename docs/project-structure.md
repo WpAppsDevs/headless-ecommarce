@@ -53,7 +53,7 @@ Components are grouped by the domain they serve, not by atomic-design level.
 | `product/` | Product card, gallery, variation selector, tabs, related grid | `ProductTabs` contains the review tab. |
 | `cart/` | Drawer, page content, line items, summary | `CartDrawer` and `CartPageContent` duplicate some chrome intentionally. |
 | `checkout/` | Checkout form, Stripe element, BACS instructions | `CheckoutForm` is the largest component in the repo. |
-| `account/` | Account shell, dashboard, orders, address, settings, wishlist | `AccountLayout` switches tabs. |
+| `account/` | Account shell, dashboard, orders, address, settings, wishlist | `AccountLayout` switches tabs over `dashboard/DashboardShell`. |
 | `auth/` | Login, register, forgot, reset forms | Forms use react-hook-form and zod. |
 | `reviews/` | Review list, card, summary, form, upload, filters | `ProductReviewsSection` is the entry point. |
 | `review-modal/` | Review modal wrapper | Used by both product page and order card. |

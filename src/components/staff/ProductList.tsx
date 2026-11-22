@@ -29,7 +29,7 @@ const PER_PAGE = 20;
  * Edit and trash appear only on products this token may change; the API
  * enforces the same rule, this is just honesty about what the buttons do.
  */
-export function ProductList() {
+export function ProductList({ initialStatus = 'publish' }: { initialStatus?: StatusFilter } = {}) {
   const access = useStaffAccess();
   const canEditOthers = access?.canEditOthers ?? false;
   const copy = useDictionary().staff.list;
@@ -37,7 +37,7 @@ export function ProductList() {
   const locale = useLocale();
   const fmt = useFormatPrice();
 
-  const [status, setStatus] = useState<StatusFilter>('publish');
+  const [status, setStatus] = useState<StatusFilter>(initialStatus);
   const [search, setSearch] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);

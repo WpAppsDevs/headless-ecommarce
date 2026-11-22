@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuthStore } from '@/stores/authStore';
+import { resolveLanding } from '@/lib/login-redirect';
 import { AUTH_CONTROL_CLASS } from '@/components/auth/styles';
 import { useDictionary } from '@/i18n/LocaleProvider';
 
@@ -53,8 +54,8 @@ export function LoginForm() {
 
       await login(username, password, guestToken);
 
-      const redirect = searchParams.get('redirect') ?? '/account';
-      router.push(redirect);
+      const roles = useAuthStore.getState().user?.roles ?? [];
+      router.push(resolveLanding({ roles, redirect: searchParams.get('redirect') }));
     } catch (e) {
       const msg = e instanceof Error ? e.message : copy.failed;
       const friendly =

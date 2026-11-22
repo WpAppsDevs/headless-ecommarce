@@ -1,34 +1,10 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { StaffLoginForm } from '@/components/staff/StaffLoginForm';
-import { getDictionary } from '@/i18n/get-dictionary';
-import { getLocale } from '@/i18n/server';
+import { redirect } from 'next/navigation';
 
-export async function generateMetadata() {
-  const copy = getDictionary(await getLocale()).staff.login;
-
-  return { title: copy.metadataTitle, description: copy.description };
-}
-
-export default async function StudioLoginPage() {
-  const copy = getDictionary(await getLocale()).staff.login;
-
-  return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12 font-geist">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">{copy.title}</CardTitle>
-          <CardDescription>{copy.description}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <StaffLoginForm />
-        </CardContent>
-      </Card>
-    </div>
-  );
+/**
+ * The staff sign-in page is gone: there is one login for everybody, and the
+ * role in the profile decides where the person lands. This path still exists
+ * so old bookmarks and links do not 404.
+ */
+export default function LegacyStudioLoginPage() {
+  redirect('/login?redirect=/studio');
 }

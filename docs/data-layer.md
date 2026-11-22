@@ -106,7 +106,7 @@ Raw API images may use `src` or `url`. Always run them through `normalizeImage()
 
 ### `staff-products.ts`
 
-- `getStaffAccess()` asks WordPress whether this token holds `edit_products`; the dashboard calls it on every mount and never stores a role in the browser.
+- `getStaffAccess()` asks WordPress whether this token may use the dashboard. The plugin decides by role (`ns_staff` or `administrator`), not by capability; the storefront also reads `roles` from the profile to route a sign-in, and asks WordPress again on every dashboard mount so a revoked role still closes the door. The client's copy is navigation, never authorization.
 - `getStaffOptions()` returns categories, tags (availability tags excluded), brands, the two availability term ids and the form limits.
 - Both go through `/api/staff/*` proxies, which forward the bearer token and return the upstream status. A 403 is a normal answer, not an error to retry.
 - `resolveApiUrl()` in `client.ts` strips a leading slash before joining `config.apiBase`. Without it, `apiClient('/api/staff/access')` produced `…/wp-json//api/staff/access`, which WordPress answers with `404 rest_no_route` while its JWT middleware still 401s the bare path — a mismatch that looked exactly like "the plugin is not deployed".
