@@ -1,11 +1,12 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { Label } from '@/components/ui/label';
 import { RichTextEditor } from '@/components/staff/RichTextEditor';
 import { STAFF_FIELD_CLASS, STAFF_SECTION_CLASS } from '@/components/staff/styles';
 import { useDictionary } from '@/i18n/LocaleProvider';
-import type { StaffProductFormValues } from '@/lib/staff-product-schema';
+import { skuFromName, type StaffProductFormValues } from '@/lib/staff-product-schema';
 
 interface ProductDetailsFieldsProps {
   form: UseFormReturn<StaffProductFormValues>;
@@ -17,9 +18,23 @@ export function ProductDetailsFields({ form }: ProductDetailsFieldsProps) {
   const { register, watch, setValue, formState } = form;
   const errors = formState.errors;
   const stockMode = watch('stockMode');
+  const name = watch('name');
   const description = watch('description');
   const regularPrice = watch('regularPrice');
   const sellPrice = watch('sellPrice');
+
+  // The SKU follows the product name until the staff member types their own:
+  // from then on it is theirs, and an existing SKU on the edit form is never
+  // overwritten.
+  const [skuEdited, setSkuEdited] = useState(false);
+
+  useEffect(() => {
+    if (skuEdited) return;
+
+    const suggestion = skuFromName(name);
+
+    if (suggestion !== '') setValue('sku', suggestion, { shouldDirty: true });
+  }, [name, skuEdited, setValue]);
 
   const showDiscount =
     Number(sellPrice) > 0 &&
@@ -58,7 +73,13 @@ export function ProductDetailsFields({ form }: ProductDetailsFieldsProps) {
 
         <div className="space-y-2">
           <Label htmlFor="product-sku">{copy.skuLabel}</Label>
-          <input id="product-sku" className={STAFF_FIELD_CLASS} {...register('sku')} />
+          <input
+            id="product-sku"
+            className={STAFF_FIELD_CLASS}
+            {...register('sku', {
+              onChange: () => setSkuEdited(true),
+            })}
+          />
           <p className="text-xs text-brand-text-muted">{copy.skuHint}</p>
         </div>
       </section>
@@ -68,7 +89,10 @@ export function ProductDetailsFields({ form }: ProductDetailsFieldsProps) {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="product-regular-price">{copy.regularPriceLabel}</Label>
+            <Label htmlFor="product-regular-price">
+              {copy.regularPriceLabel}{' '}
+              <span className="font-normal text-brand-text-muted">({copy.markRequired})</span>
+            </Label>
             <input
               id="product-regular-price"
               inputMode="decimal"
@@ -84,7 +108,10 @@ export function ProductDetailsFields({ form }: ProductDetailsFieldsProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="product-sell-price">{copy.sellPriceLabel}</Label>
+            <Label htmlFor="product-sell-price">
+              {copy.sellPriceLabel}{' '}
+              <span className="font-normal text-brand-text-muted">({copy.markOptional})</span>
+            </Label>
             <input
               id="product-sell-price"
               inputMode="decimal"

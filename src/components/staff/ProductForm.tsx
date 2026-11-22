@@ -39,7 +39,9 @@ function defaultsFrom(product?: StaffProduct): StaffProductFormValues {
     name: product?.name ?? '',
     description: product?.description ?? '',
     regularPrice: product?.regularPrice ?? '',
-    sellPrice: product?.salePrice || product?.regularPrice || '',
+    // Empty means "no discount" — never copy the regular price in, or saving
+    // would look like a sale that is exactly 0% off.
+    sellPrice: product?.salePrice ?? '',
     sku: product?.sku ?? '',
     stockMode: product?.manageStock === false ? 'status' : 'managed',
     stockQuantity: String(product?.stockQuantity ?? 0),
@@ -47,10 +49,6 @@ function defaultsFrom(product?: StaffProduct): StaffProductFormValues {
     stockStatus: product?.stockStatus === 'outofstock' ? 'outofstock' : 'instock',
     categoryIds: product?.categories.map((term) => term.id) ?? [],
     brandIds: product?.brands.map((term) => term.id) ?? [],
-    tagIds:
-      product?.tags
-        .filter((term) => term.slug !== 'ready-stock' && term.slug !== 'pre-order')
-        .map((term) => term.id) ?? [],
     availability: product?.availability === 'pre-order' ? 'pre-order' : 'ready-stock',
     imageId: product?.image?.id ?? 0,
     galleryIds: product?.gallery.map((image) => image.id) ?? [],

@@ -4,6 +4,7 @@ import type { StaffProductPayload } from '@/lib/api/staff-products';
 export interface StaffFormCopy {
   nameRequired: string;
   priceInvalid: string;
+  sellInvalid: string;
   sellAboveRegular: string;
   categoryRequired: string;
   imageRequired: string;
@@ -32,7 +33,6 @@ export function buildStaffProductSchema(copy: StaffFormCopy) {
       stockStatus: z.enum(['instock', 'outofstock']),
       categoryIds: z.array(z.number().int().positive()),
       brandIds: z.array(z.number().int().positive()).max(1),
-      tagIds: z.array(z.number().int().positive()),
       availability: z.enum(['ready-stock', 'pre-order']),
       imageId: z.number().int(),
       galleryIds: z.array(z.number().int().positive()),
@@ -48,8 +48,11 @@ export function buildStaffProductSchema(copy: StaffFormCopy) {
         ctx.addIssue({ code: 'custom', path: ['regularPrice'], message: copy.priceInvalid });
       }
 
-      if (sell === null || sell <= 0) {
-        ctx.addIssue({ code: 'custom', path: ['sellPrice'], message: copy.priceInvalid });
+      // The sell price is optional: an empty field means "no discount", and
+      // WooCommerce then holds no sale price. Anything typed must be a real
+      // price, because a zero one is stored as 0.00 and sells for nothing.
+      if (values.sellPrice.trim() !== '' && (sell === null || sell <= 0)) {
+        ctx.addIssue({ code: 'custom', path: ['sellPrice'], message: copy.sellInvalid });
       }
 
       if (regular !== null && sell !== null && sell > regular) {
@@ -80,6 +83,20 @@ export function buildStaffProductSchema(copy: StaffFormCopy) {
 
 export type StaffProductFormValues = z.infer<ReturnType<typeof buildStaffProductSchema>>;
 
+/**
+ * A SKU suggested from the product name: lowercase, words joined by dashes.
+ *
+ * The staff member can edit it afterwards, so this only has to be readable —
+ * the plugin still refuses a duplicate.
+ */
+export function skuFromName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+}
+
 /** Parse a price field. Empty or malformed is null, which the schema rejects. */
 export function parsePrice(value: string): number | null {
   const trimmed = value.trim();
@@ -103,7 +120,9 @@ export function toStaffProductPayload(values: StaffProductFormValues): StaffProd
     stock_status: values.stockStatus,
     category_ids: values.categoryIds,
     brand_ids: values.brandIds,
-    tag_ids: values.tagIds,
+    // The form has no tag picker: availability is its own choice, and the rest
+    // of the shop's tags are catalogue taxonomy, not a staff decision.
+    tag_ids: [],
     availability: values.availability,
     image_id: values.imageId,
     gallery_ids: values.galleryIds,
