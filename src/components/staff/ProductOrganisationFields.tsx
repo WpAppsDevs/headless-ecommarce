@@ -14,11 +14,12 @@ interface ProductOrganisationFieldsProps {
 }
 
 /**
- * Availability, categories, brand and tags.
+ * Availability, categories and brand.
  *
  * Availability is the first choice because the storefront behaves differently
  * for each: a Ready Stock product leaves the collection when it sells out, while
- * a Pre-Order stays buyable. Neither tag appears in the tag list.
+ * a Pre-Order stays buyable. It is a choice, not a tag the staff member picks
+ * from a list.
  */
 export function ProductOrganisationFields({ form, options }: ProductOrganisationFieldsProps) {
   const copy = useDictionary().staff.form;
@@ -26,7 +27,6 @@ export function ProductOrganisationFields({ form, options }: ProductOrganisation
   const errors = formState.errors;
   const availability = watch('availability');
   const categoryIds = watch('categoryIds');
-  const tagIds = watch('tagIds');
   const brandIds = watch('brandIds');
 
   const toggle = (list: number[], id: number): number[] =>
@@ -132,35 +132,6 @@ export function ProductOrganisationFields({ form, options }: ProductOrganisation
           </div>
         )}
 
-        {options.tags.length > 0 && (
-          <div className="space-y-2">
-            <Label>{copy.tagLabel}</Label>
-            <div className="flex flex-wrap gap-2">
-              {options.tags.map((term) => (
-                <label
-                  key={term.id}
-                  className={cn(
-                    'cursor-pointer rounded-full border px-3 py-1 text-sm',
-                    tagIds.includes(term.id)
-                      ? 'border-brand-accent-strong bg-brand-accent-light text-brand-accent-strong'
-                      : 'border-brand-border bg-white text-brand-text',
-                  )}
-                >
-                  <input
-                    type="checkbox"
-                    className="sr-only"
-                    checked={tagIds.includes(term.id)}
-                    onChange={() =>
-                      setValue('tagIds', toggle(tagIds, term.id), { shouldDirty: true })
-                    }
-                  />
-                  {term.name}
-                </label>
-              ))}
-            </div>
-            <p className="text-xs text-brand-text-muted">{copy.tagHint}</p>
-          </div>
-        )}
       </section>
     </>
   );

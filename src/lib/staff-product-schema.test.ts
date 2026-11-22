@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildStaffProductSchema,
   parsePrice,
+  skuFromName,
   toStaffProductPayload,
   type StaffProductFormValues,
 } from '@/lib/staff-product-schema';
@@ -9,6 +10,7 @@ import {
 const copy = {
   nameRequired: 'name',
   priceInvalid: 'price',
+  sellInvalid: 'sell',
   sellAboveRegular: 'sell',
   categoryRequired: 'category',
   imageRequired: 'image',
@@ -31,7 +33,6 @@ function values(overrides: Partial<StaffProductFormValues> = {}): StaffProductFo
     stockStatus: 'instock',
     categoryIds: [18],
     brandIds: [],
-    tagIds: [],
     availability: 'ready-stock',
     imageId: 101,
     galleryIds: [],
@@ -63,6 +64,21 @@ describe('staff product schema', () => {
     // This shipped once: 0 was read as "no discount" and the product went live
     // at ৳0.00 while its regular price still read 2500.
     expect(issuePaths(values({ sellPrice: '0' }))).toContain('sellPrice');
+  });
+
+  it('accepts an empty sell price as no discount', () => {
+    expect(schema.safeParse(values({ sellPrice: '' })).success).toBe(true);
+  });
+
+  it('sends no sale price when the sell price is empty', () => {
+    const payload = toStaffProductPayload(values({ sellPrice: '' }));
+
+    expect(payload.sell_price).toBe('');
+  });
+
+  it('always sends an empty tag list', () => {
+    // The form has no tag picker; availability is its own choice.
+    expect(toStaffProductPayload(values()).tag_ids).toEqual([]);
   });
 
   it('rejects a zero regular price', () => {
@@ -110,5 +126,14 @@ describe('staff product schema', () => {
     expect(parsePrice('1200.50')).toBe(1200.5);
     expect(parsePrice('1,200')).toBeNull();
     expect(parsePrice('')).toBeNull();
+  });
+
+  it('suggests a SKU from the name, lowercased and dashed', () => {
+    expect(skuFromName('Cotton Shirt')).toBe('cotton-shirt');
+    expect(skuFromName("  Men's  Panjabi — Blue  ")).toBe('men-s-panjabi-blue');
+  });
+
+  it('suggests nothing for a name with no latin characters', () => {
+    expect(skuFromName('পাঞ্জাবি')).toBe('');
   });
 });
