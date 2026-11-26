@@ -77,6 +77,9 @@ _Avoid_: Selling price, discounted price
 **Reseller price** — the B2B figure the wholesale channel quotes from (resellers, bulk buyers). Required on every product, greater than zero, and never above the regular price. It is product metadata, not a WooCommerce sale price, and the storefront never reads it: staff and administrators only.
 _Avoid_: Wholesale price, dealer price, resell rate
 
+**PKR price** — the same product priced in Pakistani rupees, for resellers who buy in that currency. Required, greater than zero, and not bounded by the taka regular price: a converted figure is not comparable to it. Like the reseller price it is product metadata the storefront never reads.
+_Avoid_: Rupee price, Pakistan price
+
 **Product brand** — the maker or label a product belongs to. A brand is always chosen from the existing list; staff never invent one per product.
 _Avoid_: Band
 

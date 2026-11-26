@@ -183,6 +183,8 @@ export interface StaffProduct {
   salePrice: string;
   /** Reseller (B2B) price. Staff only: never on the storefront API. */
   resellPrice: string;
+  /** The same product priced in Pakistani rupees. Staff only. */
+  pkrPrice: string;
   price: string;
   stockStatus: string;
   stockQuantity: number | null;
@@ -214,6 +216,8 @@ export interface StaffProductPayload {
   sell_price: string;
   /** Reseller (B2B) price — required, and never above the regular price. */
   resell_price: string;
+  /** PKR price — required, greater than zero, no ceiling. */
+  pkr_price: string;
   sku: string;
   stock_mode: 'managed' | 'status';
   stock_quantity: number;
@@ -257,6 +261,7 @@ function normalizeStaffProduct(raw: unknown): StaffProduct {
     regularPrice: asString(product.regular_price),
     salePrice: asString(product.sale_price),
     resellPrice: asString(product.resell_price),
+    pkrPrice: asString(product.pkr_price),
     price: asString(product.price),
     stockStatus: asString(product.stock_status, 'instock'),
     stockQuantity: asNullableNumber(product.stock_quantity),

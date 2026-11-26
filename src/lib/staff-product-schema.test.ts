@@ -14,6 +14,7 @@ const copy = {
   sellAboveRegular: 'sell',
   resellInvalid: 'resell',
   resellAboveRegular: 'resell',
+  pkrInvalid: 'pkr',
   categoryRequired: 'category',
   imageRequired: 'image',
   galleryLimit: 'gallery',
@@ -29,6 +30,7 @@ function values(overrides: Partial<StaffProductFormValues> = {}): StaffProductFo
     regularPrice: '1200',
     sellPrice: '1000',
     resellPrice: '900',
+    pkrPrice: '3100',
     sku: '',
     stockMode: 'managed',
     stockQuantity: '4',
@@ -119,6 +121,20 @@ describe('staff product schema', () => {
 
   it('sends the reseller price in the payload', () => {
     expect(toStaffProductPayload(values({ resellPrice: ' 900 ' })).resell_price).toBe('900');
+  });
+
+  it('requires a PKR price', () => {
+    expect(issuePaths(values({ pkrPrice: '' }))).toContain('pkrPrice');
+    expect(issuePaths(values({ pkrPrice: '0' }))).toContain('pkrPrice');
+  });
+
+  it('lets the PKR price exceed the taka price', () => {
+    // A converted rupee figure is not comparable to the taka amount.
+    expect(schema.safeParse(values({ pkrPrice: '9000' })).success).toBe(true);
+  });
+
+  it('sends the PKR price in the payload', () => {
+    expect(toStaffProductPayload(values({ pkrPrice: ' 3100 ' })).pkr_price).toBe('3100');
   });
 
   it('rejects a negative quantity in managed mode', () => {
