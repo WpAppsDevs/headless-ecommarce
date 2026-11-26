@@ -8,6 +8,7 @@ export interface StaffFormCopy {
   sellAboveRegular: string;
   resellInvalid: string;
   resellAboveRegular: string;
+  pkrInvalid: string;
   categoryRequired: string;
   imageRequired: string;
   galleryLimit: string;
@@ -29,6 +30,7 @@ export function buildStaffProductSchema(copy: StaffFormCopy) {
       regularPrice: z.string(),
       sellPrice: z.string(),
       resellPrice: z.string(),
+      pkrPrice: z.string(),
       sku: z.string(),
       stockMode: z.enum(['managed', 'status']),
       stockQuantity: z.string(),
@@ -73,6 +75,14 @@ export function buildStaffProductSchema(copy: StaffFormCopy) {
 
       if (regular !== null && resell !== null && resell > regular) {
         ctx.addIssue({ code: 'custom', path: ['resellPrice'], message: copy.resellAboveRegular });
+      }
+
+      // The PKR figure is a conversion, not a taka amount, so it is required
+      // but not bounded by the regular price.
+      const pkr = parsePrice(values.pkrPrice);
+
+      if (pkr === null || pkr <= 0) {
+        ctx.addIssue({ code: 'custom', path: ['pkrPrice'], message: copy.pkrInvalid });
       }
 
       if (values.categoryIds.length < 1) {
@@ -130,6 +140,7 @@ export function toStaffProductPayload(values: StaffProductFormValues): StaffProd
     regular_price: values.regularPrice.trim(),
     sell_price: values.sellPrice.trim(),
     resell_price: values.resellPrice.trim(),
+    pkr_price: values.pkrPrice.trim(),
     sku: values.sku.trim(),
     stock_mode: values.stockMode,
     stock_quantity: values.stockMode === 'managed' ? Number(values.stockQuantity) : 0,

@@ -879,6 +879,8 @@ export const bn: Dictionary = {
       resellPriceLabel: 'রিসেল প্রাইস',
       resellHint:
         'হোলসেল চ্যানেল এই দাম থেকে কোট দেয়। শুধু স্টাফ দেখে, সাইটে কোথাও আসে না।',
+      pkrPriceLabel: 'PKR প্রাইস',
+      pkrHint: 'একই পণ্যের পাকিস্তানি রুপিতে দাম — যাঁরা PKR-এ কেনেন তাঁদের জন্য।',
       discountHint: 'বিক্রয় মূল্য কম, তাই ছাড় হিসেবে দেখাবে।',
       noDiscountHint: 'ছাড় না থাকলে Sell price খালি রাখুন।',
       stock: 'স্টক',
@@ -929,6 +931,7 @@ export const bn: Dictionary = {
         priceInvalid: 'শূন্যের বেশি দাম লিখুন, সংখ্যা ও ডট দিয়ে।',
         resellInvalid: 'রিসেল প্রাইস শূন্যের বেশি হতে হবে।',
         resellAboveRegular: 'রিসেল প্রাইস নিয়মিত দামের বেশি হতে পারবে না।',
+        pkrInvalid: 'PKR প্রাইস শূন্যের বেশি হতে হবে।',
         sellInvalid: 'শূন্যের বেশি দাম লিখুন, অথবা ঘরটি খালি রাখুন।',
         sellAboveRegular: 'বিক্রয় মূল্য নিয়মিত দামের চেয়ে বেশি হতে পারে না।',
         categoryRequired: 'কমপক্ষে একটা ক্যাটাগরি বাছুন।',

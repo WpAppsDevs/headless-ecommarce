@@ -879,6 +879,8 @@ export const en = {
       resellPriceLabel: 'Reseller price',
       resellHint:
         'What the wholesale channel quotes from. Shown to staff only, never on the storefront.',
+      pkrPriceLabel: 'PKR price',
+      pkrHint: 'The same product priced in Pakistani rupees, for resellers buying in PKR.',
       discountHint: 'The sell price is lower, so it will show as a discount.',
       noDiscountHint: 'Leave the sell price empty when there is no discount.',
       stock: 'Stock',
@@ -929,6 +931,7 @@ export const en = {
         priceInvalid: 'Enter a price greater than zero, using digits and a dot.',
         resellInvalid: 'Enter a reseller price greater than zero.',
         resellAboveRegular: 'The reseller price cannot be higher than the regular price.',
+        pkrInvalid: 'Enter a PKR price greater than zero.',
         sellInvalid: 'Enter a price greater than zero, or leave the field empty.',
         sellAboveRegular: 'The sell price cannot be higher than the regular price.',
         categoryRequired: 'Choose at least one category.',

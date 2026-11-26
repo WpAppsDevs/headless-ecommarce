@@ -150,6 +150,26 @@ export function ProductDetailsFields({ form }: ProductDetailsFieldsProps) {
           )}
           <p className="text-xs text-brand-text-muted">{copy.resellHint}</p>
         </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="product-pkr-price">
+            {copy.pkrPriceLabel}{' '}
+            <span className="font-normal text-brand-text-muted">({copy.markRequired})</span>
+          </Label>
+          <input
+            id="product-pkr-price"
+            inputMode="decimal"
+            className={STAFF_FIELD_CLASS}
+            aria-invalid={Boolean(errors.pkrPrice)}
+            {...register('pkrPrice')}
+          />
+          {errors.pkrPrice && (
+            <p role="alert" className="text-sm text-destructive">
+              {errors.pkrPrice.message}
+            </p>
+          )}
+          <p className="text-xs text-brand-text-muted">{copy.pkrHint}</p>
+        </div>
       </section>
 
       <section className={STAFF_SECTION_CLASS}>

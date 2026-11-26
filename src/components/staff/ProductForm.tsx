@@ -43,6 +43,7 @@ function defaultsFrom(product?: StaffProduct): StaffProductFormValues {
     // would look like a sale that is exactly 0% off.
     sellPrice: product?.salePrice ?? '',
     resellPrice: product?.resellPrice ?? '',
+    pkrPrice: product?.pkrPrice ?? '',
     sku: product?.sku ?? '',
     stockMode: product?.manageStock === false ? 'status' : 'managed',
     stockQuantity: String(product?.stockQuantity ?? 0),
