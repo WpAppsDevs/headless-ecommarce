@@ -42,6 +42,7 @@ function defaultsFrom(product?: StaffProduct): StaffProductFormValues {
     // Empty means "no discount" — never copy the regular price in, or saving
     // would look like a sale that is exactly 0% off.
     sellPrice: product?.salePrice ?? '',
+    resellPrice: product?.resellPrice ?? '',
     sku: product?.sku ?? '',
     stockMode: product?.manageStock === false ? 'status' : 'managed',
     stockQuantity: String(product?.stockQuantity ?? 0),
