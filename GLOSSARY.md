@@ -74,6 +74,9 @@ _Avoid_: Catalog
 **Sell price** — the price a customer actually pays. It equals the regular price when there is no discount.
 _Avoid_: Selling price, discounted price
 
+**Reseller price** — the B2B figure the wholesale channel quotes from (resellers, bulk buyers). Required on every product, greater than zero, and never above the regular price. It is product metadata, not a WooCommerce sale price, and the storefront never reads it: staff and administrators only.
+_Avoid_: Wholesale price, dealer price, resell rate
+
 **Product brand** — the maker or label a product belongs to. A brand is always chosen from the existing list; staff never invent one per product.
 _Avoid_: Band
 

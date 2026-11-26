@@ -181,6 +181,8 @@ export interface StaffProduct {
   sku: string;
   regularPrice: string;
   salePrice: string;
+  /** Reseller (B2B) price. Staff only: never on the storefront API. */
+  resellPrice: string;
   price: string;
   stockStatus: string;
   stockQuantity: number | null;
@@ -210,6 +212,8 @@ export interface StaffProductPayload {
   description: string;
   regular_price: string;
   sell_price: string;
+  /** Reseller (B2B) price — required, and never above the regular price. */
+  resell_price: string;
   sku: string;
   stock_mode: 'managed' | 'status';
   stock_quantity: number;
@@ -252,6 +256,7 @@ function normalizeStaffProduct(raw: unknown): StaffProduct {
     sku: asString(product.sku),
     regularPrice: asString(product.regular_price),
     salePrice: asString(product.sale_price),
+    resellPrice: asString(product.resell_price),
     price: asString(product.price),
     stockStatus: asString(product.stock_status, 'instock'),
     stockQuantity: asNullableNumber(product.stock_quantity),

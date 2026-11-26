@@ -6,6 +6,8 @@ export interface StaffFormCopy {
   priceInvalid: string;
   sellInvalid: string;
   sellAboveRegular: string;
+  resellInvalid: string;
+  resellAboveRegular: string;
   categoryRequired: string;
   imageRequired: string;
   galleryLimit: string;
@@ -26,6 +28,7 @@ export function buildStaffProductSchema(copy: StaffFormCopy) {
       description: z.string(),
       regularPrice: z.string(),
       sellPrice: z.string(),
+      resellPrice: z.string(),
       sku: z.string(),
       stockMode: z.enum(['managed', 'status']),
       stockQuantity: z.string(),
@@ -57,6 +60,19 @@ export function buildStaffProductSchema(copy: StaffFormCopy) {
 
       if (regular !== null && sell !== null && sell > regular) {
         ctx.addIssue({ code: 'custom', path: ['sellPrice'], message: copy.sellAboveRegular });
+      }
+
+      // The reseller price is what the wholesale channel quotes from, so it is
+      // required. Below the regular price it is a real B2B rate; above it the
+      // shop would charge a reseller more than a customer.
+      const resell = parsePrice(values.resellPrice);
+
+      if (resell === null || resell <= 0) {
+        ctx.addIssue({ code: 'custom', path: ['resellPrice'], message: copy.resellInvalid });
+      }
+
+      if (regular !== null && resell !== null && resell > regular) {
+        ctx.addIssue({ code: 'custom', path: ['resellPrice'], message: copy.resellAboveRegular });
       }
 
       if (values.categoryIds.length < 1) {
@@ -113,6 +129,7 @@ export function toStaffProductPayload(values: StaffProductFormValues): StaffProd
     description: values.description,
     regular_price: values.regularPrice.trim(),
     sell_price: values.sellPrice.trim(),
+    resell_price: values.resellPrice.trim(),
     sku: values.sku.trim(),
     stock_mode: values.stockMode,
     stock_quantity: values.stockMode === 'managed' ? Number(values.stockQuantity) : 0,

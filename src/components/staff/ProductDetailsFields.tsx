@@ -130,6 +130,26 @@ export function ProductDetailsFields({ form }: ProductDetailsFieldsProps) {
         <p className="text-xs text-brand-text-muted">
           {showDiscount ? copy.discountHint : copy.noDiscountHint}
         </p>
+
+        <div className="space-y-2">
+          <Label htmlFor="product-resell-price">
+            {copy.resellPriceLabel}{' '}
+            <span className="font-normal text-brand-text-muted">({copy.markRequired})</span>
+          </Label>
+          <input
+            id="product-resell-price"
+            inputMode="decimal"
+            className={STAFF_FIELD_CLASS}
+            aria-invalid={Boolean(errors.resellPrice)}
+            {...register('resellPrice')}
+          />
+          {errors.resellPrice && (
+            <p role="alert" className="text-sm text-destructive">
+              {errors.resellPrice.message}
+            </p>
+          )}
+          <p className="text-xs text-brand-text-muted">{copy.resellHint}</p>
+        </div>
       </section>
 
       <section className={STAFF_SECTION_CLASS}>

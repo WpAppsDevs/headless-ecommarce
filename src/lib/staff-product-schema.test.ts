@@ -12,6 +12,8 @@ const copy = {
   priceInvalid: 'price',
   sellInvalid: 'sell',
   sellAboveRegular: 'sell',
+  resellInvalid: 'resell',
+  resellAboveRegular: 'resell',
   categoryRequired: 'category',
   imageRequired: 'image',
   galleryLimit: 'gallery',
@@ -26,6 +28,7 @@ function values(overrides: Partial<StaffProductFormValues> = {}): StaffProductFo
     description: '',
     regularPrice: '1200',
     sellPrice: '1000',
+    resellPrice: '900',
     sku: '',
     stockMode: 'managed',
     stockQuantity: '4',
@@ -99,6 +102,23 @@ describe('staff product schema', () => {
 
   it('caps the gallery at six images', () => {
     expect(issuePaths(values({ galleryIds: [1, 2, 3, 4, 5, 6, 7] }))).toContain('galleryIds');
+  });
+
+  it('requires a reseller price', () => {
+    expect(issuePaths(values({ resellPrice: '' }))).toContain('resellPrice');
+    expect(issuePaths(values({ resellPrice: '0' }))).toContain('resellPrice');
+  });
+
+  it('refuses a reseller price above the regular price', () => {
+    expect(issuePaths(values({ resellPrice: '1300' }))).toContain('resellPrice');
+  });
+
+  it('accepts a reseller price equal to the regular price', () => {
+    expect(schema.safeParse(values({ resellPrice: '1200' })).success).toBe(true);
+  });
+
+  it('sends the reseller price in the payload', () => {
+    expect(toStaffProductPayload(values({ resellPrice: ' 900 ' })).resell_price).toBe('900');
   });
 
   it('rejects a negative quantity in managed mode', () => {
