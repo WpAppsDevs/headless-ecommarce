@@ -14,11 +14,11 @@ Single-context: one `GLOSSARY.md` plus `docs/adr/` at the repo root. See `docs/a
 
 ### Codebase docs
 
-Read `docs/coding-standards.md` before changing code, `docs/design-system.md` before changing colour, type, spacing or any UI surface, and `docs/architecture.md` before changing data flow, auth, or routing. Read `docs/operations.md` before opening a pull request or changing CI. Read `docs/localization.md` before changing copy, translation, fonts, or anything language-dependent. The maintained documentation index is `docs/README.md`. The code is the source of truth; update the docs in the same change when behavior moves.
+Read `docs/coding-standards.md` before changing code, `docs/design-system.md` before changing colour, type, spacing or any UI surface, and `docs/architecture.md` before changing data flow, auth, or routing. Read `docs/operations.md` before opening a pull request, changing CI, or diagnosing a production 404/401 — its cache section explains why a working endpoint can look broken. Read `docs/localization.md` before changing copy, translation, fonts, or anything language-dependent. The maintained documentation index is `docs/README.md`. The code is the source of truth; update the docs in the same change when behavior moves.
 
 ### Working style
 
-Run long commands (`npm run build`, `npm run verify:full`) in the background and continue with other work; the harness reports completion, so read the final output once. `npm run verify:fast` (typecheck, lint, unit tests) is the iteration gate; the pre-commit hook runs it when `git config core.hooksPath .githooks` has been set once.
+Run long commands (`npm run build`, `npm run verify:full`) in the background and continue with other work; the harness reports completion, so read the final output once. `npm run verify:fast` (typecheck, lint, unit tests) is the iteration gate; the pre-commit hook runs it when `git config core.hooksPath .githooks` has been set once. `check:routes` boots its own server, so run `npm run build && npm run check:routes` as one command: the build is the expensive half and runs once.
 
 The Studio WordPress checkout at `/Users/saifulislam/Studio/development/wp-content/plugins/wpappsdev-headless-wrapper-api` intermittently disappears for a few seconds (the Studio mount re-syncs). A command that fails with "no such file or directory" for that path should be retried once with the absolute path before treating it as missing.
 
