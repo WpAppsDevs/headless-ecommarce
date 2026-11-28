@@ -98,6 +98,7 @@ Closing this needs either WPML/Polylang, or a `translations` field plus endpoint
 - **No brand or tag creation.** Both are chosen from what exists. Brands are hidden entirely while the `product_brand` taxonomy is empty.
 - **Alt text is optional.** Images upload and save without it; the image endpoint can correct it later.
 - **No stock/order sections yet.** The shell and guard are ready for them.
+- **The B2B prices are not a storefront feature.** The reseller and PKR prices ride on product metadata and are shown read-only in wp-admin; no shop page, catalog export or API route reads them yet.
 
 - Where: `src/app/(staff)/`, `src/components/staff/`, `includes/Staff/` in the plugin.
 - Impact: low — each is a decision, not a defect.

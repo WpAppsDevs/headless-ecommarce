@@ -31,6 +31,8 @@ const COPY = {
   name: 'Product name',
   regular: 'Regular price',
   sell: 'Sell price',
+  resell: 'Reseller price',
+  pkr: 'PKR price',
   drafts: 'Drafts',
   save: 'Save product',
   trash: 'Trash',
@@ -78,6 +80,9 @@ test.describe.serial('staff dashboard', () => {
     await page.getByLabel(COPY.name).fill(name);
     await page.getByLabel(COPY.regular).fill('1500');
     await page.getByLabel(COPY.sell).fill('1200');
+    // Both B2B prices are required, and the label carries its "(required)" mark.
+    await page.getByLabel(COPY.resell).fill('900');
+    await page.getByLabel(COPY.pkr).fill('3100');
 
     // The first category is enough; the plugin requires at least one.
     await page.locator('label:has(input[type="checkbox"])').first().click();
