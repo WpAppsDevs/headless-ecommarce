@@ -60,6 +60,7 @@ Server Components in this codebase do not read auth cookies. Authenticated scree
 - An authenticated browser call goes to this site's own `/api/*` route, never to WordPress cross-origin: the bearer token stays same-origin and no CORS preflight is involved. A path passed to `apiClient` never starts with `/`; `resolveApiUrl` strips one, because `…/wp-json//api/…` is a `404 rest_no_route` while the same path without the extra slash 401s — a mismatch that reads like a missing plugin.
 - Normalize at the boundary. The API may return `{}` for empty arrays or `url` instead of `src`; handle it once in the API module.
 - Set a revalidation policy deliberately. If the data should be fresh, use `cache: 'no-store'`; if it is catalog data, use ISR.
+- Update the spec when behaviour changes. `.scratch/<feature>/spec.md` records decisions as numbered rows; `.scratch/` is gitignored, so no check and no diff will catch a stale row. When a later change contradicts a decision, edit that row in the same session and mark it *changed*, rather than leaving the old rule to be read as current.
 - Catch and degrade on server pages. Empty products, empty filters, and missing menus are recoverable; a thrown error is not.
 - Pass data down from the page, or lift the fetch, so one page does not fetch the same data twice.
 
