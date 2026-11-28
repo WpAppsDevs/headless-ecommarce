@@ -71,6 +71,8 @@ function decodeEntities(text) {
 }
 
 async function waitForServer(deadline) {
+  let lastError = null;
+
   while (Date.now() < deadline) {
     for (const candidate of BASES) {
       try {
@@ -82,14 +84,19 @@ async function waitForServer(deadline) {
           BASE = candidate;
           return;
         }
-      } catch {
-        // not listening yet
+      } catch (error) {
+        // not listening yet — keep the reason for the final message
+        lastError = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
       }
     }
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
 
-  throw new Error(`server did not answer on ${BASES.join(' or ')} within 30s`);
+  // Name the last real error. "did not answer within 30s" next to a server log
+  // saying "Ready in 133ms" is the most misleading line this script can print.
+  throw new Error(
+    `server did not answer on ${BASES.join(' or ')} within 30s${lastError ? ` (last attempt: ${lastError})` : ''}`,
+  );
 }
 
 /**
@@ -152,7 +159,11 @@ async function check() {
   return failures;
 }
 
-const server = spawn('npx', ['next', 'start', '--port', String(PORT)], {
+// Bind to 127.0.0.1 explicitly. Without `--hostname`, Next binds whatever the
+// runner resolves for "localhost", and a CI runner that resolves it to ::1 left
+// the probe looping on 127.0.0.1 while the server had long printed "Ready" —
+// which read as "the app never started".
+const server = spawn('npx', ['next', 'start', '--port', String(PORT), '--hostname', '127.0.0.1'], {
   stdio: ['ignore', 'pipe', 'pipe'],
   env: { ...process.env, PORT: String(PORT) },
 });
